@@ -1,25 +1,4 @@
-# Object Security of CoAP (OSCOAP)
-
-This is the working area for the Working Group internet-draft, "Object Security of CoAP (OSCOAP)".
-
-* [Editor's copy](https://core-wg.github.io/oscoap/)
-* [Working Group Draft] (https://tools.ietf.org/html/draft-ietf-core-object-security)
-* [Compare Working Group Draft and Editor's copy] (https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-ietf-core-object-security.txt?url2=https://core-wg.github.io/{GITHUB_REPRO}/draft-ietf-core-object-security.txt)
-
-
-## Building the Draft
-
-Formatted text and HTML versions of the draft can be built using `make`.
-
-```sh
-$ make
-```
-
-This requires that you have the necessary software installed.  See [the
-instructions](https://github.com/martinthomson/i-d-template/blob/master/doc/SETUP.md).
-
-
-## Contributing
+# Contributing
 
 Before submitting feedback, please familiarize yourself with our current issues
 list and review the [working group
