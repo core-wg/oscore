@@ -215,14 +215,14 @@ The 3-tuple (Cid, Sender ID, Partial IV) is called Transaction Identifier (Tid),
 
 This section describes how to derive the initial parameters in the security context, given a small set of input parameters. We also give indications on how applications should select the input parameters.
 
-The following input parameters SHALL be established in a previous phase:
+The following input parameters SHALL be pre-established:
 
 * Context Identifier (Cid)
 * Base Key (base_key)
 * AEAD Algorithm (Alg)
    - Default is AES-CCM-64-64-128 (value 12)
 
-The following input parameters MAY be established in a previous phase:
+The following input parameters MAY be pre-established:
 
 * Sender ID
    - Defaults are 0x00 for the endpoint intially being client, and 0x01 for the endpoint initially being server
@@ -283,7 +283,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-
 
 ### Context Identifier ### {#cid-est}
 
-As mentioned, Cid is established in a previous phase. How this is done is application specific, but it is RECOMMENDED that the application uses 64-bits long pseudo-random Cids, in order to have globally unique Context Identifiers. Cid SHOULD be unique in the sets of all security contexts used by all the endpoints. If it is not the case, it is the role of the application to specify how to handle collisions.
+As mentioned, Cid is pre-established. How this is done is application specific, but it is RECOMMENDED that the application uses 64-bits long pseudo-random Cids, in order to have globally unique Context Identifiers. Cid SHOULD be unique in the sets of all security contexts used by all the endpoints. If it is not the case, it is the role of the application to specify how to handle collisions.
 
 If the application has total control of both clients and servers, shorter unique Cids MAY be used. Note that Cids of different lengths can be used by different clients and that e.g. a Cid with the value 0x00 is different from the Cid with the value 0x0000.
 
