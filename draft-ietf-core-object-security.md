@@ -436,7 +436,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
    * ver: uint, contains the CoAP version number of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}
 
-   * code: bstr, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
+   * code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
 
    * alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}});
 
@@ -456,7 +456,7 @@ external_aad = external_aad_req / external_aad_resp
 
 external_aad_req = [
    ver : uint,
-   code : bstr,
+   code : uint,
    alg : int,
    unencrypted-uri : tstr,
    ? mac-previous-block : bstr
@@ -464,7 +464,7 @@ external_aad_req = [
 
 external_aad_resp = [
    ver : uint,
-   code : bstr,
+   code : uint,
    alg : int,
    cid : bstr,
    id : bstr,
