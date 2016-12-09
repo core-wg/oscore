@@ -234,8 +234,7 @@ The following input parameters MAY be established in a previous phase:
    - Default is 64
 
 
-The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. The former server will then make the request using the Sender Context, the former client will verify the request using its Recipient Context etc. The endpoints MUST NOT change the Sender/Recipient ID.
-
+The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. When this happens, the former server still protects the message to send using the Sender Context, and verifies the message received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
 
 The input parameters are included unchanged in the security context. From the input parameters, the following parameters are derived:
 
