@@ -492,7 +492,7 @@ A receiving endpoint SHALL verify that the Sequence Number (Partial IV) received
 
 The receiving endpoint SHALL reject messages with a sequence number greater than the allowed maximum value. For AES-CCM-64-64-128 the maximum value is 2^56-1.
 
-OSCOAP is a challenge-response protocol, where the response is verified to match a prior request, by including the unique transaction identifier (Tid as defined in {{sec-context-section}}) of the request in the Additional Authenticated Data of the response message.
+OSCOAP responses are verified to match a prior request, by including the unique transaction identifier (Tid as defined in {{sec-context-section}}) of the request in the Additional Authenticated Data of the response message. In case of CoAP observe, each notification MUST be verified using the Tid of the observe registration, so the Tid of the registration needs to be cached by the observer until the observation ends.
 
 If a CoAP server receives a request with the Object-Security option, then the server SHALL include the Tid of the request in the AAD of the response, as described in {{protected-coap-formatting-resp}}.
 
