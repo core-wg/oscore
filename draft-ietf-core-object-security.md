@@ -301,11 +301,11 @@ The Sender Sequence Number is initialized to 0. The Recipient Replay Window is i
 
 # Protected CoAP Message Fields # {#coap-headers-and-options} 
 
-This section defines how the CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}.
+This section defines how the CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Note that OSCOAP complies with CoAP over unreliable transport {{rfc7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
 The CoAP Payload SHALL be encrypted and integrity protected.
 
-The CoAP Header fields Version and Code SHALL be integrity protected but not encrypted. The CoAP Message Layer parameters, Type and Message ID, as well as Token and Token Length SHALL neither be integrity protected nor encrypted.
+The CoAP version number and the header field Code SHALL be integrity protected but not encrypted. Other CoAP Header fields SHALL neither be integrity protected nor encrypted.
 
 Protection of CoAP Options can be summarized as follows:
 
@@ -434,7 +434,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
 * the "external\_aad" is a serialized CBOR array {{aad}} where the exact content is different in requests (external_aad_req) and repsonses (external_aad_resp). It contains:
 
-   * ver: uint, contains the CoAP version number of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}
+   * ver: uint, contains the CoAP version number, as defined in Section 3 of {{RFC7252}}
 
    * code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
 
