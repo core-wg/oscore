@@ -617,7 +617,7 @@ Note to RFC Editor: Please replace all occurrences of "\[\[this document\]\]" wi
 
 
 
-## CoAP Option Number Registration ## 
+## CoAP Option Numbers Registry ## 
 
 The Object-Security option is added to the CoAP Option Numbers registry:
 
@@ -627,6 +627,19 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 +--------+-----------------+-------------------+
 |  TBD   | Object-Security | [[this document]] |
 +--------+-----------------+-------------------+
+~~~~~~~~~~~
+{: artwork-align="center"}
+
+## COSE Header Parameters Registry ##
+
+The "sid" parameter is added to the COSE Header Parameter Registry:
+
+~~~~~~~~~~~
++------+-------+------------+----------------+-------------------+
+| name | label | value type | value registry | description       |
++------+-------+------------+----------------+-------------------+
+|  sid |  TBD  |    bstr    |                | Sender Identifier |
++------+-------+------------+----------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
