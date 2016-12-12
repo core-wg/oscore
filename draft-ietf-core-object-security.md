@@ -301,7 +301,7 @@ The Sender Sequence Number is initialized to 0. The Recipient Replay Window is i
 
 # Protected CoAP Message Fields # {#coap-headers-and-options} 
 
-This section defines how the CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Note that OSCOAP complies with CoAP over unreliable transport {{rfc7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
+This section defines how the CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Note that OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
 The CoAP Payload SHALL be encrypted and integrity protected.
 
