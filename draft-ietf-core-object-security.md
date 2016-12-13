@@ -358,7 +358,7 @@ However, some options that are encrypted need to be readable in the protected Co
 
 * The Observe option is duplicate. If Observe is used, then the encrypted Observe and the unencrypted Observe SHALL have the same value. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
-* The block options Block1 and Block2 are duplicate. The encrypted block options are used for end-to-end secure fragmentation of payload into blocks and protected information about the fragmentation (block number, last block, etc.). The MAC from each block is included in the calculation of the MAC for the next block's (see {{AAD}}). In this way, each block in ordered sequence from the first block can be verified as it arrives. The unencrypted block option allows for arbitrary proxy fragmentation operations, which cannot be verified by the endpoints. An intermediary node can generate an arbitrarily long sequence of blocks. However, since it is possible to protect fragmentation of large messages, there SHALL be a security policy defining a maximum unfragmented message size such that messages exceeding this size SHALL be fragmented by the sending endpoint. Hence an endpoint receiving fragments of a message that exceeds maximum message size SHALL discard this message.
+* The block options Block1 and Block2 are duplicate. The encrypted block options are used for end-to-end secure fragmentation of payload into blocks and protected information about the fragmentation (block number, last block, etc.). The AEAD Tag from each block is included in the calculation of the Tag for the next block's (see {{AAD}}). In this way, each block in ordered sequence from the first block can be verified as it arrives. The unencrypted block option allows for arbitrary proxy fragmentation operations, which cannot be verified by the endpoints. An intermediary node can generate an arbitrarily long sequence of blocks. However, since it is possible to protect fragmentation of large messages, there SHALL be a security policy defining a maximum unfragmented message size such that messages exceeding this size SHALL be fragmented by the sending endpoint. Hence an endpoint receiving fragments of a message that exceeds maximum message size SHALL discard this message.
 
 * The size options Size1 and Size2 are duplicate, analogously to the block options.
 
@@ -448,7 +448,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
    * seq : bstr, is the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
-    * mac-previous-block: bstr, contains the MAC of the message containing the previous block in the sequence, as enumerated by Block1 in the case of a request and Block2 in the case of a response, if the message is fragmented using a block option {{RFC7959}}.
+    * tag-previous-block: bstr, contains the AEAD Tag of the message containing the previous block in the sequence, as enumerated by Block1 in the case of a request and Block2 in the case of a response, if the message is fragmented using a block option {{RFC7959}}.
 
 
 ~~~~~~~~~~~
@@ -459,7 +459,7 @@ external_aad_req = [
    code : uint,
    alg : int,
    unencrypted-uri : tstr,
-   ? mac-previous-block : bstr
+   ? tag-previous-block : bstr
 ]
 
 external_aad_resp = [
@@ -469,7 +469,7 @@ external_aad_resp = [
    cid : bstr,
    id : bstr,
    seq : bstr,
-   ? mac-previous-block : bstr
+   ? tag-previous-block : bstr
 ]
 ~~~~~~~~~~~
 {: #aad title="External AAD (external_aad)" }
@@ -501,7 +501,7 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 1. Compute the COSE object as specified in {{sec-obj-cose}}
 
     * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number (partial IV).
-    * If the block option is used, the AAD includes the MAC from the previous fragment sent (from the second fragment and following) {{AAD}}. This means that the endpoint MUST store the MAC of each last-sent fragment to compute the following.
+    * If the block option is used, the AAD includes the AEAD Tag from the previous block sent (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-sent block to compute the following.
     * Note that the 'sid' field containing the Sender ID is included in the COSE object ({{sec-obj-cose}}) if the application needs it.
 
 2. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload, based on the unprotected CoAP message:
@@ -526,7 +526,7 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 1. Verify the Sequence Number in the Partial IV parameter, as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
 
 2. Recreate the Additional Authenticated Data, as described in {{sec-obj-cose}}.
-    * If the block option is used, the AAD includes the MAC from the previous fragment received (from the second fragment and following) {{AAD}}. This means that the endpoint MUST store the MAC of each last-received fragment to compute the following.
+    * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object.
 
@@ -546,7 +546,7 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 2. Compute the COSE object as specified in Section {{sec-obj-cose}}
   * The AEAD nonce is created by XORing the Sender IV (context IV) and the padded Sender Sequence Number.
-  * If the block option is used, the AAD includes the MAC from the previous fragment sent (from the second fragment and following) {{AAD}}. This means that the endpoint MUST store the MAC of each last-sent fragment to compute the following.
+  * If the block option {{RFC7959}} is used, the AAD includes the AEAD Tag from the previous block sent (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-sent block to compute the following. Note that this applies even for random access of blocks, i.e. when blocks are not requested in the order of their relative number (NUM). 
   
 3. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload based on the unprotected CoAP message:
   * The CoAP header is the same as the unprotected CoAP message.
@@ -565,7 +565,7 @@ A CoAP client receiving a message containing the Object-Security option SHALL pe
 1. Verify the Sequence Number in the Partial IV parameter as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the client MUST stop processing the response.
 
 2. Recreate the Additional Authenticated Data as described in {{sec-obj-cose}}.
-  * If the block option is used, the AAD includes the MAC from the previous fragment received (from the second fragment and following) {{AAD}}. This means that the endpoint MUST store the MAC of each last-received fragment to compute the following.
+  * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the Partial IV parameter, received in the COSE Object.
 
@@ -593,7 +593,7 @@ The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broa
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The encrypted block options enable the sender to split large messages into protected fragments such that the receiving node can verify blocks before having received the complete message. In order to protect from attacks replacing fragments from a different message with the same block number between same endpoints and same resource at roughly the same time, the MAC from the message containing one block is included in the external_aad of the message containing the next block. 
+The encrypted block options enable the sender to split large messages into protected blocks such that the receiving node can verify blocks before having received the complete message. In order to protect from attacks replacing blocks from a different message with the same block number between same endpoints and same resource at roughly the same time, the AEAD Tag from the message containing one block is included in the external_aad of the message containing the next block. 
 
 The unencrypted block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
@@ -1057,7 +1057,7 @@ This COSE object encodes to a total size of 83 bytes.
 
 ## Authenticated Encryption with Additional Data (AEAD) ## {#sem-auth-enc}
 
-This example is based on AES-CCM with the MAC truncated to 8 bytes. 
+This example is based on AES-CCM with the Tag truncated to 8 bytes. 
 
 Since the key is implicitly known by the recipient, the COSE_Encrypt0_Tagged structure is used (Section 5.2 of {{I-D.ietf-cose-msg}}).
 
