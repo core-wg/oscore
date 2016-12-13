@@ -735,7 +735,7 @@ Let's analyze the contributions one at a time:
 
 * The header parameters of the COSE object are the Context Identifier (Cid) and the Sequence Number (Seq) (also part of the Transaction Identifier (Tid)) if the message is a request, and Seq only if the message is a response (see {{sec-obj-cose}}).
 
-  * The size of Cid depends on the number of simultaneous clients, as discussed in {{sec-context-est-section}}
+  * The size of Cid is recommended to be 64 bits, but may be shorter, as discussed in {{cid-est}}
 
   * The size of Seq is variable, and increases with the number of messages exchanged.
 
@@ -771,9 +771,9 @@ Message Overhead = Cid + Seq + Tag + COSE Overhead
 
 This section gives an example of message expansion in a request with OSCOAP.
 
-In this example we assume an extreme 4-byte Cid, based on the assumption of an ACE deployment with billions of clients requesting access to this particular server. (A typical Cid, will be 1-2 byte as is discussed in {{appendix-a2}}.)
+In this example we assume an 8-byte Cid.
 
-* Cid: 0xa1534e3c
+* Cid: 0xa1534e3c9cecad84
 
 In the example the sequence number is 225, requiring 1 byte to encode. (The size of Seq could be larger depending on how many messages that has been sent as is discussed in {{appendix-a2}}.) 
 
@@ -787,11 +787,12 @@ The COSE object is represented in {{mess-exp-ex}} using CBOR's diagnostic notati
 
 ~~~~~~~~~~~
 [
-  h'a20444a1534e3c0641e2', # protected:
-                             {04:h'a1534e3c',
-                              06:h'e2'}
-  {},                      # unprotected: -
-  Tag                      # ciphertext + 8 byte authentication tag
+  h'a20448a1534e3c9cecad840641e2', / protected:
+                                      {04:h'a1534e3c9cecad84',
+                                       06:h'e2'} /
+  {},                              / unprotected: - /
+  Ciph + Tag                       / ciphertext + 8 byte 
+                                      authentication tag /
 ]
 ~~~~~~~~~~~
 {: #mess-exp-ex title="Example of message expansion" }
@@ -799,18 +800,18 @@ The COSE object is represented in {{mess-exp-ex}} using CBOR's diagnostic notati
 
 Note that the encrypted CoAP options and payload are omitted since we target the message expansion (see {{appendix-a3}}). Therefore the size of the COSE Cipher Text equals the size of the Tag, which is 8 bytes.
 
-The COSE object encodes to a total size of 22 bytes, which is the message expansion in this example. The COSE overhead in this example is 22 - (4 + 1 + 8) = 9 bytes, according to the formula in {{mess-exp-formula}}. Note that in this example two bytes in the COSE overhead are used to encode the length of Cid and the length of Seq. 
+The COSE object encodes to a total size of 26 bytes, which is the message expansion in this example. The COSE overhead in this example is 26 - (8 + 1 + 8) = 9 bytes, according to the formula in {{mess-exp-formula}}. Note that in this example two bytes in the COSE overhead are used to encode the length of Cid and the length of Seq. 
 
 {{table-aes-ccm}} summarizes these results.
 
 ~~~~~~~~~~~
-+---------+---------+----------+------------+
-|   Tid   |   Tag   | COSE OH  | Message OH |
-+---------+---------+----------+------------+
-| 5 bytes | 8 bytes |  9 bytes |  22 bytes  |
-+---------+---------+----------+------------+
++---------+---------+---------+----------+------------+
+|   Cid   |   Seq   |   Tag   | COSE OH  | Message OH |
++---------+---------+---------+----------+------------+
+| 8 bytes | 1 byte  | 8 bytes |  9 bytes |  22 bytes  |
++---------+---------+---------+----------+------------+
 ~~~~~~~~~~~
-{: #table-aes-ccm title="Message overhead for a 5-byte Tid and 8-byte Tag."}
+{: #table-aes-ccm title="Message overhead for a 8-byte Cid, 1-byte Seq and 8-byte Tag."}
 {: artwork-align="center"}
 
 # Examples # {#appendix-d}
