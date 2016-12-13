@@ -302,63 +302,61 @@ The CoAP Payload SHALL be encrypted and integrity protected.
 
 The CoAP version number and the header field Code SHALL be integrity protected but not encrypted. Other CoAP Header fields SHALL neither be integrity protected nor encrypted.
 
-Protection of CoAP Options can be summarized as follows:
+The CoAP options require particular attention. In general, most options are encrypted. The encrypted options (marked as 'e' in {{protected-coap-options}}) are omitted from the Options part of the protected CoAP message, so they are not visible to intermediary nodes (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). Hence the actions resulting from the use of such options is analogous to communicating directly with the endpoint. For example, a client using an ETag option will not be served by a proxy. When receiving the message, the endpoint removes all options in this class from the Options part of the CoAP message (in case they were added by an intermediary) and extract their value from the COSE object after verification. 
 
-* To prevent information leakage, Uri-Path and Uri-Query SHALL be encrypted. If Proxy-Uri is used, Uri-* are not present in the unprotected CoAP message. The OSCOAP implementation MUST first split the Proxy-Uri value into the unencrypted Uri {{AAD}} and the Uri-Path/Query options (according to section 6.4 of {{RFC7252}}), replace the Proxy-Uri value with the unencrypted Uri, and encrypt Uri-Path/Query, which will then be carried in the ciphertext. This means that the Proxy-Uri option is present in the protected CoAP message, while a proxy will not be able to read Uri-Path and Uri-Query, which are part of the encrypted options, and will thus process the message (including the Proxy-Uri option) as indicated by CoAP.
+Some options, marked as 'd' in {{protected-coap-options}}, need to be visible in the protected CoAP message in order to support certain proxy functions. An endpoint may include such options intended for the proxy in the Options part of the CoAP message, possibly having a different value than that of the corresponding option encrypted in the COSE object.
+Such options may be encrypted in the COSE object of the protected CoAP message, and also unencrypted as CoAP option in the protected CoAP message (potentially with a different value). The "encrypted" value of an option is intended for the destination endpoint and the "unencrypted" value is intended for a proxy. This means that the destination endpoint SHALL discard the "unencrypted" value and SHALL replace it with the "encrypted" value when present. The unencrypted value is neither encrypted nor integrity protected.
 
-* The CoAP Options Uri-Host, Uri-Port, Proxy-Uri, and Proxy-Scheme SHALL neither be encrypted, nor integrity protected. Note that even though these options are not protected, their values are included in the additional authenticated data, thus they are indirectly integrity protected (cf. protection of the unencrypted Uri in {{AAD}}).
+* The Max-Age option is both encrypted and unencrypted. The unencrypted Max-Age SHOULD have value zero to prevent caching of responses. The encrypted Max-Age is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
+* The Observe option is both encrypted and unencrypted. If Observe is used, then the encrypted Observe and the unencrypted Observe SHALL have the same value. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
-* The other CoAP options SHALL be encrypted and integrity protected.
+A special case is given by the block options. The block options Block1 and Block2 are encrypted, but can appear encrypted and unencrypted at the same time. In fact, the encrypted block options are used for end-to-end secure fragmentation of payload into blocks and protected information about the fragmentation (block number, last block, etc.). The AEAD Tag from each block is included in the calculation of the Tag for the next block's (see {{AAD}}), so that each block in ordered sequence from the first block sent can be verified as it arrives. Additionally, a proxy may arbitrarily do fragmentation operations, adding unencrypted block options that cannot be verified by the endpoint. An endpoint receiving unencrypted block options SHALL process this option first, then continue processing the protected message as usual (verifying and replacing the options with their encrypted value, as for options 'd'). This processing is marked as 'd*' in {{protected-coap-options}}. There SHALL be a security policy defining a maximum unfragmented message size for unencrypted Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. Hence an endpoint receiving fragments of a message that exceeds maximum message size SHALL discard this message.
 
-A summary of which options are encrypted or integrity protected is shown in
-{{protected-coap-options}}.
+The size options Size1 and Size2 are analogous to the block options.
+
+Finally, a small set of CoAP options, marked as 'a' in {{protected-coap-options}}, are kept (modified or not) in the Options part of the protected CoAP message, and are only authenticated by a value constructed from them in the AAD value. These options are: Uri-Host, Uri-Port, Proxy-Uri and Proxy-Scheme. Exact processing is explained in detail in the following paragraphs:
+
+When Proxy-Uri is used:
+:      If Proxy-Uri is used, Uri-* are not present in the unprotected CoAP message. The OSCOAP implementation MUST first split the Proxy-Uri value into the unencrypted Uri {{AAD}} and the Uri-Path/Query options, which MUST be encrypted to prevent information leakage. The split is done according to section 6.4 of {{RFC7252}}. Then, it MUST replace the Proxy-Uri value with the unencrypted Uri, and encrypt Uri-Path/Query, which will then be carried in the ciphertext with the other encrypted options. This means that the Proxy-Uri option is present in the protected CoAP message, while a proxy will not be able to read Uri-Path and Uri-Query, and will thus process the message (including the Proxy-Uri option) as indicated by CoAP.
+
+When Proxy-Uri is not used:
+:      The CoAP Options Uri-Host, Uri-Port, Proxy-Uri, and Proxy-Scheme SHALL neither be encrypted, nor integrity protected. Note that even though these options are not protected, their values are included in the additional authenticated data, thus they are indirectly integrity protected (cf. protection of the unencrypted Uri in {{AAD}}).
+
+A summary of which options are encrypted or integrity protected and how the processing is done is shown in {{protected-coap-options}}.
 
 ~~~~~~~~~~~
 +----+---+---+---+---+----------------+--------+--------+---+---+
-| No.| C | U | N | R | Name           | Format | Length | E | D |
+| No.| C | U | N | R | Name           | Format | Length | E | P |
 +----+---+---+---+---+----------------+--------+--------+---+---+
-|  1 | x |   |   | x | If-Match       | opaque | 0-8    | x |   |
-|  3 | x | x | - |   | Uri-Host       | string | 1-255  |   |   |
-|  4 |   |   |   | x | ETag           | opaque | 1-8    | x |   |
-|  5 | x |   |   |   | If-None-Match  | empty  | 0      | x |   |
-|  6 |   | x | - |   | Observe        | uint   | 0-3    | x | x |
-|  7 | x | x | - |   | Uri-Port       | uint   | 0-2    |   |   |
-|  8 |   |   |   | x | Location-Path  | string | 0-255  | x |   |
-| 11 | x | x | - | x | Uri-Path       | string | 0-255  | x |   |
-| 12 |   |   |   |   | Content-Format | uint   | 0-2    | x |   |
-| 14 |   | x | - |   | Max-Age        | uint   | 0-4    | x | x |
-| 15 | x | x | - | x | Uri-Query      | string | 0-255  | x |   |
-| 17 | x |   |   |   | Accept         | uint   | 0-2    | x |   |
-| 20 |   |   |   | x | Location-Query | string | 0-255  | x |   |
-| 23 | x | x | - | - | Block2         | uint   | 0-3    | x | x |
-| 27 | x | x | - | - | Block1         | uint   | 0-3    | x | x |
-| 28 |   |   | x |   | Size2          | unit   | 0-4    | x | x |
-| 35 | x | x | - |   | Proxy-Uri      | string | 1-1034 |   |   |
-| 39 | x | x | - |   | Proxy-Scheme   | string | 1-255  |   |   |
-| 60 |   |   | x |   | Size1          | uint   | 0-4    | x | x |
+|  1 | x |   |   | x | If-Match       | opaque | 0-8    | x | e |
+|  3 | x | x | - |   | Uri-Host       | string | 1-255  |   | a |
+|  4 |   |   |   | x | ETag           | opaque | 1-8    | x | e |
+|  5 | x |   |   |   | If-None-Match  | empty  | 0      | x | e |
+|  6 |   | x | - |   | Observe        | uint   | 0-3    | x | d |
+|  7 | x | x | - |   | Uri-Port       | uint   | 0-2    |   | a |
+|  8 |   |   |   | x | Location-Path  | string | 0-255  | x | e |
+| 11 | x | x | - | x | Uri-Path       | string | 0-255  | x | e |
+| 12 |   |   |   |   | Content-Format | uint   | 0-2    | x | e |
+| 14 |   | x | - |   | Max-Age        | uint   | 0-4    | x | d |
+| 15 | x | x | - | x | Uri-Query      | string | 0-255  | x | e |
+| 17 | x |   |   |   | Accept         | uint   | 0-2    | x | e |
+| 20 |   |   |   | x | Location-Query | string | 0-255  | x | e |
+| 23 | x | x | - | - | Block2         | uint   | 0-3    | x | d*|
+| 27 | x | x | - | - | Block1         | uint   | 0-3    | x | d*|
+| 28 |   |   | x |   | Size2          | unit   | 0-4    | x | d*|
+| 35 | x | x | - |   | Proxy-Uri      | string | 1-1034 |   | a |
+| 39 | x | x | - |   | Proxy-Scheme   | string | 1-255  |   | a |
+| 60 |   |   | x |   | Size1          | uint   | 0-4    | x | d*|
 +----+---+---+---+---+----------------+--------+--------+---+---+
          C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable,
-         E=Encrypt and Integrity Protect, D=Duplicate.
+          E=Encrypt and Integrity Protect, P=Processing
 ~~~~~~~~~~~
 {: #protected-coap-options title="Protection of CoAP Options" }
 {: artwork-align="center"}
 
 Unless specified otherwise, CoAP options not listed in {{protected-coap-options}} SHALL be encrypted and integrity protected.
 
-The encrypted options are in general omitted from the protected CoAP message and not visible to intermediary nodes (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). Hence the actions resulting from the use of corresponding options is analogous to the case of communicating directly with the endpoint. For example, a client using an ETag option will not be served by a proxy.
-
-However, some options that are encrypted need to be readable in the protected CoAP message to support certain proxy functions. A CoAP option that may be both encrypted in the COSE object of the protected CoAP message, and also unencrypted as CoAP option in the protected CoAP message, is called "duplicate". The "encrypted" value of a duplicate option is intended for the destination endpoint and the "unencrypted" value is intended for a proxy. The unencrypted value is not integrity protected.
-
-* The Max-Age option is duplicate. The unencrypted Max-Age SHOULD have value zero to prevent caching of responses. The encrypted Max-Age is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
-
-* The Observe option is duplicate. If Observe is used, then the encrypted Observe and the unencrypted Observe SHALL have the same value. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
-
-* The block options Block1 and Block2 are duplicate. The encrypted block options are used for end-to-end secure fragmentation of payload into blocks and protected information about the fragmentation (block number, last block, etc.). The AEAD Tag from each block is included in the calculation of the Tag for the next block's (see {{AAD}}). In this way, each block in ordered sequence from the first block can be verified as it arrives. The unencrypted block option allows for arbitrary proxy fragmentation operations, which cannot be verified by the endpoints. An intermediary node can generate an arbitrarily long sequence of blocks. However, since it is possible to protect fragmentation of large messages, there SHALL be a security policy defining a maximum unfragmented message size such that messages exceeding this size SHALL be fragmented by the sending endpoint. Hence an endpoint receiving fragments of a message that exceeds maximum message size SHALL discard this message.
-
-* The size options Size1 and Size2 are duplicate, analogously to the block options.
-
-Specifications of new CoAP options SHOULD specify how they are processed with OSCOAP. New COAP options SHALL be encrypted and integrity protected. New COAP options SHOULD NOT be duplicate unless a forwarding proxy needs to read the option. If an option is registered as duplicate, the duplicate value SHOULD NOT be the same as the end-to-end value, unless the proxy is required by specification to be able to read the end-to-end value.
-
+Specifications of new CoAP options SHOULD specify how they are processed with OSCOAP. New COAP options SHALL be encrypted and integrity protected ('e'). New COAP options SHOULD NOT be encrypted and unencrypted ('d') unless a forwarding proxy needs to read the option. If an option is registered as encrypted and unencrypted, the two values SHOULD NOT be the same as the end-to-end value, unless the proxy is required by specification to be able to read the end-to-end value.
 
 # The COSE Object # {#sec-obj-cose}
 
@@ -505,7 +503,7 @@ When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\
 
     * The CoAP header is the same as the unprotected CoAP message.
 
-    * The CoAP options, which are encrypted and not duplicate ({{coap-headers-and-options}}) are removed. Any duplicate option that is present has its unencrypted value. The Object-Security option is added.
+    * The CoAP options, which are encrypted and not unencrypted ('e') ({{coap-headers-and-options}}) are removed. Any encrypted and unencrypted option ('d') that is present has its unencrypted value. The Object-Security option is added.
 
     * If the message type of the unprotected CoAP message does not allow Payload, then the value of the Object-Security option is the COSE object. If the message type of the unprotected CoAP message allows Payload, then the Object-Security option is empty and the Payload of the protected CoAP message is the COSE object.
 
@@ -534,7 +532,7 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 6. If the message verifies, update the Recipient Replay Window, as described in {{replay-protection-section}}.
 
-7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any duplicate options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
+7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any unencrypted 'd' options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
 
 ## Protecting the Response ## {#protected-coap-formatting-resp}
 
@@ -548,7 +546,7 @@ Given an unprotected CoAP response, including header, options, and payload, the 
   
 3. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload based on the unprotected CoAP message:
   * The CoAP header is the same as the unprotected CoAP message.
-  * The CoAP options which are encrypted and not duplicate ({{coap-headers-and-options}}) are removed. Any duplicate option that is present has its unencrypted value. The Object-Security option is added. 
+  * The CoAP options which are encrypted and not unencrypted ('e') ({{coap-headers-and-options}}) are removed. Any encrypted and unencrypted ('d') option that is present has its unencrypted value. The Object-Security option is added. 
   * If the message type of the unprotected CoAP message does not allow Payload, then the value of the Object-Security option is the COSE object. If the message type of the unprotected CoAP message allows Payload, then the Object-Security option is empty and the Payload of the protected CoAP message is the COSE object.
 
 4. Increment the Sender Sequence Number by one. If the Sender Sequence Number exceeds the maximum number for the AEAD algorithm, the server MUST NOT process any more responses with the given security context. The server SHOULD acquire a new security context (and consequently inform the client about it) before this happens. The latter is out of scope of this memo. 
@@ -573,7 +571,7 @@ A CoAP client receiving a message containing the Object-Security option SHALL pe
 
 6. If the message verifies, update the Recipient Replay Window, as described in {{replay-protection-section}}.
 
-7. Restore the unprotected response by adding any decrypted options or payload from the plaintext. Any duplicate options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed. 
+7. Restore the unprotected response by adding any decrypted options or payload from the plaintext. Any 'd' options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed. 
 
 
 
