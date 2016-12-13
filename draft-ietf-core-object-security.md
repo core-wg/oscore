@@ -490,7 +490,7 @@ In order to protect from replay of messages and verify freshness, a CoAP endpoin
 
 A receiving endpoint SHALL verify that the Sequence Number (Partial IV) received in the COSE object has not been received before in the security context identified by the Cid. The size of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Recipient Sequence Number + 1.
 
-The receiving endpoint SHALL reject messages with a sequence number greater than the allowed maximum value. For AES-CCM-64-64-128 the maximum value is 2^56-1.
+The receiving endpoint SHALL reject messages with a sequence number greater than the maximum value of the Partial IV. This maximum value is algorithm specific, for example for AES-CCM-64-64-128 it is 2^56-1.
 
 OSCOAP responses are verified to match a prior request, by including the unique transaction identifier (Tid as defined in {{sec-context-section}}) of the request in the Additional Authenticated Data of the response message. In case of CoAP observe, each notification MUST be verified using the Tid of the observe registration, so the Tid of the registration needs to be cached by the observer until the observation ends.
 
