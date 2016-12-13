@@ -57,6 +57,7 @@ normative:
   RFC7641:
   RFC7959:
   RFC3986:
+  RFC7049:
   
 informative:
 
@@ -67,6 +68,7 @@ informative:
   I-D.ietf-ace-oauth-authz:
   I-D.seitz-ace-oscoap-profile:
   I-D.ietf-core-coap-tcp-tls:
+  I-D.greevenbosch-appsawg-cbor-cddl:
   RFC5869:
   RFC7228:
 
@@ -113,7 +115,7 @@ The message protection provided by OSCOAP can alternatively be applied only to t
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
-Readers are expected to be familiar with the terms and concepts described in {{RFC7252}} and {{RFC7641}}. Terminology for constrained environments, such as "constrained device", "constrained-node network", is defined in {{RFC7228}}.
+Readers are expected to be familiar with the terms and concepts described in {{RFC7252}} and {{RFC7641}}. Readers are also expected to be familiar with {{RFC7049}} and understand {{I-D.greevenbosch-appsawg-cbor-cddl}}. Terminology for constrained environments, such as "constrained device", "constrained-node network", is defined in {{RFC7228}}.
 
 # The Object-Security Option # {#obj-sec-option-section}
 
@@ -145,8 +147,6 @@ More details about the message overhead caused by the Object-Security option are
 # The Security Context # {#sec-context-section}
 
 OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm. The specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
-
-
 
 ## Security Context Definition ## {#sec-context-def-section}
 
@@ -209,9 +209,6 @@ The Recipient Context contains the following parameters:
 
 The 3-tuple (Cid, Sender ID, Partial IV) is called Transaction Identifier (Tid), and SHALL be unique for each Base Key. The Tid is used as a unique challenge in the COSE object of the protected CoAP request. The Tid is part of the Additional Authenticated Data (AAD, see {{sec-obj-cose}}) of the protected CoAP response message, which is how responses are bound to requests.
 
-
-
-
 ## Derivation of Security Context Parameters ## {#sec-context-est-section}
 
 This section describes how to derive the initial parameters in the security context, given a small set of input parameters. We also give indications on how applications should select the input parameters.
@@ -250,8 +247,6 @@ Given the input parameters, the client and server can derive all the other param
 
 The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using the HKDF-Expand primitive {{RFC5869}}:
 
-
-
 ~~~~~~~~~~~
   output parameter = HKDF-Expand(base_key, info, output_length),
 ~~~~~~~~~~~
@@ -278,7 +273,6 @@ where:
 ~~~~~~~~~~~
 
 * output_length is the size of the AEAD key/IV in bytes encoded as an 8-bit unsigned integer
-
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, output\_length for the keys is 128 bits and output\_length for the IVs is 56 bits.
 
@@ -441,7 +435,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
    * alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}});
 
-   * unencrypted-uri: tstr, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port (if present) options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request;
+   * unencrypted-uri: tstr with tag URI, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port (if present) options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request;
 
    * cid : bstr, contains the cid for the request (which is same as the cid for the response).
 
@@ -459,7 +453,7 @@ external_aad_req = [
    ver : uint,
    code : uint,
    alg : int,
-   unencrypted-uri : tstr,
+   unencrypted-uri : uri,
    ? tag-previous-block : bstr
 ]
 
