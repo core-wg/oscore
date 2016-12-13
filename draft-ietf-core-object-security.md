@@ -56,6 +56,7 @@ normative:
   RFC7252:
   RFC7641:
   RFC7959:
+  RFC3986:
   
 informative:
 
@@ -440,7 +441,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
    * alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}});
 
-   * unencrypted-uri: tstr, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request;
+   * unencrypted-uri: tstr, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port (if present) options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request;
 
    * cid : bstr, contains the cid for the request (which is same as the cid for the response).
 
@@ -498,6 +499,8 @@ If the CoAP client receives a response with the Object-Security option, then the
 
 Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{cid-est}}).
 
+When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address, for canonicalization of the destination address.
+
 1. Compute the COSE object as specified in {{sec-obj-cose}}
 
     * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number (partial IV).
@@ -527,8 +530,9 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 2. Recreate the Additional Authenticated Data, as described in {{sec-obj-cose}}.
     * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
+    * Note that the server's \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address. 
 
-3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object.
+3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object. 
 
 4. Retrieve the Recipient Key.
 
