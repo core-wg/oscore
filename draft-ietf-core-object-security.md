@@ -287,7 +287,7 @@ As mentioned, Cid is pre-established. How this is done is application specific, 
 
 If the application has total control of both clients and servers, shorter unique Cids MAY be used. Note that Cids of different lengths can be used by different clients and that e.g. a Cid with the value 0x00 is different from the Cid with the value 0x0000.
 
-In the same phase during which the Cid is established in the endpoint, the application informs the endpoint what resource can be accessed using the corresponding security context. The granularity of that is decided by the application (resource, host, etc.). The endpoint SHALL save the association resource-Cid, in order to be able to retrieve the correct security context to access a resource.
+In the same phase during which the Cid is established in the endpoint, the application informs the endpoint what resources can be accessed using the corresponding security contexts. Resources that are accessed with OSCOAP are called "protected" resources. The set of resources that can be accessed using a certain security context is decided by the application (resource, host, etc.). The client SHALL save the association resource-Cid, in order to be able to retrieve the correct security context to access a protected resource. The server SHALL save the association resource-Cid, in order to determine whether a particular resource may be accessed using a certain Cid.
 
 ### Sender ID and Recipient ID### {#id-est}
 
@@ -478,10 +478,6 @@ external_aad_resp = [
 
 The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}. 
 
-
-
-
-
 # Protecting CoAP Messages # {#coap-protected-generate}
 
 ## Replay and Freshness Protection ## {#replay-protection-section}
@@ -522,6 +518,8 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 
 ## Verifying the Request ## {#verif-coap-req}
+
+A CoAP server receiving an unprotected CoAP request to access a protected resource (as defined {{cid-est}}) SHALL reject the message with error code 4.01 (Unauthorized).
 
 A CoAP server receiving a message containing the Object-Security option SHALL perform the following steps, using the security context identified by the Context Identifier in the "kid" parameter in the received COSE object:
 
