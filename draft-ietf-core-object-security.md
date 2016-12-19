@@ -385,7 +385,7 @@ For options in class E (see {{protected-coap-options}}) the option value in the 
 
 The sending endpoint SHALL write the class E option from the unprotected CoAP message into the plaintext of the COSE object (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). 
 
-Except for the special options described in the subsections, the sending endpoint SHALL not use the outer options of class E. However, note that an intermediary may, legimitimately or not, add, change or remove the value of an outer option.
+Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legimitimately or not, add, change or remove the value of an outer option.
 
 Execept for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present (see {{verif-coap-req}} and {{verif-coap-resp}}). 
 
@@ -396,7 +396,7 @@ An inner Max-Age option is used as defined in {{RFC7252}} taking into account th
 
 Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. Therefore, there SHOULD be an outer Max-Age option with value zero to prevent caching of responses (see Section 5.6.1 of {{RFC7252}}). 
 
-The outer Max-Age option SHALL neither be encrypted nor integrity protected.
+The outer Max-Age option SHALL NOT be encrypted and  SHALL NOT be integrity protected.
 
 
 #### Observe ### {#observe}
