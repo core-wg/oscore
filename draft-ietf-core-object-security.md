@@ -185,7 +185,7 @@ The Common Context contains the following parameters:
 
 * Algorithm (Alg). Value that identifies the COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Base Key (base_key). Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
+* Base Key (master_secret). Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 The Sender Context contains the following parameters:
 
@@ -216,7 +216,7 @@ This section describes how to derive the initial parameters in the security cont
 The following input parameters SHALL be pre-established:
 
 * Context Identifier (Cid)
-* Base Key (base_key)
+* Base Key (master_secret)
 * AEAD Algorithm (Alg)
    - Default is AES-CCM-64-64-128 (value 12)
 
@@ -243,17 +243,18 @@ The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of in
 
 ### Derivation of Sender Key/IV, Recipient Key/IV ###
 
-Given the input parameters, the client and server can derive all the other parameters in the security context. The derivation procedure described here MUST NOT be executed more than once using the same base_key and Cid. The same base_key SHOULD NOT be used with more than one Cid.
+Given the input parameters, the client and server can derive all the other parameters in the security context. The derivation procedure described here MUST NOT be executed more than once using the same master_secret and Cid. The same master_secret SHOULD NOT be used with more than one Cid.
 
-The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using the HKDF-Expand primitive {{RFC5869}}:
+The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}):
 
 ~~~~~~~~~~~
-  output parameter = HKDF-Expand(base_key, info, output_length),
+  output parameter = HKDF(master_secret, salt, info, output_length), 
 ~~~~~~~~~~~
 
 where:
 
-* base_key is defined above
+* master_secret is defined above
+* salt is a string of zeros of the length of the hash function output in octets
 * info is a serialized CBOR array consisting of:
 
 ~~~~~~~~~~~
@@ -275,6 +276,7 @@ where:
 * output_length is the size of the AEAD key/IV in bytes encoded as an 8-bit unsigned integer
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, output\_length for the keys is 128 bits and output\_length for the IVs is 56 bits.
+
 
 ### Context Identifier ### {#cid-est}
 
@@ -298,7 +300,7 @@ The Sender Sequence Number is initialized to 0. The Recipient Replay Window is i
 
 OSCOAP transforms an unprotected CoAP message into a protected CoAP message, and vice versa. This section defines how the unprotected CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. 
 
-This section also outlines how the message fields are processed and transferred, a detailed description is provided in {{coap-protected-generate}}. Message fields of the unprotected CoAP message are either trasferred in the header/options part of the protected CoAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the protected CoAP message is called "outer" or "inner": 
+This section also outlines how the message fields are processed and transferred, a detailed description is provided in {{coap-protected-generate}}. Message fields of the unprotected CoAP message are either transferred in the header/options part of the protected CoAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the protected CoAP message is called "outer" or "inner": 
 
 * Inner message field = message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
 * Outer message field = message field included in the header or options part of the protected CoAP message
