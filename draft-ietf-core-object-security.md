@@ -440,7 +440,6 @@ Uri-Path and Uri-Query are class E options and SHALL be protected and processed 
 
 The value of the Proxy-Uri option of the protected CoAP message SHALL be replaced with unencrypted-Uri and SHALL be protected and processed as a class A option, see {{class-a}}.
 
-
 # The COSE Object # {#sec-obj-cose}
 
 This section defines how to use the COSE format {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm.
