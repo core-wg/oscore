@@ -142,6 +142,8 @@ The length of the Object-Security option depends on whether the unprotected mess
 
 * If the unprotected message does not allow payload, then the COSE object is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
 
+Note that according to {{RFC7252}}, new Methods and Response Codes should specify if the payload is optional, required or not allowed (Section 12.1.2) in the message, and in case this is not defined the sender must not include a payload (Section 5.5). Thus, in this case, the COSE object MUST be the value of the Object-Security option.
+
 More details about the message overhead caused by the Object-Security option are given in {{appendix-a}}.
 
 # The Security Context # {#sec-context-section}
