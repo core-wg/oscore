@@ -220,7 +220,7 @@ The following input parameters SHALL be pre-established:
 * Context Identifier (Cid)
 * Base Key (master_secret)
 * AEAD Algorithm (Alg)
-   - Default is AES-CCM-64-64-128 (value 12)
+   - Implmenentations MUST support the mandatory-to-implement algorithm AES-CCM-64-64-128 (value 12).
 
 The following input parameters MAY be pre-established:
 
