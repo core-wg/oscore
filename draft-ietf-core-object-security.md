@@ -225,9 +225,9 @@ The following input parameters SHALL be pre-established:
 The following input parameters MAY be pre-established:
 
 * Sender ID
-   - Defaults are 0x00 for the endpoint intially being client, and 0x01 for the endpoint initially being server
+   - Defaults are 0x00 for the endpoint initially being client, and 0x01 for the endpoint initially being server
 * Recipient ID
-   - Defaults are 0x01 for the endpoint intially being client, and 0x00 for the endpoint initially being server
+   - Defaults are 0x01 for the endpoint initially being client, and 0x00 for the endpoint initially being server
 * Key Derivation Function (KDF)
    - Default is HKDF SHA-256
 * Replay Window Size
@@ -385,9 +385,9 @@ For options in class E (see {{protected-coap-options}}) the option value in the 
 
 The sending endpoint SHALL write the class E option from the unprotected CoAP message into the plaintext of the COSE object (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). 
 
-Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legimitimately or not, add, change or remove the value of an outer option.
+Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
-Execept for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present (see {{verif-coap-req}} and {{verif-coap-resp}}). 
+Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present (see {{verif-coap-req}} and {{verif-coap-resp}}). 
 
 
 #### Max-Age ### {#max-Age}
@@ -511,7 +511,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
 * the "protected" parameter, which includes the "protected" part of the "Headers" field;
 
-* the "external\_aad" is a serialized CBOR array {{aad}} where the exact content is different in requests (external_aad_req) and repsonses (external_aad_resp). It contains:
+* the "external\_aad" is a serialized CBOR array {{aad}} where the exact content is different in requests (external_aad_req) and responses (external_aad_resp). It contains:
 
    * ver: uint, contains the CoAP version number, as defined in Section 3 of {{RFC7252}}
 
