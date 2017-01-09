@@ -69,6 +69,7 @@ informative:
   I-D.seitz-ace-oscoap-profile:
   I-D.ietf-core-coap-tcp-tls:
   I-D.greevenbosch-appsawg-cbor-cddl:
+  RFC4303:
   RFC5869:
   RFC7228:
 
@@ -154,7 +155,8 @@ OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) al
 
 The security context is the set of information elements necessary to carry out the cryptographic operations in OSCOAP. Each security context is identified by a Context Identifier. A Context Identifier that is no longer in use can be reassigned to a new security context.
 
-For each endpoint, the security context is composed by a "Common Context", a "Sender Context" and a "Recipient Context". The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Each endpoint has a unique ID used to derive its Sender Context, this identifier is called  "Sender ID". The Recipient Context is derived with the other endpoint's ID, which is called "Recipient ID". The Recipient ID is thus the ID of the endpoint from which a CoAP message is received. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same Context Identifiers in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{sec-context-ex}}.
+For each endpoint, the security context is composed by a "Common Part", a "Sender Part" and a "Recipient Part". The endpoints protect messages to send using the Sender Part and verify messages received using the Recipient Part, both parts being derived from the Common part and other data. Each endpoint has a unique ID used to derive its Sender part, this identifier is called  "Sender ID". The Recipient part is derived with the other endpoint's ID, which is called "Recipient ID". The Recipient ID is thus the ID of the endpoint from which a CoAP message is received. In communication between two endpoints, the Sender part of one endpoint matches the Recipient part of the other endpoint, and vice versa. Thus the two security contexts identified by the same Context Identifiers in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{sec-context-ex}}.  {{context-example}} shows an example of two such matching
+contexts.
 
 ~~~~~~~~~~~
                .-Cid = Cid1-.           .-Cid = Cid1-.
@@ -167,21 +169,21 @@ For each endpoint, the security context is composed by a "Common Context", a "Se
 Retrieve context for  | request:              |
  target resource      | [Token = Token1,      |
 Protect request with  |  Cid = Cid1, ...]     |
-  Sender Context      +---------------------->| Retrieve context with
+  Sender Part         +---------------------->| Retrieve context with
                       |                       |  Cid = Cid1
                       |                       | Verify request with
-                      |                       |  Recipient Context
+                      |                       |  Recipient Part
                       | response:             | Protect response with
-                      | [Token = Token1, ...] |  Sender Context
+                      | [Token = Token1, ...] |  Sender Part
 Retrieve context with |<----------------------+
  Token = Token1       |                       |
 Verify request with   |                       |
- Recipient Context    |                       |
+ Recipient Part       |                       |
 ~~~~~~~~~~~
 {: #sec-context-ex title="Retrieval and use of the Security Context"}
 {: artwork-align="center"}
 
-The Common Context contains the following parameters:
+The Common Part contains the following parameters:
 
 * Context Identifier (Cid). Variable length byte string that identifies the security context. Its value is immutable once the security context is established.
 
@@ -189,7 +191,7 @@ The Common Context contains the following parameters:
 
 * Base Key (master_secret). Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
-The Sender Context contains the following parameters:
+The Sender Part contains the following parameters:
 
 * Sender ID. Variable length byte string identifying the endpoint itself. Its value is immutable once the security context is established.
 
@@ -199,7 +201,7 @@ The Sender Context contains the following parameters:
 
 * Sender Sequence Number. Non-negative integer enumerating the COSE objects that the endpoint sends using the context. Used as partial IV {{I-D.ietf-cose-msg}} to generate unique nonces for the AEAD. Maximum value is determined by Algorithm.
 
-The Recipient Context contains the following parameters:
+The Recipient Part contains the following parameters:
 
 * Recipient ID. Variable length byte string identifying the endpoint messages are received from. Its value is immutable once the security context is established.
 
@@ -207,7 +209,8 @@ The Recipient Context contains the following parameters:
 
 * Recipient IV. Byte string containing the context IV to verify messages received. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
-* Recipient Replay Window. The replay protection window for messages received.
+* Recipient Replay Window. The replay protection window for messages received.  This consists of a counter representing the highest validated sequence number received and a list of the lesser sequence numbers within the
+window that have been received. See section 3.4.3 of {{RFC4303}} for an efficient method to implment this.
 
 The 3-tuple (Cid, Sender ID, Partial IV) is called Transaction Identifier (Tid), and SHALL be unique for each Base Key. The Tid is used as a unique challenge in the COSE object of the protected CoAP request. The Tid is part of the Additional Authenticated Data (AAD, see {{sec-obj-cose}}) of the protected CoAP response message, which is how responses are bound to requests.
 
@@ -234,7 +237,7 @@ The following input parameters MAY be pre-established:
    - Default is 64
 
 
-The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. When this happens, the former server still protects the message to send using the Sender Context, and verifies the message received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
+The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. When this happens, the former server still protects the message to send using the Sender Part, and verifies the message received using its Recipient Part. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
 
 The input parameters are included unchanged in the security context. From the input parameters, the following parameters are derived:
 
@@ -1215,4 +1218,66 @@ This COSE object encodes to a total size of 92 bytes.
 {: #comp-aes-ccm-ecdsa title="Message overhead for a 5-byte Tid using AES-CCM countersigned with ECDSA."}
 {: artwork-align="center"}
 
+# Example of Security Contexts # {#context-example}
+
+This section shows an example of a Security Context established between a 
+pair of nodes.  All binary values in these examples have been replaced with
+simple strings for clarity, and none of the available COSE abbreviations are
+used.  The contexts are represented in a non-normative JSON format.
+
+~~~~~~~~~~~
+{
+  Node="Node1",
+  CommonPart = {
+    Cid = "123",
+    Alg = "AES-CCM-64-64-128",
+    BaseKey = "ourKey"
+  }
+  SenderPart = {
+    SenderId = "0x00",
+    SenderKey = "firstDerivedKey",
+    SenderIV = "456",
+    SenderSeqNo = "74"
+  }
+  RecipientPart = {
+    RecipientId = "0x01",
+    RecipientKey = "secondDerivedKey",
+    RecipientIV = "789",
+    RecipientReplayWindow = {
+      LastSeen = "85",
+      Window = "11011101...."
+    }
+  }
+}
+~~~~~~~~~~~
+{: #context-ex1 title="Security Context of original Sender node."}
+{: artwork-align="center"}
+~~~~~~~~~~~
+{
+  Node="Node2",
+  CommonPart = {
+    Cid = "123",
+    Alg = "AES-CCM-64-64-128",
+    BaseKey = "ourKey"
+  }
+  SenderPart = {
+    SenderId = "0x01",
+    SenderKey = "secondDerivedKey",
+    SenderIV = "789",
+    SenderSeqNo = "85"
+  }
+  RecipientPart = {
+    RecipientId = "0x00",
+    RecipientKey = "firstDerivedKey",
+    RecipientIV = "456",
+    RecipientReplayWindow = {
+      LastSeen = "74",
+      Window = "10011111...."
+    }
+  }
+}
+
+~~~~~~~~~~~
+{: #context-ex2 title="Security Context of original Recipient node."}
+{: artwork-align="center"}
 --- fluff
