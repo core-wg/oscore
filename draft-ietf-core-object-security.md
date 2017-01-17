@@ -219,11 +219,11 @@ The following input parameters SHALL be pre-established:
 
 * Context Identifier (Cid)
 * Base Key (master_secret)
+
+The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
+
 * AEAD Algorithm (Alg)
    - Default is AES-CCM-64-64-128 (value 12)
-
-The following input parameters MAY be pre-established:
-
 * Sender ID
    - Defaults are 0x00 for the endpoint initially being client, and 0x01 for the endpoint initially being server
 * Recipient ID
@@ -232,7 +232,6 @@ The following input parameters MAY be pre-established:
    - Default is HKDF SHA-256
 * Replay Window Size
    - Default is 64
-
 
 The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. When this happens, the former server still protects the message to send using the Sender Context, and verifies the message received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
 
