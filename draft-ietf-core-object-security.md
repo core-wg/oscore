@@ -448,7 +448,8 @@ The value of the Proxy-Uri option of the protected CoAP message SHALL be replace
 
 This section defines how to use the COSE format {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm.
 
-The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key SHALL be 128 bits, the length of nonce, Sender IV, and Recipient IV SHALL be 7 bytes, and the maximum Sequence Number SHALL be 2^56-1. The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the Partial IV (Sequence Number) with zeroes and XORing it with the context IV (Sender IV or Recipient IV).
+The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key SHALL be 128 bits, the length of nonce, Sender IV, and Recipient IV SHALL be 7 bytes, and the maximum Sequence Number SHALL be 2^56-1. The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the Partial IV (Sequence Number in
+network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV).
 
 Since OSCOAP only makes use of a single COSE structure, there is no need to explicitly specify the structure, and OSCOAP uses the untagged version of the COSE\_Encrypt0 structure (Section 2. of {{I-D.ietf-cose-msg}}). If the COSE object has a different structure, the recipient MUST reject the message, treating it as malformed.
 
@@ -581,7 +582,7 @@ When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\
 
 1. Compute the COSE object as specified in {{sec-obj-cose}}
 
-    * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number (partial IV).
+    * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number in network byte order (partial IV).
     
     * If the block option is used, the AAD includes the AEAD Tag from the previous block sent (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-sent block to compute the following.
     
