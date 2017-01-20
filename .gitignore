@@ -1,4 +1,5 @@
 *.redxml
+*.xml
 *.txt
 *.html
 *.pdf
@@ -10,4 +11,3 @@
 venv/
 issues.json
 lib
-draft-ietf-core-object-security.md
