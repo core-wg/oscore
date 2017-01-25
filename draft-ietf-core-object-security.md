@@ -246,7 +246,7 @@ The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of in
 
 Given the input parameters, the client and server can derive all the other parameters in the security context. The derivation procedure described here MUST NOT be executed more than once using the same master_secret and Cid. The same master_secret SHOULD NOT be used with more than one Cid.
 
-The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}):
+The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
   output parameter = HKDF(master_secret, salt, info, output_length), 
@@ -421,7 +421,7 @@ The protected CoAP message may be fragmented by the sending endpoint or proxy as
 
 An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, or the cumulated message size of the exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document (see {{verif-coap-req}} and {{verif-coap-resp}}). 
 
-If the unprotected CoAP message contains Block options, the receiving endpoint processes this according to {{RFC7959}.
+If the unprotected CoAP message contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
 
 
 ### Class A Options ### {#class-a}
