@@ -943,8 +943,8 @@ Client  Proxy  Server
 {: #get-protected-sig title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicate a COSE object. The brackets { ... \} indicate encrypted data." } 
 {: artwork-align="center"}
 
-Since the unprotected request message (GET) has no payload, the Object-Security option carries the COSE object as its value.
-Since the unprotected response message (Content) has payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
+Since the unprotected request message (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value.
+Since the unprotected response message (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
 
 The COSE header of the request contains a Context Identifier (cid:5fdc), indicating which security context was used to protect the message and a Sequence Number (seq:42).
 
@@ -1010,7 +1010,7 @@ Client  Proxy  Server
 {: #get-protected-enc title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicates COSE object. The bracket { ... \} indicates encrypted data." } 
 {: artwork-align="center"}
 
-Since the unprotected request message (GET) allows no payload, the COSE object (indicated with \[ ... \]) is carried in the Object-Security option value. Since the unprotected response message (Content) has payload, the Object-Security option is empty, and the COSE object is carried as the payload.
+Since the unprotected request message (GET) doesn't allow payload, the COSE object (indicated with \[ ... \]) is carried in the Object-Security option value. Since the unprotected response message (Content) allows payload, the Object-Security option is empty, and the COSE object is carried as the payload.
 
 The COSE header of the request contains a Context Identifier (cid:ca), indicating which security context was used to protect the message and a Sequence Number (seq:15b7).
 
