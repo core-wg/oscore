@@ -333,11 +333,11 @@ The sending endpoint SHALL copy the header fields from the unprotected CoAP mess
 
 As with the message fields described in the previous sections, CoAP options may be encrypted and integrity protected, integrity protected only, or neither encrypted nor integrity protected. 
 
-Most options are encrypted and integrity protected (see {{protected-coap-options}}), and thus inner message fields. But to allow certain proxy operations, some options have outer values and require special processing. Indeed, certain options may or must have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
+Most options are encrypted and integrity protected (see {{protected-coap-options}}), and thus inner message fields. But to allow certain proxy operations, some options have outer values and are not encrypted nor integrity protected, while others require special processing. Indeed, certain options may or must have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
 
 ~~~~~~~~~~~
 +----+---+---+---+---+----------------+--------+--------+---+---+
-| No.| C | U | N | R | Name           | Format | Length | E | A |
+| No.| C | U | N | R | Name           | Format | Length | E | U |
 +----+---+---+---+---+----------------+--------+--------+---+---+
 |  1 | x |   |   | x | If-Match       | opaque | 0-8    | x |   |
 |  3 | x | x | - |   | Uri-Host       | string | 1-255  |   | x |
@@ -360,7 +360,7 @@ Most options are encrypted and integrity protected (see {{protected-coap-options
 | 60 |   |   | x |   | Size1          | uint   | 0-4    | * |   |
 +----+---+---+---+---+----------------+--------+--------+---+---+
       C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable,
-  E=Encrypt and Integrity Protect, A=Integrity Protect, *=Special
+  E=Encrypt and Integrity Protect, U=Unprotected, *=Special
 ~~~~~~~~~~~
 {: #protected-coap-options title="Protection of CoAP Options" }
 {: artwork-align="center"}
@@ -369,7 +369,7 @@ Most options are encrypted and integrity protected (see {{protected-coap-options
 A summary of how options are protected and processed is shown in {{protected-coap-options}}. The CoAP options are partitioned into two classes: 
 
 * E - options which are encrypted and integrity protected, and
-* A - options which are only integrity protected. 
+* U - options which are neither encrypted nor integrity protected.
 
 Options within each class are protected and processed in a similar way, but certain options which require special processing as described in the subsections and indicated by a \'*\' in {{protected-coap-options}}.
 
@@ -424,24 +424,24 @@ An endpoint receiving a message with an outer Block option SHALL first process t
 If the unprotected CoAP message contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
 
 
-### Class A Options ### {#class-a}
+### Class U Options ### {#class-u}
 
-Options in this class are used to support forward proxy operations. Class A options SHALL only have outer values and SHALL NOT be encrypted. In order for the destination endpoint to verify the Uri, class A options SHALL be integrity protected.
+Options in this class are used to support forward proxy operations. Class U options SHALL only have outer values and SHALL NOT be encrypted nor integrity protected.
 
-Uri-Host, Uri-Port, Proxy-Scheme and Proxy-Uri are class A options. When Uri-Host, Uri-Port, Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. Proxy-Uri is processed like the other class A options after a pre-processing step (see {{proxy-uri}}.
+Uri-Host, Uri-Port, Proxy-Scheme and Proxy-Uri are class U options. When Uri-Host, Uri-Port, Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. Proxy-Uri is processed like the other class U options after a pre-processing step (see {{proxy-uri}}.
 
-Except for Proxi-Uri, the sending endpoint SHALL copy the class A option from the unprotected CoAP message to the protected CoAP message. The class A options are inserted in the AAD of the COSE object (see unencrypted-Uri {{AAD}}).  
+Except for Proxi-Uri, the sending endpoint SHALL copy the class U option from the unprotected CoAP message to the protected CoAP message.
 
 
 #### Proxy-Uri #### {#proxy-uri}
 
-Proxy-Uri, when present, is split by OSCOAP into class A options and privacy sensitive class E options, which are processed accordingly. When Proxy-Uri is used in the unprotected CoAP message, Uri-* are not present {{RFC7252}}.
+Proxy-Uri, when present, is split by OSCOAP into class U options and privacy sensitive class E options, which are processed accordingly. When Proxy-Uri is used in the unprotected CoAP message, Uri-* are not present {{RFC7252}}.
 
-The sending endpoint SHALL first decompose the Proxy-Uri value of the unprotected CoAP message into the unencrypted-Uri ({{AAD}}) and Uri-Path/Query options according to section 6.4 of {{RFC7252}}. 
+The sending endpoint SHALL first decompose the Proxy-Uri value of the unprotected CoAP message into the unencrypted-Uri (composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port if present) and Uri-Path/Query options according to section 6.4 of {{RFC7252}}. 
 
 Uri-Path and Uri-Query are class E options and SHALL be protected and processed as if obtained from the unprotected CoAP message, see {{class-e}}. 
 
-The value of the Proxy-Uri option of the protected CoAP message SHALL be replaced with unencrypted-Uri and SHALL be protected and processed as a class A option, see {{class-a}}.
+The value of the Proxy-Uri option of the protected CoAP message SHALL be replaced with unencrypted-Uri and MUST be processed as a class U option, see {{class-u}}.
 
 # The COSE Object # {#sec-obj-cose}
 
@@ -519,7 +519,7 @@ The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 
 
    * alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}});
 
-   * unencrypted-uri: tstr with tag URI, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port (if present) options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request;
+<!--   * unencrypted-uri: tstr with tag URI, contains the part of the URI which is not encrypted, and is composed of the request scheme (Proxy-Scheme if present), Uri-Host and Uri-Port (if present) options according to the method described in Section 6.5 of {{RFC7252}}, if the message is a CoAP request; -->
 
    * cid : bstr, contains the cid for the request (which is same as the cid for the response).
 
@@ -537,7 +537,7 @@ external_aad_req = [
    ver : uint,
    code : uint,
    alg : int,
-   unencrypted-uri : uri,
+<!--   unencrypted-uri : uri, -->
    ? tag-previous-block : bstr
 ]
 
@@ -577,7 +577,7 @@ If the CoAP client receives a response with the Object-Security option, then the
 
 Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{cid-est}}).
 
-When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address, for canonicalization of the destination address.
+<!-- When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address, for canonicalization of the destination address. -->
 
 1. Compute the COSE object as specified in {{sec-obj-cose}}
 
@@ -614,7 +614,7 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 2. Recreate the Additional Authenticated Data, as described in {{sec-obj-cose}}.
     * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
-    * Note that the server's \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address. 
+<!--    * Note that the server's \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address. -->
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object. 
 
