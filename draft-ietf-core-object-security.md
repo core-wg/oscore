@@ -187,7 +187,9 @@ The Common Context contains the following parameters:
 
 * Algorithm (Alg). Value that identifies the COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Base Key (master_secret). Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
+* Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
+
+* Master Salt (OPTIONAL). Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 The Sender Context contains the following parameters:
 
@@ -209,7 +211,7 @@ The Recipient Context contains the following parameters:
 
 * Recipient Replay Window. The replay protection window for messages received.
 
-The 3-tuple (Cid, Sender ID, Partial IV) is called Transaction Identifier (Tid), and SHALL be unique for each Base Key. The Tid is used as a unique challenge in the COSE object of the protected CoAP request. The Tid is part of the Additional Authenticated Data (AAD, see {{sec-obj-cose}}) of the protected CoAP response message, which is how responses are bound to requests.
+The 3-tuple (Cid, Sender ID, Partial IV) is called Transaction Identifier (Tid), and SHALL be unique for each Master Secret. The Tid is used as a unique challenge in the COSE object of the protected CoAP request. The Tid is part of the Additional Authenticated Data (AAD, see {{sec-obj-cose}}) of the protected CoAP response message, which is how responses are bound to requests.
 
 ## Derivation of Security Context Parameters ## {#sec-context-est-section}
 
@@ -218,7 +220,7 @@ This section describes how to derive the initial parameters in the security cont
 The following input parameters SHALL be pre-established:
 
 * Context Identifier (Cid)
-* Base Key (master_secret)
+* Master Secret
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
 
@@ -228,6 +230,8 @@ The following input parameters MAY be pre-established. In case any of these para
    - Defaults are 0x00 for the endpoint initially being client, and 0x01 for the endpoint initially being server
 * Recipient ID
    - Defaults are 0x01 for the endpoint initially being client, and 0x00 for the endpoint initially being server
+* Master Salt
+   - Default is the empty string
 * Key Derivation Function (KDF)
    - Default is HKDF SHA-256
 * Replay Window Size
@@ -249,34 +253,31 @@ Given the input parameters, the client and server can derive all the other param
 The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
-  output parameter = HKDF(master_secret, salt, info, output_length), 
+  output parameter = HKDF(salt, IKM, info, L), 
 ~~~~~~~~~~~
 
 where:
 
-* master_secret is defined above
-* salt is a string of zeros of the length of the hash function output in octets
+* salt is the Master Salt as defined above
+* IKM is the Master Secret is defined above
 * info is a serialized CBOR array consisting of:
 
 ~~~~~~~~~~~
    info = [
-       cid : bstr,
        id : bstr,
        alg : int,
-       out_type : tstr,
-       out_len : uint
+       type : tstr,
+       L : bstr
    ]
 
    - id is the Sender ID or Recipient ID
 
-   - out_type is "Key" or "IV"
-
-   - out_len is the key/IV size of the AEAD algorithm
+   - type is "Key" or "IV"
 ~~~~~~~~~~~
 
-* output_length is the size of the AEAD key/IV in bytes encoded as an 8-bit unsigned integer
+* L is the key/IV size of the AEAD algorithm in octets without leading zeroes.
 
-For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, output\_length for the keys is 128 bits and output\_length for the IVs is 56 bits.
+For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, L is 16 bytes for keys and 7 bytes for IVs.
 
 
 ### Context Identifier ### {#cid-est}
