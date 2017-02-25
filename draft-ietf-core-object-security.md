@@ -671,8 +671,6 @@ CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP M
 
 Note to RFC Editor: Please replace all occurrences of "\[\[this document\]\]" with the RFC number of this specification.
 
-
-
 ## CoAP Option Numbers Registry ## 
 
 The Object-Security option is added to the CoAP Option Numbers registry:
@@ -683,19 +681,6 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 +--------+-----------------+-------------------+
 |  TBD   | Object-Security | [[this document]] |
 +--------+-----------------+-------------------+
-~~~~~~~~~~~
-{: artwork-align="center"}
-
-## COSE Header Parameters Registry ##
-
-The "sid" parameter is added to the COSE Header Parameter Registry:
-
-~~~~~~~~~~~
-+------+-------+------------+----------------+-------------------+
-| name | label | value type | value registry | description       |
-+------+-------+------------+----------------+-------------------+
-|  sid |  TBD  |    bstr    |                | Sender Identifier |
-+------+-------+------------+----------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
@@ -713,11 +698,11 @@ The "application/oscon" media type is added to the Media Types registry:
 
         Encoding considerations: binary
 
-        Security considerations: See Appendix C of [[this document]].
+        Security considerations: See Appendix C of this document.
 
         Interoperability considerations: N/A
 
-        Published specification: [[this document]]
+        Published specification: [[this document]] (this document)
 
         Applications that use this media type: To be identified
 
@@ -732,18 +717,16 @@ The "application/oscon" media type is added to the Media Types registry:
         * Macintosh file type code(s): N/A
 
         Person & email address to contact for further information:
-        iesg@ietf.org
+           Göran Selander <goran.selander@ericsson.com>
 
         Intended usage: COMMON
 
         Restrictions on usage: N/A
 
-        Author: Goeran Selander, goran.selander@ericsson.com
+        Author: Göran Selander, goran.selander@ericsson.com
 
-        Change Controller: IESG
-
-        Provisional registration? No
-
+        Change Controller: IESG
+        
 ## CoAP Content Format Registration ## 
 
 The "application/oscon" content format is added to the CoAP Content Format registry:
@@ -759,7 +742,7 @@ The "application/oscon" content format is added to the CoAP Content Format regis
 
 # Acknowledgments #
 
-The following individuals provided input to this document: Carsten Bormann, Joakim Brorsson, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, and Malisa Vucinic. 
+The following individuals provided input to this document: Carsten Bormann, Joakim Brorsson, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, Malisa Vucinic, and Christian Amsüss.
 
 Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
