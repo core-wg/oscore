@@ -252,14 +252,15 @@ where:
 * IKM is the Master Secret is defined above
 * info is a serialized CBOR array consisting of:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
    info = [
        id : bstr,
        alg : int,
        type : tstr,
        L : bstr
    ]
-
+~~~~~~~~~~~
+~~~~~~~~~~~
    - id is the Sender ID or Recipient ID
 
    - type is "Key" or "IV"
@@ -429,46 +430,45 @@ Uri-Path and Uri-Query are class E options and SHALL be protected and processed 
 
 The value of the Proxy-Uri option of the protected CoAP message SHALL be replaced with unencrypted-Uri and MUST be processed as a class U option, see {{class-u}}.
 
-# The COSE Object # {#sec-obj-cose}
+# The COSE Object {#sec-obj-cose}
 
-This section defines how to use the COSE format {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm.
+This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the untagged COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, and maximum sequence number are algorithm dependent. The maximum sequence number SHALL be 2^(nonce length in bits - 1) - 1.
+ 
+The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes, and the maximum Sequence Number is 2^55 - 1.
 
-The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key SHALL be 128 bits, the length of nonce, Sender IV, and Recipient IV SHALL be 7 bytes, and the maximum Sequence Number SHALL be 2^56-1. The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the Partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV).
+The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV). The first bit in the Sender IV or Recipient IV SHALL be flipped in responses.
 
-Since OSCOAP only makes use of a single COSE structure, there is no need to explicitly specify the structure, and OSCOAP uses the untagged version of the COSE\_Encrypt0 structure (Section 2. of {{I-D.ietf-cose-msg}}). If the COSE object has a different structure, the recipient MUST reject the message, treating it as malformed.
+We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
-We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only, in the COSE object.
+The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
-The fields of COSE\_Encrypt0 structure are defined as follows (see example in {{sem-auth-enc}}).
+- The "protected" field includes:
 
-* The "Headers" field is formed by:
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses.
 
-    - The "protected" field, which SHALL include:
+   * The "kid" parameter. The value is set to the Sender ID (see {{sec-context-section}}). This parameter SHALL be present in requests.
 
-        * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV is a byte string (type: bstr), and SHOULD be of minimum length needed to encode the sequence number.
+- The "unprotected" field is empty.
 
-        * The "kid" parameter. The value is set to the Sender ID (see {{sec-context-section}}).
-        
-    - The "unprotected" field, which SHALL be empty.
+-  The "ciphertext" field is computed from the Plaintext (see {{plaintext}}) and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{I-D.ietf-cose-msg}}.
 
-* The "ciphertext" field is computed from the Plaintext (see {{plaintext}}) and the Additional Authenticated Data (AAD) (see {{AAD}}) and encoded as a byte string (type: bstr), following Section 5.2 of {{I-D.ietf-cose-msg}}.
+The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}.
 
-
-## Plaintext ## {#plaintext}
+## Plaintext {#plaintext}
 
 The Plaintext is formatted as a CoAP message without Header (see {{plaintext-figure}}) consisting of:
 
-* all CoAP Options present in the unprotected message which are encrypted (see {{coap-headers-and-options}}), in the order as given by the Option number (each Option with Option Header including delta to previous included encrypted option); and
+- all CoAP Options present in the unprotected message that are encrypted (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included encrypted option); and
 
-* the CoAP Payload, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
+- the Payload of unprotected CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
 ~~~~~~~~~~~
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Options to Encrypt (if any) ...                            ~
+|    Options to Encrypt (if any) ...                             
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|1 1 1 1 1 1 1 1|    Payload (if any) ...                       ~
+|1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  (only if there 
    is payload)
@@ -476,54 +476,32 @@ The Plaintext is formatted as a CoAP message without Header (see {{plaintext-fig
 {: #plaintext-figure title="Plaintext" }
 {: artwork-align="center"}
 
-## Additional Authenticated Data ## {#AAD}
+## Additional Authenticated Data {#AAD}
 
-The Additional Authenticated Data ("Enc_structure") as described is Section 5.3 of {{I-D.ietf-cose-msg}} includes:
+The external_aad SHALL be a CBOR array as defined below:
 
-* the "context" parameter, which has value "Encrypted"
-
-* the "protected" parameter, which includes the "protected" part of the "Headers" field;
-
-* the "external\_aad" is a serialized CBOR array {{aad}} where the exact content is different in requests (external_aad_req) and responses (external_aad_resp). It contains:
-
-   * ver: uint, contains the CoAP version number, as defined in Section 3 of {{RFC7252}}
-
-   * code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
-
-   * alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}});
-
-   * id : bstr, is the identifier for the endpoint sending the request and verifying the response; which means that for the endpoint sending the response, the id has value Recipient ID, while for the endpoint receiving the response, id has the value Sender ID.
-
-   * seq : bstr, is the value of the "Partial IV" in the COSE object of the request (see Section 5).
-
-    * tag-previous-block: bstr, contains the AEAD Tag of the message containing the previous block in the sequence, as enumerated by Block1 in the case of a request and Block2 in the case of a response, if the message is fragmented using a block option {{RFC7959}}.
-
-
-~~~~~~~~~~~
-external_aad = external_aad_req / external_aad_resp
-
-external_aad_req = [
+~~~~~~~~~~~ CDDL
+external_aad = [
    ver : uint,
    code : uint,
    alg : int,
-<!--   unencrypted-uri : uri, -->
-   ? tag-previous-block : bstr
-]
-
-external_aad_resp = [
-   ver : uint,
-   code : uint,
-   alg : int,
-   id : bstr,
-   seq : bstr,
-   ? tag-previous-block : bstr
+   request_id : bstr,
+   request_seq : bstr
 ]
 ~~~~~~~~~~~
-{: #aad title="External AAD (external_aad)" }
-{: artwork-align="center"}
 
+where:
 
-The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}. 
+- ver: uint, contains the CoAP version number, as defined in Section 3 of {{RFC7252}}.
+
+- code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
+
+- alg: int, contains the Algorithm from the security context used for the exchange (see {{sec-context-def-section}}).
+
+- request_id : bstr, contains the identifier for the endpoint sending the request and verifying the response; which means that for the endpoint sending the response, the id has value Recipient ID, while for the endpoint receiving the response, id has the value Sender ID.
+
+-  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
+
 
 # Protecting CoAP Messages # {#coap-protected-generate}
 
