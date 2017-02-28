@@ -141,8 +141,6 @@ The length of the Object-Security option depends on whether the unprotected mess
 
 Note that according to {{RFC7252}}, new Methods and Response Codes should specify if the payload is optional, required or not allowed (Section 12.1.2) in the message, and in case this is not defined the sender must not include a payload (Section 5.5). Thus, in this case, the COSE object MUST be the value of the Object-Security option.
 
-More details about the message overhead caused by the Object-Security option are given in {{appendix-a}}.
-
 # The Security Context {#sec-context-section}
 
 OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm. The specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
@@ -726,110 +724,9 @@ Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPl
 
 --- back
 
-# Overhead {#appendix-a}
+# Test Vectors {#app-vectors}
 
-OSCOAP transforms an unprotected CoAP message to a protected CoAP message, and the protected CoAP message is larger than the unprotected CoAP message. This appendix illustrates the message expansion.
-
-## Length of the Object-Security Option {#appendix-a1}
-
-The protected CoAP message contains the COSE object. The COSE object is included in the payload if the message type of the unprotected CoAP message allows payload or else in the Object-Security option. In the former case the Object-Security option is empty. So the length of the Object-Security option is either zero or the size of the COSE object, depending on whether the CoAP message allows payload or not.
-
-Length of Object-Security option = \{ 0, size of COSE Object \}
-
-## Size of the COSE Object {#appendix-a2}
-
-The size of the COSE object is the sum of the sizes of 
-
-* the Header parameters,
-
-* the Cipher Text (excluding the Tag),
-
-* the Tag, and 
-
-* data incurred by the COSE format itself (including CBOR encoding).
-
-Let's analyze the contributions one at a time:
-
-* The header parameters of the COSE object are the Context Identifier (Cid) and the Sequence Number (Seq) (also part of the Transaction Identifier (Tid)) if the message is a request, and Seq only if the message is a response (see {{sec-obj-cose}}).
-
-  * The size of Cid is recommended to be 64 bits, but may be shorter, as discussed in {{cid-est}}
-
-  * The size of Seq is variable, and increases with the number of messages exchanged.
-
-  * As the AEAD nonce is generated from the padded Sequence Number and a previously agreed upon context IV it is not required to send the whole nonce in the message.
-
-* The Cipher Text, excluding the Tag, is the encryption of the payload and the encrypted options {{coap-headers-and-options}}, which are present in the unprotected CoAP message.
-
-* The size of the Tag depends on the Algorithm. For example, for the algorithm AES-CCM-64-64-128, the Tag is 8 bytes.
-
-* The overhead from the COSE format itself depends on the sizes of the previous fields, and is of the order of 10 bytes.
-
-
-
-## Message Expansion {#appendix-a3}
-
-The message expansion is not the size of the COSE object. The ciphertext in the COSE object is encrypted payload and options of the unprotected CoAP message - the plaintext of which is removed from the protected CoAP message. Since the size of the ciphertext is the same as the corresponding plaintext, there is no message expansion due to encryption; payload and options are just represented in a different way in the protected CoAP message: 
-
-* The encrypted payload is in the payload of the protected CoAP message
-
-* The encrypted options are in the Object-Security option or within the payload.
-
-Therefore the OSCOAP message expansion is due to Cid (if present), Seq, Tag, and COSE overhead:
-
-
-~~~~~~~~~~~
-Message Overhead = Cid + Seq + Tag + COSE Overhead
-~~~~~~~~~~~
-{: #mess-exp-formula title="OSCOAP message expansion" }
-{: artwork-align="center"}
-
-
-## Example {#appendix-b}
-
-This section gives an example of message expansion in a request with OSCOAP.
-
-In this example we assume an 8-byte Cid.
-
-* Cid: 0xa1534e3c9cecad84
-
-In the example the sequence number is 225, requiring 1 byte to encode. (The size of Seq could be larger depending on how many messages that has been sent as is discussed in {{appendix-a2}}.) 
-
-* Seq: 225
-
-The example is based on AES-CCM-64-64-128.
-
-* Tag is 8 bytes
-
-The COSE object is represented in {{mess-exp-ex}} using CBOR's diagnostic notation. 
-
-~~~~~~~~~~~
-[
-  h'a20448a1534e3c9cecad840641e2', / protected:
-                                      {04:h'a1534e3c9cecad84',
-                                       06:h'e2'} /
-  {},                              / unprotected: - /
-  Ciph + Tag                       / ciphertext + 8 byte 
-                                      authentication tag /
-]
-~~~~~~~~~~~
-{: #mess-exp-ex title="Example of message expansion" }
-{: artwork-align="center"}
-
-Note that the encrypted CoAP options and payload are omitted since we target the message expansion (see {{appendix-a3}}). Therefore the size of the COSE Cipher Text equals the size of the Tag, which is 8 bytes.
-
-The COSE object encodes to a total size of 26 bytes, which is the message expansion in this example. The COSE overhead in this example is 26 - (8 + 1 + 8) = 9 bytes, according to the formula in {{mess-exp-formula}}. Note that in this example two bytes in the COSE overhead are used to encode the length of Cid and the length of Seq. 
-
-{{table-aes-ccm}} summarizes these results.
-
-~~~~~~~~~~~
-+---------+---------+---------+----------+------------+
-|   Cid   |   Seq   |   Tag   | COSE OH  | Message OH |
-+---------+---------+---------+----------+------------+
-| 8 bytes | 1 byte  | 8 bytes |  9 bytes |  22 bytes  |
-+---------+---------+---------+----------+------------+
-~~~~~~~~~~~
-{: #table-aes-ccm title="Message overhead for a 8-byte Cid, 1-byte Seq and 8-byte Tag."}
-{: artwork-align="center"}
+TODO: This section needs to be updated.
 
 # Examples {#appendix-d}
 
@@ -995,7 +892,7 @@ all examples, with these values:
 * Seq: 0xa3
 
 For each scheme, we indicate the fixed length of these two parameters ("Cid+Seq" column) and of the Tag ("MAC"/"SIG"/"TAG"). The "Message OH" column
-shows the total expansions of the CoAP message size, while the "COSE OH" column is calculated from the previous columns following the formula in {{mess-exp-formula}}.
+shows the total expansions of the CoAP message size, while the "COSE OH" column is calculated from the previous columns.
 
 Overhead incurring from CBOR encoding is also included in the COSE overhead count. 
 
