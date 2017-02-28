@@ -51,12 +51,12 @@ normative:
 
   I-D.ietf-cose-msg:
   RFC2119:
+  RFC5869:
   RFC6347:
+  RFC7049:
   RFC7252:
   RFC7641:
   RFC7959:
-  RFC3986:
-  RFC7049:
   
 informative:
 
@@ -68,7 +68,6 @@ informative:
   I-D.seitz-ace-oscoap-profile:
   I-D.ietf-core-coap-tcp-tls:
   I-D.greevenbosch-appsawg-cbor-cddl:
-  RFC5869:
   RFC7228:
 
 --- abstract
