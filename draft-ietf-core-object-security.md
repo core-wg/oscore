@@ -531,7 +531,7 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 4. Store the association Token - Security Context. The Client SHALL be able to find the correct security context used to protect the request and verify the response with use of the Token of the message exchange.
 
-5. Increment the Sender Sequence Number by one. If the Sender Sequence Number exceeds the maximum number for the AEAD algorithm, the client MUST NOT process any more requests with the given security context. The client SHOULD acquire a new security context (and consequently inform the server about it) before this happens. The latter is out of scope of this memo.
+5. Increment the Sender Sequence Number by one.
 
 ## Verifying the Request {#verif-coap-req}
 
@@ -544,7 +544,6 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 1. Verify the Sequence Number in the Partial IV parameter, as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
 
 2. Recreate the Additional Authenticated Data, as described in {{sec-obj-cose}}.
-    * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object. 
 
@@ -564,14 +563,13 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 2. Compute the COSE object as specified in Section {{sec-obj-cose}}
   * The AEAD nonce is created by XORing the Sender IV (context IV) and the padded Sender Sequence Number.
-  * If the block option {{RFC7959}} is used, the AAD includes the AEAD Tag from the previous block sent (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-sent block to compute the following. Note that this applies even for random access of blocks, i.e. when blocks are not requested in the order of their relative number (NUM). 
   
 3. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload based on the unprotected CoAP message:
   * The CoAP header is the same as the unprotected CoAP message.
   * The CoAP options which are of class E are removed, except any special option (labelled '*') that is present which has its outer value ({{coap-headers-and-options}}). The Object-Security option is added. 
   * If the message type of the unprotected CoAP message does not allow Payload, then the value of the Object-Security option is the COSE object. If the message type of the unprotected CoAP message allows Payload, then the Object-Security option is empty and the Payload of the protected CoAP message is the COSE object.
 
-4. Increment the Sender Sequence Number by one. If the Sender Sequence Number exceeds the maximum number for the AEAD algorithm, the server MUST NOT process any more responses with the given security context. The server SHOULD acquire a new security context (and consequently inform the client about it) before this happens. The latter is out of scope of this memo. 
+4. Increment the Sender Sequence Number by one.
 
 
 ## Verifying the Response {#verif-coap-resp}
@@ -583,7 +581,6 @@ A CoAP client receiving a message containing the Object-Security option SHALL pe
 1. Verify the Sequence Number in the Partial IV parameter as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the client MUST stop processing the response.
 
 2. Recreate the Additional Authenticated Data as described in {{sec-obj-cose}}.
-  * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the Partial IV parameter, received in the COSE Object.
 
