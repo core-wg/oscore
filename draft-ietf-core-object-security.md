@@ -169,8 +169,7 @@ Retrieve context with |<----------------------+
 Verify request with   |                       |
  Recipient Context    |                       |
 ~~~~~~~~~~~
-{: #sec-context-ex title="Retrieval and use of the Security Context"}
-{: artwork-align="center"}
+{: #sec-context-ex title="Retrieval and use of the Security Context" artwork-align="center"}
 
 The Common Context contains the following parameters:
 
@@ -498,7 +497,7 @@ where:
 
 -  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
-# Replay and Freshness Protection ## {#replay-protection-section}
+# Replay and Freshness Protection {#replay-protection-section}
 
 In order to protect from replay of messages and verify freshness, a CoAP endpoint SHALL maintain a Sender Sequence Number and a Recipient Replay Window in the security context. An endpoint uses the Sender Sequence Number to protect messages to send and the Recipient Replay Window to verify received messages, as described in {{sec-context-section}}.
 
@@ -512,9 +511,9 @@ If a CoAP server receives a request with the Object-Security option, then the se
 
 If the CoAP client receives a response with the Object-Security option, then the client SHALL verify the integrity of the response, using the Tid of its own associated request in the AAD, as described in {{verif-coap-resp}}.
 
-# Processing # {#coap-protected-generate}
+# Processing {#coap-protected-generate}
 
-## Protecting the Request ## {#protected-coap-formatting-req}
+## Protecting the Request {#protected-coap-formatting-req}
 
 Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{id-est}}).
 
@@ -540,8 +539,7 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 5. Increment the Sender Sequence Number by one. If the Sender Sequence Number exceeds the maximum number for the AEAD algorithm, the client MUST NOT process any more requests with the given security context. The client SHOULD acquire a new security context (and consequently inform the server about it) before this happens. The latter is out of scope of this memo.
 
-
-## Verifying the Request ## {#verif-coap-req}
+## Verifying the Request {#verif-coap-req}
 
 A CoAP server receiving an unprotected CoAP request to access a protected resource (as defined {{id-est}}) SHALL reject the message with error code 4.01 (Unauthorized).
 
@@ -564,7 +562,7 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any outer E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
 
-## Protecting the Response ## {#protected-coap-formatting-resp}
+## Protecting the Response {#protected-coap-formatting-resp}
 
 A server receiving a valid request with a protected CoAP message (i.e. containing an Object-Security option) SHALL respond with a protected CoAP message.
 
@@ -584,7 +582,7 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 Note the differences between generating a protected request, and a protected response, for example whether "kid" is present in the header, or whether Destination URI or Tid is present in the AAD, of the COSE object. 
 
 
-## Verifying the Response ## {#verif-coap-resp}
+## Verifying the Response {#verif-coap-resp}
 
 A CoAP client receiving a message containing the Object-Security option SHALL perform the following steps, using the security context identified by the Token of the received response:
 
