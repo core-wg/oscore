@@ -84,7 +84,7 @@ This memo defines Object Security of CoAP (OSCOAP), a data object based security
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7228}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}.
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{obj-sec-option-section}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the COSE object are added, see {{oscoap-ex}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{obj-sec-option-section}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                           Server
@@ -100,8 +100,7 @@ Client                                           Server
    |<----------------------------------------------+
    |                                               |
 ~~~~~~~~~~~
-{: #oscoap-ex title="Sketch of OSCOAP"}
-{: artwork-align="center"}
+{: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
 OSCOAP may be used in extremely constrained settings, where DTLS cannot be supported. Alternatively, OSCOAP can be combined with DTLS, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{appendix-d}}.
 
