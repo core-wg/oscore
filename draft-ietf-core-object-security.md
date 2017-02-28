@@ -515,10 +515,6 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
     * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number in network byte order (partial IV).
     
-    * If the block option is used, the AAD includes the AEAD Tag from the previous block sent (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-sent block to compute the following.
-    
-    * Note that the 'sid' field containing the Sender ID is included in the COSE object ({{sec-obj-cose}}) if the application needs it.
-
 2. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload, based on the unprotected CoAP message:
 
     * The CoAP header is the same as the unprotected CoAP message.
@@ -539,7 +535,7 @@ A CoAP server receiving an unprotected CoAP request to access a protected resour
 
 A CoAP server receiving a message containing the Object-Security option and a outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
 
-A CoAP server receiving a message containing the Object-Security option SHALL perform the following steps, using the security context identified by the Context Identifier in the "kid" parameter in the received COSE object:
+A CoAP server receiving a message containing the Object-Security option SHALL perform the following steps, using the Recipient Context identified by the "kid" parameter in the received COSE object:
 
 1. Verify the Sequence Number in the Partial IV parameter, as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
 
