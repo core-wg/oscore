@@ -573,8 +573,6 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 4. Increment the Sender Sequence Number by one. If the Sender Sequence Number exceeds the maximum number for the AEAD algorithm, the server MUST NOT process any more responses with the given security context. The server SHOULD acquire a new security context (and consequently inform the client about it) before this happens. The latter is out of scope of this memo. 
 
-Note the differences between generating a protected request, and a protected response, for example whether "kid" is present in the header, or whether Destination URI or Tid is present in the AAD, of the COSE object. 
-
 
 ## Verifying the Response {#verif-coap-resp}
 
@@ -833,6 +831,8 @@ The server verifies that the Sequence Number has not been received before (see {
 
 
 # Object Security of Content (OSCON) {#mode-payl}
+
+TODO: This section needs to be updated.
 
 OSCOAP protects message exchanges end-to-end between a certain client and a
 certain server, targeting the security requirements for forward proxy of {{I-D.hartke-core-e2e-security-reqs}}. In contrast, many use cases require one and
