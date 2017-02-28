@@ -498,10 +498,7 @@ where:
 
 -  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
-
-# Protecting CoAP Messages # {#coap-protected-generate}
-
-## Replay and Freshness Protection ## {#replay-protection-section}
+# Replay and Freshness Protection ## {#replay-protection-section}
 
 In order to protect from replay of messages and verify freshness, a CoAP endpoint SHALL maintain a Sender Sequence Number and a Recipient Replay Window in the security context. An endpoint uses the Sender Sequence Number to protect messages to send and the Recipient Replay Window to verify received messages, as described in {{sec-context-section}}.
 
@@ -515,11 +512,11 @@ If a CoAP server receives a request with the Object-Security option, then the se
 
 If the CoAP client receives a response with the Object-Security option, then the client SHALL verify the integrity of the response, using the Tid of its own associated request in the AAD, as described in {{verif-coap-resp}}.
 
+# Processing # {#coap-protected-generate}
+
 ## Protecting the Request ## {#protected-coap-formatting-req}
 
 Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{id-est}}).
-
-<!-- When using Uri-Host or Proxy-Uri in the construction of the request, the \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address, for canonicalization of the destination address. -->
 
 1. Compute the COSE object as specified in {{sec-obj-cose}}
 
@@ -556,7 +553,6 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 2. Recreate the Additional Authenticated Data, as described in {{sec-obj-cose}}.
     * If the block option is used, the AAD includes the AEAD Tag from the previous block received (from the second block and following) {{AAD}}. This means that the endpoint MUST store the Tag of each last-received block to compute the following.
-<!--    * Note that the server's \<host\> value MUST be a reg-name ({{RFC3986}}), and not an IP-literal or IPv4address. -->
 
 3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object. 
 
