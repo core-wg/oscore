@@ -84,7 +84,7 @@ This memo defines Object Security of CoAP (OSCOAP), a data object based security
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7228}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}.
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{obj-sec-option-section}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                           Server
@@ -112,13 +112,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{I-D.ietf-cose-msg}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
-# The Object-Security Option {#obj-sec-option-section}
+# The Object-Security Option {#option}
 
-The Object-Security option indicates that OSCOAP is used to protect the CoAP message exchange. The protection is achieved by means of a COSE object included in the protected CoAP message, as detailed in {{sec-obj-cose}}.
-
-The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. {{obj-sec-option}} illustrates the structure of the Object-Security option.
-
-A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option.  The effect of this is that messages with the Object-Security option will never generate cache hits. To further prevent caching, a Max-Age option with value zero SHOULD be added to the protected CoAP responses.
+The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP message exchange. The Object-Security option is critical, safe to forward, part of the cache key, not repeatable, and opaque.
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+--------+--------+
@@ -128,16 +124,17 @@ A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security op
 +-----+---+---+---+---+-----------------+--------+--------+
      C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable
 ~~~~~~~~~~~
-{: #obj-sec-option title="The Object-Security Option"}
-{: artwork-align="center"}
+{: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The length of the Object-Security option depends on whether the unprotected message allows payload, on the set of options that are included in the unprotected message, the length of the integrity tag, and the length of the information identifying the security context.
+A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. To prevent caching in proxies not recognizing the Object-Security, a server MAY add a Max-Age option with value zero to protected CoAP responses.
 
-* If the unprotected message allows payload, then the COSE object is the payload of the protected message (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}), and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
+The protection is achieved by means of a COSE object (see {{sec-obj-cose}}) included in the protected CoAP message. The placement of the COSE object depends on whether the method/response code allows payload (see {{RFC7252}}):
 
-* If the unprotected message does not allow payload, then the COSE object is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
+* If the method/response code allows payload, then the COSE object is the payload of the protected message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
 
-Note that according to {{RFC7252}}, new Methods and Response Codes should specify if the payload is optional, required or not allowed (Section 12.1.2) in the message, and in case this is not defined the sender must not include a payload (Section 5.5). Thus, in this case, the COSE object MUST be the value of the Object-Security option.
+* If the method/response code does not allow payload, then the COSE object is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
+
+The size of the COSE object depends on whether the method/response code allows payload, if the message is a request or response, on the set of options that are included in the unprotected message, the AEAD algorithm, the length of the information identifying the security context, and the length of the sequence number.
 
 # The Security Context {#sec-context-section}
 
