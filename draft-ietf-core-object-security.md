@@ -178,23 +178,23 @@ The Common Context contains the following parameters:
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Variable length byte string identifying the endpoint itself. Its value is immutable once the security context is established.
+* Sender ID. Variable length byte string identifying the Sender Context. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
-* Sender IV. Byte string containing the fixed context IV {{I-D.ietf-cose-msg}}) to protect messages to send. Length is determined by Algorithm. Its value is immutable once the security context is established.
+* Sender IV. Byte string containing the IV to protect messages to send. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
-* Sequence Number. Non-negative integer enumerating the COSE objects that the endpoint sends using the context. Used as partial IV {{I-D.ietf-cose-msg}} to generate unique nonces for the AEAD. Maximum value is determined by Algorithm.
+* Sequence Number. Non-negative integer used to protect requests and observe responses to send. Used as partial IV {{I-D.ietf-cose-msg}} to generate unique nonces for the AEAD. Maximum value is determined by Algorithm.
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Variable length byte string identifying the endpoint messages are received from. Its value is immutable once the security context is established.
+* Recipient ID. Variable length byte string identifying the Recipient Context. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Length is determined by the Algorithm. Its value is immutable once the security context is established.
 
-* Recipient IV. Byte string containing the context IV to verify messages received. Length is determined by Algorithm. Its value is immutable once the security context is established.
+* Recipient IV. Byte string containing the IV to verify messages received. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
-* Replay Window. The replay protection window for messages received.
+* Replay Window (OPTIONAL). The replay window to verify requests and observe responses received.
 
 ## Derivation of Security Context Parameters {#context-derivation}
 
