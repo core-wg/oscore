@@ -156,7 +156,7 @@ Retrieve context for  | request:              |
  target resource      | [Token = Token1,      |
 Protect request with  |  kid = SID, ...]      |
   Sender Context      +---------------------->| Retrieve context with
-                      |                       |  context with RID = SID
+                      |                       |  with RID = SID
                       |                       | Verify request with
                       |                       |  Recipient Context
                       | response:             | Protect response with
