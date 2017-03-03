@@ -142,7 +142,12 @@ OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) al
 
 ## Security Context Definition {#context-definition}
 
-The security context is the set of information elements necessary to carry out the cryptographic operations in OSCOAP. For each endpoint, the security context is composed of a "Common Context", a "Sender Context", and a "Recipient Context". The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Each (Sender Context, Recipient Context)-pair has a unique ID. An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
+The security context is the set of information elements necessary to carry out the cryptographic operations in OSCOAP. For each endpoint, the security context is composed of a "Common Context", a "Sender Context", and a "Recipient Context".
+
+The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data.
+
+
+Each (Sender Context, Recipient Context)-pair has a unique ID. An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
                .------------.           .------------.
@@ -196,43 +201,43 @@ The Recipient Context contains the following parameters:
 
 * Replay Window. The replay window to verify requests and observe responses received.
 
-An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, Recipient IV and deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+
+The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
 
 ## Derivation of Security Context Parameters {#context-derivation}
 
-This section describes how to derive the initial parameters in the security context, given a small set of input parameters. We also give indications on how applications should select the input parameters.
-
-The following input parameters SHALL be pre-established:
+The parameters in the security context are derived from a small set of input parameters. The following input parameters SHALL be pre-established:
 
 * Master Secret
+
 * Sender ID
+
 * Recipient ID
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
 
 * AEAD Algorithm (Alg)
+
    - Default is AES-CCM-64-64-128 (value 12)
+
 * Master Salt
+
    - Default is the empty string
+
 * Key Derivation Function (KDF)
+
    - Default is HKDF SHA-256
-* Replay Window Size
-   - Default is 64
 
-The endpoints MAY interchange the CoAP client and server roles while maintaining the same security context. When this happens, the former server still protects the message to send using the Sender Context, and verifies the message received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
+* Replay Window Type and Size
 
-The input parameters are included unchanged in the security context. From the input parameters, the following parameters are derived:
+   - Default is DTLS-type replay window with size 64
 
-* Sender Key, Sender IV, Sender Sequence Number
-* Recipient Key, Recipient IV, Recipient Sequence Number
-
-The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of input parameters with the property of forward secrecy, and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
+How the input parameters are pre-established, is application specific. The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of input parameters with the property of forward secrecy, and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
 
 ### Derivation of Sender Key/IV, Recipient Key/IV
 
-Given the input parameters, the client and server can derive all the other parameters in the security context. The derivation procedure described here MUST NOT be executed more than once using the same master_secret and Cid. The same master_secret SHOULD NOT be used with more than one Cid.
-
-The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived from the input parameters using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
   output parameter = HKDF(salt, IKM, info, L), 
@@ -253,32 +258,34 @@ where:
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
-   - id is the Sender ID or Recipient ID
+   * id is the Sender ID or Recipient ID
 
-   - type is "Key" or "IV"
+   * type is "Key" or "IV"
 ~~~~~~~~~~~
 
 * L is the key/IV size of the AEAD algorithm in octets without leading zeroes.
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, L is 16 bytes for keys and 7 bytes for IVs.
 
-### Sender ID and Recipient ID {#identities}
+### Initial Sequence Numbers and Replay Window
 
-The Sender ID and Recipient ID are pre-established, and how this is done is application specific. As collisions may lead to the loss of both confidentiality and integrity, the Sender ID SHALL be unique in the set of all endpoints using the same Master Secret. Normally (e.g. when using EDHOC) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+The Sender Sequence Number is initialized to 0. The Recipient Replay Window is by default initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+
+## Requirements on the Security Context Parameters {#context-requirements}
+
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using EDHOC) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipent Contexts used by an endpoint.
 
-### Sequence Numbers and Replay Window
+The same Master Salt MAY be used with several Master Secrets.
 
-The Sender Sequence Number is initialized to 0. The Recipient Replay Window is initiated as described in Section 4.1.2.6 of {{RFC6347}}.
-
-# Protected Resources {#resource}
+## Protected Resources {#resources}
 
 TODO:
 
 In the same phase during which the Sender ID and Recipient ID are established in the endpoint, the application informs the endpoint what resources can be accessed using the corresponding security contexts. Resources that are accessed with OSCOAP are called "protected" resources. The set of resources that can be accessed using a certain security context is decided by the application (resource, host, etc.). The client SHALL save the association resource-SID, in order to be able to retrieve the correct security context to access a protected resource. The server SHALL save the association resource-RID, in order to determine whether a particular resource may be accessed using a certain context.
 
-A CoAP server receiving an unprotected CoAP request to access a protected resource (as defined {{identities}}) SHALL reject the message with error code 4.01 (Unauthorized).
+A CoAP server receiving an unprotected CoAP request to access a protected resource SHALL reject the message with error code 4.01 (Unauthorized).
 
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
