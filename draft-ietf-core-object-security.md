@@ -269,13 +269,17 @@ The Sender ID and Recipient ID are pre-established, and how this is done is appl
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipent Contexts used by an endpoint.
 
-In the same phase during which the Sender ID and Recipient ID are established in the endpoint, the application informs the endpoint what resources can be accessed using the corresponding security contexts. Resources that are accessed with OSCOAP are called "protected" resources. The set of resources that can be accessed using a certain security context is decided by the application (resource, host, etc.). The client SHALL save the association resource-SID, in order to be able to retrieve the correct security context to access a protected resource. The server SHALL save the association resource-RID, in order to determine whether a particular resource may be accessed using a certain context.
-
-
 ### Sequence Numbers and Replay Window
 
 The Sender Sequence Number is initialized to 0. The Recipient Replay Window is initiated as described in Section 4.1.2.6 of {{RFC6347}}.
 
+# Protected Resources {#resource}
+
+TODO:
+
+In the same phase during which the Sender ID and Recipient ID are established in the endpoint, the application informs the endpoint what resources can be accessed using the corresponding security contexts. Resources that are accessed with OSCOAP are called "protected" resources. The set of resources that can be accessed using a certain security context is decided by the application (resource, host, etc.). The client SHALL save the association resource-SID, in order to be able to retrieve the correct security context to access a protected resource. The server SHALL save the association resource-RID, in order to determine whether a particular resource may be accessed using a certain context.
+
+A CoAP server receiving an unprotected CoAP request to access a protected resource (as defined {{id-est}}) SHALL reject the message with error code 4.01 (Unauthorized).
 
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
@@ -530,8 +534,6 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 5. Increment the Sender Sequence Number by one.
 
 ## Verifying the Request {#verif-coap-req}
-
-A CoAP server receiving an unprotected CoAP request to access a protected resource (as defined {{id-est}}) SHALL reject the message with error code 4.01 (Unauthorized).
 
 A CoAP server receiving a message containing the Object-Security option and a outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
 
