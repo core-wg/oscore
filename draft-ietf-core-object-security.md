@@ -102,7 +102,7 @@ Client                                           Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
-OSCOAP may be used in extremely constrained settings, where DTLS cannot be supported. Alternatively, OSCOAP can be combined with DTLS, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{appendix-d}}.
+OSCOAP may be used in extremely constrained settings, where DTLS cannot be supported. Alternatively, OSCOAP can be combined with DTLS, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
 The message protection provided by OSCOAP can alternatively be applied only to the payload of individual messages. We call this object security of content (OSCON) and it is defined in {{oscon}}.
 
@@ -704,7 +704,7 @@ Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPl
 
 TODO: This section needs to be updated.
 
-# Examples {#appendix-d}
+# Examples {#examples}
 
 This section gives examples of OSCOAP. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format. 
 
