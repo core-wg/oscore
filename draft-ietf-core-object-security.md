@@ -104,7 +104,7 @@ Client                                           Server
 
 OSCOAP may be used in extremely constrained settings, where DTLS cannot be supported. Alternatively, OSCOAP can be combined with DTLS, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{appendix-d}}.
 
-The message protection provided by OSCOAP can alternatively be applied only to the payload of individual messages. We call this object security of content (OSCON) and it is defined in {{mode-payl}}.
+The message protection provided by OSCOAP can alternatively be applied only to the payload of individual messages. We call this object security of content (OSCON) and it is defined in {{oscon}}.
 
 ## Terminology {#terminology}
 
@@ -822,7 +822,7 @@ The server verifies that the Sequence Number has not been received before (see {
 
 
 
-# Object Security of Content (OSCON) {#mode-payl}
+# Object Security of Content (OSCON) {#oscon}
 
 TODO: This section needs to be updated.
 
