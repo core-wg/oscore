@@ -196,7 +196,7 @@ The Recipient Context contains the following parameters:
 
 * Replay Window. The replay window to verify requests and observe responses received.
 
-An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, Recipient IV and deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 ## Derivation of Security Context Parameters {#context-derivation}
 
