@@ -235,7 +235,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
 How the input parameters are pre-established, is application specific. The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of input parameters with the property of forward secrecy, and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
 
-### Derivation of Sender Key/IV, Recipient Key/IV
+### Derivation of Sender Key/IV, Recipient Key/IV 
 
 The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. The KDF HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV, Recipient Key/IV SHALL be derived from the input parameters using HKDF, and consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
@@ -519,7 +519,7 @@ For responses without Observe, OSCOAP provides absolute freshness. For requests,
 
 ## Protecting the Request {#protected-coap-formatting-req}
 
-Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{identities}}).
+Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{context}}).
 
 1. Compute the COSE object as specified in {{cose-object}}
 
