@@ -202,7 +202,7 @@ The Recipient Context contains the following parameters:
 
 * Replay Window. The replay window to verify requests and observe responses received.
 
-An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, Recipient IV and deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
 
@@ -234,7 +234,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay window with size 64
 
-How the input parameters are pre-established, is application specific. The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of input parameters with the property of forward secrecy, and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
+How the input parameters are pre-established, is application specific. The EDHOC protocol [I-D.selander-ace-cose-ecdhe] enables the establishment of input parameters with the property of forward secrecy and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
 
 ### Derivation of Sender Key/IV, Recipient Key/IV 
 
