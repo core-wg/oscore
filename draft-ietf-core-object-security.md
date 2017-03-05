@@ -241,7 +241,7 @@ How the input parameters are pre-established, is application specific. The EDHOC
 The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE, and HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV and Recipient Key/IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
-  output parameter = HKDF(salt, IKM, info, L), 
+   output parameter = HKDF(salt, IKM, info, L) 
 ~~~~~~~~~~~
 
 where:
@@ -270,7 +270,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-
 
 ### Initial Sequence Numbers and Replay Window
 
-The Sender Sequence Number is initialized to 0. The Recipient Replay Window is by default initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sequence Number is initialized to 0. The supported type of replay protection is application specific and depends on the lower layers. It is mandatory to support a DTLS-type replay window with size 64. This default Replay Window is initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters {#context-requirements}
 
