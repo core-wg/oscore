@@ -280,13 +280,9 @@ To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be u
 
 The same Master Salt MAY be used with several Master Secrets.
 
-# Protected Resources {#resources}
+# URI Schemes and Resources {#resources}
 
-TODO:
-
-In the same phase during which the Sender ID and Recipient ID are established in the endpoint, the application informs the endpoint what resources can be accessed using the corresponding security contexts. Resources that are accessed with OSCOAP are called "protected" resources. The set of resources that can be accessed using a certain security context is decided by the application (resource, host, etc.). The client SHALL save the association resource-SID, in order to be able to retrieve the correct security context to access a protected resource. The server SHALL save the association resource-RID, in order to determine whether a particular resource may be accessed using a certain context.
-
-A CoAP server receiving an unprotected CoAP request to access a protected resource SHALL reject the message with error code 4.01 (Unauthorized).
+The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The set of resources and methods that requires OSCOAP is decided by the application. The set of resources and methods that can be used with a certain security context is decided by the application. For each resource and method, clients need to be able to retrieve the correct security context to use. For each resource and method, servers need to be able to determine whether the security context is authorized. A server receiving an unprotected request to a resource and method requiring OSCOAP SHALL reject the message with error code 4.01 (Unauthorized). A server receiving a protected request with a security context not authorized for use with the resource and method SHALL reject the message with error code 4.01 (Unauthorized).
 
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
@@ -566,8 +562,6 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any outer E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
 
 ## Protecting the Response {#protected-coap-formatting-resp}
-
-A server receiving a valid request with a protected CoAP message (i.e. containing an Object-Security option) SHALL respond with a protected CoAP message.
 
 Given an unprotected CoAP response, including header, options, and payload, the server SHALL perform the following steps to create a protected CoAP response, using the security context identified by the Context Identifier of the received request:
 
