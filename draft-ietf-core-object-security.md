@@ -276,11 +276,11 @@ The Sender Sequence Number is initialized to 0. The Recipient Replay Window is b
 
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using EDHOC) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
-To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipent Contexts used by an endpoint.
+To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
 The same Master Salt MAY be used with several Master Secrets.
 
-## Protected Resources {#resources}
+# Protected Resources {#resources}
 
 TODO:
 
