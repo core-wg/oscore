@@ -288,7 +288,7 @@ The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be use
 
 OSCOAP transforms an unprotected CoAP message into a protected CoAP message, and vice versa. This section defines how the unprotected CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. 
 
-This section also outlines how the message fields are processed and transferred, a detailed description is provided in {{coap-protected-generate}}. Message fields of the unprotected CoAP message are either transferred in the header/options part of the protected CoAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the protected CoAP message is called "outer" or "inner": 
+This section also outlines how the message fields are processed and transferred, a detailed description is provided in {{processing}}. Message fields of the unprotected CoAP message are either transferred in the header/options part of the protected CoAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the protected CoAP message is called "outer" or "inner": 
 
 * Inner message field = message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
 * Outer message field = message field included in the header or options part of the protected CoAP message
@@ -513,7 +513,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allows a recipient to determine the relative order of messages.  For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness [I-D.mattsson-core-coap-actuators]. 
 
-# Processing {#coap-protected-generate}
+# Processing {#processing}
 
 TODO: Update include new Observe processing
 
