@@ -127,7 +127,7 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
+A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
 The protection is achieved by means of a COSE object (see {{cose-object}}) included in the protected CoAP message. The placement of the COSE object depends on whether the method/response code allows payload (see {{RFC7252}}):
 
@@ -295,7 +295,7 @@ This section also outlines how the message fields are processed and transferred,
 * Inner message field = message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
 * Outer message field = message field included in the header or options part of the protected CoAP message
 
-The inner message fields are by definition encrypted and integrity protected by the COSE object. The outer message fields are not encrypted and thus visible to a proxy, but may be integrity protected by including the message field values in the AAD of the COSE object (see {{AAD}}).
+The inner message fields are by definition encrypted and integrity protected by the COSE object. The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the AAD of the COSE object (see {{AAD}}).
 
 Note that, even though the message formats are slightly different, OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
@@ -378,7 +378,7 @@ Except for the Block options {{block-options}}, the receiving endpoint SHALL dis
 
 An inner Max-Age option is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
 
-Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching in proxies not recognizing the Object-Security, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). 
+Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). 
 
 The outer Max-Age option is not integrity protected.
 
