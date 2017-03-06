@@ -378,7 +378,7 @@ Except for the Block options {{block-options}}, the receiving endpoint SHALL dis
 
 An inner Max-Age option is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
 
-Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To prevent caching in proxies not recognizing the Object-Security, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). 
+Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching in proxies not recognizing the Object-Security, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). 
 
 The outer Max-Age option is not integrity protected.
 
