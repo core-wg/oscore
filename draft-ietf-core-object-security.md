@@ -139,7 +139,9 @@ The size of the COSE object depends on whether the method/response code allows p
 
 # The Security Context {#context}
 
-OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm. The specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
+OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only the server part.
+
+The specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
@@ -385,6 +387,8 @@ The outer Max-Age option is not integrity protected.
 
 TODO: Update processing to support multiple concurrently proceeding requests
 
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY support RFC7252 with the Object-Security option without supporting {{RFC7959}}.
+
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
 The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, last block, etc.). Additionally, a proxy may arbitrarily do fragmentation operations on the protected CoAP message, adding outer block options that are not intended to be verified by any endpoint or proxy.  
@@ -406,7 +410,7 @@ Options in this class are used to support forward proxy operations. Unless other
 
 #### Observe {#observe}
 
-The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
+Observe {{RFC7641}} is an optional feature. An implementation MAY support RFC7252 with the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
 To secure the order of the notifications, the Partial IV of the response is used instead of the Observe option for the responses, which may be changed by a proxy. However, in order for a proxy to support forwarding of notifications, there must be an outer Observe option.
 
