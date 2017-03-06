@@ -280,7 +280,7 @@ To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be u
 
 The same Master Salt MAY be used with several Master Secrets.
 
-# URI Schemes and Resources {#resources}
+# URI Schemes and Protected Resources {#resources}
 
 The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The set of resources and methods that requires OSCOAP is decided by the application. The set of resources and methods that can be used with a certain security context is decided by the application. For each resource and method, clients need to be able to retrieve the correct security context to use. For each resource and method, servers need to be able to determine whether the security context is authorized. A server receiving an unprotected request to a resource and method requiring OSCOAP SHALL reject the message with error code 4.01 (Unauthorized). A server receiving a protected request with a security context not authorized for use with the resource and method SHALL reject the message with error code 4.01 (Unauthorized).
 
