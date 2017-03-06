@@ -854,7 +854,7 @@ protected CoAP message shall be replaced with "application/oscon" ({{iana}})
 The COSE object shall be protected (encrypted) and verified (decrypted) as
 described in ({{I-D.ietf-cose-msg}}). 
 
-Most AEAD algorithms require a unique nonce for each message. Sequence numbers for partial IV as specified for OSCOAP may be used for replay protection as described in {{replay-protection-section}}. The use of time stamps in the COSE header parameter 'operation time' {{I-D.ietf-cose-msg}} for freshness may be used.
+Most AEAD algorithms require a unique nonce for each message. Sequence numbers for partial IV as specified for OSCOAP may be used for replay protection as described in {{sequence-numbers}}. The use of time stamps in the COSE header parameter 'operation time' {{I-D.ietf-cose-msg}} for freshness may be used.
 
 OSCON shall not be used in cases where CoAP header fields (such as Code or
 Version) or CoAP options need to be integrity protected or encrypted. OSCON shall not be used in cases which require a secure binding between request and
