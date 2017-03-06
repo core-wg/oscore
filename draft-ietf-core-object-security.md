@@ -503,7 +503,7 @@ where:
 
 -  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
-# Sequence Numbers, Replay, Message Binding, and Freshness {#replay-protection-section}
+# Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests and Observe responses. The maximum sequence number is algorithm dependent and SHALL be 2^(nonce length in bits - 1) - 1. If the Sender Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this memo.
 
@@ -545,7 +545,7 @@ A CoAP server receiving a message containing the Object-Security option and a ou
 
 A CoAP server receiving a message containing the Object-Security option SHALL perform the following steps, using the Recipient Context identified by the "kid" parameter in the received COSE object:
 
-1. Verify the Sequence Number in the Partial IV parameter, as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
+1. Verify the Sequence Number in the Partial IV parameter, as described in {{sequence-numbers}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
 
 2. Recreate the Additional Authenticated Data, as described in {{cose-object}}.
 
@@ -555,7 +555,7 @@ A CoAP server receiving a message containing the Object-Security option SHALL pe
 
 5. Verify and decrypt the message. If the verification fails, the server MUST stop processing the request.
 
-6. If the message verifies, update the Recipient Replay Window, as described in {{replay-protection-section}}.
+6. If the message verifies, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
 7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any outer E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
 
@@ -580,7 +580,7 @@ A CoAP client receiving a message containing the Object-Security option SHALL pe
 
 0. If the message contain an outer Block option the client SHALL process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
 
-1. Verify the Sequence Number in the Partial IV parameter as described in {{replay-protection-section}}. If it cannot be verified that the Sequence Number has not been received before, the client MUST stop processing the response.
+1. Verify the Sequence Number in the Partial IV parameter as described in {{sequence-numbers}}. If it cannot be verified that the Sequence Number has not been received before, the client MUST stop processing the response.
 
 2. Recreate the Additional Authenticated Data as described in {{cose-object}}.
 
@@ -590,7 +590,7 @@ A CoAP client receiving a message containing the Object-Security option SHALL pe
 
 5. Verify and decrypt the message. If the verification fails, the client MUST stop processing the response.
 
-6. If the message verifies, update the Recipient Replay Window, as described in {{replay-protection-section}}.
+6. If the message verifies, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
 7. Restore the unprotected response by adding any decrypted options or payload from the plaintext. Any class E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed. 
 
@@ -761,7 +761,7 @@ The COSE header of the request contains a Context Identifier (cid:5fdc), indicat
 
 The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}}, and encrypted in the COSE Cipher Text (indicated with \{ ... \}).
 
-The server verifies that the Sequence Number has not been received before (see {{replay-protection-section}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the sent request message (see {{replay-protection-section}}).
+The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the sent request message (see {{sequence-numbers}}).
 
 ## Secure Subscribe to Sensor
 
@@ -827,7 +827,7 @@ The COSE header of the request contains a Context Identifier (cid:ca), indicatin
 
 The options Observe, Content-Format and the payload are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}). 
 
-The server verifies that the Sequence Number has not been received before (see {{replay-protection-section}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the subscribe request.
+The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the subscribe request.
 
 
 
