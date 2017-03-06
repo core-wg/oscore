@@ -459,7 +459,7 @@ The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}.
 
 ## Plaintext {#plaintext}
 
-The Plaintext is formatted as a CoAP message without Header (see {{plaintext-figure}}) consisting of:
+The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
 - all CoAP Options present in the unprotected message that are encrypted (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included encrypted option); and
 
@@ -476,8 +476,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{plaintext-fig
  (only if there 
    is payload)
 ~~~~~~~~~~~
-{: #plaintext-figure title="Plaintext" }
-{: artwork-align="center"}
+{: #fig-plaintext title="Plaintext" artwork-align="center"}
 
 ## Additional Authenticated Data {#AAD}
 
