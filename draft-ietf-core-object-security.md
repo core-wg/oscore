@@ -347,8 +347,7 @@ Most options are encrypted and integrity protected, and thus inner message field
       C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable,
   E=Encrypt and Integrity Protect, U=Unprotected, *=Special
 ~~~~~~~~~~~
-{: #protected-coap-options title="Protection of CoAP Options" }
-{: artwork-align="center"}
+{: #protected-coap-options title="Protection of CoAP Options" artwork-align="center"}
 
 
 A summary of how options are protected and processed is shown in {{protected-coap-options}}. The CoAP options are partitioned into two classes: 
