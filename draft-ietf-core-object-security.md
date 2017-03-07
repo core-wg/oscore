@@ -590,7 +590,7 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the request has been received, see Section {{block-options}}.
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see Section {{block-options}}.
 
 2. Retrieve the Recipient Context associated with the Recipient ID in the "kid" parameter of the COSE object.
 
@@ -626,7 +626,7 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the protected CoAP message have been received, see {{block-options}}.
 
 2. Retrieve the Recipient Context associated with the Token.
 
@@ -636,9 +636,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 5. Compose the AEAD nonce
 
-   * If Observe is not used, Compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, Compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the response.
+   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the response.
 
 5. Decrypt the COSE object using the Recipient Key.
 
