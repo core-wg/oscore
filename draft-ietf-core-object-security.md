@@ -592,13 +592,13 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Recipient ID in the "kid" parameter of the COSE object.
+2. Retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter of the COSE object.
 
-3. Verify the Sequence Number in the Partial IV parameter, as described in {{sequence-numbers}}.
+3. Verify the Sequence Number in the 'Partial IV' parameter, as described in {{sequence-numbers}}.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-5. Compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded Partial IV parameter, received in the COSE Object.
+5. Compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded 'Partial IV' parameter, received in the COSE Object.
 
 6. Decrypt the COSE object using the Recipient Key.
 
@@ -606,7 +606,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
    * If decryption suceeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted options or payload to the unprotected overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
+7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
 ## Protecting the Response {#protected-coap-formatting-resp}
 
