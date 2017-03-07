@@ -562,13 +562,7 @@ For responses without Observe, OSCOAP provides absolute freshness. For requests,
 
 In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCOAP binds responses to the request by including the request's ID (Sender ID or Recipient ID) and sequence number in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and sequence number until all responses has been sent.
 
-
-
-
-
 # Processing {#processing}
-
-TODO: Update include new Observe processing
 
 ## Protecting the Request {#protected-coap-formatting-req}
 
@@ -628,28 +622,33 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 4. Increment the Sender Sequence Number by one.
 
+## Verifying the Response {#proc-resp-client}
 
-## Verifying the Response {#verif-coap-resp}
+A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
-A CoAP client receiving a message containing the Object-Security option SHALL perform the following steps, using the security context identified by the Token of the received response:
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
 
-0. If the message contain an outer Block option the client SHALL process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
+2. Retrieve the Recipient Context associated with the Token.
 
-1. Verify the Sequence Number in the Partial IV parameter as described in {{sequence-numbers}}. If it cannot be verified that the Sequence Number has not been received before, the client MUST stop processing the response.
+3. If Observe is uses, verify the Sequence Number in the Partial IV parameter as described in {{sequence-numbers}}.
 
-2. Recreate the Additional Authenticated Data as described in {{cose-object}}.
+4. Compose the Additional Authenticated Data, as described in {{{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the Partial IV parameter, received in the COSE Object.
+5. Compose the AEAD nonce
 
-4. Retrieve the Recipient Key.
+   * If Observe is not used, Compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+ 
+   * If Observe is used, Compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the response.
 
-5. Verify and decrypt the message. If the verification fails, the client MUST stop processing the response.
+5. Decrypt the COSE object using the Recipient Key.
 
-6. If the message verifies, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+   * If decryption fails, the client MUST stop processing the response and SHOULD send an error message.
 
-7. Restore the unprotected response by adding any decrypted options or payload from the plaintext. Any class E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed. 
+   * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{replay-protection-section}}.
 
+6. Add decrypted options or payload to the unprotected overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
+   * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
 
 # Security Considerations {#sec-considerations}
 
