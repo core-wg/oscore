@@ -590,7 +590,7 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see Section {{block-options}}.
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
 2. Retrieve the Recipient Context associated with the Recipient ID in the "kid" parameter of the COSE object.
 
