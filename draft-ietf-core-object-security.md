@@ -566,6 +566,8 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 ## Protecting the Request {#protected-coap-formatting-req}
 
+TODO: Update
+
 Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{context}}).
 
 1. Compute the COSE object as specified in {{cose-object}}
@@ -609,6 +611,8 @@ A server receiving a request containing the Object-Security option SHALL perform
 7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
 ## Protecting the Response {#protected-coap-formatting-resp}
+
+TODO: Update
 
 Given an unprotected CoAP response, including header, options, and payload, the server SHALL perform the following steps to create a protected CoAP response, using the security context identified by the Context Identifier of the received request:
 
