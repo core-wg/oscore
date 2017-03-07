@@ -309,7 +309,7 @@ The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus 
 
 The sending endpoint writes the payload of the unprotected CoAP message into the plaintext of the COSE object (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). 
 
-The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the unprotected CoAP message (see {{verif-coap-req}} and {{verif-coap-resp}}).
+The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the unprotected CoAP message.
 
 ## CoAP Header {#coap-header}
 
@@ -371,8 +371,7 @@ The sending endpoint SHALL write the class E option from the unprotected CoAP me
 
 Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
-Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present (see {{verif-coap-req}} and {{verif-coap-resp}}). 
-
+Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present.
 
 #### Max-Age {#max-age}
 
@@ -399,10 +398,9 @@ In addition to the processing defined for the inner Block options inherent to cl
 
 The protected CoAP message may be fragmented by the sending endpoint or proxy as defined in {{RFC7959}}, in which case the outer Block options are being used. The outer Block options SHALL neither be encrypted nor integrity protected. 
 
-An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, or the cumulated message size of the exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document (see {{verif-coap-req}} and {{verif-coap-resp}}). 
+An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, or the cumulated message size of the exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document.
 
 If the unprotected CoAP message contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
-
 
 ### Class I Options {#class-i}
 
@@ -594,25 +592,27 @@ Given an unprotected CoAP request, including header, options and payload, the cl
 
 5. Increment the Sender Sequence Number by one.
 
-## Verifying the Request {#verif-coap-req}
+## Verifying the Request {#proc-request-server}
 
-A CoAP server receiving a message containing the Object-Security option and a outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, see {{block-options}}.
+A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
-A CoAP server receiving a message containing the Object-Security option SHALL perform the following steps, using the Recipient Context identified by the "kid" parameter in the received COSE object:
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the request has been received, see Section {{block-options}}.
 
-1. Verify the Sequence Number in the Partial IV parameter, as described in {{sequence-numbers}}. If it cannot be verified that the Sequence Number has not been received before, the server MUST stop processing the request.
+2. Retrieve the Recipient Context associated with the Recipient ID in the "kid" parameter of the COSE object.
 
-2. Recreate the Additional Authenticated Data, as described in {{cose-object}}.
+3. Verify the Sequence Number in the Partial IV parameter, as described in {{sequence-numbers}}.
 
-3. Compose the AEAD nonce by XORing the Recipient IV (context IV) with the padded Partial IV parameter, received in the COSE Object. 
+4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-4. Retrieve the Recipient Key.
+5. Compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded Partial IV parameter, received in the COSE Object.
 
-5. Verify and decrypt the message. If the verification fails, the server MUST stop processing the request.
+6. Decrypt the COSE object using the Recipient Key.
 
-6. If the message verifies, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+   * If decryption fails, the server MUST stop processing the request and SHOULD send an 4.01 error message.
 
-7. Restore the unprotected request by adding any decrypted options or payload from the plaintext. Any outer E options ({{coap-headers-and-options}}) are overwritten. The Object-Security option is removed.
+   * If decryption suceeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+
+7. Add decrypted options or payload to the unprotected overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
 ## Protecting the Response {#protected-coap-formatting-resp}
 
