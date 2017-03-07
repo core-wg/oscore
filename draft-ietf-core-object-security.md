@@ -630,9 +630,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 2. Retrieve the Recipient Context associated with the Token.
 
-3. If Observe is uses, verify the Sequence Number in the Partial IV parameter as described in {{sequence-numbers}}.
+3. If Observe is used, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}.
 
-4. Compose the Additional Authenticated Data, as described in {{{cose-object}}.
+4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
 5. Compose the AEAD nonce
 
@@ -642,11 +642,11 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 5. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the client MUST stop processing the response and SHOULD send an error message.
+   * If decryption fails, the client MUST stop processing the response and SHOULD send an 4.01 error message.
 
-   * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{replay-protection-section}}.
+   * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
-6. Add decrypted options or payload to the unprotected overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
+6. Add decrypted options or payload to the unprotected response overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
 
