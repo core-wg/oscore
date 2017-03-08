@@ -518,12 +518,31 @@ where:
 
 - alg: int, contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
 
-- request_id : bstr, contains the identifier for the endpoint sending the request and verifying the response; which means that for the endpoint sending the response, the id has value Recipient ID, while for the endpoint receiving the response, id has the value Sender ID.
+- request\_id : bstr, contains the Sender ID for the endpoint sending the request; which means that for the endpoint receiving the request and sending the response, the id has value Recipient ID. Note that the same request\_id value is used in the external aad both for request and response and in both endpoints, as long as server and client roles remain the same. An example is given in {{fig-request-id}}.
 
 -  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
 TODO: Add integrity protected options
 
+~~~~~~~~~~~
+          .-------------------.      .-------------------.
+          |  Sender ID = 00 , |      |  Sender ID = 01 , |
+          | Recipient ID = 01 |      | Recipient ID = 00 |
+          '-------------------'      '-------------------'
+                   Client                   Server
+                      |                       |
+ Protect request with |                       |
+request_id = Sender_ID = 00                   |
+                      +---------------------->|
+                      |                       | Verify request with
+                      |                  request_id = Recipient_ID = 00
+                      |                       | Protect response with
+                      |                  request_id = Recipient_ID = 00
+Verify response with  |<----------------------+
+request_id = Sender_ID = 00                   |
+                      |                       |
+~~~~~~~~~~~
+{: #fig-request-id title="Example of use of the request_id in the external_aad" artwork-align="center"}
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
