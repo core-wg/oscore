@@ -223,7 +223,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * Replay Window Type and Size
 
-   - Default is DTLS-type replay window with size 64
+   - Default is DTLS-type replay protection with a window size of 32
 
 How the input parameters are pre-established, is application specific. The EDHOC protocol {{I-D.selander-ace-cose-ecdhe}} enables the establishment of input parameters with the property of forward secrecy and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
 
@@ -261,7 +261,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-
 
 ### Initial Sequence Numbers and Replay Window
 
-The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. It is mandatory to support a DTLS-type replay window with size 64. This default Replay Window is initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters {#context-requirements}
 
