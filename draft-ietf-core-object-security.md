@@ -432,6 +432,25 @@ Uri-Path and Uri-Query are class E options and MUST be protected and processed a
 
 The value of the Proxy-Uri option of the protected CoAP message MUST be replaced with Proxy-Scheme, Uri-Host and Uri-Port options (if present) composed according to section 6.5 of {{RFC7252}} and MUST be processed as a class U option, see {{class-u}}.
 
+An example of how Proxy-Uri is processed is given below.
+
+An unprotected CoAP message contains:
+
+* Proxy-Uri = "coap://example.com/resource?q=1"
+
+During OSCOAP processing, Proxy-Uri is split into:
+
+* Proxy-Scheme = "coap"
+* Uri-Host = "example.com"
+* Uri-Port = "5863"
+* Uri-Path = "resource"
+* Uri-Query = "q=1"
+
+Uri-Path and Uri-Query follow the processing defined in {{class-e}}.
+Proxy-Uri is added to the OSCOAP protected message with value:
+
+* Proxy-Uri = "coap://example.com"
+
 # The COSE Object {#cose-object}
 
 This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the untagged COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, and maximum sequence number are algorithm dependent.
