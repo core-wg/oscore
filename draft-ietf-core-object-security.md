@@ -773,7 +773,7 @@ The "application/oscon" content format is added to the CoAP Content Format regis
 
 # Acknowledgments
 
-The following individuals provided input to this document: Christian Amsüss, Carsten Bormann, Joakim Brorsson, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, and Malisa Vucinic.
+The following individuals provided input to this document: Christian Amsüss, Carsten Bormann, Joakim Brorsson, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, and Mališa Vučinić.
 
 Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
