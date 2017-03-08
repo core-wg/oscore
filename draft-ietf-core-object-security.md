@@ -57,6 +57,7 @@ normative:
   RFC7252:
   RFC7641:
   RFC7959:
+  RFC5988:
   
 informative:
 
@@ -653,6 +654,12 @@ A client receiving a response containing the Object-Security option SHALL perfor
 6. Add decrypted options or payload to the unprotected response overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
+
+# Web Linking
+
+The use of OSCOAP MAY be indicated by a target attribute "sec" in a web link {{RFC5988}} to a CoAP resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCOAP. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCOAP. 
+
+A value MUST NOT be given for the "sec" attribute; any present value MUST be ignored by parsers. The "sec" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
 # Security Considerations {#sec-considerations}
 
