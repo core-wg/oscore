@@ -18,33 +18,21 @@ author:
         ins: G. Selander
         name: Göran Selander
         org: Ericsson AB
-        street: Färögatan 6
-        code: SE-164 80 Stockholm
-        country: SWEDEN
         email: goran.selander@ericsson.com
       -
         ins: J. Mattsson
         name: John Mattsson
         org: Ericsson AB
-        street: Färögatan 6
-        code: SE-164 80 Stockholm
-        country: SWEDEN
         email: john.mattsson@ericsson.com
       -
         ins: F. Palombini
         name: Francesca Palombini
         org: Ericsson AB
-        street: Färögatan 6
-        code: SE-164 80 Stockholm
-        country: SWEDEN
         email: francesca.palombini@ericsson.com
       -
         ins: L. Seitz
         name: Ludwig Seitz
         org: SICS Swedish ICT
-        street: Scheelevagen 17
-        code: SE-223 70 Lund
-        country: SWEDEN
         email: ludwig@sics.se
 
 normative:
