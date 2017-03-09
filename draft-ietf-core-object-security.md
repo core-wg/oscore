@@ -786,7 +786,7 @@ The exception is Responses without Observe that SHALL be encoded as:
 ciphertext
 ~~~~~~~~~~~
 
-## Examples
+## Examples {#compression-examples}
 
 ### Example Request
 
