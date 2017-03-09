@@ -895,15 +895,15 @@ Client  Proxy  Server
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15b7, {Observe:0,
-   |      |      |                   Uri-Path:"glucose"}, <Tag>]
+   |      |      | Object-Security: [kid:ca, seq:15b7,
+   |      |      |                   {Uri-Path:"glucose"}, <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15b7, {Observe:0,
-   |      |      |                   Uri-Path:"glucose"}, <Tag>]
+   |      |      | Object-Security: [kid:ca, seq:15b7,
+   |      |      |                   {Uri-Path:"glucose"}, <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
