@@ -518,9 +518,9 @@ where:
 
 - alg: contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
 
-- request_id:  contains the value of the "kid" in the COSE object of the request (see Section 5).
+- request_kid:  contains the value of the 'kid' in the COSE object of the request (see Section 5).
 
-- request_seq: contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
+- request_seq: contains the value of the 'Partial IV' in the COSE object of the request (see Section 5).
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
