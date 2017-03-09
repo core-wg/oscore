@@ -314,35 +314,34 @@ Most options are encrypted and integrity protected (Class E), and thus inner mes
 
 A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing as described in the subsections and indicated by a '*' in {{protected-coap-options}}.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+----+----------------+---+---+---+
-| No.| Name           | E | I | U |
-+----+----------------+---+---+---+
-|  1 | If-Match       | x |   |   |
-|  3 | Uri-Host       |   |   | x |
-|  4 | ETag           | x |   |   |
-|  5 | If-None-Match  | x |   |   |
-|  6 | Observe        |   | * |   |
-|  7 | Uri-Port       |   |   | x |
-|  8 | Location-Path  | x |   |   |
-| 11 | Uri-Path       | x |   |   |
-| 12 | Content-Format | x |   |   |
-| 14 | Max-Age        | * |   |   |
-| 15 | Uri-Query      | x |   |   |
-| 17 | Accept         | x |   |   |
-| 20 | Location-Query | x |   |   |
-| 23 | Block2         | * |   |   |
-| 27 | Block1         | * |   |   |
-| 28 | Size2          | * |   |   |
-| 35 | Proxy-Uri      |   |   | * |
-| 39 | Proxy-Scheme   |   |   | x |
-| 60 | Size1          | * |   |   |
-+----+----------------+---+---+---+
+~~~~~~~~~~~
+           +----+----------------+---+---+---+
+           | No.| Name           | E | I | U |
+           +----+----------------+---+---+---+
+           |  1 | If-Match       | x |   |   |
+           |  3 | Uri-Host       |   |   | x |
+           |  4 | ETag           | x |   |   |
+           |  5 | If-None-Match  | x |   |   |
+           |  6 | Observe        |   | * |   |
+           |  7 | Uri-Port       |   |   | x |
+           |  8 | Location-Path  | x |   |   |
+           | 11 | Uri-Path       | x |   |   |
+           | 12 | Content-Format | x |   |   |
+           | 14 | Max-Age        | * |   |   |
+           | 15 | Uri-Query      | x |   |   |
+           | 17 | Accept         | x |   |   |
+           | 20 | Location-Query | x |   |   |
+           | 23 | Block2         | * |   |   |
+           | 27 | Block1         | * |   |   |
+           | 28 | Size2          | * |   |   |
+           | 35 | Proxy-Uri      |   |   | * |
+           | 39 | Proxy-Scheme   |   |   | x |
+           | 60 | Size1          | * |   |   |
+           +----+----------------+---+---+---+
 
 E=Encrypt and Integrity Protect, I=Integrity Protect only, 
 U=Unprotected, *=Special
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 {: #protected-coap-options title="Protection of CoAP Options" artwork-align="center"}
 
 Unless specified otherwise, CoAP options not listed in {{protected-coap-options}} SHALL be encrypted and integrity protected and processed as class E options.
