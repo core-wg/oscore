@@ -561,7 +561,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 # Processing {#processing}
 
-## Protecting the Request  {#protected-coap-formatting-resp}
+## Protecting the Request
 
 Given an unprotected request, the client SHALL perform the following steps to create a protected request:
 
@@ -599,7 +599,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
-## Protecting the Response {#protected-coap-formatting-resp}
+## Protecting the Response
 
 TODO: Update
 
