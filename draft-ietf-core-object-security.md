@@ -770,7 +770,7 @@ The Concise Binary Object Representation (CBOR) combines very small message size
 
 The value of the Object-Security option SHALL in general be encoded as:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 [
   Partial IV,
   ? ( kid, ? gid ),
