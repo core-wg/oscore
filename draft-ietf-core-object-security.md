@@ -561,31 +561,23 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 # Processing {#processing}
 
-## Protecting the Request {#protected-coap-formatting-req}
+## Protecting the Request  {#protected-coap-formatting-resp}
 
-TODO: Update
+Given an unprotected request, the client SHALL perform the following steps to create a protected request:
 
-Given an unprotected CoAP request, including header, options and payload, the client SHALL perform the following steps to create a protected CoAP request using a security context associated with the target resource (see {{context}}).
+1. Retrieve the Sender Context associated with the target resource.
 
-1. Compute the COSE object as specified in {{cose-object}}
+2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-    * the AEAD nonce is created by XORing the Sender IV (context IV) with the Sender Sequence Number in network byte order (partial IV).
-    
-2. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload, based on the unprotected CoAP message:
+3. Compose the AEAD nonce by XORing the context IV (Sender IV) with with the partial IV (Sender Sequence Number in network byte order). Increment the Sender Sequence Number by one.
 
-    * The CoAP header is the same as the unprotected CoAP message.
-    
-    * If present, the CoAP option Proxy-Uri is decomposed as described in {{proxy-uri}}.
+4. Encrypt the COSE object using the Sender Key.
 
-    * The CoAP options which are of class E ({{coap-headers-and-options}}) are removed. The Object-Security option is added.
+5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
 
-    * If the message type of the unprotected CoAP message does not allow Payload, then the value of the Object-Security option is the COSE object. If the message type of the unprotected CoAP message allows Payload, then the Object-Security option is empty and the Payload of the protected CoAP message is the COSE object.
+6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
-4. Store the association Token - Security Context. The Client SHALL be able to find the correct security context used to protect the request and verify the response with use of the Token of the message exchange.
-
-5. Increment the Sender Sequence Number by one.
-
-## Verifying the Request {#proc-request-server}
+## Verifying the Request
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
@@ -623,7 +615,7 @@ Given an unprotected CoAP response, including header, options, and payload, the 
 
 4. Increment the Sender Sequence Number by one.
 
-## Verifying the Response {#proc-resp-client}
+## Verifying the Response
 
 A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
