@@ -571,7 +571,7 @@ Given an unprotected request, the client SHALL perform the following steps to cr
 
 3. Compose the AEAD nonce by XORing the context IV (Sender IV) with with the partial IV (Sender Sequence Number in network byte order). Increment the Sender Sequence Number by one.
 
-4. Encrypt the COSE object using the Sender Key.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
 5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
 
@@ -613,7 +613,7 @@ Given an unprotected response, the server SHALL perform the following steps to c
  
    * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
 
-4. Encrypt the COSE object using the Sender Key.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
 5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
 
