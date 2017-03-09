@@ -531,7 +531,7 @@ In order to protect from replay of messages, each Recipient Context contains a R
 
 To prevent from reusing of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
-After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g.  using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligable cost in terms of e.g. power consumption.
+After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
 In order to reuse a stored security context the following procedure MUST be performed:
 
