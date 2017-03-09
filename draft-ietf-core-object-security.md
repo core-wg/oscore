@@ -795,7 +795,7 @@ ciphertext
 ### Example Request
 
 ~~~~~~~~~~~
-COSE object of OSCOAP Request Before Compression (24 bytes)
+COSE Object Before Compression (24 bytes)
 83 a2 04 41 25 06 41 05 a0 4e ae a0 15 56 67 92
 4d ff 8a 24 e4 cb 35 b9
 
@@ -816,7 +816,7 @@ After Compression (18 bytes)
 ### Example Response
 
 ~~~~~~~~~~~
-COSE object of OSCOAP Response Before Compression (18 bytes)
+COSE Object Before Compression (18 bytes)
 83 a0 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
 35 b9
 
@@ -833,7 +833,7 @@ ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
 ### Example Response (with Observe)
 
 ~~~~~~~~~~~
-COSE object of OSCOAP Response Before Compression (21 bytes)
+COSE Object Before Compression (21 bytes)
 83 a1 06 41 07 a0 4e ae a0 15 56 67 92 4d ff 8a
 24 e4 cb 35 b9
 
