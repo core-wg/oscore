@@ -305,7 +305,7 @@ The CoAP header field Code MUST be sent in plaintext to support RESTful processi
 
 Other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). The CoAP header fields are thus outer message fields.
 
-The sending endpoint SHALL copy the header fields from the unprotected CoAP message to the protected CoAP message. The receiving endpoint SHALL copy the header fields from the protected CoAP message to the unprotected CoAP message. Both sender and receiver inserts the CoAP version number and header field Code in the AAD of the COSE object (see section {{AAD}}). 
+The sending endpoint SHALL copy the header fields from the unprotected CoAP message to the protected CoAP message. The receiving endpoint SHALL copy the header fields from the protected CoAP message to the unprotected CoAP message. Both sender and receiver insert the CoAP version number and header field Code in the AAD of the COSE object (see section {{AAD}}). 
 
 
 ## CoAP Options {#coap-options}
