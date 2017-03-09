@@ -601,19 +601,21 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 ## Protecting the Response
 
-TODO: Update
+Given an unprotected response, the server SHALL perform the following steps to create a protected response:
 
-Given an unprotected CoAP response, including header, options, and payload, the server SHALL perform the following steps to create a protected CoAP response, using the security context identified by the Context Identifier of the received request:
+1. Retrieve the Sender Context in the Security Context used to verify the request.
 
-2. Compute the COSE object as specified in Section {{cose-object}}
-  * The AEAD nonce is created by XORing the Sender IV (context IV) and the padded Sender Sequence Number.
-  
-3. Format the protected CoAP message as an ordinary CoAP message, with the following Header, Options, and Payload based on the unprotected CoAP message:
-  * The CoAP header is the same as the unprotected CoAP message.
-  * The CoAP options which are of class E are removed, except any special option (labelled '*') that is present which has its outer value ({{coap-headers-and-options}}). The Object-Security option is added. 
-  * If the message type of the unprotected CoAP message does not allow Payload, then the value of the Object-Security option is the COSE object. If the message type of the unprotected CoAP message allows Payload, then the Object-Security option is empty and the Payload of the protected CoAP message is the COSE object.
+2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-4. Increment the Sender Sequence Number by one.
+3. Compose the AEAD nonce
+
+   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+ 
+   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
+
+4. Encrypt the COSE object using the Sender Key.
+
+5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
 
 ## Verifying the Response
 
