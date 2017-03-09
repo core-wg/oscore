@@ -510,37 +510,17 @@ external_aad = [
 
 where:
 
-- ver: uint, contains the CoAP version number, as defined in Section 3 of {{RFC7252}}.
+- ver: contains the CoAP version number, as defined in Section 3 of {{RFC7252}}.
 
-- code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
+- code: contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
 
-- options: bstr, contains the class I options {{class-i}} encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
+- options: contains the class I options {{class-i}} encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
 
-- alg: int, contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
+- alg: contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
 
-- request\_id : bstr, contains the Sender ID for the endpoint sending the request; which means that for the endpoint receiving the request and sending the response, the id has value Recipient ID. Note that the same request\_id value is used in the external aad both for request and response and in both endpoints, as long as server and client roles remain the same. An example is given in {{fig-request-id}}.
+- request_id:  contains the value of the "kid" in the COSE object of the request (see Section 5).
 
--  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
-
-~~~~~~~~~~~
-          .-------------------.      .-------------------.
-          |  Sender ID = 00 , |      |  Sender ID = 01 , |
-          | Recipient ID = 01 |      | Recipient ID = 00 |
-          '-------------------'      '-------------------'
-                   Client                   Server
-                      |                       |
- Protect request with |                       |
-request_id = Sender_ID = 00                   |
-                      +---------------------->|
-                      |                       | Verify request with
-                      |                  request_id = Recipient_ID = 00
-                      |                       | Protect response with
-                      |                  request_id = Recipient_ID = 00
-Verify response with  |<----------------------+
-request_id = Sender_ID = 00                   |
-                      |                       |
-~~~~~~~~~~~
-{: #fig-request-id title="Example of use of the request_id in the external_aad" artwork-align="center"}
+- request_seq: contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
