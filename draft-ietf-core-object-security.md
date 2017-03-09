@@ -529,17 +529,17 @@ In order to protect from replay of messages, each Recipient Context contains a R
 
 ### The Basic Case ###
 
-To prevent from reusing of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
+To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-In order to reuse a stored security context the following procedure MUST be performed:
+If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. The node MAY perform the following procedure:
 
-* Before sending a message, the client MUST have stored in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client MUST NOT use any lower sequence number in a request than what was persistently stored with that security context.
+* Before sending a message, the client stores in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client does not use any lower sequence number in a request than what was persistently stored with that security context.
 
-   * Storing to persistent memory can be costly. Instead of storing a sequence number for each request, the client MAY store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
+   * Storing to persistent memory can be costly. Instead of storing a sequence number for each request, the client may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
-* After boot, before accepting a message from a stored security context, the server MUST synchronize the replay window so that no old messages are being accepted. The server MAY use the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+* After boot, before accepting a message from a stored security context, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
 ## Freshness ## 
 
