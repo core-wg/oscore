@@ -138,7 +138,6 @@ The security context is the set of information elements necessary to carry out t
 
 The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Clients need to be able to retrieve the correct security context to use.
 
-
 Each (Sender Context, Recipient Context)-pair has a unique ID. An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
@@ -307,7 +306,6 @@ Other CoAP header fields SHALL neither be integrity protected nor encrypted (Cla
 
 The sending endpoint SHALL copy the header fields from the unprotected CoAP message to the protected CoAP message. The receiving endpoint SHALL copy the header fields from the protected CoAP message to the unprotected CoAP message. Both sender and receiver insert the CoAP version number and header field Code in the AAD of the COSE object (see section {{AAD}}). 
 
-
 ## CoAP Options {#coap-options}
 
 Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
@@ -366,7 +364,6 @@ Since OSCOAP binds CoAP responses to requests, a cached response would not be po
 
 The outer Max-Age option is not integrity protected.
 
-
 #### The Block Options {#block-options}
 
 TODO: Update processing to support multiple concurrently proceeding requests
@@ -407,16 +404,13 @@ To secure the Observe Registration and the order of the Notifications, Observe S
 
 TODO: Complete this section
 
-
 ### Class U Options {#class-u}
 
-Options in Class U are used to support forward proxy operations. Unless otherwise specified, the sending endpoint  SHALL copy a Class U option from the unprotected CoAP message to the protected CoAP message, and v.v. for the receiving endpoint. 
-
+Options in Class U are used to support forward proxy operations. Unless otherwise specified, the sending endpoint SHALL copy a Class U option from the unprotected CoAP message to the protected CoAP message, and v.v. for the receiving endpoint. 
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
 The sending endpoint SHALL copy Uri-Host, Uri-Port, and Proxy-Scheme from the unprotected CoAP message to the protected CoAP message. When Uri-Host, Uri-Port, Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. 
-
 
 #### Proxy-Uri {#proxy-uri}
 
@@ -531,7 +525,6 @@ An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure u
 
 In order to protect from replay of messages, each Recipient Context contains a Replay Window used to verify request, and - in case of Observe - responses. A receiving endpoint SHALL verify that a Sequence Number (Partial IV) received in the COSE object has not been received before in the Recipient Context. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
 
-
 ## Sequence Number and Replay Window State ##
 
 ### The Basic Case ###
@@ -547,8 +540,6 @@ In order to reuse a stored security context the following procedure MUST be perf
    * Storing to persistant memory can be costly. Instead of storing a sequence number for each request, the client MAY store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
 * After boot, before accepting a message from a stored security context, the server MUST synchronize the replay window so that no old messages are being accepted. The server MAY use the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
-
-#  
 
 ## Freshness ## 
 
