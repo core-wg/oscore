@@ -503,7 +503,7 @@ external_aad = [
    code : uint,
    options : bstr,
    alg : int,
-   request_id : bstr,
+   request_kid : bstr,
    request_seq : bstr
 ]
 ~~~~~~~~~~~
