@@ -239,7 +239,7 @@ where:
 
 * salt is the Master Salt as defined above
 * IKM is the Master Secret is defined above
-* info is a serialized CBOR array consisting of:
+* info is a CBOR array consisting of:
 
 ~~~~~~~~~~~ CDDL
    info = [
@@ -393,7 +393,7 @@ If the unprotected CoAP message contains Block options, the receiving endpoint p
 
 ### Class I Options {#class-i}
 
-Except for the special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL only be integrity protected between the endpoints. Class I options are serialized with delta encoding  in the external_aad ({{AAD}}).
+Except for the special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL only be integrity protected between the endpoints. Class I options are included in the external_aad ({{AAD}}).
 
 #### Observe {#observe}
 
@@ -406,8 +406,8 @@ In order for a proxy to support forwarding of Observe, there MUST be an outer Ob
 
 To secure the Observe Registration and the order of the Notifications, Observe SHALL be integrity protected as described in this section:
 
-* The Observe Registration of the unprotected CoAP request SHALL be included in the external_aad of the request (see {{AAD}}).
-* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 lowest bytes of the Sender Sequence Number of the response
+* The Observe option in the unprotected CoAP request SHALL be included in the external_aad of the request (see {{AAD}}).
+* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sender Sequence Number of the response
 
 TODO: Complete this section
 
@@ -479,7 +479,7 @@ The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}.
 
 The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
-- all CoAP Options present in the unprotected message that are encrypted (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included encrypted option); and
+- all CoAP Options present in the unprotected message that are encrypted (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included encrypted option; and
 
 - the Payload of unprotected CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
@@ -504,6 +504,7 @@ The external_aad SHALL be a CBOR array as defined below:
 external_aad = [
    ver : uint,
    code : uint,
+   options : bstr,
    alg : int,
    request_id : bstr,
    request_seq : bstr
@@ -516,13 +517,13 @@ where:
 
 - code: uint, contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
 
+- options: bstr, contains the class I options {{class-i}} encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
+
 - alg: int, contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
 
 - request\_id : bstr, contains the Sender ID for the endpoint sending the request; which means that for the endpoint receiving the request and sending the response, the id has value Recipient ID. Note that the same request\_id value is used in the external aad both for request and response and in both endpoints, as long as server and client roles remain the same. An example is given in {{fig-request-id}}.
 
 -  request_seq : bstr, contains the value of the "Partial IV" in the COSE object of the request (see Section 5).
-
-TODO: Add integrity protected options
 
 ~~~~~~~~~~~
           .-------------------.      .-------------------.
@@ -571,15 +572,7 @@ In order to reuse a stored security context the following procedure MUST be perf
 
 * After boot, before accepting a message from a stored security context, the server MUST synchronize the replay window so that no old messages are being accepted. The server MAY use the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
-### The Observe Case ###
-
-If Observe is used, in order to continue an ongoing observation after reboot the following procedure MUST be used:
-
-* Before sending a notification, the server MUST have stored in persistent memory an Observe sequence number higher than any Observe sequence number which has been or are being sent with this stored security context. After boot, the server MUST NOT use any lower Observe sequence number than is persitently stored with that security context.
-
-   * Instead of storing a sequence number for each notification, the server MAY store Seq + K to persistent memory every K notifications, where Seq is the current Observe sequence number and K > 1.
-
-Note that a client MAY continue an ongoing observation after reboot using a stored security context. With Observe, the client can only verify the order of the notifications, as they may be delayed. If the client wants to synchronize with a server resource it MAY restart an observation.
+#  
 
 ## Freshness ## 
 
@@ -711,6 +704,8 @@ Applications need to use a padding scheme if the content of a message can be det
 
 Privacy threats executed through intermediate nodes are considerably reduced by means of OSCOAP. End-to-end integrity protection and encryption of CoAP payload and all options that are not used for forwarding, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
+The unprotected options ({{protected-coap-options}}) may reveal privacy sensitive information. In particular Uri-Host  SHOULD NOT contain privacy sensitive information. 
+
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
 
@@ -794,7 +789,7 @@ The "application/oscon" content format is added to the CoAP Content Format regis
 
 The following individuals provided input to this document: Christian Amsüss, Carsten Bormann, Joakim Brorsson, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, and Mališa Vučinić.
 
-Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
+Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
 --- back
 
