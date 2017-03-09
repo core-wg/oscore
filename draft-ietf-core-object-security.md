@@ -853,26 +853,24 @@ Client  Proxy  Server
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x8c
    |      |      | Object-Security: [kid:5f, seq:42,
-   |      |      |                   {Uri-Path:"alarm_status"},
-   |      |      |                   <Tag>]
+   |      |      |                   {Uri-Path:"alarm_status"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0x7b
    |      |      | Object-Security: [kid:5f, seq:42,
-   |      |      |                   {Uri-Path:"alarm_status"},
-   |      |      |                   <Tag>]
+   |      |      |                   {Uri-Path:"alarm_status"}]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0x7b
    |      |      | Object-Security: -
-   |      |      |         Payload: [{"OFF"}, <Tag>]
+   |      |      |         Payload: [{"OFF"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x8c
    |      |      | Object-Security: -
-   |      |      |         Payload: [{"OFF"}, <Tag>]
+   |      |      |         Payload: [{"OFF"}]
    |      |      |
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
