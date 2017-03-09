@@ -535,9 +535,9 @@ After boot, a node MAY reject to use existing security contexts from before it b
 
 In order to reuse a stored security context the following procedure MUST be performed:
 
-* Before sending a message, the client MUST have stored in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client MUST NOT use any lower sequence number in a request than what was persitently stored with that security context.
+* Before sending a message, the client MUST have stored in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client MUST NOT use any lower sequence number in a request than what was persistently stored with that security context.
 
-   * Storing to persistant memory can be costly. Instead of storing a sequence number for each request, the client MAY store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
+   * Storing to persistent memory can be costly. Instead of storing a sequence number for each request, the client MAY store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
 * After boot, before accepting a message from a stored security context, the server MUST synchronize the replay window so that no old messages are being accepted. The server MAY use the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
@@ -559,7 +559,7 @@ Given an unprotected request, the client SHALL perform the following steps to cr
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the context IV (Sender IV) with with the partial IV (Sender Sequence Number in network byte order). Increment the Sender Sequence Number by one.
+3. Compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sender Sequence Number in network byte order). Increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -585,7 +585,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
    * If decryption fails, the server MUST stop processing the request and SHOULD send an 4.01 error message.
 
-   * If decryption suceeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+   * If decryption succeeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
 7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
