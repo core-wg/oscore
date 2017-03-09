@@ -841,8 +841,6 @@ TODO: This section needs to be updated.
 
 # Examples {#examples}
 
-TODO: This section needs to be updated.
-
 This section gives examples of OSCOAP. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format. 
 
 ## Secure Access to Sensor
@@ -854,29 +852,27 @@ Client  Proxy  Server
    |      |      |
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x8c
-   |      |      | Object-Security: [cid:5fdc, seq:42,
+   |      |      | Object-Security: [kid:5f, seq:42,
    |      |      |                   {Uri-Path:"alarm_status"},
    |      |      |                   <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0x7b
-   |      |      | Object-Security: [cid:5fdc, seq:42,
+   |      |      | Object-Security: [cid:5f, seq:42,
    |      |      |                   {Uri-Path:"alarm_status"},
    |      |      |                   <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0x7b
-   |      |      |         Max-Age: 0
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:56, {"OFF"}, <Tag>]
+   |      |      |         Payload: [{"OFF"}, <Tag>]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x8c
-   |      |      |         Max-Age: 0
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:56, {"OFF"}, <Tag>]
+   |      |      |         Payload: [{"OFF"}, <Tag>]
    |      |      |
 ~~~~~~~~~~~
 {: #get-protected-sig title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicate a COSE object. The brackets { ... \} indicate encrypted data." } 
