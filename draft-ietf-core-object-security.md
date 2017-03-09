@@ -894,14 +894,14 @@ Client  Proxy  Server
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
    |      |      | Object-Security: [kid:ca, seq:15b7,
-   |      |      |                   {Uri-Path:"glucose"}, <Tag>]
+   |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
    |      |      | Object-Security: [kid:ca, seq:15b7,
-   |      |      |                   {Uri-Path:"glucose"}, <Tag>]
+   |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
@@ -909,14 +909,14 @@ Client  Proxy  Server
    |      |      |         Observe: 0032c2
    |      |      | Object-Security: -
    |      |      |         Payload: [seq:32c2, {Content-Format:0,
-   |      |      |                   "220"}, <Tag>]
+   |      |      |                   "220"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 0032c2
    |      |      | Object-Security: -
    |      |      |         Payload: [seq:32c2, {Content-Format:0,
-   |      |      |                   "220"}, <Tag>]
+   |      |      |                   "220"}]
   ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
@@ -924,14 +924,14 @@ Client  Proxy  Server
    |      |      |         Observe: 0032c6
    |      |      | Object-Security: -
    |      |      |         Payload: [seq:32c6, {Content-Format:0,
-   |      |      |                   "180"}, <Tag>]
+   |      |      |                   "180"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 0032c6
    |      |      | Object-Security: -
    |      |      |         Payload: [seq:32c6, {Content-Format:0,
-   |      |      |                   "180"}, <Tag>]
+   |      |      |                   "180"}]
    |      |      |
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
