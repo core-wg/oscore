@@ -293,7 +293,7 @@ Note that, even though the message formats are slightly different, OSCOAP compli
 
 The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus is an inner message field.
 
-The sending endpoint writes the payload of the unprotected CoAP message into the plaintext of the COSE object (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). 
+The sending endpoint writes the payload of the unprotected CoAP message into the plaintext of the COSE object.
 
 The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the unprotected CoAP message.
 
@@ -353,7 +353,7 @@ Specifications of new CoAP options SHOULD define how they are processed with OSC
 
 For options in class E (see {{protected-coap-options}}) the option value in the unprotected CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints.  Hence the actions resulting from the use of such options is analogous to communicating in a protected manner with the endpoint. For example, a client using an ETag option will not be served by a proxy.
 
-The sending endpoint SHALL write the class E option from the unprotected CoAP message into the plaintext of the COSE object (see {{protected-coap-formatting-req}} and {{protected-coap-formatting-resp}}). 
+The sending endpoint SHALL write the class E option from the unprotected CoAP message into the plaintext of the COSE object.
 
 Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
