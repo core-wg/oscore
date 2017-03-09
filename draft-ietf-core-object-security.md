@@ -875,7 +875,7 @@ Client  Proxy  Server
    |      |      |         Payload: [{"OFF"}, <Tag>]
    |      |      |
 ~~~~~~~~~~~
-{: #get-protected-sig title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicate a COSE object. The brackets { ... \} indicate encrypted data." } 
+{: title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicate a COSE object. The brackets { ... \} indicate encrypted data." } 
 {: artwork-align="center"}
 
 Since the unprotected request message (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value.
