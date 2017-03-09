@@ -845,7 +845,7 @@ This section gives examples of OSCOAP. The message exchanges are made, based on 
 
 ## Secure Access to Sensor
 
-Here is an example targeting the scenario in the Section 2.2.1. - Forwarding of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting the alarm status from a server. In the request, CoAP option Uri-Path is encrypted and integrity protected, and the CoAP header fields Code and Version are integrity protected (see {{coap-headers-and-options}}). In the response, the CoAP Payload is encrypted and integrity protected, and the CoAP header fields Code and Version are integrity protected.
+This example targets the scenario in Section 3.1 of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting the alarm status from a server.
 
 ~~~~~~~~~~~
 Client  Proxy  Server
@@ -859,7 +859,7 @@ Client  Proxy  Server
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0x7b
-   |      |      | Object-Security: [cid:5f, seq:42,
+   |      |      | Object-Security: [kid:5f, seq:42,
    |      |      |                   {Uri-Path:"alarm_status"},
    |      |      |                   <Tag>]
    |      |      |         Payload: -
@@ -875,21 +875,19 @@ Client  Proxy  Server
    |      |      |         Payload: [{"OFF"}, <Tag>]
    |      |      |
 ~~~~~~~~~~~
-{: title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicate a COSE object. The brackets { ... \} indicate encrypted data." } 
-{: artwork-align="center"}
+{: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the unprotected request message (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value.
-Since the unprotected response message (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
 
-The COSE header of the request contains a Context Identifier (cid:5fdc), indicating which security context was used to protect the message and a Sequence Number (seq:42).
+The COSE header of the request contains an identifier (cid:5f), indicating which security context was used to protect the message and a Sequence Number (seq:42).
 
-The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}}, and encrypted in the COSE Cipher Text (indicated with \{ ... \}).
+The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}).
 
-The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the sent request message (see {{sequence-numbers}}).
+The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the response message is generated as a response to the request.
 
 ## Secure Subscribe to Sensor
 
-Here is an example targeting the scenario in the Forwarding with observe case  of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), and first receiving the value 220 mg/dl, and then a second reading with value 180 mg/dl. The CoAP options Observe, Uri-Path, Content-Format, and Payload are encrypted and integrity protected, and the CoAP header field Code is integrity protected (see {{coap-headers-and-options}}).
+This example targets the scenario in Section 3.2 of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), and first receiving the value 220 mg/dl, and then a second reading with value 180 mg/dl.
 
 ~~~~~~~~~~~
 Client  Proxy  Server
@@ -897,63 +895,56 @@ Client  Proxy  Server
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
-   |      |      | Object-Security: [cid:ca, seq:15b7, {Observe:0,
+   |      |      | Object-Security: [kid:ca, seq:15b7, {Observe:0,
    |      |      |                   Uri-Path:"glucose"}, <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
-   |      |      | Object-Security: [cid:ca, seq:15b7, {Observe:0,
+   |      |      | Object-Security: [kid:ca, seq:15b7, {Observe:0,
    |      |      |                   Uri-Path:"glucose"}, <Tag>]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Max-Age: 0
-   |      |      |         Observe: 1
+   |      |      |         Observe: 0032c2
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c2, {Observe:1, 
-   |      |      |                   Content-Format:0, "220"}, <Tag>]
+   |      |      |         Payload: [seq:32c2, {Content-Format:0,
+   |      |      |                   "220"}, <Tag>]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Max-Age: 0
-   |      |      |         Observe: 1
+   |      |      |         Observe: 0032c2
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c2, {Observe:1,
-   |      |      |                   Content-Format:0, "220"}, <Tag>]
+   |      |      |         Payload: [seq:32c2, {Content-Format:0,
+   |      |      |                   "220"}, <Tag>]
   ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Max-Age: 0
-   |      |      |         Observe: 2
+   |      |      |         Observe: 0032c6
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c6, {Observe:2, 
-   |      |      |                   Content-Format:0, "180"}, <Tag>]
+   |      |      |         Payload: [seq:32c6, {Content-Format:0,
+   |      |      |                   "180"}, <Tag>]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Max-Age: 0
-   |      |      |         Observe: 2
+   |      |      |         Observe: 0032c6
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c6, {Observe:2,
-   |      |      |                   Content-Format:0, "180"}, <Tag>]
+   |      |      |         Payload: [seq:32c6, {Content-Format:0,
+   |      |      |                   "180"}, <Tag>]
    |      |      |
 ~~~~~~~~~~~
-{: #get-protected-enc title="Indication of CoAP GET protected with OSCOAP. The brackets [ ... ] indicates COSE object. The bracket { ... \} indicates encrypted data." } 
-{: artwork-align="center"}
+{: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the unprotected request message (GET) doesn't allow payload, the COSE object (indicated with \[ ... \]) is carried in the Object-Security option value. Since the unprotected response message (Content) allows payload, the Object-Security option is empty, and the COSE object is carried as the payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
 
-The COSE header of the request contains a Context Identifier (cid:ca), indicating which security context was used to protect the message and a Sequence Number (seq:15b7).
+The COSE header of the request contains an identifier (kid:ca), indicating which security context was used to protect the message and a Sequence Number (seq:15b7). The COSE header of the responses contains sequence numbers (seq:32c and seq:32c6).
 
-The options Observe, Content-Format and the payload are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}). 
+The options Content-Format and the payload are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}). The option Observe is integrity protected.
 
-The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the Sequence Number has not been received before and that the response message is generated as a response to the subscribe request.
-
-
+The server verifies that the sequence number has not been received before (see {{sequence-numbers}}). The client verifies that the sequence number has not been received before and tha the response message is generated as a response to the subscribe request.
 
 # Object Security of Content (OSCON) {#oscon}
 
