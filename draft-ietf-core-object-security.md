@@ -679,10 +679,6 @@ The unprotected options ({{protected-coap-options}}) may reveal privacy sensitiv
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
-
-
-
-
 # IANA Considerations {#iana}
 
 Note to RFC Editor: Please replace all occurrences of "\[\[this document\]\]" with the RFC number of this specification.
@@ -764,7 +760,7 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 --- back
 
-# OSCOAP Compression # {#app-compression}
+# OSCOAP Compression {#app-compression}
 
 The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
