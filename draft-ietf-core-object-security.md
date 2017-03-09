@@ -893,52 +893,48 @@ Client  Proxy  Server
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15b7,
+   |      |      | Object-Security: [kid:ca, seq:15,
    |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15b7,
+   |      |      | Object-Security: [kid:ca, seq:15,
    |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 0032c2
+   |      |      |         Observe: 000032
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c2, {Content-Format:0,
-   |      |      |                   "220"}]
+   |      |      |         Payload: [seq:32, {Content-Format:0, "220"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 0032c2
+   |      |      |         Observe: 000032
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c2, {Content-Format:0,
-   |      |      |                   "220"}]
+   |      |      |         Payload: [seq:32, {Content-Format:0, "220"}]
   ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 0032c6
+   |      |      |         Observe: 000036
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c6, {Content-Format:0,
-   |      |      |                   "180"}]
+   |      |      |         Payload: [seq:36, {Content-Format:0, "180"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 0032c6
+   |      |      |         Observe: 000036
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32c6, {Content-Format:0,
-   |      |      |                   "180"}]
+   |      |      |         Payload: [seq:36, {Content-Format:0, "180"}]
    |      |      |
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (kid:ca), indicating which security context was used to protect the message and a Sequence Number (seq:15b7). The COSE header of the responses contains sequence numbers (seq:32c and seq:32c6).
+The COSE header of the request contains an identifier (kid:ca), indicating which security context was used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36).
 
 The options Content-Format and the payload are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}). The option Observe is integrity protected.
 
