@@ -875,11 +875,9 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (cid:5f), indicating which security context was used to protect the message and a Sequence Number (seq:42).
-
-The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}).
+The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Sequence Number (42). The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}} and encrypted.
 
 The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the response message is generated as a response to the request.
 
@@ -932,11 +930,9 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object (indicated with \[ ... \]) is carried as the CoAP payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (kid:ca), indicating which security context was used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36).
-
-The options Content-Format and the payload are formatted as indicated in {{cose-object}}, and encrypted in the COSE ciphertext (indicated with \{ ... \}). The option Observe is integrity protected.
+The COSE header of the request contains an identifier (ca), indicating which security context was used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36). The options Content-Format and the payload are formatted as indicated in {{cose-object}} and encrypted. The option Observe is integrity protected.
 
 The server verifies that the sequence number has not been received before (see {{sequence-numbers}}). The client verifies that the sequence number has not been received before and tha the response message is generated as a response to the subscribe request.
 
