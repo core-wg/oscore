@@ -842,7 +842,7 @@ This section gives examples of OSCOAP. The message exchanges are made, based on 
 
 ## Secure Access to Sensor
 
-This example targets the scenario in Section 3.1 of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting the alarm status from a server.
+This example targets the scenario in Section 3.1 of {{I-D.hartke-core-e2e-security-reqs}} and illustrates a client requesting the alarm status from a server.
 
 ~~~~~~~~~~~
 Client  Proxy  Server
@@ -872,15 +872,15 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object is carried as the CoAP payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Sequence Number (42). The option Uri-Path (alarm_status) and payload ("OFF") are formatted as indicated in {{cose-object}} and encrypted.
+The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a sequence number (42). The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
 
-The server verifies that the Sequence Number has not been received before (see {{sequence-numbers}}). The client verifies that the response message is generated as a response to the request.
+The server verifies that the sequence number has not been received before. The client verifies that the response is bound to the request.
 
 ## Secure Subscribe to Sensor
 
-This example targets the scenario in Section 3.2 of {{I-D.hartke-core-e2e-security-reqs}}. The example illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), and first receiving the value 220 mg/dl, and then a second reading with value 180 mg/dl.
+This example targets the scenario in Section 3.2 of {{I-D.hartke-core-e2e-security-reqs}} and illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), first receiving the value 220 mg/dl and then a second value 180 mg/dl.
 
 ~~~~~~~~~~~
 Client  Proxy  Server
@@ -927,11 +927,11 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload ("OFF"), the COSE object is carried as the CoAP payload.
+Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (ca), indicating which security context was used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36). The options Content-Format and the payload are formatted as indicated in {{cose-object}} and encrypted. The option Observe is integrity protected.
+The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is integrity protected. The shown Observe values (000032 and 000036) are the ones that the client will see after OSCOAP processing.
 
-The server verifies that the sequence number has not been received before (see {{sequence-numbers}}). The client verifies that the sequence number has not been received before and tha the response message is generated as a response to the subscribe request.
+The server verifies that the sequence number has not been received before. The client verifies that the sequence number has not been received before and that the responses are bound to the request.
 
 # Object Security of Content (OSCON) {#oscon}
 
