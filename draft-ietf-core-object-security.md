@@ -366,23 +366,22 @@ The outer Max-Age option is not integrity protected.
 
 #### The Block Options {#block-options}
 
-TODO: Update processing to support multiple concurrently proceeding requests
-
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY support RFC7252 with the Object-Security option without supporting {{RFC7959}}.
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}.
 
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
-The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, last block, etc.). Additionally, a proxy may arbitrarily do fragmentation operations on the protected CoAP message, adding outer block options that are not intended to be verified by any endpoint or proxy.  
+The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP message is fragmented by the CoAP client as defined in {{RFC7959}} before the message is processed by OSCOAP, and processed by OSCOAP by the CoAP server, before segmented as defined in {{RFC7959}}.
 
 There SHALL be a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
-In addition to the processing defined for the inner Block options inherent to class E options, the AEAD Tag from each block SHALL be included in the calculation of the Tag for the next block (see {{AAD}}), so that each block in the order being sent can be verified as it arrives. 
-
-The protected CoAP message may be fragmented by the sending endpoint or proxy as defined in {{RFC7959}}, in which case the outer Block options are being used. The outer Block options SHALL neither be encrypted nor integrity protected. 
+Additionally, a proxy may arbitrarily do block fragmentation on any CoAP message, in particular an OSCOAP message, as defined in {{RFC7959}} and thereby add outer Block options to a block and send on the next hop. The outer block options are thus neither encrypted nor integrity protected. 
 
 An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, or the cumulated message size of the exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document.
 
-If the unprotected CoAP message contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
+If the unprotected CoAP message in turn contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
+
+TODO: Update processing to support multiple concurrently proceeding requests
+
 
 ### Class I Options {#class-i}
 
@@ -390,7 +389,7 @@ Except for the special options described in the subsections, for options in Clas
 
 #### Observe {#observe}
 
-Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} with the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
+Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
 In order for a proxy to support forwarding of Observe, there MUST be an outer Observe option in the message. 
 
@@ -401,8 +400,6 @@ To secure the Observe Registration and the order of the Notifications, Observe S
 
 * The Observe option in the unprotected CoAP request SHALL be included in the external_aad of the request (see {{AAD}}).
 * The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sender Sequence Number of the response
-
-TODO: Complete this section
 
 ### Class U Options {#class-u}
 
@@ -455,7 +452,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "protected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests.
 
