@@ -308,9 +308,9 @@ The sending endpoint SHALL copy the header fields from the unprotected CoAP mess
 
 ## CoAP Options {#coap-options}
 
-Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
+Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present in the protected CoAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
 
-A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing as described in the subsections and indicated by a '*' in {{protected-coap-options}}.
+A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing as described in the subsections and indicated by a * in {{protected-coap-options}}.
 
 ~~~~~~~~~~~
            +----+----------------+---+---+---+
@@ -354,7 +354,7 @@ The sending endpoint SHALL write the class E option from the unprotected CoAP me
 
 Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
-Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it with the value from the COSE object when present.
+Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it in the unprotected CoAP messages with the value from the COSE object when present.
 
 #### Max-Age {#max-age}
 
@@ -385,7 +385,9 @@ TODO: Update processing to support multiple concurrently proceeding requests
 
 ### Class I Options {#class-i}
 
-Except for the special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL only be integrity protected between the endpoints. Class I options are included in the external_aad ({{AAD}}).
+Except for the special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL only be integrity protected between the endpoints. Options in Class I have outer values. Unless otherwise specified, the sending endpoint SHALL encode the Class I options in the protected CoAP message as described in {{options-in-protected}}.
+
+Class I options are included in the external_aad ({{AAD}}).
 
 #### Observe {#observe}
 
@@ -393,8 +395,8 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for a proxy to support forwarding of Observe, there MUST be an outer Observe option in the message. 
 
-* The Observe Registration (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP request SHALL be copied to the protected CoAP request.
-* The Observe Notification (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP response SHALL be copied to the protected CoAP response.
+* The Observe Registration (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP request SHALL be encoded in the protected CoAP request as described in {{options-in-protected}}.
+* The Observe Notification (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP response SHALL be encoded in the protected CoAP response as described in {{options-in-protected}}.
 
 To secure the Observe Registration and the order of the Notifications, Observe SHALL be integrity protected as described in this section:
 
@@ -403,7 +405,8 @@ To secure the Observe Registration and the order of the Notifications, Observe S
 
 ### Class U Options {#class-u}
 
-Options in Class U are used to support forward proxy operations. Unless otherwise specified, the sending endpoint SHALL copy a Class U option from the unprotected CoAP message to the protected CoAP message, and v.v. for the receiving endpoint. 
+Options in Class U have outer values and are used to support forward proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the protected CoAP message as described in {{options-in-protected}}.
+
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
@@ -438,6 +441,11 @@ Proxy-Uri is added to the OSCOAP protected message with value:
 
 * Proxy-Uri = "coap://example.com"
 
+### Outer Options in the Protected CoAP Message ### {#options-in-protected}
+
+All options with outer values present in the protected CoAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option. 
+
+
 # The COSE Object {#cose-object}
 
 This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the untagged COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, and maximum sequence number are algorithm dependent.
@@ -454,7 +462,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests.
+   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
 - The "unprotected" field is empty.
 
@@ -466,7 +474,7 @@ The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}.
 
 The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
-- all CoAP Options present in the unprotected message that are encrypted (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included encrypted option; and
+- all Class E options {{class-e}} present in the unprotected CoAP message (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
 
 - the Payload of unprotected CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
@@ -504,7 +512,7 @@ where:
 
 - code: contains is the CoAP Code of the unprotected CoAP message, as defined in Section 3 of {{RFC7252}}.
 
-- options: contains the class I options {{class-i}} encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
+- options: contains the Class I options {{class-i}} present in the unprotected CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
 
 - alg: contains the Algorithm from the security context used for the exchange (see {{context-definition}}).
 
@@ -514,9 +522,9 @@ where:
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
-## AEAD Nonce Uniqueness ##
+## AEAD Nonce Uniqueness ## {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent and SHALL be 2^(nonce length in bits - 1) - 1. If the Sender Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent and SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. If the Sender Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Replay Protection ##
 
@@ -560,7 +568,7 @@ Given an unprotected request, the client SHALL perform the following steps to cr
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
-5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
+5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
@@ -586,6 +594,8 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
+8. The unprotected CoAP request is processed according to {{RFC7252}}
+
 ## Protecting the Response
 
 Given an unprotected response, the server SHALL perform the following steps to create a protected response:
@@ -602,7 +612,7 @@ Given an unprotected response, the server SHALL perform the following steps to c
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
-5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{option}}.
+5. Format the protected CoAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
 
 ## Verifying the Response
 
@@ -631,12 +641,15 @@ A client receiving a response containing the Object-Security option SHALL perfor
 6. Add decrypted options or payload to the unprotected response overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
+   
+7. The unprotected CoAP response is processed according to {{RFC7252}}
+
 
 # Web Linking
 
-The use of OSCOAP MAY be indicated by a target attribute "sec" in a web link {{RFC5988}} to a CoAP resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCOAP. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCOAP. 
+The use of OSCOAP MAY be indicated by a target attribute "osc" in a web link {{RFC5988}} to a CoAP resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCOAP. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCOAP. 
 
-A value MUST NOT be given for the "sec" attribute; any present value MUST be ignored by parsers. The "sec" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
+A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
 # Security Considerations {#sec-considerations}
 
@@ -648,7 +661,9 @@ The CoAP message layer, however, cannot be protected end-to-end through intermed
 
 The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using EDHOC {{I-D.selander-ace-cose-ecdhe}} or the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
 
-The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum no. messages (2^56-1). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
+The formula 2^(min(nonce length in bits, 56) - 1) - 1 {{nonce-uniqueness}} guarantees unique nonces during the required use the algorithm, considering the same partial IV and flipped first bit of IV {{cose-object}} is used in request and response (which is the reason for -1 in the exponent). The compression algorithm {{app-compression}} assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+
+The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum no. messages (2^55-1). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
