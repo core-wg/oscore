@@ -1,6 +1,6 @@
 ---
 title: Object Security of CoAP (OSCOAP)
-docname: draft-ietf-core-object-security-latest
+docname: draft-ietf-core-object-security-02
 
 ipr: trust200902
 wg: CoRE Working Group
@@ -138,7 +138,7 @@ The security context is the set of information elements necessary to carry out t
 
 The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Clients need to be able to retrieve the correct security context to use.
 
-Each (Sender Context, Recipient Context)-pair has a unique ID. An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
+An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
                .------------.           .------------.
@@ -245,7 +245,7 @@ where:
        id : bstr,
        alg : int,
        type : tstr,
-       L : bstr
+       L : int
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
@@ -256,7 +256,7 @@ where:
 
 * L is the key/IV size of the AEAD algorithm in octets without leading zeroes.
 
-For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, L is 16 bytes for keys and 7 bytes for IVs.
+For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, the value for L is 16 for keys and 7 for IVs.
 
 ### Initial Sequence Numbers and Replay Window
 
@@ -281,8 +281,8 @@ OSCOAP transforms an unprotected CoAP message into a protected CoAP message, and
 
 This section also outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the unprotected CoAP message are either transferred in the header/options part of the protected CoAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the protected CoAP message is called "inner" or "outer": 
 
-* Inner message field = message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
-* Outer message field = message field included in the header or options part of the protected CoAP message
+* Inner message field: message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
+* Outer message field: message field included in the header or options part of the protected CoAP message
 
 The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E). The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the AAD of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
 
@@ -344,7 +344,7 @@ U=Unprotected, *=Special
 
 Unless specified otherwise, CoAP options not listed in {{protected-coap-options}} SHALL be encrypted and integrity protected and processed as class E options.
 
-Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. New COAP options SHOULD be of class E and SHOULD NOT have outer options unless a forwarding proxy needs to read an option value. If a certain option is both inner and outer, the two values SHOULD NOT be the same, unless a proxy is required by specification to be able to read the end-to-end value.
+Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. New COAP options SHOULD be of class E and SHOULD NOT have outer options unless a forwarding proxy needs to read that option value. If a certain option is both inner and outer, the two values SHOULD NOT be the same, unless a proxy is required by specification to be able to read the end-to-end value.
 
 ### Class E Options {#class-e}
 
@@ -370,7 +370,7 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with 
 
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
-The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP message is fragmented by the CoAP client as defined in {{RFC7959}} before the message is processed by OSCOAP, and processed by OSCOAP by the CoAP server, before segmented as defined in {{RFC7959}}.
+The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP client fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The CoAP server first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
 
 There SHALL be a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
@@ -401,7 +401,7 @@ In order for a proxy to support forwarding of Observe, there MUST be an outer Ob
 To secure the Observe Registration and the order of the Notifications, Observe SHALL be integrity protected as described in this section:
 
 * The Observe option in the unprotected CoAP request SHALL be included in the external_aad of the request (see {{AAD}}).
-* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sender Sequence Number of the response
+* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sequence Number of the response
 
 ### Class U Options {#class-u}
 
@@ -460,7 +460,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "protected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
+   * The "Partial IV" parameter. The value is set to the Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
@@ -524,7 +524,7 @@ where:
 
 ## AEAD Nonce Uniqueness ## {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent and SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. If the Sender Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent and SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Replay Protection ##
 
@@ -552,7 +552,7 @@ For responses without Observe, OSCOAP provides absolute freshness. For requests,
 
 ## Delay and Mismatch Attacks ##
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCOAP binds responses to the request by including the request's ID (Sender ID or Recipient ID) and sequence number in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and sequence number until all responses has been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCOAP binds responses to the request by including the request's ID (Sender ID or Recipient ID) and sequence number in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and sequence number until all responses have been sent.
 
 # Processing {#processing}
 
@@ -564,7 +564,7 @@ Given an unprotected request, the client SHALL perform the following steps to cr
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sender Sequence Number in network byte order). Increment the Sender Sequence Number by one.
+3. Compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -661,15 +661,13 @@ The CoAP message layer, however, cannot be protected end-to-end through intermed
 
 The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using EDHOC {{I-D.selander-ace-cose-ecdhe}} or the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
 
-The formula 2^(min(nonce length in bits, 56) - 1) - 1 {{nonce-uniqueness}} guarantees unique nonces during the required use the algorithm, considering the same partial IV and flipped first bit of IV {{cose-object}} is used in request and response (which is the reason for -1 in the exponent). The compression algorithm {{app-compression}} assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+The formula 2^(min(nonce length in bits, 56) - 1) - 1 ({{nonce-uniqueness}}) guarantees unique nonces during the required use the algorithm, considering the same partial IV and flipped first bit of IV ({{cose-object}}) is used in request and response (which is the reason for -1 in the exponent). The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
-The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum no. messages (2^55-1). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
+The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum number of messages (2^56). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The encrypted block options enable the sender to split large messages into protected blocks such that the receiving node can verify blocks before having received the complete message. In order to protect from attacks replacing blocks from a different message with the same block number between same endpoints and same resource at roughly the same time, the AEAD Tag from the message containing one block is included in the external_aad of the message containing the next block. 
-
-The unencrypted block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
+The inner block options enable the sender to split large messages into protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
 Applications need to use a padding scheme if the content of a message can be determined solely from the length of the payload.  As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms.  Some information can be determined even from looking at boundary conditions.  An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length.  For example using 0 and 1 instead of 'yes' and 'no'.  2) Use a character which is not part of the responses to pad to a fixed length.  For example, pad with a space to three characters.  3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m.  For example, appending a 0 to "YES" and two 1's to "NO".  This style of padding means that all values need to be padded.
 
@@ -771,8 +769,8 @@ The value of the Object-Security option SHALL in general be encoded as:
 ~~~~~~~~~~~ CDDL
 [
   Partial IV,
-  ? ( kid, ? gid ),
-  ciphertext | signature
+  ? kid,
+  ciphertext
 ]
 ~~~~~~~~~~~
 
