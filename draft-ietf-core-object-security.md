@@ -1,6 +1,6 @@
 ---
 title: Object Security of CoAP (OSCOAP)
-docname: draft-ietf-core-object-security-02
+docname: draft-ietf-core-object-security-latest
 
 ipr: trust200902
 wg: CoRE Working Group
