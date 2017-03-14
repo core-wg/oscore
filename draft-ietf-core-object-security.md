@@ -270,7 +270,6 @@ To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be u
 
 The same Master Salt MAY be used with several Master Secrets.
 
-
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
 OSCOAP transforms an unprotected CoAP message into a protected CoAP message, and vice versa. This section defines how the CoAP message fields are protected. OSCOAP protects as much of the unprotected CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
