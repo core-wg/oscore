@@ -3,8 +3,8 @@
 This is the working area for the Working Group internet-draft, "Object Security of CoAP (OSCOAP)".
 
 * [Editor's copy](https://core-wg.github.io/oscoap/)
-* [Working Group Draft] (https://tools.ietf.org/html/draft-ietf-core-object-security)
-* [Compare Working Group Draft and Editor's copy] (https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-ietf-core-object-security.txt&url2=https://core-wg.github.io/oscoap/draft-ietf-core-object-security.txt)
+* [Working Group Draft](https://tools.ietf.org/html/draft-ietf-core-object-security)
+* [Compare Working Group Draft and Editor's copy](https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-ietf-core-object-security.txt&url2=https://core-wg.github.io/oscoap/draft-ietf-core-object-security.txt)
 
 
 ## Building the Draft
