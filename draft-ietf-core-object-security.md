@@ -74,7 +74,7 @@ This document defines Object Security of CoAP (OSCOAP), a data object based secu
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7228}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{app-compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, certain options, and header fields. The solution transforms an unprotected CoAP message into a protected CoAP message in the following way: the unprotected CoAP message is protected by including payload (if present), certain options, and header fields in a COSE object. The message fields that have been encrypted are removed from the message whereas the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                           Server
@@ -120,9 +120,9 @@ A successful response to a request with the Object-Security option SHALL contain
 
 The protection is achieved by means of a COSE object (see {{cose-object}}) included in the protected CoAP message. The placement of the COSE object depends on whether the method/response code allows payload (see {{RFC7252}}):
 
-* If the method/response code allows payload, then the compressed COSE object is the payload of the protected message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
+* If the method/response code allows payload, then the compressed COSE object {{app-compression}} is the payload of the protected message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
 
-* If the method/response code does not allow payload, then the compressed COSE object is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
+* If the method/response code does not allow payload, then the compressed COSE object {{app-compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
 
 The size of the COSE object depends on whether the method/response code allows payload, if the message is a request or response, on the set of options that are included in the unprotected message, the AEAD algorithm, the length of the information identifying the security context, and the length of the sequence number.
 
@@ -202,9 +202,9 @@ The parameters in the security context are derived from a small set of input par
 
 * Master Secret
 
-* Sender ID
+* Sender ID 
 
-* Recipient ID
+* Recipient ID 
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
 
@@ -228,7 +228,7 @@ How the input parameters are pre-established, is application specific. The EDHOC
 
 ### Derivation of Sender Key/IV, Recipient Key/IV 
 
-The KDF MUST be one of the HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV and Recipient Key/IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV and Recipient Key/IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -264,7 +264,7 @@ The Sequence Number is initialized to 0. The supported types of replay protectio
 
 ## Requirements on the Security Context Parameters {#context-requirements}
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using EDHOC) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using EDHOC {{I-D.selander-ace-cose-ecdhe}}) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
@@ -303,7 +303,7 @@ The CoAP header field Code MUST be sent in plaintext to support RESTful processi
 
 Other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). The CoAP header fields are thus outer message fields.
 
-The sending endpoint SHALL copy the header fields from the unprotected CoAP message to the protected CoAP message. The receiving endpoint SHALL copy the header fields from the protected CoAP message to the unprotected CoAP message. Both sender and receiver insert the CoAP version number and header field Code in the AAD of the COSE object (see section {{AAD}}). 
+The sending endpoint SHALL copy the header fields from the unprotected CoAP message to the protected CoAP message. The receiving endpoint SHALL copy the header fields from the protected CoAP message to the unprotected CoAP message. Both sender and receiver insert the CoAP version number and header field Code in the AAD of the COSE object (see {{AAD}}). 
 
 ## CoAP Options {#coap-options}
 
@@ -343,25 +343,24 @@ U=Unprotected, *=Special
 
 Unless specified otherwise, CoAP options not listed in {{protected-coap-options}} SHALL be encrypted and integrity protected and processed as class E options.
 
-Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. New COAP options SHOULD be of class E and SHOULD NOT have outer options unless a forwarding proxy needs to read that option value. If a certain option is both inner and outer, the two values SHOULD NOT be the same, unless a proxy is required by specification to be able to read the end-to-end value.
+Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. New COAP options SHOULD be of class E and SHOULD NOT have outer values unless a forwarding proxy needs to read that option value. If a certain option has both inner and outer values, the two values SHOULD NOT be the same.
 
 ### Class E Options {#class-e}
 
-For options in class E (see {{protected-coap-options}}) the option value in the unprotected CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints.  Hence the actions resulting from the use of such options is analogous to communicating in a protected manner with the endpoint. For example, a client using an ETag option will not be served by a proxy.
+For options in class E (see {{protected-coap-options}}) the option value in the unprotected CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints.  Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an ETag option will not be served by a proxy.
 
 The sending endpoint SHALL write the class E option from the unprotected CoAP message into the plaintext of the COSE object.
 
 Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
-Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL replace it in the unprotected CoAP messages with the value from the COSE object when present.
+Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the protected CoAP message and SHALL write the Class E options present in the plaintext of the COSE object into the unprotected CoAP message. 
+
 
 #### Max-Age {#max-age}
 
 An inner Max-Age option, like other class E options, is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
 
-Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). 
-
-The outer Max-Age option is not integrity protected.
+Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching, a server MAY add an outer Max-Age option with value zero to protected CoAP responses (see Section 5.6.1 of {{RFC7252}}). The outer Max-Age option is not integrity protected.
 
 #### The Block Options {#block-options}
 
@@ -453,7 +452,7 @@ This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect d
  
 The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes, and the maximum Sequence Number is 2^55 - 1.
 
-The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV). The first bit in the Sender IV or Recipient IV SHALL be flipped in responses.
+The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV), with the following addition: The first bit in the Sender IV or Recipient IV SHALL be flipped in responses.
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
@@ -539,13 +538,13 @@ To prevent reuse of the Nonce/Sequence Number with the same key, or from accepti
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. The node MAY perform the following procedure:
+If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. To prevent this, the node MAY perform the following procedure during normal operations:
 
-* Before sending a message, the client stores in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client does not use any lower sequence number in a request than what was persistently stored with that security context.
+1. Before sending a message, the client stores in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client does not use any lower sequence number in a request than what was persistently stored with that security context.
 
    * Storing to persistent memory can be costly. Instead of storing a sequence number for each request, the client may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
-* After boot, before accepting a message from a stored security context, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+2.  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
 ## Freshness ## 
 
@@ -589,11 +588,11 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 6. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the server MUST stop processing the request and SHOULD send an 4.01 error message.
+   * If decryption fails, the server MUST stop processing the request and SHOULD send a 4.01 error message.
 
    * If decryption succeeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted options or payload to the unprotected request, overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
+7. Add decrypted options and payload to the unprotected request, processing the E options as described in ({{coap-headers-and-options}}). The Object-Security option is removed.
 
 8. The unprotected CoAP request is processed according to {{RFC7252}}
 
@@ -765,27 +764,39 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-The value of the Object-Security option SHALL in general be encoded as:
+The value of the Object-Security option for requests SHALL be encoded as:
 
 ~~~~~~~~~~~ CDDL
 [
   Partial IV,
-  ? kid,
+  kid,
   ciphertext
 ]
 ~~~~~~~~~~~
 
-Furthermore, the type and length for the ciphertext is redundant and 10 bits in the first two bytes are static. The type and length for the ciphertext SHALL be excluded, and the first sixteen bits in the above COSE array SHALL be encoded as a single byte:
+The value of the Object-Security option for responses SHALL be encoded as:
+
+~~~~~~~~~~~ 
+  ciphertext
+~~~~~~~~~~~
+
+except for Observe responses, where the encoding SHALL be:
+
+~~~~~~~~~~~ CDDL
+[
+  kid,
+  ciphertext
+]
+~~~~~~~~~~~
+
+
+Furthermore, the type and length for the ciphertext is redundant and 10 bits in the first two bytes are static. The type and length for the ciphertext SHALL be excluded, and the first sixteen bits in the COSE arrays above SHALL be encoded as a single byte:
 
 ~~~~~~~~~~~
 10000abc 01000def -> 00abcdef
 ~~~~~~~~~~~
 
-The exception is Responses without Observe that SHALL be encoded as:
 
-~~~~~~~~~~~
-ciphertext
-~~~~~~~~~~~
 
 ## Examples {#compression-examples}
 
