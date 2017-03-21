@@ -394,13 +394,15 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for a proxy to support forwarding of Observe, there MUST be an outer Observe option in the message. 
 
-* The Observe Registration (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP request SHALL be encoded in the protected CoAP request as described in {{options-in-protected}}.
-* The Observe Notification (see Section 1.2 of {{RFC7641}}) of the unprotected CoAP response SHALL be encoded in the protected CoAP response as described in {{options-in-protected}}.
+* The Observe option of the unprotected CoAP request SHALL be encoded in the protected CoAP request as described in {{options-in-protected}}.
 
-To secure the Observe Registration and the order of the Notifications, Observe SHALL be integrity protected as described in this section:
+* The Observe option of the unprotected CoAP response SHALL be encoded in the protected CoAP response as described in {{options-in-protected}}.
 
-* The Observe option in the unprotected CoAP request SHALL be included in the external_aad of the request (see {{AAD}}).
+To secure the order of the notifications, responses with the Observe option SHALL be integrity protected as described in the following way:
+
 * The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sequence Number of the response
+
+The Observe option in the CoAP request SHALL NOT be integrity protected since it may be legitimately removed by a proxy. 
 
 ### Class U Options {#class-u}
 
