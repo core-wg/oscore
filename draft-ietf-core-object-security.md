@@ -607,9 +607,9 @@ Given an unprotected response, the server SHALL perform the following steps to c
 
 3. Compose the AEAD nonce
 
-   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Sender IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
+   * If Observe is used, compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -631,7 +631,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
    * If Observe is not used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the response.
+   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
 5. Decrypt the COSE object using the Recipient Key.
 
@@ -785,7 +785,7 @@ except for Observe responses, where the encoding SHALL be:
 
 ~~~~~~~~~~~ CDDL
 [
-  kid,
+  Partial IV,
   ciphertext
 ]
 ~~~~~~~~~~~
