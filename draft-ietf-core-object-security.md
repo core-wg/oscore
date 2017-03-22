@@ -805,14 +805,11 @@ Furthermore, the type and length for the ciphertext is redundant and 10 bits in 
 
 ~~~~~~~~~~~
 COSE Object Before Compression (24 bytes)
-83 a2 04 41 25 06 41 05 a0 4e ae a0 15 56 67 92
-4d ff 8a 24 e4 cb 35 b9
+83 47 a2 04 41 25 06 41 05 a0 4e ae a0 15 56 67
+92 4d ff 8a 24 e4 cb 35 b9
 
 [
-{
-  4:h'25',
-  6:h'05'
-},
+h'a2044125064105'   / { 4:h'25', 6:h'05' } /,
 {},
 h'aea0155667924dff8a24e4cb35b9'
 ]
@@ -826,11 +823,11 @@ After Compression (18 bytes)
 
 ~~~~~~~~~~~
 COSE Object Before Compression (18 bytes)
-83 a0 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
+83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
 35 b9
 
 [
-{},
+h'',
 {},
 h'aea0155667924dff8a24e4cb35b9'
 ]
@@ -843,13 +840,11 @@ ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
 
 ~~~~~~~~~~~
 COSE Object Before Compression (21 bytes)
-83 a1 06 41 07 a0 4e ae a0 15 56 67 92 4d ff 8a
-24 e4 cb 35 b9
+83 44 a1 06 41 07 a0 4e ae a0 15 56 67 92 4d ff
+8a 24 e4 cb 35 b9
 
 [
-{
-  6:h'07'
-},
+h'a1064107' / { 6:h'07' } /,
 {},
 h'aea0155667924dff8a24e4cb35b9'
 ]
