@@ -784,7 +784,7 @@ except for Observe responses, where the encoding SHALL be:
 
 ~~~~~~~~~~~ CDDL
 [
-  kid,
+  Partial IV,
   ciphertext
 ]
 ~~~~~~~~~~~
