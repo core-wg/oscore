@@ -129,9 +129,9 @@ The size of the COSE object depends on whether the method/response code allows p
 
 # The Security Context {#context}
 
-OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only the server part.
+OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only implement the server part.
 
-The specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
+This specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
@@ -211,7 +211,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * AEAD Algorithm (Alg)
 
-   - Default is AES-CCM-64-64-128 (value 12)
+   - Default is AES-CCM-64-64-128 (COSE abbreviation: 12)
 
 * Master Salt
 
@@ -284,7 +284,7 @@ This section also outlines how the message fields are transferred, a detailed de
 * Inner message field: message field included in the plaintext of the COSE object of the protected CoAP message (see {{plaintext}})
 * Outer message field: message field included in the header or options part of the protected CoAP message
 
-The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E). The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the AAD of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
+The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E). The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the Additional Authenticated Data (AAD) of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
 
 Note that, even though the message formats are slightly different, OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
@@ -411,7 +411,7 @@ Options in Class U have outer values and are used to support forward proxy opera
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
-The sending endpoint SHALL copy Uri-Host, Uri-Port, and Proxy-Scheme from the unprotected CoAP message to the protected CoAP message. When Uri-Host, Uri-Port, Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. 
+The sending endpoint SHALL copy Uri-Host, Uri-Port, and Proxy-Scheme from the unprotected CoAP message to the protected CoAP message. When Uri-Host, Uri-Port, or Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. 
 
 #### Proxy-Uri {#proxy-uri}
 
@@ -532,6 +532,8 @@ An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure u
 In order to protect from replay of messages, each Recipient Context contains a Replay Window used to verify request, and - in case of Observe - responses. A receiving endpoint SHALL verify that a Sequence Number (Partial IV) received in the COSE object has not been received before in the Recipient Context. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
 
 ## Sequence Number and Replay Window State ##
+
+FIXME some text should be here.
 
 ### The Basic Case ###
 
