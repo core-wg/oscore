@@ -259,7 +259,7 @@ where:
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, the value for L is 16 for keys and 7 for IVs.
 
-### Initial Sequence Numbers and Replay Window
+### Initial Sequence Numbers and Replay Window  {#initial-sequence-replay}
 
 The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
@@ -522,6 +522,8 @@ where:
 - request_seq: contains the value of the 'Partial IV' in the COSE object of the request (see Section 5).
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
+
+Sequence numbers and replay window are initialized as defined in {{initial-sequence-replay}}.
 
 ## AEAD Nonce Uniqueness ## {#nonce-uniqueness}
 
