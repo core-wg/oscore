@@ -535,21 +535,35 @@ In order to protect from replay of messages, each Recipient Context contains a R
 
 ## Sequence Number and Replay Window State ##
 
-FIXME some text should be here.
-
-### The Basic Case ###
-
 To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. To prevent this, the node MAY perform the following procedure during normal operations:
+If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. 
 
-1. Before sending a message, the client stores in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client does not use any lower sequence number in a request than what was persistently stored with that security context.
+### The Basic Case ###
+
+To prevent reuse of Sequence Number, the node MAY perform the following procedure during normal operations:
+
+* Before sending a message, the client stores in persistent memory a sequence number associated to the stored security context higher than any sequence number which has been or are being sent using this security context. After boot, the client does not use any lower sequence number in a request than what was persistently stored with that security context.
 
    * Storing to persistent memory can be costly. Instead of storing a sequence number for each request, the client may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
-2.  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+To prevent accepting replay of previously received messages, the node MAY perform the following procedure:
+
+*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+
+### The Observe Case ### 
+
+To prevent reuse of Sequence Number in case of Observe, the node MAY perform the following procedure during normal operations:
+
+* Before sending a notification, the server stores in persistent memory a sequence number associated to the stored securit context higher than any sequence number for which a notification has been or are being sent using this security context. After boot, the server does not use any lower sequence number in an Observe response than what was persistently stored with that security context. 
+
+   * Storing to persistent memory can be costly. Instead of storing a sequence number for each notification, the server may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
+
+
+Note that a client MAY continue an ongoing observation after reboot using a stored security context. With Observe, the client can only verify the order of the notifications, as they may be delayed. If the client wants to synchronize with a server resource it MAY restart an observation.
+
 
 ## Freshness ## 
 
