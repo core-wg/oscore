@@ -451,7 +451,7 @@ All options with outer values present in the protected CoAP message, including t
 
 This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect data in the unprotected CoAP message. OSCOAP uses the untagged COSE\_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, and maximum sequence number are algorithm dependent.
  
-The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes, and the maximum Sequence Number is 2^55 - 1.
+The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
 
 The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV), with the following addition: The first bit in the Sender IV or Recipient IV SHALL be flipped in responses.
 
@@ -527,7 +527,7 @@ Sequence numbers and replay window are initialized as defined in {{initial-seque
 
 ## AEAD Nonce Uniqueness ## {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent and SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent, see {{sec-considerations}}. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Replay Protection ##
 
@@ -567,7 +567,9 @@ Note that a client MAY continue an ongoing observation after reboot using a stor
 
 ## Freshness ## 
 
-For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allows a recipient to determine the relative order of messages.  For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.mattsson-core-coap-actuators}}. 
+For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allows a recipient to determine the relative order of messages.  
+
+For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.mattsson-core-coap-actuators}}. 
 
 ## Delay and Mismatch Attacks ##
 
@@ -653,7 +655,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 5. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the client MUST stop processing the response and SHOULD send an 4.01 error message.
+   * If decryption fails, the client MUST stop processing.
 
    * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
@@ -680,11 +682,11 @@ The CoAP message layer, however, cannot be protected end-to-end through intermed
 
 The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using EDHOC {{I-D.selander-ace-cose-ecdhe}} or the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
 
-The formula 2^(min(nonce length in bits, 56) - 1) - 1 ({{nonce-uniqueness}}) guarantees unique nonces during the required use the algorithm, considering the same partial IV and flipped first bit of IV ({{cose-object}}) is used in request and response (which is the reason for -1 in the exponent). The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
-
 The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum number of messages (2^56). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
+
+The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is algorithm dependent. Using AES_CCM, with the maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. The "-1" in the exponent stems from the same partial IV and flipped first bit of IV ({{cose-object}}) is used in request and response. The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
 The inner block options enable the sender to split large messages into protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
