@@ -459,13 +459,13 @@ We denote by Plaintext the data that is encrypted and integrity protected, and b
 
 The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
-- The "protected" field includes:
+- The "protected" field is empty.
+
+- The "unprotected" field includes:
 
    * The "Partial IV" parameter. The value is set to the Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
-
-- The "unprotected" field is empty.
 
 -  The "ciphertext" field is computed from the Plaintext (see {{plaintext}}) and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{I-D.ietf-cose-msg}}.
 
@@ -829,12 +829,12 @@ Furthermore, the type and length for the ciphertext is redundant and 10 bits in 
 
 ~~~~~~~~~~~
 COSE Object Before Compression (24 bytes)
-83 47 a2 04 41 25 06 41 05 a0 4e ae a0 15 56 67
-92 4d ff 8a 24 e4 cb 35 b9
+83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
+4d ff 8a 24 e4 cb 35 b9
 
 [
-h'a2044125064105'   / { 4:h'25', 6:h'05' } /,
-{},
+h'',
+{ 4:h'25', 6:h'05' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
 
@@ -864,12 +864,12 @@ ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
 
 ~~~~~~~~~~~
 COSE Object Before Compression (21 bytes)
-83 44 a1 06 41 07 a0 4e ae a0 15 56 67 92 4d ff
+83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
 8a 24 e4 cb 35 b9
 
 [
-h'a1064107' / { 6:h'07' } /,
-{},
+h'',
+{ 6:h'07' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
 
