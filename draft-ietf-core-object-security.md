@@ -195,7 +195,7 @@ The Recipient Context contains the following parameters:
 
 * Replay Window. The replay window to verify requests and observe responses received.
 
-When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV of this context (Sender IV or Recipient IV, respectively).
+When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
 
 An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
@@ -475,7 +475,7 @@ The encryption process is described in Section 5.3 of {{I-D.ietf-cose-msg}}.
 
 The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
-- all Class E options {{class-e}} present in the unprotected CoAP message (see {{coap-headers-and-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
+- all Class E option values {{class-e}} present in the unprotected CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
 
 - the Payload of unprotected CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
@@ -483,7 +483,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Options to Encrypt (if any) ...                             
+|    Class E options (if any) ...                             
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -557,7 +557,7 @@ To prevent accepting replay of previously received messages, the node MAY perfor
 
 To prevent reuse of Sequence Number in case of Observe, the node MAY perform the following procedure during normal operations:
 
-* Before sending a notification, the server stores in persistent memory a sequence number associated to the stored securit context higher than any sequence number for which a notification has been or are being sent using this security context. After boot, the server does not use any lower sequence number in an Observe response than what was persistently stored with that security context. 
+* Before sending a notification, the server stores in persistent memory a sequence number associated to the stored security context higher than any sequence number for which a notification has been or are being sent using this security context. After boot, the server does not use any lower sequence number in an Observe response than what was persistently stored with that security context. 
 
    * Storing to persistent memory can be costly. Instead of storing a sequence number for each notification, the server may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
@@ -629,7 +629,7 @@ Given an unprotected response, the server SHALL perform the following steps to c
 
    * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
+   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order). Increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -643,15 +643,15 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 2. Retrieve the Recipient Context associated with the Token.
 
-3. If Observe is used, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}.
+3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
 5. Compose the AEAD nonce
 
-   * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
+      * If the Observe option is present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
 5. Decrypt the COSE object using the Recipient Key.
 
