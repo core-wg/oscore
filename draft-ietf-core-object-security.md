@@ -403,7 +403,7 @@ To secure the order of the notifications, responses with the Observe option SHAL
 
 The Observe option in the CoAP request SHALL NOT be integrity protected, since it may be legitimately removed by a proxy. 
 
-If the Observe option is removed by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response without an outer Observe value to an Observe request, then it MUST verify the response as a non-Observe response, i.e. not include the Sequence Number of the response in the external_aad.
+If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response, i.e. not include the Sequence Number of the response in the external_aad.
 
 
 ### Class U Options {#class-u}
