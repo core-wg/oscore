@@ -102,6 +102,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{I-D.ietf-cose-msg}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV, Recepient ID/Key/IV and Context IV are defined in {{context-definition}}.
+
 # The Object-Security Option {#option}
 
 The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP message exchange. The Object-Security option is critical, safe to forward, part of the cache key, not repeatable, and opaque.
@@ -153,7 +155,7 @@ Retrieve context for  | request:              |
  target resource      | [Token = Token1,      |
 Protect request with  |  kid = SID, ...]      |
   Sender Context      +---------------------->| Retrieve context with
-                      |                       |  RID = SID
+                      |                       |  RID = kid
                       |                       | Verify request with
                       |                       |  Recipient Context
                       | response:             | Protect response with
@@ -192,6 +194,8 @@ The Recipient Context contains the following parameters:
 * Recipient IV. Byte string containing the IV to verify messages received. Derived from Common Context and Recipient ID. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
 * Replay Window. The replay window to verify requests and observe responses received.
+
+When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV of this context (Sender IV or Recipient IV, respectively).
 
 An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
@@ -453,7 +457,8 @@ This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect d
  
 The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
 
-The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the context IV (Sender IV or Recipient IV), with the following addition: The first bit in the Sender IV or Recipient IV SHALL be flipped in responses.
+The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The first bit in the Context IV SHALL be flipped for responses, in case  there is a unique response (not Observe). In this way, the same sequence number can be reused for requests and corresponding responses, which reduces the size of the responses in the most common case. For detailed processing instructions, see {{processing}}. 
+
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
@@ -585,7 +590,7 @@ Given an unprotected request, the client SHALL perform the following steps to cr
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
+3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -605,7 +610,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-5. Compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded 'Partial IV' parameter, received in the COSE Object.
+5. Compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded 'Partial IV' parameter, received in the COSE Object.
 
 6. Decrypt the COSE object using the Recipient Key.
 
@@ -627,9 +632,9 @@ Given an unprotected response, the server SHALL perform the following steps to c
 
 3. Compose the AEAD nonce
 
-   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Sender IV with the first bit flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
+   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
 
@@ -649,9 +654,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 5. Compose the AEAD nonce
 
-   * If Observe is not used, compose the AEAD nonce by XORing the context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the context IV (Recipient IV) with the padded Partial IV parameter from the response.
+   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
 5. Decrypt the COSE object using the Recipient Key.
 
