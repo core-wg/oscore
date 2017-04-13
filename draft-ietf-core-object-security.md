@@ -673,90 +673,96 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-The value of the Object-Security option for requests SHALL be encoded as:
+The value of the Object-Security option for requests SHALL be encoded as follows:
 
-~~~~~~~~~~~ CDDL
-[
-  Partial IV,
-  kid,
-  ciphertext
-]
-~~~~~~~~~~~
+* The first byte MUST encode a set of flags and the length of the Partial IV parameter.
+    - The three least significant bits encode the Partial IV size. If their value is 0, the Partial IV is not present in the compressed message.
+    - The fourth least significant bit is set to 1 if the kid is present in the compressed message.
+    - The fifth least significant bit is set to 1 if a counter signature is present in the compressed message.
+    - The sixth least significant bit is set to 1 if a group identifier is present in the compressed message. 
+* The following n bytes (n being the value of the Partial IV size in the first byte) encode the value of the Partial IV, if the Partial IV is present (size not 0).
+* The following byte encodes the size of the kid parameter, if the kid is present (flag bit set to 1) 
+* The following m bytes (m given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1)
+* The following byte encodes the size of the counter signature, if a counter signature is present (flag bit set to 1) 
+* The following x bytes (x given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1) 
+* The following byte encodes the size of the group identifier parameter, if a group identifier is present (flag bit set to 1) 
+* The following y bytes (y given by the previous byte) encode the value of the group identifier parameter, if a group identifier is present (flag bit set to 1) 
+* The remainining bytes encode the ciphertext.
 
-The value of the Object-Security option for responses SHALL be encoded as:
-
-~~~~~~~~~~~ 
-  ciphertext
-~~~~~~~~~~~
-
-except for Observe responses, where the encoding SHALL be:
-
-~~~~~~~~~~~ CDDL
-[
-  Partial IV,
-  ciphertext
-]
-~~~~~~~~~~~
-
-
-Furthermore, the type and length for the ciphertext is redundant and 10 bits in the first two bytes are static. The type and length for the ciphertext SHALL be excluded, and the first sixteen bits in the COSE arrays above SHALL be encoded as a single byte:
-
-~~~~~~~~~~~
-10000abc 01000def -> 00abcdef
-~~~~~~~~~~~
+In requests, Partial IV and kid MUST be present; counter signature and group Identifier MUST NOT be present.
+In responses without observe, Partial IV, kid, counter signature and group Identifier MUST NOT be present.
+In responses with observe, kid MUST be present; Partial IV, counter signature and group Identifier MUST NOT be present.
 
 ## Examples {#compression-examples}
 
 ### Example Request
 
-~~~~~~~~~~~
-COSE Object Before Compression (24 bytes)
-83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
-4d ff 8a 24 e4 cb 35 b9
+COSE Object Before Compression:
 
+~~~~~~~~~~~
 [
 h'',
 { 4:h'25', 6:h'05' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
 
-After Compression (18 bytes)
-19 05 41 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9 
+0x83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
+4d ff 8a 24 e4 cb 35 b9 (24 bytes)
 ~~~~~~~~~~~
 
-### Example Response
+After Compression:
+
+first byte: 0b00001001 = 0x09
 
 ~~~~~~~~~~~
-COSE Object Before Compression (18 bytes)
-83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9
+0x09 05 01 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
+35 b9 (18 bytes)
+~~~~~~~~~~~
 
+### Example Response (without Observe)
+
+COSE Object Before Compression:
+
+~~~~~~~~~~~
 [
 h'',
 {},
 h'aea0155667924dff8a24e4cb35b9'
 ]
 
-After Compression (14 bytes)
-ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+0x83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
+35 b9 (18 bytes)
+~~~~~~~~~~~
+
+After Compression:
+
+first byte: 0b00000000 = 0x00
+
+~~~~~~~~~~~
+0x00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+(14 bytes)
 ~~~~~~~~~~~
 
 ### Example Response (with Observe)
 
-~~~~~~~~~~~
-COSE Object Before Compression (21 bytes)
-83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
-8a 24 e4 cb 35 b9
+COSE Object Before Compression:
 
+~~~~~~~~~~~
 [
 h'',
 { 6:h'07' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
 
-After Compression (16 bytes)
-11 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+0x83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
+8a 24 e4 cb 35 b9 (21 bytes)
+~~~~~~~~~~~
+
+first byte: 0b00000001 = 0x01
+
+~~~~~~~~~~~
+0x01 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+(16 bytes)
 ~~~~~~~~~~~
 
 # Web Linking
