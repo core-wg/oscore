@@ -452,7 +452,7 @@ This section defines how to use COSE {{I-D.ietf-cose-msg}} to wrap and protect d
  
 The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{I-D.ietf-cose-msg}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
 
-The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The first bit in the Context IV SHALL be flipped for responses, in case  there is a unique response (not Observe). In this way, the same sequence number can be reused for requests and corresponding responses, which reduces the size of the responses in the most common case. For detailed processing instructions, see {{processing}}. 
+The nonce is constructed as described in Section 3.1 of {{I-D.ietf-cose-msg}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case  there is a unique response (not Observe). In this way, the same sequence number can be reused for requests and corresponding responses, which reduces the size of the responses in the most common case. For detailed processing instructions, see {{processing}}. 
 
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
@@ -629,7 +629,7 @@ Given an unprotected response, the server SHALL perform the following steps to c
 
 3. Compose the AEAD nonce
 
-   * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the first bit flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
    * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order).
 
@@ -653,7 +653,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 5. Compose the AEAD nonce
 
-      * If the Observe option is not present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV with the first bit flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV with the the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
       * If the Observe option is present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
@@ -785,7 +785,7 @@ The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broa
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is algorithm dependent. Using AES_CCM, with the maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. The "-1" in the exponent stems from the same partial IV and flipped first bit of IV ({{cose-object}}) is used in request and response. The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is algorithm dependent. Using AES_CCM, with the maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
 The inner block options enable the sender to split large messages into protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
