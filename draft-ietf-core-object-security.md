@@ -669,6 +669,95 @@ A client receiving a response containing the Object-Security option SHALL perfor
    
 7. The unprotected CoAP response is processed according to {{RFC7252}}
 
+# OSCOAP Compression {#app-compression}
+
+The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
+
+The value of the Object-Security option for requests SHALL be encoded as:
+
+~~~~~~~~~~~ CDDL
+[
+  Partial IV,
+  kid,
+  ciphertext
+]
+~~~~~~~~~~~
+
+The value of the Object-Security option for responses SHALL be encoded as:
+
+~~~~~~~~~~~ 
+  ciphertext
+~~~~~~~~~~~
+
+except for Observe responses, where the encoding SHALL be:
+
+~~~~~~~~~~~ CDDL
+[
+  Partial IV,
+  ciphertext
+]
+~~~~~~~~~~~
+
+
+Furthermore, the type and length for the ciphertext is redundant and 10 bits in the first two bytes are static. The type and length for the ciphertext SHALL be excluded, and the first sixteen bits in the COSE arrays above SHALL be encoded as a single byte:
+
+~~~~~~~~~~~
+10000abc 01000def -> 00abcdef
+~~~~~~~~~~~
+
+## Examples {#compression-examples}
+
+### Example Request
+
+~~~~~~~~~~~
+COSE Object Before Compression (24 bytes)
+83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
+4d ff 8a 24 e4 cb 35 b9
+
+[
+h'',
+{ 4:h'25', 6:h'05' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+
+After Compression (18 bytes)
+19 05 41 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
+35 b9 
+~~~~~~~~~~~
+
+### Example Response
+
+~~~~~~~~~~~
+COSE Object Before Compression (18 bytes)
+83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
+35 b9
+
+[
+h'',
+{},
+h'aea0155667924dff8a24e4cb35b9'
+]
+
+After Compression (14 bytes)
+ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+~~~~~~~~~~~
+
+### Example Response (with Observe)
+
+~~~~~~~~~~~
+COSE Object Before Compression (21 bytes)
+83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
+8a 24 e4 cb 35 b9
+
+[
+h'',
+{ 6:h'07' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+
+After Compression (16 bytes)
+11 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
+~~~~~~~~~~~
 
 # Web Linking
 
@@ -784,98 +873,6 @@ The following individuals provided input to this document: Christian Amsüss, Ca
 Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
 --- back
-
-# OSCOAP Compression {#app-compression}
-
-The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
-
-The value of the Object-Security option for requests SHALL be encoded as:
-
-~~~~~~~~~~~ CDDL
-[
-  Partial IV,
-  kid,
-  ciphertext
-]
-~~~~~~~~~~~
-
-The value of the Object-Security option for responses SHALL be encoded as:
-
-~~~~~~~~~~~ 
-  ciphertext
-~~~~~~~~~~~
-
-except for Observe responses, where the encoding SHALL be:
-
-~~~~~~~~~~~ CDDL
-[
-  Partial IV,
-  ciphertext
-]
-~~~~~~~~~~~
-
-
-Furthermore, the type and length for the ciphertext is redundant and 10 bits in the first two bytes are static. The type and length for the ciphertext SHALL be excluded, and the first sixteen bits in the COSE arrays above SHALL be encoded as a single byte:
-
-~~~~~~~~~~~
-10000abc 01000def -> 00abcdef
-~~~~~~~~~~~
-
-
-
-## Examples {#compression-examples}
-
-### Example Request
-
-~~~~~~~~~~~
-COSE Object Before Compression (24 bytes)
-83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
-4d ff 8a 24 e4 cb 35 b9
-
-[
-h'',
-{ 4:h'25', 6:h'05' },
-h'aea0155667924dff8a24e4cb35b9'
-]
-
-After Compression (18 bytes)
-19 05 41 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9 
-~~~~~~~~~~~
-
-### Example Response
-
-~~~~~~~~~~~
-COSE Object Before Compression (18 bytes)
-83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9
-
-[
-h'',
-{},
-h'aea0155667924dff8a24e4cb35b9'
-]
-
-After Compression (14 bytes)
-ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-~~~~~~~~~~~
-
-### Example Response (with Observe)
-
-~~~~~~~~~~~
-COSE Object Before Compression (21 bytes)
-83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
-8a 24 e4 cb 35 b9
-
-[
-h'',
-{ 6:h'07' },
-h'aea0155667924dff8a24e4cb35b9'
-]
-
-After Compression (16 bytes)
-11 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-~~~~~~~~~~~
 
 # Test Vectors {#app-vectors}
 
