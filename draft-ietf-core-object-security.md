@@ -259,7 +259,7 @@ where:
    * type is "Key" or "IV"
 ~~~~~~~~~~~
 
-* L is the key/IV size of the AEAD algorithm in octets without leading zeroes.
+* L is the size of the key/IV for the AEAD algorithm used, in octets.
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{I-D.ietf-cose-msg}}) is used, the value for L is 16 for keys and 7 for IVs.
 
