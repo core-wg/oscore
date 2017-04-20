@@ -601,7 +601,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter of the COSE object.
+2. Decompress the COSE Object ({{app-compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter.
 
 3. Verify the Sequence Number in the 'Partial IV' parameter, as described in {{sequence-numbers}}.
 
@@ -645,7 +645,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the protected CoAP message have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Token.
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{app-compression}}).
 
 3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}.
 
