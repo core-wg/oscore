@@ -463,7 +463,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests, and MAY be present in responses. In case of Observe ({{observe}}}) the Partial IV SHALL be present in the response.
+   * The "Partial IV" parameter. The value is set to the Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in the response, and otherwise the Partial IV SHALL NOT be present in the response.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
@@ -671,33 +671,31 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 # OSCOAP Compression {#app-compression}
 
-The Concise Binary Object Representation (CBOR) combines very small message sizes with extensibility. CBOR Object Signing and Encryption (COSE) uses CBOR to achieve smaller message sizes than JOSE. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
+The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-The value of the Object-Security option for requests SHALL be encoded as follows:
+
+## Encoding of the Object-Security Option {#encoding}
+
+The value of the Object-Security option SHALL be encoded as follows:
 
 * The first byte MUST encode a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV size. If their value is 0, the Partial IV is not present in the compressed message.
     - The fourth least significant bit is set to 1 if the kid is present in the compressed message.
-    - The fifth least significant bit is set to 1 if a counter signature is present in the compressed message.
-    - The sixth least significant bit is set to 1 if a group identifier is present in the compressed message. 
+    - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
 * The following n bytes (n being the value of the Partial IV size in the first byte) encode the value of the Partial IV, if the Partial IV is present (size not 0).
 * The following byte encodes the size of the kid parameter, if the kid is present (flag bit set to 1) 
 * The following m bytes (m given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1)
-* The following byte encodes the size of the counter signature, if a counter signature is present (flag bit set to 1) 
-* The following x bytes (x given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1) 
-* The following byte encodes the size of the group identifier parameter, if a group identifier is present (flag bit set to 1) 
-* The following y bytes (y given by the previous byte) encode the value of the group identifier parameter, if a group identifier is present (flag bit set to 1) 
 * The remainining bytes encode the ciphertext.
 
-In requests, Partial IV and kid MUST be present; counter signature and group Identifier MUST NOT be present.
-In responses without observe, Partial IV, kid, counter signature and group Identifier MUST NOT be present.
-In responses with observe, kid MUST be present; Partial IV, counter signature and group Identifier MUST NOT be present.
+The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}.
 
 ## Examples {#compression-examples}
 
-### Example Request
+This section provides examples of COSE Objects before and after OSCOAP compression.
 
-COSE Object Before Compression:
+### Example: Request
+
+Before compression:
 
 ~~~~~~~~~~~
 [
@@ -710,18 +708,18 @@ h'aea0155667924dff8a24e4cb35b9'
 4d ff 8a 24 e4 cb 35 b9 (24 bytes)
 ~~~~~~~~~~~
 
-After Compression:
+After compression:
 
-first byte: 0b00001001 = 0x09
+First byte: 0b00001001 = 0x09
 
 ~~~~~~~~~~~
 0x09 05 01 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
 35 b9 (18 bytes)
 ~~~~~~~~~~~
 
-### Example Response (without Observe)
+### Example: Response (without Observe)
 
-COSE Object Before Compression:
+Before compression:
 
 ~~~~~~~~~~~
 [
@@ -734,18 +732,18 @@ h'aea0155667924dff8a24e4cb35b9'
 35 b9 (18 bytes)
 ~~~~~~~~~~~
 
-After Compression:
+After compression:
 
-first byte: 0b00000000 = 0x00
+First byte: 0b00000000 = 0x00
 
 ~~~~~~~~~~~
 0x00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
 (14 bytes)
 ~~~~~~~~~~~
 
-### Example Response (with Observe)
+### Example: Response (with Observe)
 
-COSE Object Before Compression:
+Before compression:
 
 ~~~~~~~~~~~
 [
@@ -758,12 +756,15 @@ h'aea0155667924dff8a24e4cb35b9'
 8a 24 e4 cb 35 b9 (21 bytes)
 ~~~~~~~~~~~
 
-first byte: 0b00000001 = 0x01
+After compression:
+
+First byte: 0b00000001 = 0x01
 
 ~~~~~~~~~~~
 0x01 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
 (16 bytes)
 ~~~~~~~~~~~
+
 
 # Web Linking
 
