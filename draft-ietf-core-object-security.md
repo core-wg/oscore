@@ -1124,7 +1124,7 @@ The object in COSE encoding gives:
                                {04:h'a1534e3c',
                                 06:h'a3'}
     {},                      # unprotected
-    TAG                      # ciphertext + truncated 8-byte TAG
+    ciphertext               # ciphertext including truncated 8-byte TAG
   ]
 )
 ~~~~~~~~~~~
@@ -1159,7 +1159,7 @@ The object in COSE encoding gives:
                                 06:h'a3'}
     {9:SIG},                 # unprotected: 
                                 09: 64 bytes signature
-    TAG                      # ciphertext + truncated 8-byte TAG
+    ciphertext               # ciphertext including truncated 8-byte TAG
   ]
 )
 ~~~~~~~~~~~
