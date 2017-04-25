@@ -738,7 +738,7 @@ First byte: 0b00000000 = 0x00
 
 ~~~~~~~~~~~
 0x00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-(14 bytes)
+(15 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (with Observe)
