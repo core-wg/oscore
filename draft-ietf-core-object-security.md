@@ -533,7 +533,9 @@ An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure u
 
 ## Replay Protection ##
 
-In order to protect from replay of messages, each Recipient Context contains a Replay Window used to verify request, and - in case of Observe - responses. A receiving endpoint SHALL verify that a Sequence Number (Partial IV) received in the COSE object has not been received before in the Recipient Context. For requests, if this verification fails and the message received is a CON message, the server SHALL respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Replay protection failed" string. For responses, if this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
+In order to protect from replay of messages, each Recipient Context contains a Replay Window used to verify request, and - in case of Observe - responses. A receiving endpoint SHALL verify that a Sequence Number (Partial IV) received in the COSE object has not been received before in the Recipient Context. For requests, if this verification fails and the message received is a CON message, the server SHALL respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Replay protection failed" string. For responses, if this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
+
+The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
 
 ## Sequence Number and Replay Window State ##
 
@@ -604,8 +606,11 @@ A server receiving a request containing the Object-Security option SHALL perform
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
 2. Decompress the COSE Object ({{app-compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a CON message, and:
-  -  either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
-  - the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
+
+   * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
+   
+   * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
+  
 If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request.
 
 3. Verify the Sequence Number in the 'Partial IV' parameter, as described in {{sequence-numbers}}.
