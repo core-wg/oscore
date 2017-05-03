@@ -702,7 +702,23 @@ The value of the Object-Security option SHALL be encoded as follows:
 * The following m bytes (m given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1)
 * The remainining bytes encode the ciphertext.
 
-The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}.
+The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{byte-flag}}.
+
+~~~~~~~~~~~
+   7 6 5 4 3 2 1 0   
+  +-+-+-+-+-+-+-+-+  k: kid flag bit
+  |0 0 0 0|k|pivsz|  pivsz: Partial IV size (3 bits)
+  +-+-+-+-+-+-+-+-+
+
++-------+---------+------------+-----------+
+|       | Request | Resp with- | Resp with |
+|       |         | out observe| observe   |
++-------+---------+------------+-----------+
+|     k |    1    |     0      |      0    |
+| pivsz |  > 0    |     0      |    > 0    |
++-------+---------+------------+-----------+
+~~~~~~~~~~~
+{: #byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
 
 ## Examples {#compression-examples}
 
