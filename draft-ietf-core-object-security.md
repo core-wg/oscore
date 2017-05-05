@@ -537,7 +537,7 @@ In order to protect from replay of messages, each Recipient Context contains a R
 
 The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
 
-## Sequence Number and Replay Window State ##
+## Sequence Number and Replay Window State ## {#seqno-replay-state}
 
 To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
@@ -830,6 +830,8 @@ Privacy threats executed through intermediate nodes are considerably reduced by 
 The unprotected options ({{protected-coap-options}}) may reveal privacy sensitive information. In particular Uri-Host  SHOULD NOT contain privacy sensitive information. 
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
+
+Using the mechanisms described in {{seqno-replay-state}} reveals when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
 
 # IANA Considerations {#iana}
 
