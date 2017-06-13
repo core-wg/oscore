@@ -674,7 +674,7 @@ there is no way to tell the server it made a mistake. we send an ack back to sto
 
 5. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the client MUST stop processing the response and, if the request is a CON message, the client MUST respond with an empty ACK back.
+   * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
 
    * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
