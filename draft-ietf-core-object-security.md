@@ -373,17 +373,17 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with 
 
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
-The inner block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP client fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The CoAP server first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
+The inner Block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP client fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The CoAP server first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
+
+The CoAP client using inner Block options MUST use the Request-Tag as defined in Section 3 of TODO:I-D.draft-amsuess-core-repeat-request-tag to allow for parallel blockwise operations. In particular, the rules in section 3.3.2. of TODO:I-D.draft-amsuess-core-repeat-request-tag MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
 There SHALL be a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
 Additionally, a proxy may arbitrarily do block fragmentation on any CoAP message, in particular an OSCOAP message, as defined in {{RFC7959}} and thereby add outer Block options to a block and send on the next hop. The outer block options are thus neither encrypted nor integrity protected. 
 
-An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message has been received, or the cumulated message size of the exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document.
+An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the protected CoAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the protected CoAP message continues as defined in this document.
 
 If the unprotected CoAP message in turn contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
-
-TODO: Update processing to support multiple concurrently proceeding requests
 
 
 ### Class I Options {#class-i}
@@ -555,7 +555,7 @@ To prevent reuse of Sequence Number, the node MAY perform the following procedur
 
 To prevent accepting replay of previously received messages, the node MAY perform the following procedure:
 
-*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.mattsson-core-coap-actuators}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.mattsson-core-coap-actuators}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option TODO:I-D.draft-amsuess-core-repeat-request-tag for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in TODO:I-D.draft-amsuess-core-repeat-request-tag. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
 ### The Observe Case ### 
 
