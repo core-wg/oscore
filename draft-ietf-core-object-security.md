@@ -898,11 +898,11 @@ The "application/oscon" media type is added to the Media Types registry:
 The "application/oscon" content format is added to the CoAP Content Format registry:
 
 ~~~~~~~~~~~
-+-------------------+----------+----+-------------------+
-| Media type        | Encoding | ID | Reference         |
-+-------------------+----------+----+-------------------+
-| application/oscon | -        | 70 | [[this document]] |
-+-------------------+----------+----+-------------------+
++-------------------+----------+-----+-------------------+
+| Media type        | Encoding |  ID | Reference         |
++-------------------+----------+-----+-------------------+
+| application/oscon | -        | TBD | [[this document]] |
++-------------------+----------+-----+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
