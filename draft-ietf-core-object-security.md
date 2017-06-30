@@ -285,7 +285,7 @@ OSCOAP protects as much of the original CoAP message as possible, while still al
 * Class I: integrity protected only, or
 * Class U: unprotected.
 
-This section also outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the original CoAP message are either transferred in the header/options part of the OSCOAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the OSCOAP message is called "inner" or "outer": 
+This section also outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the original CoAP message are either transferred in the header/options part of the OSCOAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the OSCOAP message is called "outer" or "inner": 
 
 * Inner message field: message field included in the plaintext of the COSE object of the OSCOAP message (see {{plaintext}}). The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E).
 * Outer message field: message field included in the header or options part of the OSCOAP message. The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the Additional Authenticated Data (AAD) of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
@@ -304,7 +304,7 @@ The receiving endpoint verifies and decrypts the COSE object, and recreates the 
 
 Many CoAP header fields are required to be read and changed during a normal message exchange or when traversing a proxy and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
 
-The CoAP header field Code MUST be sent in plaintext to support RESTful processing, but MUST be integrity protected to prevent an intermediary from changing, e.g. from GET to DELETE (Class I).  The CoAP version number MUST be integrity protected to prevent potential future version-based attacks (Class I). Note that while the version number is not sent in each CoAP message over reliable transport {{I-D.ietf-core-coap-tcp-tls}}, its value is known to client and server.
+The CoAP header field Code MUST be sent in plaintext to support RESTful processing, but MUST be integrity protected (Class I) to prevent an intermediary from changing, e.g. from GET to DELETE.  The CoAP version number MUST be integrity protected to prevent potential future version-based attacks (Class I). Note that while the version number is not sent in each CoAP message over reliable transport {{I-D.ietf-core-coap-tcp-tls}}, its value is known to client and server.
 
 The other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). All CoAP header fields are thus outer message fields.
 
@@ -312,9 +312,9 @@ The sending endpoint SHALL copy the header fields from the original CoAP message
 
 ## CoAP Options {#coap-options}
 
-Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for the proxy. 
+Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy. 
 
-A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing are indicated by a * in {{protected-coap-options}} and described in the subsections below.
+A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing as indicated by a * in {{protected-coap-options}} and described in the processing of the respective option.
 
 ~~~~~~~~~~~
            +----+----------------+---+---+---+
@@ -356,9 +356,9 @@ For options in class E (see {{protected-coap-options}}) the option value in the 
 
 The sending endpoint SHALL write the class E option from the original CoAP message into the plaintext of the COSE object.
 
-Except for the special options described in the subsections, the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
+Except for the special options (* in {{protected-coap-options}}), the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
 
-Except for the Block options {{block-options}}, the receiving endpoint SHALL discard any outer options of class E from the OSCOAP message and SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
+Except for the special options, the receiving endpoint SHALL discard any outer options of class E from the OSCOAP message and SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
 
 
 #### Max-Age {#max-age}
@@ -373,17 +373,24 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with 
 
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
-The inner Block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the CoAP client fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The CoAP server first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
+##### Inner Block Options #####
 
-The CoAP client using inner Block options MUST use the Request-Tag as defined in Section 3 of TODO:I-D.draft-amsuess-core-repeat-request-tag to allow for parallel blockwise operations. In particular, the rules in section 3.3.2. of TODO:I-D.draft-amsuess-core-repeat-request-tag MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+The inner Block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the sending CoAP endpoint fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The receiving CoAP endpoint first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
 
 There SHALL be a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
-Additionally, a proxy may arbitrarily do block fragmentation on any CoAP message, in particular an OSCOAP message, as defined in {{RFC7959}} and thereby add outer Block options to a block and send on the next hop. The outer block options are thus neither encrypted nor integrity protected. 
+If a CoAP client needs to make multiple concurrent blockwise request operations to the same resource (using Block1) then the client MUST use and process the Request-Tag as defined in Section 3 of TODO:I-D.draft-amsuess-core-repeat-request-tag. In particular, the rules in section 3.3.2 of TODO:I-D.draft-amsuess-core-repeat-request-tag MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-An endpoint receiving a message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
+If a CoAP server needs to make multiple concurrent blockwise response operations using Block2 of the same resource (using Block2) then the server MUST use and process the ETag as defined in Section 4 of TODO:I-D.draft-amsuess-core-repeat-request-tag. 
 
-If the decrypted CoAP message in turn contains Block options, the receiving endpoint processes this according to {{RFC7959}}.
+
+##### Outer Block Options #####
+
+A CoAP proxy may do block fragmentation on any CoAP message as defined in {{RFC7959}}, in particular an OSCOAP message, and thereby add decompose it into multiple blocks using outer Block options. The outer block options are thus neither encrypted nor integrity protected. 
+
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy MUST use and process the Request-Tag as specified in section 3.3.1 of TODO:I-D.draft-amsuess-core-repeat-request-tag.
+
+An endpoint receiving an OSCOAP message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
 
 
 ### Class I Options {#class-i}
