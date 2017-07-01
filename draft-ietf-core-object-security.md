@@ -38,6 +38,7 @@ author:
 normative:
 
   I-D.ietf-cose-msg:
+  I-D.amsuess-core-repeat-request-tag:
   RFC2119:
   RFC5869:
   RFC6347:
@@ -379,16 +380,16 @@ The inner Block options are used for endpoint-to-endpoint secure fragmentation o
 
 Applications using OSCOAP with inner Block options MUST specify a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
-For blockwise request operations (using Block1) the client MUST use and process the Request-Tag as defined in Section 3 of TODO:I-D.draft-amsuess-core-repeat-request-tag. In particular, the rules in section 3.3.1 of TODO:I-D.draft-amsuess-core-repeat-request-tag MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise request operations (using Block1) the client MUST use and process the Request-Tag as defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise response operations (using Block2) the server MUST use and process the ETag as defined in Section 4 of TODO:I-D.draft-amsuess-core-repeat-request-tag. 
+For blockwise response operations (using Block2) the server MUST use and process the ETag as defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}. 
 
 
 ##### Outer Block Options #####
 
 A CoAP proxy may do block fragmentation on any CoAP message (including OSCOAP messages) as defined in {{RFC7959}}, and thereby decompose it into multiple blocks using outer Block options. The outer block options are thus neither encrypted nor integrity protected. 
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy should use and process the Request-Tag as specified in section 3.3.2 of TODO:I-D.draft-amsuess-core-repeat-request-tag; an OSCOAP server that supports outer Block options MUST support the Request-Tag option.
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy should use and process the Request-Tag as specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}; an OSCOAP server that supports outer Block options MUST support the Request-Tag option.
 
 An endpoint receiving an OSCOAP message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
 
@@ -562,7 +563,7 @@ To prevent reuse of Sequence Number, the node MAY perform the following procedur
 
 To prevent accepting replay of previously received messages, the node MAY perform the following procedure:
 
-*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option TODO:I-D.draft-amsuess-core-repeat-request-tag for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in TODO:I-D.draft-amsuess-core-repeat-request-tag. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.amsuess-core-repeat-request-tag}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
 ### The Observe Case ### 
 
