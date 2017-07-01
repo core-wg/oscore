@@ -40,7 +40,6 @@ normative:
   I-D.ietf-cose-msg:
   I-D.amsuess-core-repeat-request-tag:
   RFC2119:
-  RFC5869:
   RFC6347:
   RFC7049:
   RFC7252:
@@ -60,6 +59,7 @@ informative:
   I-D.tiloca-core-multicast-oscoap:
   I-D.greevenbosch-appsawg-cbor-cddl:
   RFC7228:
+  RFC5869:
 
 --- abstract
 
