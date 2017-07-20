@@ -303,11 +303,9 @@ The receiving endpoint verifies and decrypts the COSE object, and recreates the 
 
 Many CoAP header fields are required to be read and changed during a normal message exchange or when traversing a proxy and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
 
-The CoAP header field Code MUST be sent in plaintext to support RESTful processing, but MUST be integrity protected (Class I) to prevent an intermediary from changing, e.g. from GET to DELETE.  The CoAP version number MUST be integrity protected to prevent potential future version-based attacks (Class I). Note that while the version number is not sent in each CoAP message over reliable transport {{I-D.ietf-core-coap-tcp-tls}}, its value is known to client and server.
+The CoAP header field Code MUST be sent in plaintext to support RESTful processing, but MUST be integrity protected (Class I) to prevent an intermediary from changing, e.g. from GET to DELETE. The other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). All CoAP header fields are thus outer message fields.
 
-The other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). All CoAP header fields are thus outer message fields.
-
-The sending endpoint SHALL copy the header fields from the original CoAP message to the header of the OSCOAP message. The receiving endpoint SHALL copy the header fields from the OSCOAP message to the header of the decrypted CoAP message. Both sender and receiver include the CoAP version number and header field Code in the AAD of the COSE object (see {{AAD}}). 
+The sending endpoint SHALL copy the header fields from the original CoAP message to the header of the OSCOAP message. The receiving endpoint SHALL copy the header fields from the OSCOAP message to the header of the decrypted CoAP message. Both sender and receiver include the CoAP header field Code in the AAD of the COSE object (see {{AAD}}). 
 
 ## CoAP Options {#coap-options}
 
@@ -500,7 +498,6 @@ The external_aad SHALL be a CBOR array as defined below:
 
 ~~~~~~~~~~~ CDDL
 external_aad = [
-   ver : uint,
    code : uint,
    options : bstr,
    alg : int,
@@ -510,8 +507,6 @@ external_aad = [
 ~~~~~~~~~~~
 
 where:
-
-- ver: contains the CoAP version number, as defined in Section 3 of {{RFC7252}}.
 
 - code: contains is the CoAP Code of the original CoAP message, as defined in Section 3 of {{RFC7252}}.
 
