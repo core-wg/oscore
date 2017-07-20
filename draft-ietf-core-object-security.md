@@ -93,7 +93,7 @@ Client                                           Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
-OSCOAP may be used in very constrained settings, thanks to its small message size, its restricted code and memory requirements, and is independent of underlying layer below CoAP. OSCOAP can be combined with DTLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{app-examples}}.
+OSCOAP may be used in very constrained settings, thanks to its small message size, its restricted code and memory requirements, and is independent of underlying layer below CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{app-examples}}.
 
 ## Terminology {#terminology}
 
