@@ -868,7 +868,7 @@ mapping as follows:
 The presence and content of the Object-Security option, both in requests and
 responses, is expressed in a HTTP header field named Object-Security in the
 mapped request or response. The value of the field is the is the value of the
-CoAP Object-Security option in base64url encoding [RFC4648].
+CoAP Object-Security option in base64url encoding without padding [RFC7515].
 
 In addition, whenever the Object-Security field is present, the protected
 message's code is expressed in a HTTP header field named CoAP-Code in dotted
