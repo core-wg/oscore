@@ -887,14 +887,14 @@ to a HTTP response) code.
 Example:
 
 ~~~~~~~~~~~
-[Client to Proxy -- HTTP]
+[Client to Proxy -- HTTP request]
 
 GET /hc/coap://device.local/ HTTP/1.1
 Hostname: proxy.local
 CoAP-Code: 0.01
 Object-Security: gQEFY2xpZW50u3RlbXBlcmF0dXJlLi4uLi4uLi4
 
-[Proxy to Server -- CoAP]
+[Proxy to Server -- CoAP request]
 
 GET /
 Uri-Host: device.local
