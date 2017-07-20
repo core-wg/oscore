@@ -860,6 +860,62 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 --- back
 
+# CoAP-HTTP Mapping {#coap-http}
+
+As requested in [RFC8075] Section 1, this protocol extension describes a HTTP
+mapping as follows:
+
+The presence and content of the Object-Security option, both in requests and
+responses, is expressed in a HTTP header field named Object-Security in the
+mapped request or response. The value of the field is the is the value of the
+CoAP Object-Security option in base64url encoding [RFC4648].
+
+In addition, whenever the Object-Security field is present, the protected
+message's code is expressed in a HTTP header field named CoAP-Code in dotted
+code number notation with leading zero. When converting an HTTP request or
+response to CoAP, the code in the CoAP-Code field gets used in the CoAP
+message, and the response code mapping rules ([RFC8075] Section 7) are ignored.
+
+Invalid base64url data, the absence of the CoAP-Code field or a CoAP-Code field
+value that can not be expressed as a CoAP code byte constitute an error, and
+MUST result in a 4.02 Bad Option or 400 Bad Request, depending on the protocol
+used in the request. If any mapper receives an Object-Security header, it MUST
+verify that the code classes match to the extent of being a request (CoAP code
+class 0 mapped to an HTTP request) or a response (CoAP code classes 1-5 mapped
+to a HTTP response) code.
+
+Example:
+
+~~~~~~~~~~~
+[Client to Proxy -- HTTP]
+
+GET /hc/coap://device.local/ HTTP/1.1
+Hostname: proxy.local
+CoAP-Code: 0.01
+Object-Security: gQEFY2xpZW50u3RlbXBlcmF0dXJlLi4uLi4uLi4=
+
+[Proxy to Server -- CoAP]
+
+GET /
+Uri-Host: device.local
+Object-Security: 81 01 05 63 ...
+
+[Sever to Proxy -- CoAP response]
+
+2.05 Content
+Object-Security: [empty]
+Payload: 00 47 01 02 03 04 05 06 07 08 [binary]
+
+[Proxy to Client -- HTTP response]
+
+HTTP/1.1 200 OK
+Object-Security: [empty]
+CoAP-Code: 2.05
+Body: 00 47 01 02 03 04 05 06 07 08 [binary]
+~~~~~~~~~~~
+
+IANA consideration: The option is registered according to BCP90
+
 # Test Vectors {#app-vectors}
 
 TODO: This section needs to be updated.
