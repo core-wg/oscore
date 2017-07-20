@@ -706,8 +706,8 @@ The value of the Object-Security option SHALL be encoded as follows:
     - The fourth least significant bit k is set to 1 if the kid is present in the compressed message.
     - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n is not 0).
-* The following 1 byte encodes the kid size m, if the kid is present (k is set to 1) 
-* The following m bytes encode the value of the kid, if the kid is present (k is set to 1)
+* The following 1 byte encodes the kid size m, if the kid is present (k is 1) 
+* The following m bytes encode the value of the kid, if the kid is present (k is 1)
 * The remainining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
