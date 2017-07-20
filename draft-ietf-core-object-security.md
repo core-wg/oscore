@@ -194,7 +194,7 @@ The Recipient Context contains the following parameters:
 
 * Recipient IV. Byte string containing the IV to verify messages received. Derived from Common Context and Recipient ID. Length is determined by Algorithm. Its value is immutable once the security context is established.
 
-* Replay Window. The replay window to verify requests and observe responses received.
+* Replay Window (Server only). The replay window to verify requests received.
 
 When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
 
