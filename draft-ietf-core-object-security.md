@@ -105,17 +105,19 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV,
 
 # The Object-Security Option {#option}
 
-The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP message exchange. The Object-Security option is critical, safe to forward, part of the cache key, not repeatable, and opaque.
+The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP message exchange. The Object-Security option is critical, safe to forward, part of the cache key and not repeatable. 
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+--------+--------+
-| No. | C | U | N | R | Name            | Format | Length |
-+-----+---+---+---+---+-----------------+--------+--------|
-| TBD | x |   |   |   | Object-Security | opaque | 0-     |
-+-----+---+---+---+---+-----------------+--------+--------+
++-----+---+---+---+---+-----------------+-----------+-----------+
+| No. | C | U | N | R | Name            | Format    | Length    |
++-----+---+---+---+---+-----------------+-----------+-----------|
+| TBD | x |   |   |   | Object-Security | see below | see below |
++-----+---+---+---+---+-----------------+-----------+-----------+
      C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
+
+The option is either empty or contains a COSE object (see {{cose-object}}), and has no default value (except for certain methods, see below). The length of the Object-Security option is either zero or the sum of length of the COSE header and the lengths of the options and payload (if present) of the original CoAP message.  Note that the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields are removed from the message so these fields does not expand the total message size.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
