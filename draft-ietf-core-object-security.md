@@ -230,7 +230,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32
 
-How the input parameters are pre-established, is application specific. The EDHOC protocol {{I-D.selander-ace-cose-ecdhe}} enables the establishment of input parameters with the property of forward secrecy and negotiation of KDF and AEAD, it thus provides all necessary pre-requisite steps for using OSCOAP as defined here.
+All input parameters need to be known to and agreed on by both endpoints. The replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
 ### Derivation of Sender Key/IV, Recipient Key/IV 
 
