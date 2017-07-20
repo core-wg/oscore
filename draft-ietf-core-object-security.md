@@ -323,7 +323,7 @@ A summary of how options are protected and processed is shown in {{protected-coa
            |  3 | Uri-Host       |   |   | x |
            |  4 | ETag           | x |   |   |
            |  5 | If-None-Match  | x |   |   |
-           |  6 | Observe        |   | * |   |
+           |  6 | Observe        |   |   | * |
            |  7 | Uri-Port       |   |   | x |
            |  8 | Location-Path  | x |   |   |
            | 11 | Uri-Path       | x |   |   |
@@ -394,24 +394,7 @@ An endpoint receiving an OSCOAP message with an outer Block option SHALL first p
 
 ### Class I Options {#class-i}
 
-A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Except for special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL 
-be integrity protected between the endpoints, see ({{AAD}}).  Unless otherwise specified, the sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
-
-#### Observe {#observe}
-
-Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
-
-In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value:
-
-* The Observe option of the original CoAP request SHALL be encoded in the OSCOAP request as described in {{options-in-protected}}.
-
-To secure the order of the notifications, responses with the Observe option SHALL be integrity protected in the following way:
-
-* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sequence Number of the response.
-
-The Observe option in the CoAP request SHALL NOT be integrity protected, since it may be legitimately removed by a proxy. 
-
-If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response, i.e. not include the Sequence Number of the response in the external_aad.
+A Class I option is an outer option and hence visible in the options part of the OSCOAP message.  Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
 
 
 ### Class U Options {#class-u}
@@ -448,6 +431,17 @@ During OSCOAP processing, Proxy-Uri is split into:
 Uri-Path and Uri-Query follow the processing defined in {{class-e}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCOAP message, which has value:
 
 * Proxy-Uri = "coap://example.com"
+
+#### Observe {#observe}
+
+Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
+
+In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value.
+
+To secure the order of the notifications, the client SHALL verify that the Partial IV of the latest notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with and empty ACK.
+
+The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
+
 
 ### Outer Options in the OSCOAP Message ### {#options-in-protected}
 
