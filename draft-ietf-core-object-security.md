@@ -541,9 +541,11 @@ An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure u
 
 ## Replay Protection ##
 
-In order to protect from replay of messages, each Recipient Context contains a Replay Window used to verify request, and - in case of Observe - responses. A receiving endpoint SHALL verify that a Sequence Number (Partial IV) received in the COSE object has not been received before in the Recipient Context. For requests, if this verification fails and the message received is a CON message, the server SHALL respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Replay protection failed" string. For responses, if this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
+In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the option Max-Age set to 0. The diagnostic payload MAY contain the "Replay protection failed" string.
 
-The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the recipient MAY just store the last received sequence number and require that newly received Sequence Numbers equals the last received Sequence Number + 1.
+The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
+
+Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe only monotonically increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
 
 ## Sequence Number and Replay Window State ## {#seqno-replay-state}
 
