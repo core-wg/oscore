@@ -963,8 +963,8 @@ Client  Proxy  Server
 
 Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE header of the responses contains Partial IVs (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is integrity protected.
+The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is not protected.
 
-The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any in any previously received response bound to the request.
+The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any in any Partial IV previously received in a response bound to the request.
 
 --- fluff
