@@ -849,20 +849,20 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 
 # Acknowledgments
 
-The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Marco Tiloca, and Mališa Vučinić.
+The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Dave Thaler, Marco Tiloca, and Mališa Vučinić.
 
 Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
 --- back
 
-# CoAP-HTTP Mapping {#coap-http}
+# HTTP-CoAP Mapping {#http-coap}
 
-As requested in [RFC8075] Section 1, this protocol extension describes a HTTP
-mapping as follows:
+As requested in Section 1 of [RFC8075], this section describes the new HTTP mapping resulting from 
+the OSCOAP protocol extension of CoAP.
 
 The presence and content of the Object-Security option, both in requests and
 responses, is expressed in a HTTP header field named Object-Security in the
-mapped request or response. The value of the field is the is the value of the
+mapped request or response. The value of the field is the value of the
 CoAP Object-Security option in base64url encoding without padding [RFC7515].
 
 In addition, whenever the Object-Security field is present, the protected
