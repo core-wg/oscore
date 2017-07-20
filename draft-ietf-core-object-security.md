@@ -883,13 +883,13 @@ Client  Proxy  Server
    |      |      |
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x8c
-   |      |      | Object-Security: [kid:5f, seq:42,
+   |      |      | Object-Security: [kid:5f, Partial IV:42,
    |      |      |                   {Uri-Path:"alarm_status"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0x7b
-   |      |      | Object-Security: [kid:5f, seq:42,
+   |      |      | Object-Security: [kid:5f, Partial IV:42,
    |      |      |                   {Uri-Path:"alarm_status"}]
    |      |      |         Payload: -
    |      |      |
@@ -908,9 +908,9 @@ Client  Proxy  Server
 
 Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a sequence number (42). The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
+The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
 
-The server verifies that the sequence number has not been received before. The client verifies that the response is bound to the request.
+The server verifies that the Partial IV has not been received before. The client verifies that the response is bound to the request.
 
 ## Secure Subscribe to Sensor
 
@@ -922,49 +922,49 @@ Client  Proxy  Server
    +----->|      |            Code: 0.01 (GET)
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15,
+   |      |      | Object-Security: [kid:ca, Partial IV:15,
    |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, seq:15,
+   |      |      | Object-Security: [kid:ca, Partial IV:15,
    |      |      |                   {Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 000032
+   |      |      |         Observe: 7
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32, {Content-Format:0, "220"}]
+   |      |      |         Payload: [Partial IV:32, {Content-Format:0, "220"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 000032
+   |      |      |         Observe: 7
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:32, {Content-Format:0, "220"}]
+   |      |      |         Payload: [Partial IV:32, {Content-Format:0, "220"}]
   ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 000036
+   |      |      |         Observe: 8
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:36, {Content-Format:0, "180"}]
+   |      |      |         Payload: [Partial IV:36, {Content-Format:0, "180"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 000036
+   |      |      |         Observe: 8
    |      |      | Object-Security: -
-   |      |      |         Payload: [seq:36, {Content-Format:0, "180"}]
+   |      |      |         Payload: [Partial IV:36, {Content-Format:0, "180"}]
    |      |      |
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
-The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Sequence Number (15). The COSE header of the responses contains sequence numbers (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is integrity protected. The shown Observe values (000032 and 000036) are the ones that the client will see after OSCOAP processing.
+The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE header of the responses contains Partial IVs (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is integrity protected.
 
-The server verifies that the sequence number has not been received before. The client verifies that the sequence number has not been received before and that the responses are bound to the request.
+The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any in any previously received response bound to the request.
 
 --- fluff
