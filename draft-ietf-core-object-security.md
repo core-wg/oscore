@@ -670,7 +670,7 @@ If the response is a NON message and any of the previous conditions appear, then
 there is no way to tell the server it made a mistake. we send an ack back to stop retransmission
  -->
 
-3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}.
+3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
