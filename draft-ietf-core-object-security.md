@@ -323,7 +323,7 @@ A summary of how options are protected and processed is shown in {{protected-coa
            |  3 | Uri-Host       |   |   | x |
            |  4 | ETag           | x |   |   |
            |  5 | If-None-Match  | x |   |   |
-           |  6 | Observe        |   |   | * |
+           |  6 | Observe        |   | * |   |
            |  7 | Uri-Port       |   |   | x |
            |  8 | Location-Path  | x |   |   |
            | 11 | Uri-Path       | x |   |   |
@@ -394,7 +394,24 @@ An endpoint receiving an OSCOAP message with an outer Block option SHALL first p
 
 ### Class I Options {#class-i}
 
-A Class I option is an outer option and hence visible in the options part of the OSCOAP message.  Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
+A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Except for special options described in the subsections, for options in Class I (see {{protected-coap-options}}) the option value SHALL 
+be integrity protected between the endpoints, see ({{AAD}}).  Unless otherwise specified, the sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
+
+#### Observe {#observe}
+
+Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
+
+In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value:
+
+* The Observe option of the original CoAP request SHALL be encoded in the OSCOAP request as described in {{options-in-protected}}.
+
+To secure the order of the notifications, responses with the Observe option SHALL be integrity protected in the following way:
+
+* The Observe option SHALL be included in the external_aad of the response (see {{AAD}}), with value set to the 3 least significant bytes of the Sequence Number of the response.
+
+The Observe option in the CoAP request SHALL NOT be integrity protected, since it may be legitimately removed by a proxy. 
+
+If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response, i.e. not include the Sequence Number of the response in the external_aad.
 
 
 ### Class U Options {#class-u}
@@ -431,19 +448,6 @@ During OSCOAP processing, Proxy-Uri is split into:
 Uri-Path and Uri-Query follow the processing defined in {{class-e}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCOAP message, which has value:
 
 * Proxy-Uri = "coap://example.com"
-
-
-#### Observe {#observe}
-
-Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
-
-In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value.
-
-To secure the order of the notifications, the client SHALL verify that the Partial IV of the latest notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with and empty ACK.
-
-The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
-
-
 
 ### Outer Options in the OSCOAP Message ### {#options-in-protected}
 
@@ -697,30 +701,32 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 
 The value of the Object-Security option SHALL be encoded as follows:
 
-* The first byte MUST encode a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV size. If their value is 0, the Partial IV is not present in the compressed message.
-    - The fourth least significant bit is set to 1 if the kid is present in the compressed message.
+* The first byte encode a set of flags and the length of the Partial IV parameter.
+    - The three least significant bits encode the Partial IV size n. If their value is 0, the Partial IV is not present in the compressed message.
+    - The fourth least significant bit k is set to 1 if the kid is present in the compressed message.
     - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
-* The following n bytes (n being the value of the Partial IV size in the first byte) encode the value of the Partial IV, if the Partial IV is present (size not 0).
-* The following byte encodes the size of the kid parameter, if the kid is present (flag bit set to 1) 
-* The following m bytes (m given by the previous byte) encode the value of the kid, if the kid is present (flag bit set to 1)
+* The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
+* The following 1 byte encodes the kid size m, if the kid is present (k = 1). 
+* The following m bytes encode the value of the kid, if the kid is present (k = 1).
 * The remainining bytes encode the ciphertext.
+
+~~~~~~~~~~~
+ 7 6 5 4 3 2 1 0   
++-+-+-+-+-+-+-+-+  k: kid flag bit
+|0 0 0 0|k|  n  |  n: Partial IV size (3 bits)
++-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
 
 The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{byte-flag}}.
 
 ~~~~~~~~~~~
-   7 6 5 4 3 2 1 0   
-  +-+-+-+-+-+-+-+-+  k: kid flag bit
-  |0 0 0 0|k|pivsz|  pivsz: Partial IV size (3 bits)
-  +-+-+-+-+-+-+-+-+
-
-+-------+---------+------------+-----------+
-|       | Request | Resp with- | Resp with |
-|       |         | out observe| observe   |
-+-------+---------+------------+-----------+
-|     k |    1    |     0      |      0    |
-| pivsz |  > 0    |     0      |    > 0    |
-+-------+---------+------------+-----------+
++--------------------------+-----+-----+
+|                          |  k  |  n  |
++--------------------------+-----+-----+
+| Request                  |  1  | > 0 |
+| Response without Observe |  0  |   0 |
+| Response with Observe    |  0  | > 0 |
++--------------------------+-----+-----+
 ~~~~~~~~~~~
 {: #byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
 
@@ -811,24 +817,19 @@ A value MUST NOT be given for the "osc" attribute; any present value MUST be ign
 
 In scenarios with intermediary nodes such as proxies or brokers, transport layer security such as DTLS only protects data hop-by-hop. As a consequence the intermediary nodes can read and modify information. The trust model where all intermediate nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-DTLS protects hop-by-hop the entire CoAP message, including header, options, and payload. OSCOAP protects end-to-end the payload, and all information in the options and header, that is not required for forwarding (see {{coap-headers-and-options}}). DTLS and OSCOAP can be combined, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node.
+DTLS protects hop-by-hop the entire CoAP message, including header, options, and payload. OSCOAP protects end-to-end the payload, and all information in the options and header, that is not required for forwarding (see {{coap-headers-and-options}}). DTLS and OSCOAP can be combined, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. The CoAP message layer, however, cannot be protected end-to-end through intermediary devices since the parameters Type and Message ID, as well as Token and Token Length may be changed by a proxy.
 
-The CoAP message layer, however, cannot be protected end-to-end through intermediary devices since the parameters Type and Message ID, as well as Token and Token Length may be changed by a proxy. Moreover, messages that are not possible to verify should for security reasons not always be acknowledged but in some cases be silently dropped. This would not comply with CoAP message layer, but does not have an impact on the application layer security solution, since message layer is excluded from that.
-
-The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using EDHOC {{I-D.selander-ace-cose-ecdhe}} or the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
+The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
 
 The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum number of messages (2^56). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{I-D.ietf-cose-msg}}.
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is algorithm dependent. The maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is algorithm dependent. The maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1, or any algorithm specific lower limit. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression algorithm ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
 The inner block options enable the sender to split large messages into OSCOAP-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
 Applications need to use a padding scheme if the content of a message can be determined solely from the length of the payload.  As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms.  Some information can be determined even from looking at boundary conditions.  An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length.  For example using 0 and 1 instead of 'yes' and 'no'.  2) Use a character which is not part of the responses to pad to a fixed length.  For example, pad with a space to three characters.  3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m.  For example, appending a 0 to "YES" and two 1's to "NO".  This style of padding means that all values need to be padded.
-
-The security considerations of Section 11.3 of RFC7252 (amplification mitigation) apply to OSCOAP even though it is not a NoSec mode. In addition to the mitigation strategies recommended there, the Repeat option can be used to mitigate unprotected requests from spoofed client {{I-D.amsuess-core-repeat-request-tag}}.
-
 
 # Privacy Considerations
 
