@@ -60,6 +60,8 @@ informative:
   I-D.greevenbosch-appsawg-cbor-cddl:
   RFC7228:
   RFC5869:
+  RFC8075:
+  RFC7515:
 
 --- abstract
 
@@ -859,22 +861,24 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 # HTTP-CoAP Mapping {#http-coap}
 
-As requested in Section 1 of [RFC8075], this section describes the new HTTP mapping resulting from 
-the OSCOAP protocol extension of CoAP.
+As requested in Section 1 of {{RFC8075}}, this section describes the
+HTTP mapping for the OSCOAP protocol extension of CoAP.
 
 The presence and content of the Object-Security option, both in requests and
 responses, is expressed in a HTTP header field named Object-Security in the
 mapped request or response. The value of the field is the value of the
-CoAP Object-Security option in base64url encoding without padding [RFC7515].
+CoAP Object-Security option in base64url encoding without padding (see
+{{RFC7515}} Appendix C for implementation notes for this encoding).
 
 In addition, whenever the Object-Security field is present, the protected
 message's code is expressed in a HTTP header field named CoAP-Code in dotted
 code number notation with leading zero. When converting an HTTP request or
 response to CoAP, the code in the CoAP-Code field gets used in the CoAP
-message, and the response code mapping rules ([RFC8075] Section 7) are ignored.
+message, and the response code mapping rules ({{RFC8075}} Section 7)
+are not applied.
 
 Invalid base64url data, the absence of the CoAP-Code field or a CoAP-Code field
-value that can not be expressed as a CoAP code byte constitute an error, and
+value that cannot be expressed as a CoAP code byte constitute an error, and
 MUST result in a 4.02 Bad Option or 400 Bad Request, depending on the protocol
 used in the request. If any mapper receives an Object-Security header, it MUST
 verify that the code classes match to the extent of being a request (CoAP code
@@ -911,7 +915,7 @@ CoAP-Code: 2.05
 Body: 00 47 01 02 03 04 05 06 07 08 [binary]
 ~~~~~~~~~~~
 
-IANA consideration: The option is registered according to BCP90
+TODO: IANA considerations --- the option is registered according to BCP90.
 
 # Test Vectors {#app-vectors}
 
