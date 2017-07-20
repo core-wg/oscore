@@ -892,7 +892,7 @@ Example:
 GET /hc/coap://device.local/ HTTP/1.1
 Hostname: proxy.local
 CoAP-Code: 0.01
-Object-Security: gQEFY2xpZW50u3RlbXBlcmF0dXJlLi4uLi4uLi4=
+Object-Security: gQEFY2xpZW50u3RlbXBlcmF0dXJlLi4uLi4uLi4
 
 [Proxy to Server -- CoAP]
 
