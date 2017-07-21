@@ -893,13 +893,13 @@ Example:
 GET /hc/coap://device.local/ HTTP/1.1
 Hostname: proxy.local
 CoAP-Code: 0.01
-Object-Security: gQEFY2xpZW50u3RlbXBlcmF0dXJlLi4uLi4uLi4
+Object-Security: CQcBE2H3D9KXsQ
 
 [Proxy to Server -- CoAP request]
 
 GET /
 Uri-Host: device.local
-Object-Security: 81 01 05 63 ...
+Object-Security: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [Sever to Proxy -- CoAP response]
 
