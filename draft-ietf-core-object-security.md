@@ -503,6 +503,7 @@ The external_aad SHALL be a CBOR array as defined below:
 
 ~~~~~~~~~~~ CDDL
 external_aad = [
+   ver : uint,
    code : uint,
    options : bstr,
    alg : int,
@@ -512,6 +513,8 @@ external_aad = [
 ~~~~~~~~~~~
 
 where:
+
+- ver: contains the OSCOAP version number.
 
 - code: contains is the CoAP Code of the original CoAP message, as defined in Section 3 of {{RFC7252}}.
 
