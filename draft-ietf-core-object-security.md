@@ -669,7 +669,7 @@ there is no way to tell the server it made a mistake. we send an ack back to sto
 
 5. Compose the AEAD nonce
 
-      * If the Observe option is not present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV with the the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
       * If the Observe option is present in the response, compose the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
@@ -694,14 +694,14 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 
 The value of the Object-Security option SHALL be encoded as follows:
 
-* The first byte encode a set of flags and the length of the Partial IV parameter.
+* The first byte encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV size n. If their value is 0, the Partial IV is not present in the compressed message.
     - The fourth least significant bit k is set to 1 if the kid is present in the compressed message.
     - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 * The following 1 byte encodes the kid size m, if the kid is present (k = 1). 
 * The following m bytes encode the value of the kid, if the kid is present (k = 1).
-* The remainining bytes encode the ciphertext.
+* The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
  7 6 5 4 3 2 1 0   
