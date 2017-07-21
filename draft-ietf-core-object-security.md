@@ -49,7 +49,6 @@ normative:
   
 informative:
 
-  I-D.selander-ace-cose-ecdhe:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
   I-D.bormann-6lo-coap-802-15-ie:
@@ -272,7 +271,7 @@ The Sequence Number is initialized to 0. The supported types of replay protectio
 
 ## Requirements on the Security Context Parameters {#context-requirements}
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using EDHOC {{I-D.selander-ace-cose-ecdhe}}) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using ACE {{I-D.ietf-ace-oauth-authz}}) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
@@ -542,7 +541,7 @@ Reponses are protected against replay as they are cryptographically bound to the
 
 To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
-After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using EDHOC {{I-D.selander-ace-cose-ecdhe}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
+After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using ACE {{I-D.ietf-ace-oauth-authz}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
 If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. 
 
