@@ -905,14 +905,14 @@ Object-Security: 81 01 05 63 ...
 
 2.05 Content
 Object-Security: [empty]
-Payload: 00 47 01 02 03 04 05 06 07 08 [binary]
+Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 [binary]
 
 [Proxy to Client -- HTTP response]
 
 HTTP/1.1 200 OK
 Object-Security: [empty]
 CoAP-Code: 2.05
-Body: 00 47 01 02 03 04 05 06 07 08 [binary]
+Body: 00 31 d1 fc f6 70 fb 0c 1d d5 [binary]
 ~~~~~~~~~~~
 
 TODO: IANA considerations --- the option is registered according to BCP90.
