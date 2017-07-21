@@ -870,8 +870,6 @@ Example:
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
 
-TODO: IANA considerations --- the option is registered according to BCP90.
-
 # Security Considerations {#sec-considerations}
 
 In scenarios with intermediary nodes such as proxies or brokers, transport layer security such as DTLS only protects data hop-by-hop. As a consequence the intermediary nodes can read and modify information. The trust model where all intermediate nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
@@ -914,6 +912,19 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 +--------+-----------------+-------------------+
 |  TBD   | Object-Security | [[this document]] |
 +--------+-----------------+-------------------+
+~~~~~~~~~~~
+{: artwork-align="center"}
+
+## Header Field Registrations
+
+The HTTP header field CoAP-Code field is added to the Message Headers registry:
+
+~~~~~~~~~~~
++-------------------+----------+----------+-------------------+
+| Header Field Name | Protocol | Status   | Reference         |
++-------------------+----------+----------+-------------------+
+| CoAP-Code         | http     | standard | [[this document]] |
++-------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
