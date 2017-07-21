@@ -115,7 +115,7 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 +-----+---+---+---+---+-----------------+-----------+-----------|
 | TBD | x |   |   |   | Object-Security | see below | see below |
 +-----+---+---+---+---+-----------------+-----------+-----------+
-     C=Critical, U=Unsafe, N=NoCacheKey, R=Repeatable
+   C = Critical,  U = Unsafe,  N = NoCacheKey,  R = Repeatable      
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
