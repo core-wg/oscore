@@ -888,10 +888,15 @@ to a HTTP response) code.
 Example:
 
 ~~~~~~~~~~~
+[HTTP request before OSCOAP processing]
+
+GET /hc/coap://device.local/orders HTTP/1.1
+Host: proxy.local
+
 [Client to Proxy -- HTTP request]
 
 GET /hc/coap://device.local/ HTTP/1.1
-Hostname: proxy.local
+Host: proxy.local
 CoAP-Code: 0.01
 Object-Security: CQcBE2H3D9KXsQ
 
@@ -905,14 +910,20 @@ Object-Security: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 2.05 Content
 Object-Security: [empty]
-Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 [binary]
+Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [Proxy to Client -- HTTP response]
 
 HTTP/1.1 200 OK
 Object-Security: [empty]
 CoAP-Code: 2.05
-Body: 00 31 d1 fc f6 70 fb 0c 1d d5 [binary]
+Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+
+[HTTP response after OSCOAP processing]
+
+HTTP/1.1 200 OK
+Body: Exterminate all humans! Exterminate all humans!
+
 ~~~~~~~~~~~
 
 TODO: IANA considerations --- the option is registered according to BCP90.
