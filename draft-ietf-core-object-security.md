@@ -888,41 +888,41 @@ to a HTTP response) code.
 Example:
 
 ~~~~~~~~~~~
-[HTTP request before OSCOAP processing]
+[HTTP request -- Before OSCOAP processing]
 
 GET /hc/coap://device.local/orders HTTP/1.1
 Host: proxy.local
 
-[Client to Proxy -- HTTP request]
+[HTTP request -- HTTP Client to Proxy]
 
 GET /hc/coap://device.local/ HTTP/1.1
 Host: proxy.local
 CoAP-Code: 0.01
 Object-Security: CQcBE2H3D9KXsQ
 
-[Proxy to Server -- CoAP request]
+[CoAP request -- Proxy to CoAP Server]
 
 GET /
 Uri-Host: device.local
 Object-Security: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
-[Sever to Proxy -- CoAP response]
+[CoAP response -- CoAP Sever to Proxy]
 
 2.05 Content
 Object-Security: [empty]
 Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-[Proxy to Client -- HTTP response]
+[HTTP response -- Proxy to HTTP Client]
 
 HTTP/1.1 200 OK
 Object-Security: [empty]
 CoAP-Code: 2.05
 Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-[HTTP response after OSCOAP processing]
+[HTTP response -- after OSCOAP processing]
 
 HTTP/1.1 200 OK
-Body: Exterminate all humans! Exterminate all humans!
+Body: Exterminate all humans! Exterminate!
 
 ~~~~~~~~~~~
 
