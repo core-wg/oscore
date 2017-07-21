@@ -922,7 +922,7 @@ Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 [HTTP response -- after OSCOAP processing]
 
 HTTP/1.1 200 OK
-Body: Exterminate all humans! Exterminate!
+Body: Exterminate! Exterminate!
 
 ~~~~~~~~~~~
 
