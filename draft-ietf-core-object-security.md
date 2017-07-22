@@ -132,9 +132,9 @@ The placement of the compressed COSE object in the OSCOAP message depends on whe
 
 # The Security Context {#context}
 
-OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only implement the server part.
+OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for encrypting CoAP message data between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only implement the server part.
 
-This specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the initial security contexts in client and server based on common shared secret and a key derivation function (KDF).
+This specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section we define the security context, and also specify how to derive the security contexts in client and server based on a common shared master secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
@@ -228,7 +228,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * Replay Window Type and Size
 
-   - Default is DTLS-type replay protection with a window size of 32
+   - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
 All input parameters need to be known to and agreed on by both endpoints. The replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
@@ -270,7 +270,7 @@ The Sequence Number is initialized to 0. The supported types of replay protectio
 
 ## Requirements on the Security Context Parameters {#context-requirements}
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. Normally (e.g. when using ACE {{I-D.ietf-ace-oauth-authz}}) Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. When a trusted third party assigns identifiers (e.g. using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. Note that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
@@ -278,7 +278,7 @@ The same Master Salt MAY be used with several Master Secrets.
 
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
-OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects messages from the CoAP Requests/Responses layer only, and not from the Messaging layer (Section 2 of {{RFC7252}}): this means that RST and ACK empty messages are not protected, while ACK with piggybacked responses are protected using the process defined in this document. All the messages mentioned in this document refer to CON, NON and non-empty ACK messages.
+OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects messages from the CoAP Request/Response layer only, and not from the Messaging layer (Section 2 of {{RFC7252}}): this means that RST and ACK empty messages are not protected, while ACK with piggybacked responses are protected using the process defined in this document. All the messages mentioned in this document refer to CON, NON and non-empty ACK messages.
 
 OSCOAP protects as much of the original CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
 
