@@ -585,6 +585,9 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 # Processing {#processing}
 
+This section describes the OSCOAP message processing. An illustration of the nonce generation used in the processing is given in {{nonce-generation}}.
+
+
 ## Protecting the Request
 
 Given a CoAP request, the client SHALL perform the following steps to create an OSCOAP request:
@@ -687,6 +690,49 @@ there is no way to tell the server it made a mistake. we send an ack back to sto
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
    
 7. The decrypted CoAP response is processed according to {{RFC7252}}
+
+
+## Nonce generation examples {#nonce-generation}
+
+This section illustrates the nonce generation in the different processing steps. Assume that:
+
+* Endpoint A has the following security context parameters: Sender Key=K1, Sender IV=IV1, Partial IV=PIV1 and Recipient Key=K2, Recipient IV=IV2, Partial IV=PIV2.
+
+* Endpoint B has the following security context parameters: Sender Key=K2, Sender IV=IV2, Partial IV=PIV2 and Recipient Key=K1, Recipient IV=IV1, Partial IV=PIV1.
+
+The examples below illustrate the key and nonce used with the given parameters above.
+
+Example 1. Endpoint A as client and endpoint B as server. 
+
+* Example 1a. Ordinary request/response.
+
+    * Endpoint A sends a request, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1. 
+
+    * Endpoint B sends a response, which is verified by Endpoint A: key=K2, nonce=BF(IV2) XOR PIV1, where BF(.) means that the most significant bit in the first byte is flipped.
+
+* Example 1b. Observe.
+
+   * Endpoint A sends a request, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1. 
+
+   * Endpoint B sends a notification, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2.
+
+
+Example 2. Endpoint B as client and endpoint A as server. 
+
+* Example 2a. Ordinary request/response.
+
+   * Endpoint B sends a request, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2. 
+
+   * Endpoint A sends a response, which is verified by Endpoint B: key=K1, nonce=BF(IV1) XOR PIV2, where BF(.) means that the most significant bit in the first byte is flipped.
+
+* Example 2b. Observe.
+
+   * Endpoint B sends a request, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2. 
+
+   * Endpoint A sends a notification, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1.
+
+Note that endpoint A always uses key K1 for encrypting and K2 for verification, and conversely for endpoint B.
+
 
 # OSCOAP Compression {#app-compression}
 
