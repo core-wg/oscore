@@ -119,18 +119,16 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The option is either empty or contains a COSE object (see {{cose-object}}), and has no default value (except for certain methods, see below). The length of the Object-Security option is either zero or the sum of length of the COSE header and the lengths of the options and payload (if present) of the original CoAP message.  Note that the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields are removed from the message so these fields does not expand the total message size.
+The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{app-compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag.  Since the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
-The protection is achieved by means of a COSE object (see {{cose-object}}),
-which is compressed and then included in the OSCOAP message. The placement of the COSE object depends on whether the method/response code allows payload (see {{RFC7252}}):
+The placement of the compressed COSE object in the OSCOAP message depends on whether the CoAP code allows payload ({{RFC7252}}, illustrated in {{fig-sketch}}):
 
-* If the method/response code allows payload, then the compressed COSE object {{app-compression}} is the payload of the OSCOAP message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
+* If the CoAP code allows payload, then the compressed COSE object is the payload of the OSCOAP message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
 
-* If the method/response code does not allow payload, then the compressed COSE object {{app-compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
+* If the CoAP code does not allow payload, then the compressed COSE object {{app-compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
 
-The size of the COSE object depends on whether the method/response code allows payload, if the message is a request or response, on the set of options that are included in the original message, the AEAD algorithm, the length of the information identifying the security context, and the length of the sequence number.
 
 # The Security Context {#context}
 
