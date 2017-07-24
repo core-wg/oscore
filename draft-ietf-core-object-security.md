@@ -229,7 +229,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints. The replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
 ### Derivation of Sender Key/IV, Recipient Key/IV 
 
@@ -263,7 +263,7 @@ where:
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 7 for IVs.
 
-### Initial Sequence Numbers and Replay Window  {#initial-sequence-replay}
+### Initial Sequence Numbers and Replay Window {#initial-sequence-replay}
 
 The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
@@ -279,7 +279,7 @@ The same Master Salt MAY be used with several Master Secrets.
 
 OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects messages from the CoAP Request/Response layer only, and not from the Messaging layer (Section 2 of {{RFC7252}}): this means that RST and ACK empty messages are not protected, while ACK with piggybacked responses are protected using the process defined in this document. All the messages mentioned in this document refer to CON, NON and non-empty ACK messages.
 
-OSCOAP protects as much of the original CoAP message as possible, while still allowing forward proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
+OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
 
 * Class E: encrypted and integrity protected, 
 * Class I: integrity protected only, or
