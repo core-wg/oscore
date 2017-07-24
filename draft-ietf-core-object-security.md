@@ -455,7 +455,7 @@ This section defines how to use COSE {{RFC8152}} to wrap and protect data in the
  
 The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case  there is a single response (not Observe). In this way, the same sequence number can be reused for requests and corresponding responses, which reduces the size of the responses in the most common case. For detailed processing instructions, see {{processing}}. 
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
