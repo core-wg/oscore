@@ -107,7 +107,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV,
 
 # The Object-Security Option {#option}
 
-The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP message exchange. The Object-Security option is critical, safe to forward, part of the cache key and not repeatable. 
+The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP request or response. The Object-Security option is critical, safe to forward, part of the cache key and not repeatable. 
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+-----------+-----------+
