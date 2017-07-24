@@ -37,30 +37,30 @@ author:
 
 normative:
 
-  I-D.ietf-cose-msg:
-  I-D.amsuess-core-repeat-request-tag:
   RFC2119:
+  RFC5988:
   RFC6347:
   RFC7049:
   RFC7252:
   RFC7641:
   RFC7959:
-  RFC5988:
+  I-D.ietf-cose-msg:
+  I-D.amsuess-core-repeat-request-tag:
   
 informative:
 
+  RFC5869:
+  RFC7228:
+  RFC7515:
+  RFC8075:
+  I-D.ietf-ace-oauth-authz:
+  I-D.ietf-core-coap-tcp-tls:
+  I-D.bormann-6lo-coap-802-15-ie:
+  I-D.greevenbosch-appsawg-cbor-cddl:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
-  I-D.bormann-6lo-coap-802-15-ie:
-  I-D.ietf-ace-oauth-authz:
   I-D.seitz-ace-oscoap-profile:
-  I-D.ietf-core-coap-tcp-tls:
   I-D.tiloca-core-multicast-oscoap:
-  I-D.greevenbosch-appsawg-cbor-cddl:
-  RFC7228:
-  RFC5869:
-  RFC8075:
-  RFC7515:
 
 --- abstract
 
