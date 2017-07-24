@@ -79,19 +79,19 @@ OSCOAP is designed for constrained nodes and networks and provides an in-layer s
 OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{app-compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
-Client                                           Server
-   |  OSCOAP request:                              |
-   |    GET example.com                            |
-   |    [Header, Token, Options: {...,             |
-   |     Object-Security: Compressed COSE object}] |
-   +---------------------------------------------->|
-   |  OSCOAP response:                             |
-   |    2.05 (Content)                             |
-   |    [Header, Token, Options: {...,             |
-   |     Object-Security:-},                       |
-   |     Payload: Compressed COSE object]          |
-   |<----------------------------------------------+
-   |                                               |
+Client                                            Server
+   |  OSCOAP request:                               |
+   |    GET example.com                             |
+   |    [Header, Token, Options: {...,              |
+   |     Object-Security: Compressed COSE object}]  |
+   +----------------------------------------------->|
+   |  OSCOAP response:                              |
+   |    2.05 (Content)                              |
+   |    [Header, Token, Options: {...,              |
+   |     Object-Security:-},                        |
+   |     Payload: Compressed COSE object]           |
+   |<-----------------------------------------------+
+   |                                                |
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
