@@ -107,7 +107,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV,
 
 # The Object-Security Option {#option}
 
-The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP request or response. The Object-Security option is critical, safe to forward, part of the cache key and not repeatable. 
+The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP request or response. The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+-----------+-----------+
@@ -277,7 +277,7 @@ The same Master Salt MAY be used with several Master Secrets.
 
 # Protected CoAP Message Fields {#coap-headers-and-options} 
 
-OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects messages from the CoAP Request/Response layer only, and not from the Messaging layer (Section 2 of {{RFC7252}}): this means that RST and ACK empty messages are not protected, while ACK with piggybacked responses are protected using the process defined in this document. All the messages mentioned in this document refer to CON, NON and non-empty ACK messages.
+OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects messages from the CoAP Request/Response layer only, and not from the Messaging layer (Section 2 of {{RFC7252}}): this means that RST and ACK empty messages are not protected, while ACK with piggybacked responses are protected using the process defined in this document. All the messages mentioned in this document refer to CON, NON, and non-empty ACK messages.
 
 OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
 
