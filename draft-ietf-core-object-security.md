@@ -169,7 +169,9 @@ Verify request with   |                       |
 
 The Common Context contains the following parameters:
 
-* Algorithm (Alg). Value that identifies the COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
+* AEAD Algorithm (Alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
+
+* HKDF Algorithm. The HMAC based HKDF used to derive Sender Key, Sender IV, Recipient Key, and Recipient IV.
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
