@@ -362,7 +362,6 @@ Except for the special options (* in {{protected-coap-options}}), the sending en
 
 Except for the special options, the receiving endpoint SHALL discard any outer options of class E from the OSCOAP message and SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
 
-
 #### Max-Age {#max-age}
 
 An inner Max-Age option, like other class E options, is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
@@ -375,7 +374,7 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with 
 
 The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
 
-##### Inner Block Options #####
+##### Inner Block Options
 
 The inner Block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the sending CoAP endpoint fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The receiving CoAP endpoint first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
 
@@ -385,8 +384,7 @@ For blockwise request operations (using Block1) the client MUST use and process 
 
 For blockwise response operations (using Block2) the server MUST use and process the ETag as defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}. 
 
-
-##### Outer Block Options #####
+##### Outer Block Options
 
 A CoAP proxy may do block fragmentation on any CoAP message (including OSCOAP messages) as defined in {{RFC7959}}, and thereby decompose it into multiple blocks using outer Block options. The outer block options are thus neither encrypted nor integrity protected. 
 
@@ -394,16 +392,13 @@ To allow multiple concurrent request operations to the same server (not only sam
 
 An endpoint receiving an OSCOAP message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
 
-
 ### Class I Options {#class-i}
 
 A Class I option is an outer option and hence visible in the options part of the OSCOAP message.  Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
 
-
 ### Class U Options {#class-u}
 
 Options in Class U have outer values and are used to support forward proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{options-in-protected}}.
-
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
@@ -445,11 +440,9 @@ To secure the order of the notifications, the client SHALL verify that the Parti
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
 
-
 ### Outer Options in the OSCOAP Message ### {#options-in-protected}
 
 All options with outer values present in the OSCOAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
-
 
 # The COSE Object {#cose-object}
 
@@ -533,7 +526,7 @@ Sequence numbers and replay window are initialized as defined in {{initial-seque
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent, see {{sec-considerations}}. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
-## Replay Protection ##
+## Replay Protection
 
 In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the option Max-Age set to 0. The diagnostic payload MAY contain the "Replay protection failed" string.
 
@@ -549,7 +542,7 @@ After boot, a node MAY reject to use existing security contexts from before it b
 
 If a stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. 
 
-### The Basic Case ###
+### The Basic Case
 
 To prevent reuse of Sequence Number, the node MAY perform the following procedure during normal operations:
 
@@ -561,7 +554,7 @@ To prevent accepting replay of previously received messages, the node MAY perfor
 
 *  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.amsuess-core-repeat-request-tag}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
-### The Observe Case ### 
+### The Observe Case
 
 To prevent reuse of Sequence Number in case of Observe, the node MAY perform the following procedure during normal operations:
 
@@ -569,24 +562,21 @@ To prevent reuse of Sequence Number in case of Observe, the node MAY perform the
 
    * Storing to persistent memory can be costly. Instead of storing a sequence number for each notification, the server may store Seq + K to persistent memory every K requests, where Seq is the current sequence number and K > 1. This is a trade-off between the number of storage operations and efficient use of sequence numbers.
 
-
 Note that a client MAY continue an ongoing observation after reboot using a stored security context. With Observe, the client can only verify the order of the notifications, as they may be delayed. If the client wants to synchronize with a server resource it MAY restart an observation.
 
-
-## Freshness ## 
+## Freshness
 
 For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.  
 
 For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.mattsson-core-coap-actuators}}. 
 
-## Delay and Mismatch Attacks ##
+## Delay and Mismatch Attacks
 
 In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCOAP binds responses to the request by including the request's ID (Sender ID or Recipient ID) and sequence number in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and sequence number until all responses have been sent.
 
 # Processing {#processing}
 
 This section describes the OSCOAP message processing. An illustration of the nonce generation used in the processing is given in {{nonce-generation}}.
-
 
 ## Protecting the Request
 
@@ -733,11 +723,9 @@ Example 2. Endpoint B as client and endpoint A as server.
 
 Note that endpoint A always uses key K1 for encrypting and K2 for verification, and conversely for endpoint B.
 
-
 # OSCOAP Compression {#app-compression}
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
-
 
 ## Encoding of the Object-Security Option {#encoding}
 
