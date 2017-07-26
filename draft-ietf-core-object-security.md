@@ -1043,26 +1043,30 @@ Client  Proxy  Server
    |      | 2.05 |           Token: 0xbe
    |      |      |         Observe: 7
    |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:32, {Content-Format:0, "220"}]
+   |      |      |         Payload: [Partial IV:32,
+   |      |      |                   {Content-Format:0, "220"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 7
    |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:32, {Content-Format:0, "220"}]
+   |      |      |         Payload: [Partial IV:32,
+   |      |      |                   {Content-Format:0, "220"}]
   ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
    |      |      |         Observe: 8
    |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:36, {Content-Format:0, "180"}]
+   |      |      |         Payload: [Partial IV:36,
+   |      |      |                   {Content-Format:0, "180"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 8
    |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:36, {Content-Format:0, "180"}]
+   |      |      |         Payload: [Partial IV:36,
+   |      |      |                   {Content-Format:0, "180"}]
    |      |      |
 ~~~~~~~~~~~
 {: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
