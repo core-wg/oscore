@@ -972,13 +972,13 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 --- back
 
-# Test Vectors {#test-vectors}
+# Test Vectors
 
 TODO: This section needs to be updated.
 
 # Examples {#examples}
 
-This section gives examples of OSCOAP. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format. 
+This section gives examples of OSCOAP. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format.
 
 ## Secure Access to Sensor
 
