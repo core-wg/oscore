@@ -269,7 +269,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{RFC8152}}
 
 The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
-## Requirements on the Security Context Parameters {#context-requirements}
+## Requirements on the Security Context Parameters
 
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret. When a trusted third party assigns identifiers (e.g. using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. Sender IDs can have any length between 0-255 bytes. Note that that the empty string is a valid Sender ID and that Sender IDs of different lengths can be used with the same Master Secret. E.g. the SID with value 0x00 is different from the SID with the value 0x0000. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
@@ -294,7 +294,7 @@ This section also outlines how the message fields are transferred, a detailed de
 
 Note that, even though the message formats are slightly different, OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
-## CoAP Payload {#coap-payload}
+## CoAP Payload
 
 The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus is an inner message field.
 
@@ -302,7 +302,7 @@ The sending endpoint writes the payload of the original CoAP message into the pl
 
 The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
-## CoAP Header {#coap-header}
+## CoAP Header
 
 Many CoAP header fields are required to be read and changed by proxies and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
 
@@ -404,7 +404,7 @@ Options in Class U have outer values and are used to support proxy operations. U
 
 The sending endpoint SHALL copy Uri-Host, Uri-Port, and Proxy-Scheme from the original CoAP message to the options part of the OSCOAP message. When Uri-Host, Uri-Port, or Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. 
 
-#### Proxy-Uri {#proxy-uri}
+#### Proxy-Uri
 
 Proxy-Uri, when present, is split by OSCOAP into class U options and class E options, which are processed accordingly. When Proxy-Uri is used in the original CoAP message, Uri-* are not present {{RFC7252}}.
 
@@ -440,7 +440,7 @@ To secure the order of the notifications, the client SHALL verify that the Parti
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
 
-### Outer Options in the OSCOAP Message ### {#options-in-protected}
+### Outer Options in the OSCOAP Message {#options-in-protected}
 
 All options with outer values present in the OSCOAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
 
@@ -725,7 +725,7 @@ Note that endpoint A always uses key K1 for encrypting and K2 for verification, 
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-## Encoding of the Object-Security Option {#encoding}
+## Encoding of the Object-Security Option
 
 The value of the Object-Security option SHALL be encoded as follows:
 
@@ -758,7 +758,7 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
 
-## Examples {#compression-examples}
+## Compression Examples
 
 This section provides examples of COSE Objects before and after OSCOAP compression.
 
@@ -840,7 +840,7 @@ The use of OSCOAP MAY be indicated by a target attribute "osc" in a web link {{R
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
-# HTTP-CoAP Mapping {#http-coap}
+# HTTP-CoAP Mapping
 
 As requested in Section 1 of {{RFC8075}}, this section describes the
 HTTP mapping for the OSCOAP protocol extension of CoAP.
@@ -934,7 +934,7 @@ CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP M
 
 Using the mechanisms described in {{seqno-replay-state}} reveals when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
 
-# IANA Considerations {#iana}
+# IANA Considerations
 
 Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
 
