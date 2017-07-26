@@ -119,7 +119,7 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{app-compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag.  Since the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
+The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{app-compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
@@ -141,7 +141,7 @@ The security context is the set of information elements necessary to carry out t
 
 The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Clients need to be able to retrieve the correct security context to use.
 
-An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored.  Retrieval and use of the security context are shown in {{fig-context}}.
+An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
                .------------.           .------------.
@@ -341,7 +341,7 @@ A summary of how options are protected is shown in {{protected-coap-options}}. O
 | 60 | Size1          | * |   |   |
 +----+----------------+---+---+---+
 
- E = Encrypt and Integrity Protect  
+ E = Encrypt and Integrity Protect
  I = Integrity Protect only 
  U = Unprotected
  * = Special
@@ -354,7 +354,7 @@ Specifications of new CoAP options SHOULD define how they are processed with OSC
 
 ### Class E Options {#class-e}
 
-For options in class E (see {{protected-coap-options}}) the option value in the original CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints.  Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
+For options in class E (see {{protected-coap-options}}) the option value in the original CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints. Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
 
 The sending endpoint SHALL write the class E option from the original CoAP message into the plaintext of the COSE object.
 
@@ -372,7 +372,7 @@ Since OSCOAP binds CoAP responses to requests, a cached response would not be po
 
 Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}.
 
-The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.  
+The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.
 
 ##### Inner Block Options
 
@@ -394,7 +394,7 @@ An endpoint receiving an OSCOAP message with an outer Block option SHALL first p
 
 ### Class I Options {#class-i}
 
-A Class I option is an outer option and hence visible in the options part of the OSCOAP message.  Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
+A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
 
 ### Class U Options {#class-u}
 
@@ -514,7 +514,7 @@ where:
 
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
-- request_kid:  contains the value of the 'kid' in the COSE object of the request (see Section 5).
+- request_kid: contains the value of the 'kid' in the COSE object of the request (see Section 5).
 
 - request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see Section 5).
 
@@ -552,7 +552,7 @@ To prevent reuse of Sequence Number, the node MAY perform the following procedur
 
 To prevent accepting replay of previously received messages, the node MAY perform the following procedure:
 
-*  After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.amsuess-core-repeat-request-tag}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
+* After boot, before verifying a message using a security context stored before boot, the server synchronizes the replay window so that no old messages are being accepted. The server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} for synchronizing the replay window: For each stored security context, the first time after boot the server receives an OSCOAP request, it generates a pseudo-random nonce and responds with the Repeat option set to the nonce as described in {{I-D.amsuess-core-repeat-request-tag}}. If the server receives a repeated OSCOAP request containing the Repeat option and the same nonce, and if the server can verify the request, then the sequence number obtained in the repeated message is set as the lower limit of the replay window.
 
 ### The Observe Case
 
@@ -566,7 +566,7 @@ Note that a client MAY continue an ongoing observation after reboot using a stor
 
 ## Freshness
 
-For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.  
+For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.
 
 For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.mattsson-core-coap-actuators}}. 
 
@@ -607,7 +607,7 @@ A server receiving a request containing the Object-Security option SHALL perform
    * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
    * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
-  
+
 If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request.
 
 3. Verify the Sequence Number in the 'Partial IV' parameter, as described in {{sequence-numbers}}.
@@ -922,13 +922,13 @@ The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}})
 
 The inner block options enable the sender to split large messages into OSCOAP-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
-Applications need to use a padding scheme if the content of a message can be determined solely from the length of the payload.  As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms.  Some information can be determined even from looking at boundary conditions.  An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length.  For example, using 0 and 1 instead of 'yes' and 'no'.  2) Use a character which is not part of the responses to pad to a fixed length.  For example, pad with a space to three characters.  3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m.  For example, appending a 0 to "YES" and two 1's to "NO".  This style of padding means that all values need to be padded.
+Applications need to use a padding scheme if the content of a message can be determined solely from the length of the payload. As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms. Some information can be determined even from looking at boundary conditions. An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length. For example, using 0 and 1 instead of 'yes' and 'no'. 2) Use a character which is not part of the responses to pad to a fixed length. For example, pad with a space to three characters. 3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m. For example, appending a 0 to "YES" and two 1's to "NO". This style of padding means that all values need to be padded.
 
 # Privacy Considerations
 
 Privacy threats executed through intermediate nodes are considerably reduced by means of OSCOAP. End-to-end integrity protection and encryption of CoAP payload and all options that are not used for forwarding, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
-The unprotected options ({{protected-coap-options}}) may reveal privacy sensitive information. In particular Uri-Host  SHOULD NOT contain privacy sensitive information. 
+The unprotected options ({{protected-coap-options}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. 
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
