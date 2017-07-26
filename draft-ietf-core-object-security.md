@@ -281,7 +281,7 @@ The same Master Salt MAY be used with several Master Secrets.
 
 OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects the CoAP Request/Response layer only, and not the Messaging layer (Section 2 of {{RFC7252}}); this means that empty CON, ACK, and RST messages are not protected. All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages.
 
-OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{I-D.hartke-core-e2e-security-reqs}} }}{{RFC8075}}. Message fields may either be
+OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{I-D.hartke-core-e2e-security-reqs}} {{RFC8075}}. Message fields may either be
 
 * Class E: encrypted and integrity protected, 
 * Class I: integrity protected only, or
