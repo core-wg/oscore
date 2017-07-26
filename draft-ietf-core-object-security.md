@@ -76,7 +76,7 @@ This document defines the security protocol Object Security of CoAP (OSCOAP), pr
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7228}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{app-compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                            Server
@@ -95,7 +95,7 @@ Client                                            Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
-OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{app-examples}}.
+OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
 ## Terminology {#terminology}
 
@@ -119,7 +119,7 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{app-compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
+The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-coap-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
@@ -127,7 +127,7 @@ The placement of the compressed COSE object in the OSCOAP message depends on whe
 
 * If the CoAP code allows payload, then the compressed COSE object is the payload of the OSCOAP message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
 
-* If the CoAP code does not allow payload, then the compressed COSE object {{app-compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
+* If the CoAP code does not allow payload, then the compressed COSE object {{compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
 
 # The Security Context {#context}
 
@@ -588,7 +588,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order).
 
-4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
 5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
 
@@ -602,7 +602,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
-2. Decompress the COSE Object ({{app-compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a CON message, and:
+2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a CON message, and:
 
    * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
@@ -640,7 +640,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
  
    * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order).
 
-4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{app-compression}}.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
 5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
 
@@ -652,7 +652,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{app-compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response.
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response.
 If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
 
 <!--
@@ -721,7 +721,7 @@ Example 2. Endpoint B as client and endpoint A as server.
 
 Note that endpoint A always uses key K1 for encrypting and K2 for verification, and conversely for endpoint B.
 
-# OSCOAP Compression {#app-compression}
+# OSCOAP Compression {#compression}
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
@@ -918,7 +918,7 @@ The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broa
 
 Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is dependent on the AEAD algorithm. The maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1, or any algorithm specific lower limit. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression mechanism ({{app-compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+The maximum sequence number to guarantee nonce uniqueness ({{nonce-uniqueness}}) is dependent on the AEAD algorithm. The maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1, or any algorithm specific lower limit. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression mechanism ({{compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
 The inner block options enable the sender to split large messages into OSCOAP-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
@@ -972,11 +972,11 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 --- back
 
-# Test Vectors {#app-vectors}
+# Test Vectors {#test-vectors}
 
 TODO: This section needs to be updated.
 
-# Examples {#app-examples}
+# Examples {#examples}
 
 This section gives examples of OSCOAP. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format. 
 
