@@ -304,7 +304,7 @@ The receiving endpoint verifies and decrypts the COSE object, and recreates the 
 
 ## CoAP Header {#coap-header}
 
-Many CoAP header fields are required to be read and changed during a normal message exchange or when traversing a proxy and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
+Many CoAP header fields are required to be read and changed by proxies and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
 
 The CoAP header field Code MUST be sent in clear to support RESTful processing, but MUST be integrity protected (Class I) to prevent an intermediary from changing, e.g. from GET to DELETE. The other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). All CoAP header fields are thus outer message fields.
 
@@ -314,7 +314,7 @@ The sending endpoint SHALL copy the header fields from the original CoAP message
 
 Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy. 
 
-A summary of how options are protected and processed is shown in {{protected-coap-options}}. Options within each class are protected and processed in a similar way, but certain options which require special processing as indicated by a * in {{protected-coap-options}} and described in the processing of the respective option.
+A summary of how options are protected is shown in {{protected-coap-options}}. Options denoted by a 'x' within each class are protected and processed in the same way, but certain options denoted by a '*' require special processing.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+---+
@@ -324,7 +324,7 @@ A summary of how options are protected and processed is shown in {{protected-coa
 |  3 | Uri-Host       |   |   | x |
 |  4 | ETag           | x |   |   |
 |  5 | If-None-Match  | x |   |   |
-|  6 | Observe        |   |   | * |
+|  6 | Observe        |   | * | * |
 |  7 | Uri-Port       |   |   | x |
 |  8 | Location-Path  | x |   |   |
 | 11 | Uri-Path       | x |   |   |
@@ -336,7 +336,7 @@ A summary of how options are protected and processed is shown in {{protected-coa
 | 23 | Block2         | * |   |   |
 | 27 | Block1         | * |   |   |
 | 28 | Size2          | * |   |   |
-| 35 | Proxy-Uri      |   |   | * |
+| 35 | Proxy-Uri      | * |   | * |
 | 39 | Proxy-Scheme   |   |   | x |
 | 60 | Size1          | * |   |   |
 +----+----------------+---+---+---+
@@ -398,7 +398,7 @@ A Class I option is an outer option and hence visible in the options part of the
 
 ### Class U Options {#class-u}
 
-Options in Class U have outer values and are used to support forward proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{options-in-protected}}.
+Options in Class U have outer values and are used to support proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{options-in-protected}}.
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
