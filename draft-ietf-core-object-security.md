@@ -936,7 +936,7 @@ Using the mechanisms described in {{seqno-replay-state}} reveals when a device g
 
 # IANA Considerations {#iana}
 
-Note to RFC Editor: Please replace all occurrences of "\[\[this document\]\]" with the RFC number of this specification.
+Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
 
 ## CoAP Option Numbers Registry 
 
