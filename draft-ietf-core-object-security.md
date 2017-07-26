@@ -358,7 +358,7 @@ For options in class E (see {{protected-coap-options}}) the option value in the 
 
 The sending endpoint SHALL write the class E option from the original CoAP message into the plaintext of the COSE object.
 
-Except for the special options (* in {{protected-coap-options}}), the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change or remove the value of an outer option.
+Except for the special options (* in {{protected-coap-options}}), the sending endpoint SHALL NOT use the outer options of class E. However, note that an intermediary may, legitimately or not, add, change, or remove the value of an outer option.
 
 Except for the special options, the receiving endpoint SHALL discard any outer options of class E from the OSCOAP message and SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
 
