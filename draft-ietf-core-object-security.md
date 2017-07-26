@@ -522,7 +522,7 @@ where:
 
 Sequence numbers and replay window are initialized as defined in {{initial-sequence-replay}}.
 
-## AEAD Nonce Uniqueness ## {#nonce-uniqueness}
+## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. The maximum sequence number is algorithm dependent, see {{sec-considerations}}. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
@@ -681,7 +681,6 @@ there is no way to tell the server it made a mistake. we send an ack back to sto
    
 7. The decrypted CoAP response is processed according to {{RFC7252}}
 
-
 ## Nonce generation examples {#nonce-generation}
 
 This section illustrates the nonce generation in the different processing steps. Assume that:
@@ -705,7 +704,6 @@ Example 1. Endpoint A as client and endpoint B as server.
    * Endpoint A sends a request, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1. 
 
    * Endpoint B sends a notification, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2.
-
 
 Example 2. Endpoint B as client and endpoint A as server. 
 
