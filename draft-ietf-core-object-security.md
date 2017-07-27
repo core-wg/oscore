@@ -534,7 +534,7 @@ The size and type of the Replay Window depends on the use case and lower protoco
 
 Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe only monotonically increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
 
-## Sequence Number and Replay Window State {#seqno-replay-state}
+## Sequence Number and Replay Window State {#replay-state}
 
 To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
@@ -932,7 +932,7 @@ The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
-Using the mechanisms described in {{seqno-replay-state}} reveals when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
+Using the mechanisms described in {{replay-state}} reveals when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
 
 # IANA Considerations
 
