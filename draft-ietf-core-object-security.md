@@ -119,7 +119,7 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{coap-headers-and-options}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
+The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
@@ -277,7 +277,7 @@ To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be u
 
 The same Master Salt MAY be used with several Master Secrets.
 
-# Protected CoAP Message Fields {#coap-headers-and-options} 
+# Protected CoAP Message Fields {#protected-fields} 
 
 OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects the CoAP Request/Response layer only, and not the Messaging layer (Section 2 of {{RFC7252}}); this means that empty CON, ACK, and RST messages are not protected. All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages.
 
@@ -590,7 +590,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
-5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{outer-options}}.
+5. Format the OSCOAP message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
@@ -622,7 +622,7 @@ If the request is a NON message and either the decompression or the COSE message
 
    * If decryption succeeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted options and payload to the decrypted request, processing the E options as described in ({{coap-headers-and-options}}). The Object-Security option is removed.
+7. Add decrypted options and payload to the decrypted request, processing the E options as described in ({{protected-fields}}). The Object-Security option is removed.
 
 8. The decrypted CoAP request is processed according to {{RFC7252}}
 
@@ -642,7 +642,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
-5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{outer-options}}.
+5. Format the OSCOAP message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
 6. If Observe is used, increment the Sequence Number by one.
 
@@ -675,7 +675,7 @@ there is no way to tell the server it made a mistake. we send an ack back to sto
 
    * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{sequence-numbers}}.
 
-6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{coap-headers-and-options}}). The Object-Security option is removed.
+6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
    
@@ -910,7 +910,7 @@ Example:
 
 In scenarios with intermediary nodes such as proxies or brokers, transport layer security such as DTLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediate nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-DTLS protects hop-by-hop the entire CoAP message, including header, options, and payload. OSCOAP protects end-to-end the payload, and all information in the options and header, that is not required for forwarding (see {{coap-headers-and-options}}). DTLS and OSCOAP can be combined, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. The CoAP message layer, however, cannot be protected end-to-end through intermediary devices since the parameters Type and Message ID, as well as Token and Token Length may be changed by a proxy.
+DTLS protects hop-by-hop the entire CoAP message, including header, options, and payload. OSCOAP protects end-to-end the payload, and all information in the options and header, that is not required for forwarding (see {{protected-fields}}). DTLS and OSCOAP can be combined, thereby enabling end-to-end security of CoAP payload, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. The CoAP message layer, however, cannot be protected end-to-end through intermediary devices since the parameters Type and Message ID, as well as Token and Token Length may be changed by a proxy.
 
 The use of COSE to protect CoAP messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained e.g. by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCOAP profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
 
