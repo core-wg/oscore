@@ -265,7 +265,7 @@ where:
 
 For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 7 for IVs.
 
-### Initial Sequence Numbers and Replay Window {#initial-sequence-replay}
+### Initial Sequence Numbers and Replay Window {#initial-replay}
 
 The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
@@ -520,7 +520,7 @@ where:
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
-Sequence numbers and replay window are initialized as defined in {{initial-sequence-replay}}.
+Sequence numbers and replay window are initialized as defined in {{initial-replay}}.
 
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
