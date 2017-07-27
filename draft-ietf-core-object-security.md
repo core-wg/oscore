@@ -394,11 +394,11 @@ An endpoint receiving an OSCOAP message with an outer Block option SHALL first p
 
 ### Class I Options {#class-i}
 
-A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{options-in-protected}}. 
+A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{outer-options}}. 
 
 ### Class U Options {#class-u}
 
-Options in Class U have outer values and are used to support proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{options-in-protected}}.
+Options in Class U have outer values and are used to support proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{outer-options}}.
 
 #### Uri-Host, Uri-Port, and Proxy-Scheme 
 
@@ -440,7 +440,7 @@ To secure the order of the notifications, the client SHALL verify that the Parti
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
 
-### Outer Options in the OSCOAP Message {#options-in-protected}
+### Outer Options in the OSCOAP Message {#outer-options}
 
 All options with outer values present in the OSCOAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
 
@@ -590,7 +590,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
-5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
+5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{outer-options}}.
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
@@ -642,7 +642,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
-5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{options-in-protected}}.
+5. Format the OSCOAP message according to {{coap-headers-and-options}}. The Object-Security option is added, see {{outer-options}}.
 
 6. If Observe is used, increment the Sequence Number by one.
 
