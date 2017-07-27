@@ -534,7 +534,7 @@ The size and type of the Replay Window depends on the use case and lower protoco
 
 Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe only monotonically increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
 
-## Sequence Number and Replay Window State ## {#seqno-replay-state}
+## Sequence Number and Replay Window State {#seqno-replay-state}
 
 To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
@@ -745,7 +745,7 @@ The value of the Object-Security option SHALL be encoded as follows:
 +-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
 
-The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{byte-flag}}.
+The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
 
 ~~~~~~~~~~~
 +--------------------------+-----+-----+
@@ -756,7 +756,7 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 | Response with Observe    |  0  | > 0 |
 +--------------------------+-----+-----+
 ~~~~~~~~~~~
-{: #byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
+{: #fig-byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
 
 ## Compression Examples
 
@@ -1069,7 +1069,7 @@ Client  Proxy  Server
    |      |      |                   {Content-Format:0, "180"}]
    |      |      |
 ~~~~~~~~~~~
-{: #get-protected-enc title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
 
