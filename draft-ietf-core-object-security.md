@@ -53,6 +53,7 @@ informative:
   RFC7228:
   RFC7515:
   RFC8075:
+  RFC3986:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-core-coap-tcp-tls:
   I-D.bormann-6lo-coap-802-15-ie:
@@ -413,6 +414,8 @@ The sending endpoint SHALL first decompose the Proxy-Uri value of the original C
 Uri-Path and Uri-Query are class E options and MUST be protected and processed as if obtained from the original CoAP message, see {{class-e}}. 
 
 The value of the Proxy-Uri option of the OSCOAP message MUST be replaced with Proxy-Scheme, Uri-Host and Uri-Port options (if present) composed according to section 6.5 of {{RFC7252}} and MUST be processed as a class U option, see {{class-u}}.
+
+Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs. OSCOAP-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1. of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In other documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCOAP class they are.
 
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
