@@ -425,7 +425,7 @@ During OSCOAP processing, Proxy-Uri is split into:
 
 * Proxy-Scheme = "coap"
 * Uri-Host = "example.com"
-* Uri-Port = "5863"
+* Uri-Port = "5683"
 * Uri-Path = "resource"
 * Uri-Query = "q=1"
 
