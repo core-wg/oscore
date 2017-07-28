@@ -49,11 +49,11 @@ normative:
   
 informative:
 
+  RFC3986:
   RFC5869:
   RFC7228:
   RFC7515:
   RFC8075:
-  RFC3986:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-core-coap-tcp-tls:
   I-D.bormann-6lo-coap-802-15-ie:
