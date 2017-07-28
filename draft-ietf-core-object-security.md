@@ -202,7 +202,7 @@ When it is understood which context is referred to (Sender Context or Recipient 
 
 An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
-The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID. In other words, changing the roles does not change the set of keys to be used.
+The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
 ## Derivation of Security Context Parameters {#context-derivation}
 
@@ -276,7 +276,7 @@ As collisions may lead to the loss of both confidentiality and integrity, Sender
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
-The same Master Salt MAY be used with several Master Secrets.
+While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
 # Protected CoAP Message Fields {#protected-fields} 
 
@@ -288,7 +288,7 @@ OSCOAP protects as much of the original CoAP message as possible, while still al
 * Class I: integrity protected only, or
 * Class U: unprotected.
 
-This section also outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the original CoAP message are either transferred in the header/options part of the OSCOAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the OSCOAP message is called "outer" or "inner": 
+This section outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the original CoAP message are either transferred in the header/options part of the OSCOAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the OSCOAP message is called "outer" or "inner": 
 
 * Inner message field: message field included in the plaintext of the COSE object of the OSCOAP message (see {{plaintext}}). The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E).
 * Outer message field: message field included in the header or options part of the OSCOAP message. The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the Additional Authenticated Data (AAD) of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
@@ -315,7 +315,7 @@ The sending endpoint SHALL copy the header fields from the original CoAP message
 
 Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy. 
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Options denoted by a 'x' within each class are protected and processed in the same way, but certain options denoted by a '*' require special processing.
+A summary of how options are protected is shown in {{fig-option-protection}}. Options denoted by 'x' within each class are protected and processed in the same way, but certain options denoted by '*' require special processing.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+---+
@@ -373,7 +373,7 @@ Since OSCOAP binds CoAP responses to requests, a cached response would not be po
 
 Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}.
 
-The Block options (Block1, Block2, Size1 and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.
+The Block options (Block1, Block2, Size1, and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.
 
 ##### Inner Block Options
 
@@ -439,7 +439,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value.
 
-To secure the order of the notifications, the client SHALL verify that the Partial IV of the latest notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with and empty ACK.
+To secure the order of the notifications, the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with and empty ACK.
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response {{processing}}.)
 
@@ -535,7 +535,7 @@ In order to protect from replay of requests, the server's Recipient Context cont
 
 The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
-Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe only monotonically increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
+Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe, only strictly increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
 
 ## Sequence Number and Replay Window State {#replay-state}
 
@@ -571,7 +571,7 @@ Note that a client MAY continue an ongoing observation after reboot using a stor
 
 For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.
 
-For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.mattsson-core-coap-actuators}}. 
+For applications having stronger demands on freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.amsuess-core-repeat-request-tag}}. 
 
 ## Delay and Mismatch Attacks
 
