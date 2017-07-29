@@ -449,7 +449,7 @@ All options with outer values present in the OSCOAP message, including the Objec
 
 # The COSE Object {#cose-object}
 
-This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, and maximum sequence number are algorithm dependent.
+This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, nonce lenght, and maximum sequence number are algorithm dependent.
  
 The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
 
@@ -465,9 +465,14 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
--  The "ciphertext" field is computed from the Plaintext (see {{plaintext}}) and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
+-  The "ciphertext" field is computed from the secret key (Sender Key or Reciepient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
+
+
+## Nonce {#nonce}
+
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
 
 ## Plaintext {#plaintext}
 
@@ -518,10 +523,6 @@ where:
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see Section 5).
 
 - request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see Section 5).
-
-## Nonce {#nonce}
-
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
