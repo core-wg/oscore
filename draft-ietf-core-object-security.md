@@ -295,14 +295,6 @@ This section outlines how the message fields are transferred, a detailed descrip
 
 Note that, even though the message formats are slightly different, OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
 
-## CoAP Payload
-
-The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus is an inner message field.
-
-The sending endpoint writes the payload of the original CoAP message into the plaintext of the COSE object.
-
-The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
-
 ## CoAP Header
 
 Many CoAP header fields are required to be read and changed by proxies and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
@@ -446,6 +438,14 @@ The Observe option in the CoAP request may be legitimately removed by a proxy. I
 ### Outer Options in the OSCOAP Message {#outer-options}
 
 All options with outer values present in the OSCOAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
+
+## CoAP Payload
+
+The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus is an inner message field.
+
+The sending endpoint writes the payload of the original CoAP message into the plaintext of the COSE object.
+
+The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 # The COSE Object {#cose-object}
 
