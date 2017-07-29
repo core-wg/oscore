@@ -513,7 +513,7 @@ where:
 
 - code: contains is the CoAP Code of the original CoAP message, as defined in Section 3 of {{RFC7252}}.
 
-- options: contains the Class I options {{class-i}} present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option
+- options: contains the Class I options {{class-i}} present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
 
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
