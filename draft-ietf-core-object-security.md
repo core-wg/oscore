@@ -592,15 +592,13 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order).
+3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Then increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
 5. Format the OSCOAP message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
-
-7. Increment the Sequence Number by one.
 
 ## Verifying the Request
 
@@ -644,13 +642,11 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
    * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order).
+   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order). Then increment the Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
 5. Format the OSCOAP message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
-
-6. If Observe is used, increment the Sequence Number by one.
 
 ## Verifying the Response
 
