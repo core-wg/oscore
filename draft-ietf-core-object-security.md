@@ -98,6 +98,8 @@ Client                                            Server
 
 OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
+An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement on of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but being OSCOAP aware increases efficiency. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP.
+
 ## Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
@@ -132,9 +134,7 @@ The placement of the compressed COSE object in the OSCOAP message depends on whe
 
 # The Security Context {#context}
 
-OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for encrypting CoAP message data between a CoAP client and a CoAP server. An implementation supporting this specification MAY only implement the client part or MAY only implement the server part.
-
-This specification requires that client and server establish a security context to apply to the COSE objects protecting the CoAP messages. In this section, we define the security context and how it is derived in client and server based on a common shared master secret and a key derivation function (KDF).
+OSCOAP requires that client and server establish a shared security context used to process the COSE objects. OSCOAP uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting CoAP message data between a CoAP client and a CoAP server. In this section, we define the security context and how it is derived in client and server based on a common shared master secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
