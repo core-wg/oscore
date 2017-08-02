@@ -469,7 +469,6 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
-
 ## Nonce {#nonce}
 
 The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
