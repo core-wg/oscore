@@ -653,12 +653,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response.
-If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
-
-<!--
-there is no way to tell the server it made a mistake. we send an ack back to stop retransmission
- -->
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
 
 3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
 
