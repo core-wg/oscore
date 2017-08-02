@@ -945,13 +945,14 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 
 ## Header Field Registrations
 
-The HTTP header field CoAP-Code field is added to the Message Headers registry:
+The HTTP header fields Object-Security and CoAP-Code are added to the Message Headers registry:
 
 ~~~~~~~~~~~
 +-------------------+----------+----------+-------------------+
 | Header Field Name | Protocol | Status   | Reference         |
 +-------------------+----------+----------+-------------------+
 | CoAP-Code         | http     | standard | [[this document]] |
+| Object-Security   | http     | standard | [[this document]] |
 +-------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
