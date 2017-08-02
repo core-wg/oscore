@@ -98,7 +98,7 @@ Client                                            Server
 
 OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
-An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement on of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but being OSCOAP aware increases efficiency. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP.
+An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but being OSCOAP aware increases efficiency. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP.
 
 ## Terminology
 
