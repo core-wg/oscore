@@ -525,8 +525,6 @@ where:
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
-Sequence numbers and replay window are initialized as defined in {{initial-replay}}.
-
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. If messages are processed concurrently, the operation of reading and increasing the sequence number MUST be atomic.
