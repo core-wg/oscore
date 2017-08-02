@@ -533,11 +533,9 @@ The maximum sequence number is algorithm dependent, see {{sec-considerations}}. 
 
 ## Replay Protection
 
-In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the option Max-Age set to 0. The diagnostic payload MAY contain the "Replay protection failed" string.
+In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the option Max-Age set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
-The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
-
-Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe, only strictly increasing Partial IVs are accepted. If this verification fails and the message received is a CON message, the client SHALL respond with an empty ACK and stop processing the response.
+Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe, the client's Recipient Context contains the last received Partial IV for each active Observe registration and the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the outer Observe value.
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection. The operation of validating the partial IV and updating the replay protection MUST be atomic.
 
