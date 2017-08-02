@@ -922,7 +922,7 @@ The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
-Using the mechanisms described in {{replay-state}} reveals when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
+Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
 
 # IANA Considerations
 
