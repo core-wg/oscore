@@ -542,7 +542,7 @@ Reponses are protected against replay as they are cryptographically bound to the
 
 ## Sequence Number and Replay Window State {#replay-state}
 
-To prevent reuse of the Nonce/Sequence Number with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates, e.g. using ACE {{I-D.ietf-ace-oauth-authz}}. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
