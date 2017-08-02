@@ -669,7 +669,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
    * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
 
-   * If decryption succeeds and Observe is used, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+   * If decryption succeeds and Observe is used, update the replay protection mechanism, as described in {{sequence-numbers}}.
 
 6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
 
