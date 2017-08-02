@@ -537,9 +537,11 @@ The maximum sequence number is algorithm dependent, see {{sec-considerations}}. 
 
 ## Freshness
 
-For responses without Observe, OSCOAP provides absolute freshness. For requests, and responses with Observe, OSCOAP provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.
+For requests, OSCOAP provides weak absolute freshness as the only guarantee is that the request is not older that the security context. For applications having stronger demands on request freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing freshness {{I-D.amsuess-core-repeat-request-tag}}.
 
-For applications having stronger demands on request freshness (e.g. control of actuators), OSCOAP needs to be augmented with mechanisms providing absolute freshness {{I-D.amsuess-core-repeat-request-tag}}. 
+For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
+
+For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.
 
 ## Replay Protection
 
