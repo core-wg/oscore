@@ -553,7 +553,7 @@ Reponses are protected against replay as they are cryptographically bound to the
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection. The operation of validating the partial IV and updating the replay protection MUST be atomic.
 
-## Losing the Context State {#context-state}
+## Losing Part of the Context State {#context-state}
 
 To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of suddenly losing sequence number and replay window state in RAM, e.g. as a result of a reboot.
 
