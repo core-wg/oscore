@@ -373,9 +373,9 @@ The inner Block options are used for endpoint-to-endpoint secure fragmentation o
 
 Applications using OSCOAP with inner Block options MUST specify a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
-For blockwise request operations (using Block1) the client MUST use and process the Request-Tag as defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise request operations (using Block1), and endpoint MUST follow the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise response operations (using Block2) the server MUST use and process the ETag as defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}. 
+For blockwise response operations (using Block2), and endpoint MUST follow the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
 
 ##### Outer Block Options
 
