@@ -347,7 +347,7 @@ Specifications of new CoAP options SHOULD define how they are processed with OSC
 
 ### Class E Options {#class-e}
 
-For options in class E (see {{fig-option-protection}}) the option value in the original CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints. Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
+For options in class E (see {{fig-option-protection}}) the option in the original CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints. Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
 
 The sending endpoint SHALL write the class E option from the original CoAP message into the plaintext of the COSE object.
 
