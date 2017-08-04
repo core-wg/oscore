@@ -543,7 +543,7 @@ For requests, OSCOAP provides weak absolute freshness as the only guarantee is t
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
 
-For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of messages.
+For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of responses.
 
 ## Replay Protection
 
