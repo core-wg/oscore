@@ -363,7 +363,7 @@ Since OSCOAP binds CoAP responses to requests, a cached response would not be po
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}.
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}. An endpoint supporting OSCOAP and {{RFC7959}} MUST support the Request-Tag Option {{I-D.amsuess-core-repeat-request-tag}}.
 
 The Block options (Block1, Block2, Size1, and Size2) MAY be either only inner options, only outer options, or both inner and outer options. The inner and outer options are processed independently.
 
@@ -381,7 +381,7 @@ For blockwise response operations (using Block2), and endpoint MUST follow the E
 
 A CoAP proxy may do block fragmentation on any CoAP message (including OSCOAP messages) as defined in {{RFC7959}}, and thereby decompose it into multiple blocks using outer Block options. The outer block options are thus neither encrypted nor integrity protected. 
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy should use and process the Request-Tag as specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}; an OSCOAP server that supports outer Block options MUST support the Request-Tag option.
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}.
 
 An endpoint receiving an OSCOAP message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
 
