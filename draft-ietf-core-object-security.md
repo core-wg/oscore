@@ -431,7 +431,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value. OCOAP aware proxies MAY look at the Partial IV value instead of the outer Observe value.
 
-To secure the order of the notifications, the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. In contrast to {{RFC7641}}, the highest received Partial IVs MUST be stored permanently, and MUST NOT be forgotten after 128 seconds.
+To secure the order of the notifications, the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. In contrast to {{RFC7641}}, the partial IVs MUST always be compared and the highest received Partial IVs MUST therefore be stored permanently and MUST NOT be forgotten after 128 seconds.
 
 If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the outer Observe value.
 
