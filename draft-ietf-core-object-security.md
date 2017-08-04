@@ -365,7 +365,7 @@ Since OSCOAP binds CoAP responses to requests, a cached response would not be po
 
 Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}.
 
-The Block options (Block1, Block2, Size1, and Size2) MAY be either only inner options, only outer options or both inner and outer options. The inner and outer options are processed independently.
+The Block options (Block1, Block2, Size1, and Size2) MAY be either only inner options, only outer options, or both inner and outer options. The inner and outer options are processed independently.
 
 ##### Inner Block Options
 
