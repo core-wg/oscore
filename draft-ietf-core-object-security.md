@@ -326,12 +326,12 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 | 15 | Uri-Query      | x |   |   |
 | 17 | Accept         | x |   |   |
 | 20 | Location-Query | x |   |   |
-| 23 | Block2         | * |   |   |
-| 27 | Block1         | * |   |   |
-| 28 | Size2          | * |   |   |
+| 23 | Block2         | * |   | * |
+| 27 | Block1         | * |   | * |
+| 28 | Size2          | * |   | * |
 | 35 | Proxy-Uri      | * |   | * |
 | 39 | Proxy-Scheme   |   |   | x |
-| 60 | Size1          | * |   |   |
+| 60 | Size1          | * |   | * |
 +----+----------------+---+---+---+
 
  E = Encrypt and Integrity Protect
