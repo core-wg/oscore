@@ -559,7 +559,7 @@ To prevent reuse of the Nonce with the same key, or from accepting replayed mess
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-If a persistently stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
+If a partly persistently stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
 
 ### Sequence Number
 
