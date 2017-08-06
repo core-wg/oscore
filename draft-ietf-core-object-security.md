@@ -555,11 +555,11 @@ If messages are processed concurrently, the partial IV needs to be validated a s
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the security context, such as sequence number and replay window state stored in RAM, e.g. as a result of a reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request token, sequence number, replay window, and highest received Partial IVs. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-If a partly persistently stored security context is to be used after reboot, then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
+After boot, a node MAY use a partly persistently stored security context, but then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
 
 ### Sequence Number
 
@@ -575,7 +575,9 @@ To prevent accepting replay of previously received requests, the server MAY perf
 
 ### Replay Protection of Observe Notifications
 
-A client MAY continue an ongoing observation after reboot using a stored security context. With Observe, the client can only verify the order of the notifications, as they may be delayed. If the client wants to synchronize with a server resource it MAY restart an observation.
+To prevent accepting replay of previously received notification responses, the client MAY perform the following procedure after boot:
+
+* The client rejects notifications bound to the earlier registration and re-register.
 
 # Processing {#processing}
 
