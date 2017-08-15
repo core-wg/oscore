@@ -106,7 +106,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
-The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV, Recepient ID/Key/IV and Context IV are defined in {{context-definition}}.
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV, Recipient ID/Key/IV and Context IV are defined in {{context-definition}}.
 
 # The Object-Security Option {#option}
 
@@ -373,9 +373,9 @@ The inner Block options are used for endpoint-to-endpoint secure fragmentation o
 
 Applications using OSCOAP with inner Block options MUST specify a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
 
-For blockwise request operations (using Block1), and endpoint MUST follow the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise request operations (using Block1), an endpoint MUST follow the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise response operations (using Block2), and endpoint MUST follow the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
+For blockwise response operations (using Block2), an endpoint MUST follow the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
 
 ##### Outer Block Options
 
@@ -467,7 +467,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
--  The "ciphertext" field is computed from the secret key (Sender Key or Reciepient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
+-  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
@@ -549,7 +549,7 @@ For requests, and responses with Observe, OSCOAP also provides relative freshnes
 
 In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the inner Max-Age option set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
-Reponses are protected against replay as they are cryptographically bound to the request. In the case of Observe, the client's Recipient Context contains the last received Partial IV for each active Observe registration and the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK.
+Responses are protected against replay as they are cryptographically bound to the request. In the case of Observe, the client's Recipient Context contains the last received Partial IV for each active Observe registration and the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK.
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection. The operation of validating the partial IV and updating the replay protection MUST be atomic.
 
@@ -565,7 +565,7 @@ After boot, a node MAY use a partly persistently stored security context, but th
 
 To prevent reuse of Sequence Numbers, a node MAY perform the following procedure during normal operations:
 
-* Each time the Sequence Number in the Sender Context (i.e. the next unsused sequence number) is evenly divisible by K, where K > 0, store the sequence number in persistent memory. After boot, the node intiates the sequence number to the value stored in persistent memory + K - 1. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of sequence numbers.
+* Each time the Sequence Number in the Sender Context (i.e. the next unused sequence number) is evenly divisible by K, where K > 0, store the sequence number in persistent memory. After boot, the node initiates the sequence number to the value stored in persistent memory + K - 1. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of sequence numbers.
 
 ### Replay Window
 
