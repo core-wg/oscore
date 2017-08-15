@@ -571,7 +571,7 @@ To prevent reuse of Sequence Numbers, a node MAY perform the following procedure
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCOAP request, the server uses the Repeat option {{I-D. amsuess-core-repeat-request-tag}} to get a request with verifiable freshness and uses that to synchronize the replay window. If the server can verify the fresh request, the partial IV in the fresh request is set as the lower limit of the replay window.
+* For each stored security context, the first time after boot the server receives an OSCOAP request, the server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness and uses that to synchronize the replay window. If the server can verify the fresh request, the partial IV in the fresh request is set as the lower limit of the replay window.
 
 ### Replay Protection of Observe Notifications
 
