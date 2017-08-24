@@ -186,7 +186,7 @@ The Sender Context contains the following parameters:
 
 * Sender IV. Byte string containing the IV to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
-* Sequence Number. Non-negative integer used to protect requests and observe responses to send. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
+* Sender Sequence Number. Non-negative integer used to protect requests and observe responses to send. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
 The Recipient Context contains the following parameters:
 
@@ -197,6 +197,8 @@ The Recipient Context contains the following parameters:
 * Recipient IV. Byte string containing the IV to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Replay Window (Server only). The replay window to verify requests received.
+
+* Recipient Sequence Number (Client only, in case of Observe). Non-negative integer used to verify Observe notifications received. One Recipient Sequence Number for each active Observe registration.
 
 When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
 
@@ -268,7 +270,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{RFC8152}}
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
-The Sequence Number is initialized to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sender Sequence Number is initialized to 0. In case of a new Observe registration, the Client initializes the corresponding Recipient Sequence Number to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters
 
@@ -451,9 +453,9 @@ The receiving endpoint verifies and decrypts the COSE object, and recreates the 
 
 # The COSE Object {#cose-object}
 
-This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, nonce length, and maximum sequence number are algorithm dependent.
+This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, nonce length, and maximum Sender Sequence Number are algorithm dependent.
  
-The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sequence Number is specified in {{sec-considerations}}.
+The AEAD algorithm AES-CCM-64-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-64-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 7 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
@@ -463,7 +465,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sequence Number. The Partial IV SHALL be of minimum length needed to encode the sequence number. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the Sender Sequence Number. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
@@ -473,7 +475,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (Sequence Number in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
 
 ## Plaintext {#plaintext}
 
@@ -531,11 +533,11 @@ where:
 
 In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCOAP binds responses to the request by including the request's ID (Sender ID or Recipient ID) and partial IV in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and partial IV until all responses have been sent.
 
-## AEAD Nonce Uniqueness
+## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sequence Number used to protect requests, and - in case of Observe - responses. If messages are processed concurrently, the operation of reading and increasing the sequence number MUST be atomic.
+An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
-The maximum sequence number is algorithm dependent, see {{sec-considerations}}. If the Sequence Number exceeds the maximum sequence number, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+The maximum Sender Sequence Number is algorithm dependent, see {{sec-considerations}}. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Freshness
 
@@ -543,29 +545,31 @@ For requests, OSCOAP provides weak absolute freshness as the only guarantee is t
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
 
-For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the sequence numbers allow a recipient to determine the relative order of responses.
+For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of responses.
 
 ## Replay Protection
 
-In order to protect from replay of requests, the server's Recipient Context contains a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before in the Recipient Context. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the inner Max-Age option set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the inner Max-Age option set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
-Responses are protected against replay as they are cryptographically bound to the request. In the case of Observe, the client's Recipient Context contains the last received Partial IV for each active Observe registration and the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK.
+Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
-If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection. The operation of validating the partial IV and updating the replay protection MUST be atomic.
+In the case of Observe, the client’s Recipient Context includes one Recipient Sequence Number for each active Observe registration containing the last successfully received Partial IV. A client receiving an Observe notification SHALL verify that the Partial IV of a received notification is greater than the Recipient Sequence Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeds, the client SHALL overwrite the corresponding Recipient Sequence Number with the received Partial IV.
+
+If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the partial IV and updating the replay protection data MUST be atomic.
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request token, sequence number, replay window, and highest received Partial IVs. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Recipient Sequence Number. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
-After boot, a node MAY use a partly persistently stored security context, but then the node MUST NOT reuse a previous Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
+After boot, a node MAY use a partly persistently stored security context, but then the node MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
 
 ### Sequence Number
 
-To prevent reuse of Sequence Numbers, a node MAY perform the following procedure during normal operations:
+To prevent reuse of Sender Sequence Numbers, a node MAY perform the following procedure during normal operations:
 
-* Each time the Sequence Number in the Sender Context (i.e. the next unused sequence number) is evenly divisible by K, where K > 0, store the sequence number in persistent memory. After boot, the node initiates the sequence number to the value stored in persistent memory + K - 1. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of sequence numbers.
+* Each time the Sender Sequence Number is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the node initiates the Sender Sequence Number to the value stored in persistent memory + K - 1. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
 
 ### Replay Window
 
@@ -577,7 +581,7 @@ To prevent accepting replay of previously received requests, the server MAY perf
 
 To prevent accepting replay of previously received notification responses, the client MAY perform the following procedure after boot:
 
-* The client rejects notifications bound to the earlier registration and re-register.
+* The client rejects notifications bound to the earlier registration, removes all Recipient Sequence Numbers and re-register using Observe.
 
 # Processing {#processing}
 
@@ -591,7 +595,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sequence Number in network byte order). Then increment the Sequence Number by one.
+3. Compose the AEAD nonce by XORing the Context IV (Sender IV) with the partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -613,7 +617,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request.
 
-3. Verify the Sequence Number in the 'Partial IV' parameter, as described in {{sequence-numbers}}.
+3. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
@@ -623,7 +627,7 @@ If the request is a NON message and either the decompression or the COSE message
 
    * If decryption fails, the server MUST stop processing the request and, if the request is a CON message, the server MUST respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Decryption failed" string.
 
-   * If decryption succeeds, update the Recipient Replay Window, as described in {{sequence-numbers}}.
+   * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
 7. Add decrypted options and payload to the decrypted request, processing the E options as described in ({{protected-fields}}). The Object-Security option is removed.
 
@@ -641,7 +645,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
    * If Observe is not used, compose the AEAD nonce by XORing the Context IV (Sender IV with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sequence Number in network byte order). Then increment the Sequence Number by one.
+   * If Observe is used, compose the AEAD nonce by XORing the Context IV (Sender IV) with the Partial IV of the response (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -655,7 +659,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
 
-3. For Observe notifications, verify the Sequence Number in the 'Partial IV' parameter as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
+3. For Observe notifications, verify the received 'Partial IV' parameter against the Recipient Sequence Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
@@ -669,11 +673,11 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
    * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
 
-   * If decryption succeeds and Observe is used, update the replay protection mechanism, as described in {{sequence-numbers}}.
+   * If decryption succeeds and Observe is used, update the Recipient Sequence Number, as described in {{sequence-numbers}}.
 
 6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
 
-   * If Observe is used, replace the Observe value with the 3 least significant bytes in the sequence number.
+   * If Observe is used, replace the Observe value with the 3 least significant bytes in the Recipient Sequence Number.
    
 7. The decrypted CoAP response is processed according to {{RFC7252}}
 
@@ -912,9 +916,9 @@ The use of COSE to protect CoAP messages as specified in this document requires 
 
 The mandatory-to-implement AEAD algorithm AES-CCM-64-64-128 is selected for broad applicability in terms of message size (2^64 blocks) and maximum number of messages (2^56). Compatibility with CCM* is achieved by using the algorithm AES-CCM-16-64-128 {{RFC8152}}.
 
-Most AEAD algorithms require a unique nonce for each message, for which the sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
+Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sequence number is dependent on the AEAD algorithm. The maximum sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1, or any algorithm specific lower limit. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression mechanism ({{compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^(min(nonce length in bits, 56) - 1) - 1, or any algorithm specific lower limit. The "-1" in the exponent stems from the same partial IV and flipped bit of IV ({{cose-object}}) is used in request and response. The compression mechanism ({{compression}}) assumes that the partial IV is 56 bits or less (which is the reason for min(,) in the exponent).
 
 The inner block options enable the sender to split large messages into OSCOAP-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
@@ -928,7 +932,7 @@ The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive
 
 CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
 
-Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and recipient replay window on a clean shutdown.
+Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
 # IANA Considerations
 
