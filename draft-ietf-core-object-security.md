@@ -685,9 +685,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 This section illustrates the nonce generation in the different processing steps. Assume that:
 
-* Endpoint A has the following security context parameters: Sender Key=K1, Sender IV=IV1, Partial IV=PIV1 and Recipient Key=K2, Recipient IV=IV2, Partial IV=PIV2.
+* Endpoint A has the following security context parameters: Sender Key=K1, Sender IV=IV1, Sender Sequence Number=PIV1 and Recipient Key=K2, Recipient IV=IV2
 
-* Endpoint B has the following security context parameters: Sender Key=K2, Sender IV=IV2, Partial IV=PIV2 and Recipient Key=K1, Recipient IV=IV1, Partial IV=PIV1.
+* Endpoint B has the following security context parameters: Sender Key=K2, Sender IV=IV2, Sender Sequence Number=PIV2 and Recipient Key=K1, Recipient IV=IV1
 
 The examples below illustrate the key and nonce used with the given parameters above.
 
@@ -719,7 +719,16 @@ Example 2. Endpoint B as client and endpoint A as server.
 
    * Endpoint A sends a notification, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1.
 
-Note that endpoint A always uses key K1 for encrypting and K2 for verification, and conversely for endpoint B.
+
+Remarks:
+
+* Note that endpoint A always uses key K1 for encrypting and K2 for verification, and vice versa for endpoint B. 
+
+* All examples are indvidually based on the assumption on the endpoints stated above - the update of the security context parameters after each operation is omitted from these examples.
+
+* Recipient Sequence Numbers are omitted from these examples since they are not used for nonce generation, but by clients for replay protection of Observe notifications. 
+
+
 
 # OSCOAP Compression {#compression}
 
