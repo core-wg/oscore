@@ -198,7 +198,7 @@ The Recipient Context contains the following parameters:
 
 * Replay Window (Server only). The replay window to verify requests received.
 
-* Recipient Sequence Number (Client only, in case of Observe). Non-negative integer used to verify Observe notifications received. One Recipient Sequence Number for each active Observe registration.
+* Recipient Sequence Number (Client only, in case of Observe). Non-negative integer used to detect replay of received Observe notifications. One Recipient Sequence Number for each active Observe registration.
 
 When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
 
