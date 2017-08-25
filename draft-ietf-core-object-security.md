@@ -77,7 +77,7 @@ This document defines the security protocol Object Security of CoAP (OSCOAP), pr
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7252}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations. OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                            Server
@@ -186,7 +186,7 @@ The Sender Context contains the following parameters:
 
 * Sender IV. Byte string containing the IV to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
-* Sender Sequence Number. Non-negative integer used to protect requests and Observe notifications. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
+* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
 The Recipient Context contains the following parameters:
 
@@ -197,8 +197,6 @@ The Recipient Context contains the following parameters:
 * Recipient IV. Byte string containing the IV to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Replay Window (Server only). The replay window to verify requests received.
-
-* Recipient Sequence Number (Client only, in case of Observe). Non-negative integer used to detect replay of received Observe notifications. One Recipient Sequence Number for each active Observe registration.
 
 When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
 
@@ -270,7 +268,7 @@ For example, if the algorithm AES-CCM-64-64-128 (see Section 10.2 in {{RFC8152}}
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
-The Sender Sequence Number is initialized to 0. In case of a new Observe registration, the Client initializes the corresponding Recipient Sequence Number to 0. The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sender Sequence Number is initialized to 0.  The supported types of replay protection and replay window length is application specific and depends on the lower layers. Default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters
 
@@ -284,7 +282,7 @@ While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the sam
 
 OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects the CoAP Request/Response layer only, and not the Messaging layer (Section 2 of {{RFC7252}}); this means that empty CON, ACK, and RST messages are not protected. All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages.
 
-OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{RFC7252}} {{RFC8075}} {{I-D.hartke-core-e2e-security-reqs}}. Message fields may either be
+OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{proxy-operations}}. Message fields may either be
 
 * Class E: encrypted and integrity protected, 
 * Class I: integrity protected only, or
@@ -307,7 +305,7 @@ The sending endpoint SHALL copy the header fields from the original CoAP message
 
 ## CoAP Options {#coap-options}
 
-Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy. 
+Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy, see {{coap-coap-proxy}}. 
 
 A summary of how options are protected is shown in {{fig-option-protection}}. Options denoted by 'x' within each class are protected and processed in the same way, but certain options denoted by '*' require special processing.
 
@@ -433,7 +431,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value. OSCOAP aware proxies MAY look at the Partial IV value instead of the outer Observe value.
 
-To secure the order of the notifications, the client SHALL verify that the Partial IV of a received notification is greater than any previously received Partial IV bound to the Observe request. In contrast to {{RFC7641}}, the partial IVs MUST always be compared and the highest received Partial IVs MUST therefore be stored permanently and MUST NOT be forgotten after 128 seconds.
+To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
 If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the outer Observe value.
 
@@ -547,19 +545,19 @@ For responses, the message binding guarantees that a response is not older than 
 
 For requests, and responses with Observe, OSCOAP also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of responses.
 
-## Replay Protection
+## Replay Protection {#replay-protection}
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the inner Max-Age option set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
-In the case of Observe, the client’s Recipient Context includes one Recipient Sequence Number for each active Observe registration containing the last successfully received Partial IV. A client receiving an Observe notification SHALL verify that the Partial IV of a received notification is greater than the Recipient Sequence Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeds, the client SHALL overwrite the corresponding Recipient Sequence Number with the received Partial IV.
+In the case of Observe, a client receiving an notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the partial IV and updating the replay protection data MUST be atomic.
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Recipient Sequence Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Nofitifcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of e.g. power consumption.
 
@@ -581,7 +579,7 @@ To prevent accepting replay of previously received requests, the server MAY perf
 
 To prevent accepting replay of previously received notification responses, the client MAY perform the following procedure after boot:
 
-* The client rejects notifications bound to the earlier registration, removes all Recipient Sequence Numbers and re-register using Observe.
+* The client rejects notifications bound to the earlier registration, removes all Notification Numbers and re-register using Observe.
 
 # Processing {#processing}
 
@@ -659,7 +657,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
 
-3. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Recipient Sequence Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
+3. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
 
 4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
@@ -673,11 +671,11 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
    * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
 
-   * If decryption succeeds and Observe is used, update the corresponding Recipient Sequence Number, as described in {{sequence-numbers}}.
+   * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
 
 6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
 
-   * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Recipient Sequence Number.
+   * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
 7. The decrypted CoAP response is processed according to {{RFC7252}}
 
@@ -724,9 +722,7 @@ Remarks:
 
 * Note that endpoint A always uses key K1 for encrypting and K2 for verification, and vice versa for endpoint B. 
 
-* All examples are indvidually based on the assumption on the endpoints stated above - the update of the security context parameters after each operation is omitted from these examples.
-
-* Recipient Sequence Numbers are omitted from these examples since they are not used for nonce generation, but by clients for replay protection of Observe notifications. 
+* All examples are individually based on the assumption on the endpoints stated above - the update of the security context parameters after each operation is omitted from these examples.
 
 
 
@@ -849,7 +845,18 @@ The use of OSCOAP MAY be indicated by a target attribute "osc" in a web link {{R
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
-# HTTP-CoAP Mapping
+# Proxy Operations {#proxy-operations}
+
+Different proxy operations are compatible with OSCOAP. This section describes the operations of a OSCOAP aware CoAP forwarding proxy (as defined in {{I-D.hartke-core-e2e-security-reqs}} and {{RFC7252}}) and proxies translating between CoAP and HTTP (including {{RFC8075}}).
+
+
+## CoAP-CoAP Forwarding Proxy {#coap-coap-proxy}
+
+This section addresses the proxy operations defined in 
+
+
+
+## HTTP-CoAP Translation Proxy
 
 As requested in Section 1 of {{RFC8075}}, this section describes the
 HTTP mapping for the OSCOAP protocol extension of CoAP.
@@ -914,6 +921,12 @@ Example:
   HTTP/1.1 200 OK
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
+
+
+## CoAP-HTTP Translation Proxy 
+
+
+
 
 # Security Considerations {#sec-considerations}
 
