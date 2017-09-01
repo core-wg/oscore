@@ -280,34 +280,26 @@ While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the sam
 
 # Protected CoAP Message Fields {#protected-fields} 
 
-OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. This section defines how the CoAP message fields are protected. Note that OSCOAP protects the CoAP Request/Response layer only, and not the Messaging layer (Section 2 of {{RFC7252}}); this means that empty CON, ACK, and RST messages are not protected. All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages.
+OSCOAP transforms a CoAP message into an OSCOAP message, and vice versa. OSCOAP protects as much of the original CoAP message as possible while still allowing certain proxy operations {{proxy-operations}}. This section defines how OSCOAP protects the CoAP message fields and transfers them between CoAP client and CoAP server (in any direction).  
 
-OSCOAP protects as much of the original CoAP message as possible, while still allowing proxy operations {{proxy-operations}}. Message fields may either be
+Message fields of the original CoAP message may be protected end-to-end between CoAP client and CoAP server in different ways:
 
 * Class E: encrypted and integrity protected, 
 * Class I: integrity protected only, or
 * Class U: unprotected.
 
-This section outlines how the message fields are transferred, a detailed description of the processing is provided in {{processing}}. Message fields of the original CoAP message are either transferred in the header/options part of the OSCOAP message, or in the plaintext of the COSE object. Depending on which, the location of the message field in the OSCOAP message is called "outer" or "inner": 
+Class E message fields are encrypted and integrity protected by the AEAD algorithm, and transferred in the ciphertext of the COSE object in the OSCOAP message. Class E message fields are not visible to proxies, and are therefore called "Inner". Class I message fields are included in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields are not protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCOAP message which is visible to proxies, and are therefore called "Outer" options.
 
-* Inner message field: message field included in the plaintext of the COSE object of the OSCOAP message (see {{plaintext}}). The inner message fields are by definition encrypted and integrity protected by the COSE object (Class E).
-* Outer message field: message field included in the header or options part of the OSCOAP message. The outer message fields are not encrypted and thus visible to an intermediary, but may be integrity protected by including the message field values in the Additional Authenticated Data (AAD) of the COSE object (see {{AAD}}). I.e. outer message fields may be Class I or Class U.
+Some CoAP message fields may be either Inner or Outer, where the Inner value is intended for the destination endpoint and the Outer value is intended for a proxy. An OSCOAP message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner and Outer message fields are processed independently.
 
-Note that, even though the message formats are slightly different, OSCOAP complies with CoAP over unreliable transport {{RFC7252}} as well as CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}}.
+## CoAP Payload
 
-## CoAP Header
+The CoAP Payload, if present in the original message, SHALL be encrypted and integrity protected and is thus an Inner message field. The sending endpoint writes the payload of the original CoAP message into the plaintext {{plaintext}} input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
-Many CoAP header fields are required to be read and changed by proxies and thus cannot in general be protected between the endpoints, e.g. CoAP message layer fields such as Message ID.
-
-The CoAP header field Code MUST be sent in clear to support RESTful processing, but MUST be integrity protected (Class I) to prevent an intermediary from changing, e.g. from GET to DELETE. The other CoAP header fields SHALL neither be integrity protected nor encrypted (Class U). All CoAP header fields are thus outer message fields.
-
-The sending endpoint SHALL copy the header fields from the original CoAP message to the header of the OSCOAP message. The receiving endpoint SHALL copy the header fields from the OSCOAP message to the header of the decrypted CoAP message. Both sender and receiver include the CoAP header field Code in the AAD of the COSE object (see {{AAD}}). 
 
 ## CoAP Options {#coap-options}
 
-Most options are encrypted and integrity protected (Class E), and thus inner message fields. But to allow certain proxy operations, some options have outer values, i.e. are present as options in the OSCOAP message. Certain options may have both an inner value and a potentially different outer value, where the inner value is intended for the destination endpoint and the outer value is intended for a proxy, see {{coap-coap-proxy}}. 
-
-A summary of how options are protected is shown in {{fig-option-protection}}. Options denoted by 'x' within each class are protected and processed in the same way, but certain options denoted by '*' require special processing.
+A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may be both Inner and Outer, are denoted by '*'.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+---+
@@ -334,78 +326,79 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 | 60 | Size1          | * |   | * |
 +----+----------------+---+---+---+
 
- E = Encrypt and Integrity Protect
- I = Integrity Protect only 
- U = Unprotected
+ E = Encrypt and Integrity Protect (Inner)
+ I = Integrity Protect only (Outer)
+ U = Unprotected (Outer)
  * = Special
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be encrypted and integrity protected and processed as class E options.
+Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be Inner.
 
-Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. New COAP options SHOULD be of class E and SHOULD NOT have outer values unless a proxy needs to read that option value. If a certain option has both inner and outer values, the two values SHOULD NOT be the same.
+Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. A new COAP option SHOULD be Inner unless it requires proxy processing. If a certain option has both Inner and Outer message fields, the two values SHOULD NOT be the same.
 
-### Class E Options {#class-e}
 
-For options in class E (see {{fig-option-protection}}) the option in the original CoAP message, if present, SHALL be encrypted and integrity protected between the endpoints. Hence the actions resulting from the use of such options is analogous to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
+### Inner Options {#inner-options}
 
-The sending endpoint SHALL write the class E option from the original CoAP message into the plaintext of the COSE object.
+Inner (marked with 'x' in column E of {{fig-option-protection}}) options work analogously to communicating in a protected manner directly with the endpoint. For example, a client using an If-Match option will not be served by a proxy.
 
-Except for the special options (* in {{fig-option-protection}}), the sending endpoint SHALL NOT use outer options of class E. However, note that an intermediary may, legitimately or not, add, change, or remove an outer option.
+The sending endpoint SHALL write the class E options present in the original CoAP message into the plaintext of the COSE object {{plaintext}}. 
 
-Except for the special options, the receiving endpoint SHALL discard any outer options of class E from the OSCOAP message and SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
+The receiving endpoint SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message. 
+
+
+### Outer Options {#outer-options}
+
+Outer options (marked with 'x' in column U or I of {{fig-option-protection}}) are used to support proxy operations. 
+
+The sending endpoint SHALL include the class U and class I options present in the original message to the options part of the OSCOAP message. Class I options (marked with 'x' in column I of {{fig-option-protection}}) SHALL be integrity protected between the endpoints as specified in {{AAD}}. All Outer options, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
+
+The receiving endpoint SHALL include the class U and class I options present in the OSCOAP message in the decrypted CoAP message.
+
+
+### Special Options
+
+Some options require special processing, marked with an asterisk ('*') in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be Inner and/or Outer; the processing is specified in this section.
 
 #### Max-Age {#max-age}
 
-An inner Max-Age option, like other class E options, is used as defined in {{RFC7252}} taking into account that it is not accessible to proxies.
+The Inner Max-Age option is used to specify the freshness of the resource, as defined in {{RFC7252}}, end-to-end from the server to the client, taking into account that the option it is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCOAP as specified in {{inner-options}}.
 
-Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. To avoid unnecessary caching, a server MAY add an outer Max-Age option with value zero to OSCOAP responses (see Section 5.6.1 of {{RFC7252}}). The outer Max-Age option is not integrity protected.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCOAP responses. Since OSCOAP binds CoAP responses to requests, a cached response would not be possible to use for any other request. A server MAY set a Class U Max-Age option with value zero to OSCOAP responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. The Outer Max-Age option value SHALL be ignored by the OSCOAP client.
+
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY comply with {{RFC7252}} and the Object-Security option without implementing {{RFC7959}}. An endpoint supporting OSCOAP and {{RFC7959}} MUST support the Request-Tag Option {{I-D.amsuess-core-repeat-request-tag}}.
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the message during the next hop (Outer options).
 
-The Block options (Block1, Block2, Size1, and Size2) MAY be either only inner options, only outer options, or both inner and outer options. The inner and outer options are processed independently.
 
-##### Inner Block Options
+##### Inner Block Options {#inner-block-options}
 
-The inner Block options are used for endpoint-to-endpoint secure fragmentation of payload into blocks and protection of information about the fragmentation (block number, block size, last block). In this case, the sending CoAP endpoint fragments the CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. The receiving CoAP endpoint first processes the OSCOAP message before processing blockwise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCOAP. In this case the Block options SHALL be processed by OSCOAP as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCOAP message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
 
-Applications using OSCOAP with inner Block options MUST specify a security policy defining a maximum unfragmented message size for inner Block options such that messages exceeding this size SHALL be fragmented by the sending endpoint. 
+For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise request operations (using Block1), an endpoint MUST follow the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
 
-For blockwise response operations (using Block2), an endpoint MUST follow the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
 
 ##### Outer Block Options
 
-A CoAP proxy may do block fragmentation on any CoAP message (including OSCOAP messages) as defined in {{RFC7959}}, and thereby decompose it into multiple blocks using outer Block options. The outer block options are thus neither encrypted nor integrity protected. 
+Proxies MAY fragment an OSCOAP message using {{RFC7959}}, which then introduces Outer Block options not generated by the sending endpoint. Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCOAP message and verify its integrity. Therefore, applications supporting OSCOAP and {{RFC7959}} MUST specify a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum  size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
+
+An endpoint receiving an OSCOAP message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCOAP message continues as defined in this document. In the latter case the message SHALL be discarded.
 
 To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}.
 
-An endpoint receiving an OSCOAP message with an outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, or the cumulated message size of the blocks exceeds the maximum unfragmented message size. In the latter case the message SHALL be discarded. In the former case, the processing of the OSCOAP message continues as defined in this document.
-
-### Class I Options {#class-i}
-
-A Class I option is an outer option and hence visible in the options part of the OSCOAP message. Unless otherwise specified, Class I options SHALL be integrity protected between the endpoints, see ({{AAD}}). The sending endpoint SHALL encode the Class I options in the OSCOAP message as described in {{outer-options}}. 
-
-### Class U Options {#class-u}
-
-Options in Class U have outer values and are used to support proxy operations. Unless otherwise specified, the sending endpoint SHALL encode the Class U options in the options part of the OSCOAP message as described in {{outer-options}}.
-
-#### Uri-Host, Uri-Port, and Proxy-Scheme 
-
-The sending endpoint SHALL copy Uri-Host, Uri-Port, and Proxy-Scheme from the original CoAP message to the options part of the OSCOAP message. When Uri-Host, Uri-Port, or Proxy-Scheme options are present, Proxy-Uri is not used {{RFC7252}}. 
-
+ 
 #### Proxy-Uri
 
 Proxy-Uri, when present, is split by OSCOAP into class U options and class E options, which are processed accordingly. When Proxy-Uri is used in the original CoAP message, Uri-* are not present {{RFC7252}}.
 
 The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to section 6.4 of {{RFC7252}}. 
 
-Uri-Path and Uri-Query are class E options and MUST be protected and processed as if obtained from the original CoAP message, see {{class-e}}. 
+Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}). 
 
-The value of the Proxy-Uri option of the OSCOAP message MUST be replaced with Proxy-Scheme, Uri-Host and Uri-Port options (if present) composed according to section 6.5 of {{RFC7252}} and MUST be processed as a class U option, see {{class-u}}.
+The Proxy-Uri option of the OSCOAP message SHALL be processed as an outer option ({{outer-options}}) set to the composition of Proxy-Scheme, Uri-Host and Uri-Port options (if present) as specified in section 6.5 of {{RFC7252}}.
 
 Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs. OSCOAP-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1. of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In other documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCOAP class they belong.
 
@@ -421,7 +414,7 @@ During OSCOAP processing, Proxy-Uri is split into:
 * Uri-Path = "resource"
 * Uri-Query = "q=1"
 
-Uri-Path and Uri-Query follow the processing defined in {{class-e}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCOAP message, which has value:
+Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCOAP message, which has value:
 
 * Proxy-Uri = "coap://example.com"
 
@@ -437,17 +430,26 @@ If the verification fails, the client SHALL stop processing the response, and in
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response, see {{processing}}.)
 
-### Outer Options in the OSCOAP Message {#outer-options}
 
-All options with outer values present in the OSCOAP message, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
 
-## CoAP Payload
+## CoAP Header
 
-The CoAP Payload SHALL be encrypted and integrity protected (Class E), and thus is an inner message field.
+Most CoAP header fields are required to be read and/or changed by proxies and thus cannot in general be protected end-to-end between the endpoints. OSCOAP protects essentially the CoAP Request/Response layer only, and not the Messaging Layer fields (Section 2 of {{RFC7252}}), such as e.g. Message ID. This means that empty CON, ACK, and RST messages are not protected. All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages. 
 
-The sending endpoint writes the payload of the original CoAP message into the plaintext of the COSE object.
+Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of Messaging Layer, OSCOAP can be applied to both unreliable and reliable transport.
 
-The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
+TODO: Change text above to consider Code being protected by OSCOAP
+
+The CoAP header field Code MUST be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
+
+The sending endpoint SHALL write the Code in the original CoAP message into the plaintext of the COSE object {{plaintext}}. Since Code is not an optional message field, Code for requests SHALL be fixed to 0.02 (POST) and for responses to 2.04 (Changed), except for Observe messages for which Code SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception is needed for Observe to support OSCOAP un-aware proxies.
+
+The receiving endpoint SHALL discared the Code in the OSCOAP message and write the Code in the plaintext of the COSE object into the decrypted CoAP message.
+
+
+The non-Code CoAP header fields are Unprotected. The sending endpoint SHALL include all non-Code header fields of the original message in the header of the OSCOAP message.  The receiving endpoint SHALL include the header fields from the OSCOAP message to the header of the decrypted CoAP message.
+
+
 
 # The COSE Object {#cose-object}
 
@@ -479,7 +481,7 @@ The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by pad
 
 The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
-- all Class E option values {{class-e}} present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
+- all Class E option values (see {{inner-options}}) present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
 
 - the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
@@ -517,7 +519,7 @@ where:
 
 - code: contains is the CoAP Code of the original CoAP message, as defined in Section 3 of {{RFC7252}}.
 
-- options: contains the Class I options {{class-i}} present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
+- options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
 
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
