@@ -884,7 +884,8 @@ Example:
   POST /hc/coap://device.local/ HTTP/1.1
   Host: proxy.local
   Object-Security: [empty]
-  Body: CQcBE2H3D9KXsQ
+  Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+  
 [CoAP request -- Proxy to CoAP Server]
 
   POST /
@@ -910,7 +911,7 @@ Example:
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
 
-Note that the HTTP Status Code 200 in the next-to-last message if the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), encrypted within the compressed COSE object carried in the Body of the HTTP response.
+Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
 
 ## CoAP-HTTP Translation Proxy 
