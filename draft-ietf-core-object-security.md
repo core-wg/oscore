@@ -425,27 +425,23 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
-In order for a proxy to support forwarding of Observe messages there SHALL be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value. OSCOAP aware proxies MAY look at the Partial IV value instead of the outer Observe value.
-
-Additionally, the outer CoAP Code for Observe messages SHALL NOT be replaced as described in XX.
+In order for an OSCOAP-unaware proxy to support forwarding of Observe messages there SHALL be an Observe option present in options part of the OSCOAP message ({{RFC7641}}). OSCOAP-aware proxies MAY look at the Partial IV value instead of the outer Observe value. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
 To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
-If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the outer Observe value.
+If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the Observe option value.
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response, see {{processing}}.)
 
 
 
-## CoAP Header
+## CoAP Header {#coap-header}
 
 Most CoAP header fields are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCOAP. 
 
 The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) to responses, except for Observe messages, for which it SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe specification {{RFC7641}}, that only define the use of GET for observing resources.
-
-TODO: Consider error messages on Observe - is the outer code still 2.05?
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) to responses, except for Observe messages, for which it SHALL be 0.01 (GET) for registrations and 2.05 (Content) for notifications ({{RFC7641}}). The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies.
 
 The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code in the plaintext of the COSE object into the decrypted CoAP message.
 
@@ -630,7 +626,7 @@ If the request is a NON message and either the decompression or the COSE message
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted options and payload to the decrypted request, processing the E options as described in {{protected-fields}}. The Object-Security option is removed.
+7. Add decrypted code, options and payload to the decrypted request, processing the class E options as described in {{protected-fields}}. The Object-Security option is removed.
 
 8. The decrypted CoAP request is processed according to {{RFC7252}}
 
@@ -676,7 +672,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
 
-6. Add decrypted options or payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
+6. Add decrypted code, options and payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
@@ -966,13 +962,12 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 
 ## Header Field Registrations
 
-The HTTP header fields Object-Security and CoAP-Code are added to the Message Headers registry:
+The HTTP header field Object-Security is added to the Message Headers registry:
 
 ~~~~~~~~~~~
 +-------------------+----------+----------+-------------------+
 | Header Field Name | Protocol | Status   | Reference         |
 +-------------------+----------+----------+-------------------+
-| CoAP-Code         | http     | standard | [[this document]] |
 | Object-Security   | http     | standard | [[this document]] |
 +-------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
@@ -1002,35 +997,35 @@ This example targets the scenario in Section 3.1 of {{I-D.hartke-core-e2e-securi
 Client  Proxy  Server
    |      |      |
    +----->|      |            Code: 0.02 (POST)
-   | GET  |      |           Token: 0x8c
+   | POST |      |           Token: 0x8c
    |      |      | Object-Security: -
    |      |      |         Payload: [kid:5f, Partial IV:42,
    |      |      |                  {Code:0.01,
    |      |      |                   Uri-Path:"alarm_status"}]
    |      |      |
    |      +----->|            Code: 0.02 (POST))
-   |      | GET  |           Token: 0x7b
-   |      |      | Object-Security: [kid:5f, Partial IV:42,
+   |      | POST |           Token: 0x7b
+   |      |      | Object-Security: -
+   |      |      |         Payload: [kid:5f, Partial IV:42,
    |      |      |                  {Code:0.01,
    |      |      |                   Uri-Path:"alarm_status"}]
-   |      |      |         Payload: -
    |      |      |
-   |      |<-----+            Code: 2.04 (Changed
-   |      | 2.05 |           Token: 0x7b
+   |      |<-----+            Code: 2.04 (Changed)
+   |      | 2.04 |           Token: 0x7b
    |      |      | Object-Security: -
    |      |      |         Payload: [{Code:2.05, "OFF"}]
    |      |      |
    |<-----+      |            Code: 2.04 (Changed)
-   | 2.05 |      |           Token: 0x8c
+   | 2.04 |      |           Token: 0x8c
    |      |      | Object-Security: -
    |      |      |         Payload: [{Code:2.05, "OFF"}]
    |      |      |
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
+The request/response Codes are encrypted by OSCOAP and only dummy Codes (POST/Changed) are visible in the header of the OSCOAP message. The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
 
-The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
+The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). 
 
 The server verifies that the Partial IV has not been received before. The client verifies that the response is bound to the request.
 
@@ -1093,9 +1088,9 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. Since the response code (Content) allows payload, the COSE object is carried as the CoAP payload.
+The request/response Codes are encrypted by OSCOAP but since this is Observe, the Codes are visible in the header of the OSCOAP message. Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. The options Content-Format (0) and the payload ("220" and "180"), are encrypted. 
 
-The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36). The options Content-Format (0) and the payload ("220" and "180"), are encrypted. The Observe option is not protected.
+The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and  36).
 
 The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any Partial IV previously received in a response bound to the request.
 
