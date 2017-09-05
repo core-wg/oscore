@@ -77,7 +77,7 @@ This document defines the security protocol Object Security of CoAP (OSCOAP), pr
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere where CoAP can be used, including non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                            Server
@@ -443,11 +443,11 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message for requests SHALL be set to 0.02 (POST) and for responses to 2.04 (Changed), except for Observe messages, for which it SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe specification {{RFC7641}}, that only define the use of GET for observing resources.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) to responses, except for Observe messages, for which it SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe specification {{RFC7641}}, that only define the use of GET for observing resources.
 
 TODO: Consider error messages on Observe - is the outer code still 2.05?
 
-The receiving endpoint SHALL discard the Code in the OSCOAP message and copy the Code in the plaintext of the COSE object into the decrypted CoAP message.
+The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code in the plaintext of the COSE object into the decrypted CoAP message.
 
 The other CoAP header fields are Unprotected. The sending endpoint SHALL include all other header fields of the original message in the header of the OSCOAP message. The receiving endpoint SHALL include the header fields from the OSCOAP message to the header of the decrypted CoAP message.
 
@@ -1013,27 +1013,29 @@ This example targets the scenario in Section 3.1 of {{I-D.hartke-core-e2e-securi
 ~~~~~~~~~~~
 Client  Proxy  Server
    |      |      |
-   +----->|      |            Code: 0.01 (GET)
+   +----->|      |            Code: 0.02 (POST)
    | GET  |      |           Token: 0x8c
-   |      |      | Object-Security: [kid:5f, Partial IV:42,
-   |      |      |                   {Uri-Path:"alarm_status"}]
-   |      |      |         Payload: -
+   |      |      | Object-Security: -
+   |      |      |         Payload: [kid:5f, Partial IV:42,
+   |      |      |                  {Code:0.01,
+   |      |      |                   Uri-Path:"alarm_status"}]
    |      |      |
-   |      +----->|            Code: 0.01 (GET)
+   |      +----->|            Code: 0.02 (POST))
    |      | GET  |           Token: 0x7b
    |      |      | Object-Security: [kid:5f, Partial IV:42,
-   |      |      |                   {Uri-Path:"alarm_status"}]
+   |      |      |                  {Code:0.01,
+   |      |      |                   Uri-Path:"alarm_status"}]
    |      |      |         Payload: -
    |      |      |
-   |      |<-----+            Code: 2.05 (Content)
+   |      |<-----+            Code: 2.04 (Changed
    |      | 2.05 |           Token: 0x7b
    |      |      | Object-Security: -
-   |      |      |         Payload: [{"OFF"}]
+   |      |      |         Payload: [{Code:2.05, "OFF"}]
    |      |      |
-   |<-----+      |            Code: 2.05 (Content)
+   |<-----+      |            Code: 2.04 (Changed)
    | 2.05 |      |           Token: 0x8c
    |      |      | Object-Security: -
-   |      |      |         Payload: [{"OFF"}]
+   |      |      |         Payload: [{Code:2.05, "OFF"}]
    |      |      |
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
@@ -1055,14 +1057,16 @@ Client  Proxy  Server
    | GET  |      |           Token: 0x83
    |      |      |         Observe: 0
    |      |      | Object-Security: [kid:ca, Partial IV:15,
-   |      |      |                   {Uri-Path:"glucose"}]
+   |      |      |                  {Code:0.01,
+   |      |      |                   Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      +----->|            Code: 0.01 (GET)
    |      | GET  |           Token: 0xbe
    |      |      |         Observe: 0
    |      |      | Object-Security: [kid:ca, Partial IV:15,
-   |      |      |                   {Uri-Path:"glucose"}]
+   |      |      |                  {Code:0.01,
+   |      |      |                   Uri-Path:"glucose"}]
    |      |      |         Payload: -
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
@@ -1070,29 +1074,33 @@ Client  Proxy  Server
    |      |      |         Observe: 7
    |      |      | Object-Security: -
    |      |      |         Payload: [Partial IV:32,
-   |      |      |                   {Content-Format:0, "220"}]
+   |      |      |                  {Code:2.05,   
+   |      |      |                   Content-Format:0, "220"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 7
    |      |      | Object-Security: -
    |      |      |         Payload: [Partial IV:32,
-   |      |      |                   {Content-Format:0, "220"}]
-  ...    ...    ...
+   |      |      |                  {Code:2.05,   
+   |      |      |                   Content-Format:0, "220"}]
+     ...    ...    ...
    |      |      |
    |      |<-----+            Code: 2.05 (Content)
    |      | 2.05 |           Token: 0xbe
    |      |      |         Observe: 8
    |      |      | Object-Security: -
    |      |      |         Payload: [Partial IV:36,
-   |      |      |                   {Content-Format:0, "180"}]
+   |      |      |                  {Code:2.05,
+   |      |      |                   Content-Format:0, "180"}]
    |      |      |
    |<-----+      |            Code: 2.05 (Content)
    | 2.05 |      |           Token: 0x83
    |      |      |         Observe: 8
    |      |      | Object-Security: -
    |      |      |         Payload: [Partial IV:36,
-   |      |      |                   {Content-Format:0, "180"}]
+   |      |      |                  {Code:2.05,
+   |      |      |                   Content-Format:0, "180"}]
    |      |      |
 ~~~~~~~~~~~
 {: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
