@@ -73,21 +73,22 @@ This document defines Object Security of CoAP (OSCOAP), a method for application
 
 The Constrained Application Protocol (CoAP) is a web application protocol, designed for constrained nodes and networks {{RFC7228}}. CoAP specifies the use of proxies for scalability and efficiency. At the same time CoAP {{RFC7252}} references DTLS {{RFC6347}} for security. CoAP proxies require DTLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of the CoAP payload and metadata, in transit between client and server. The proxy can also inject, delete, or reorder packages since they are no longer protected by DTLS.
 
-This document defines the security protocol Object Security of CoAP (OSCOAP), protecting CoAP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and HTTP-to-CoAP proxies {{RFC8075}}. OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}). All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. In addition to the core features defined in {{RFC7252}}, OSCOAP supports Observe {{RFC7641}} and Blockwise {{RFC7959}}.
+This document defines the security protocol Object Security of CoAP (OSCOAP), protecting CoAP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and HTTP-to-CoAP proxies {{RFC8075}}. OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}). All the messages mentioned in this document refer to non-empty CON, NON, and ACK messages. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of Messaging Layer, OSCOAP can be applied to both unreliable and reliable transport. In addition to the core features defined in {{RFC7252}}, OSCOAP supports Observe {{RFC7641}} and Blockwise {{RFC7959}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. 
 
-OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere that CoAP can be used, including unreliable transport {{RFC7252}}, reliable transport {{I-D.ietf-core-coap-tcp-tls}}, and non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
+OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere where CoAP can be used, including non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
 OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                            Server
    |  OSCOAP request:                               |
-   |    GET example.com                             |
+   |    POST example.com                            |
    |    [Header, Token, Options: {...,              |
-   |     Object-Security: Compressed COSE object}]  |
+   |     Object-Security:-},                        |
+   |     Payload: Compressed COSE object]           |
    +----------------------------------------------->|
    |  OSCOAP response:                              |
-   |    2.05 (Content)                              |
+   |    2.04 (Changed)                              |
    |    [Header, Token, Options: {...,              |
    |     Object-Security:-},                        |
    |     Payload: Compressed COSE object]           |
@@ -96,7 +97,7 @@ Client                                            Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCOAP" artwork-align="center"}
 
-OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP payload and options, in combination with hop-by-hop protection of the entire CoAP message, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
+OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with hop-by-hop protection of the Messaging Layer, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
 An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCOAP aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP.
 
@@ -110,7 +111,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV,
 
 # The Object-Security Option {#option}
 
-The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to protect the CoAP request or response. The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
+The Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCOAP message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+-----------+-----------+
@@ -122,15 +123,14 @@ The Object-Security option (see {{fig-option}}) indicates that OSCOAP is used to
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The option is either empty or contains a compressed COSE object (see {{cose-object}} and {{compression}}), and has no default value (except for certain CoAP codes, see below). The length of the Object-Security option is either zero or the sum of the length of the compressed COSE header, the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
+Except in the case of an Observe request, the Object-Security option SHALL be empty (length zero), and the compressed COSE object is the payload of the OSCOAP message. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
 
-A successful response to a request with the Object-Security option SHALL contain the Object-Security option. A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
+In case of a CoAP request with the Observe option (GET, see {{RFC7641}}), the compressed COSE object SHALL be the value of the Object-Security option. In this case the length of the Object-Security option is equal to the size of the compressed COSE object, i.e. the sum of the length of the compressed COSE header, the encrypted CoAP Code header field (1 byte), the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size. (The same conclusion about message expansion of OSCOAP messages is independent of whether the compressed COSE object is in the Object-Security option or in the CoAP payload as described above).
 
-The placement of the compressed COSE object in the OSCOAP message depends on whether the CoAP code allows payload ({{RFC7252}}, illustrated in {{fig-sketch}}):
+A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
-* If the CoAP code allows payload, then the compressed COSE object is the payload of the OSCOAP message, and the Object-Security option has length zero. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it.
+TODO: Move the previous paragraph to {{coap-coap-proxy}}.
 
-* If the CoAP code does not allow payload, then the compressed COSE object {{compression}} is the value of the Object-Security option and the length of the Object-Security option is equal to the size of the compressed COSE object. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it.
 
 # The Security Context {#context}
 
@@ -425,7 +425,9 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
-In order for a proxy to support forwarding of Observe messages, there must be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value. OSCOAP aware proxies MAY look at the Partial IV value instead of the outer Observe value.
+In order for a proxy to support forwarding of Observe messages there SHALL be an Observe option present in options part of the OSCOAP message ({{RFC7641}}), so Observe must have an outer value. OSCOAP aware proxies MAY look at the Partial IV value instead of the outer Observe value.
+
+Additionally, the outer CoAP Code for Observe messages SHALL NOT be replaced as described in XX.
 
 To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
@@ -437,17 +439,15 @@ The Observe option in the CoAP request may be legitimately removed by a proxy. I
 
 ## CoAP Header
 
-Most CoAP header fields are required to be read and/or changed by proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCOAP.
+Most CoAP header fields are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCOAP. 
 
-Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of Messaging Layer, OSCOAP can be applied to both unreliable and reliable transport.
+The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-TODO: Change text above to consider Code being protected by OSCOAP
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message for requests SHALL be set to 0.02 (POST) and for responses to 2.04 (Changed), except for Observe messages, for which it SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe specification {{RFC7641}}, that only define the use of GET for observing resources.
 
-The CoAP header field Code MUST be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
+TODO: Consider error messages on Observe - is the outer code still 2.05?
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message for requests SHALL be SET to 0.02 (POST) and for responses to 2.04 (Changed), except for Observe messages, for which it SHALL be 0.01 (GET) for requests and 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe specifications {{RFC7641}}, that only define the use of GET for observing resources.
-
-The receiving endpoint SHALL discared the Code in the OSCOAP message and copy the Code in the plaintext of the COSE object into the decrypted CoAP message.
+The receiving endpoint SHALL discard the Code in the OSCOAP message and copy the Code in the plaintext of the COSE object into the decrypted CoAP message.
 
 The other CoAP header fields are Unprotected. The sending endpoint SHALL include all other header fields of the original message in the header of the OSCOAP message. The receiving endpoint SHALL include the header fields from the OSCOAP message to the header of the decrypted CoAP message.
 
@@ -483,6 +483,8 @@ The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by pad
 
 The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
+- the Code of the original CoAP message as defined in Section 3 of {{RFC7252}}; and
+
 - all Class E option values (see {{inner-options}}) present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
 
 - the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
@@ -491,7 +493,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Class E options (if any) ...                             
+|    Code       |    Class E options (if any) ...                             
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -507,7 +509,6 @@ The external_aad SHALL be a CBOR array as defined below:
 ~~~~~~~~~~~ CDDL
 external_aad = [
    version : uint,
-   code : uint,
    options : bstr,
    alg : int,
    request_kid : bstr,
@@ -518,8 +519,6 @@ external_aad = [
 where:
 
 - version: contains the OSCOAP version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
-
-- code: contains is the CoAP Code of the original CoAP message, as defined in Section 3 of {{RFC7252}}.
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
 
