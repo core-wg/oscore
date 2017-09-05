@@ -870,20 +870,6 @@ mapped request or response. The value of the field is the value of the
 CoAP Object-Security option in base64url encoding without padding (see
 {{RFC7515}} Appendix C for implementation notes for this encoding).
 
-In addition, whenever the Object-Security field is present, the protected
-message's code is expressed in a HTTP header field named CoAP-Code in dotted
-code number notation with leading zero. When converting an HTTP request or
-response to CoAP, the code in the CoAP-Code field gets used in the CoAP
-message, and the response code mapping rules ({{RFC8075}} Section 7)
-are not applied.
-
-Invalid base64url data, the absence of the CoAP-Code field or a CoAP-Code field
-value that cannot be expressed as a CoAP code byte constitute an error, and
-MUST result in a 4.02 Bad Option or 400 Bad Request, depending on the protocol
-used in the request. If any mapper receives an Object-Security header, it MUST
-verify that the code classes match to the extent of being a request (CoAP code
-class 0 mapped to an HTTP request) or a response (CoAP code classes 1-5 mapped
-to a HTTP response) code.
 
 Example:
 
@@ -895,20 +881,20 @@ Example:
 
 [HTTP request -- HTTP Client to Proxy]
 
-  GET /hc/coap://device.local/ HTTP/1.1
+  POST /hc/coap://device.local/ HTTP/1.1
   Host: proxy.local
-  CoAP-Code: 0.01
-  Object-Security: CQcBE2H3D9KXsQ
-
+  Object-Security: [empty]
+  Body: CQcBE2H3D9KXsQ
 [CoAP request -- Proxy to CoAP Server]
 
-  GET /
+  POST /
   Uri-Host: device.local
-  Object-Security: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+  Object-Security: [empty]
+  Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
-[CoAP response -- CoAP Sever to Proxy]
+[CoAP response -- CoAP Server to Proxy]
 
-  2.05 Content
+  2.04 Changed
   Object-Security: [empty]
   Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
@@ -916,7 +902,6 @@ Example:
 
   HTTP/1.1 200 OK
   Object-Security: [empty]
-  CoAP-Code: 2.05
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [HTTP response -- After object security processing]
@@ -924,6 +909,8 @@ Example:
   HTTP/1.1 200 OK
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
+
+Note that the HTTP Status Code 200 in the next-to-last message if the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
 
 ## CoAP-HTTP Translation Proxy 
