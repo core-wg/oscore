@@ -337,18 +337,13 @@ Unless specified otherwise, CoAP options not listed in {{fig-option-protection}}
 
 Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. A new COAP option SHOULD be Inner unless it requires proxy processing.
 
-
 ### Inner Options {#inner-options}
 
 When using OSCOAP, Inner options (marked with 'x' in column E of {{fig-option-protection}}) are sent in a way analogous to communicating in a protected manner directly with the other endpoint.
 
 The sending endpoint SHALL write the class E options present in the original CoAP message into the plaintext of the COSE object {{plaintext}}, and then remove the class E options from the OSCOAP message. 
 
-The receiving endpoint SHALL write the Class E options present in the plaintext of the COSE object into the decrypted CoAP message.
-
-The receiving endpoint MUST verify that the options present in the plaintext of the COSE object are only of Class E. If the endpoint recognizes the option (Class I or U), it MUST discard such option and continue processing the message as usually. If it does not recognize the option, and therefore it cannot establish which class it belongs to, the endpoint MUST reply with a 4.02 Bad Option error.
-
-TODO: Check the paragraph above
+The receiving endpoint SHALL process Inner options as specified in {{ver-req}} and {{ver-res}}.
 
 ### Outer Options {#outer-options}
 
@@ -356,12 +351,11 @@ Outer options (marked with 'x' in column U or I of {{fig-option-protection}}) ar
 
 The sending endpoint SHALL include the class U and class I options present in the original message to the options part of the OSCOAP message. Class I options (marked with 'x' in column I of {{fig-option-protection}}) SHALL be integrity protected between the endpoints as specified in {{AAD}}. All Outer options, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
 
-The receiving endpoint SHALL include the class U and class I options present in the OSCOAP message in the decrypted CoAP message.
-
+The receiving endpoint SHALL process Inner options as specified in {{ver-req}} and {{ver-res}}.
 
 ### Special Options
 
-Some options require special processing, marked with an asterisk ('*') in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be Inner and/or Outer; the processing is specified in this section.
+Some options require special processing, marked with an asterisk ('*') in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be added as an Inner and/or Outer message by the sending endpoint; the processing is specified in this section.
 
 #### Max-Age {#max-age}
 
@@ -433,8 +427,6 @@ If the verification fails, the client SHALL stop processing the response, and in
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCOAP client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response, see {{processing}}.)
 
-
-
 ## CoAP Header {#coap-header}
 
 Most CoAP header fields are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCOAP protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCOAP. 
@@ -446,8 +438,6 @@ The sending endpoint SHALL write the Code of the original CoAP message into the 
 The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code in the plaintext of the COSE object into the decrypted CoAP message.
 
 The other CoAP header fields are Unprotected. The sending endpoint SHALL include all other header fields of the original message in the header of the OSCOAP message. The receiving endpoint SHALL include the header fields from the OSCOAP message to the header of the decrypted CoAP message.
-
-
 
 # The COSE Object {#cose-object}
 
@@ -584,7 +574,7 @@ To prevent accepting replay of previously received notification responses, the c
 
 This section describes the OSCOAP message processing. An illustration of the nonce generation used in the processing is given in {{nonce-generation}}.
 
-## Protecting the Request
+## Protecting the Request {#prot-req}
 
 Given a CoAP request, the client SHALL perform the following steps to create an OSCOAP request:
 
@@ -600,19 +590,19 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
-## Verifying the Request
+## Verifying the Request {#ver-req}
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
-2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a CON message, and:
+2. Discard the message Code and all Outer options of Class non I and non U from the message. For example, If-Match Outer option is discarded, Uri-Host Outer option is not discarded.
+
+3. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If the request is a CON message, and:
 
    * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
    * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
-
-If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request.
 
 3. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
 
@@ -626,11 +616,13 @@ If the request is a NON message and either the decompression or the COSE message
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted code, options and payload to the decrypted request, processing the class E options as described in {{protected-fields}}. The Object-Security option is removed.
+7. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Content-Format Inner and a Content-Format Outer option. The Outer Content-Format is discarded.
 
-8. The decrypted CoAP request is processed according to {{RFC7252}}
+8. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
 
-## Protecting the Response
+9. The decrypted CoAP request is processed according to {{RFC7252}}
+
+## Protecting the Response {#prot-res}
 
 Given a CoAP response, the server SHALL perform the following steps to create an OSCOAP response:
 
@@ -648,35 +640,39 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 5. Format the OSCOAP message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
-## Verifying the Response
+## Verifying the Response {#ver-res}
 
 A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCOAP message have been received, see {{block-options}}.
 
-2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
+2. Discard the message Code and all Outer options of Class non I and non U from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
 
-3. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
+3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
 
-4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
+4. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
 
-5. Compute the AEAD nonce
+5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
+
+6. Compute the AEAD nonce
 
       * If the Observe option is not present in the response, compute the AEAD nonce by XORing the Context IV (Recipient IV with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
       * If the Observe option is present in the response, compute the AEAD nonce by XORing the Context IV (Recipient IV) with the padded Partial IV parameter from the response.
 
-5. Decrypt the COSE object using the Recipient Key.
+7. Decrypt the COSE object using the Recipient Key.
 
    * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
 
-6. Add decrypted code, options and payload to the decrypted response overwriting any outer E options (see {{protected-fields}}). The Object-Security option is removed.
+8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
+
+9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
 
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
-7. The decrypted CoAP response is processed according to {{RFC7252}}
+10. The decrypted CoAP response is processed according to {{RFC7252}}
 
 ## Nonce generation examples {#nonce-generation}
 
