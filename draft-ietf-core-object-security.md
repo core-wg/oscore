@@ -604,27 +604,27 @@ A server receiving a request containing the Object-Security option SHALL perform
    
    * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
 
-3. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
+4. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
 
-4. Compose the Additional Authenticated Data, as described in {{cose-object}}.
+5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-5. Compute the AEAD nonce by XORing the Context IV (Recipient IV) with the padded 'Partial IV' parameter, received in the COSE Object.
+6. Compute the AEAD nonce by XORing the Context IV (Recipient IV) with the padded 'Partial IV' parameter, received in the COSE Object.
 
-6. Decrypt the COSE object using the Recipient Key.
+7. Decrypt the COSE object using the Recipient Key.
 
    * If decryption fails, the server MUST stop processing the request and, if the request is a CON message, the server MUST respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Decryption failed" string.
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-7. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Content-Format Inner and a Content-Format Outer option. The Outer Content-Format is discarded.
+8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Content-Format Inner and a Content-Format Outer option. The Outer Content-Format is discarded.
 
-8. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
+9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
 
-9. The decrypted CoAP request is processed according to {{RFC7252}}
+10. The decrypted CoAP request is processed according to {{RFC7252}}
 
 ## Protecting the Response {#prot-res}
 
-Given a CoAP response, the server SHALL perform the following steps to create an OSCOAP response:
+Given a CoAP response, the server SHALL perform the following steps to create an OSCOAP response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCOAP errors (point 3., 4., 7. in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCOAP processing.
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
