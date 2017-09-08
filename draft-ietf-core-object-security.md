@@ -351,7 +351,7 @@ Outer options (marked with 'x' in column U or I of {{fig-option-protection}}) ar
 
 The sending endpoint SHALL include the class U and class I options present in the original message to the options part of the OSCOAP message. Class I options (marked with 'x' in column I of {{fig-option-protection}}) SHALL be integrity protected between the endpoints as specified in {{AAD}}. All Outer options, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
 
-The receiving endpoint SHALL process Inner options as specified in {{ver-req}} and {{ver-res}}.
+The receiving endpoint SHALL process Outer options as specified in {{ver-req}} and {{ver-res}}.
 
 ### Special Options
 
