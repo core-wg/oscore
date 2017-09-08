@@ -288,13 +288,15 @@ Message fields of the original CoAP message may be protected end-to-end between 
 * Class I: integrity protected only, or
 * Class U: unprotected.
 
-Class E message fields are encrypted and integrity protected by the AEAD algorithm, and transferred in the ciphertext of the COSE object in the OSCOAP message. Class E message fields are not visible to proxies, and are therefore called "Inner". Class I message fields are included in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields are not protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCOAP message which is visible to proxies, and are therefore called "Outer" options.
+The sending endpoint SHALL transfer Class E message fields in the ciphertext of the COSE object in the OSCOAP message. The sending endpoint SHALL included Class I message fields in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields SHALL NOT be protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCOAP message which is visible to proxies.
+
+Message fields not visible to proxies, i.e. transported in the ciphertext of the COSE object, are called "Inner". Message fields transferred in the header or options part of the OSCOAP message which is visible to proxies are called "Outer".
 
 CoAP message fields are either Inner or Outer: Inner if the value is intended for the destination endpoint, Outer if the value is intended for a proxy. An OSCOAP message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner and Outer message fields are processed independently.
 
 ## CoAP Payload
 
-The CoAP Payload, if present in the original message, SHALL be encrypted and integrity protected and is thus an Inner message field. The sending endpoint writes the payload of the original CoAP message into the plaintext {{plaintext}} input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
+The CoAP Payload, if present in the original message, SHALL be encrypted and integrity protected and is thus a Class E message field. The sending endpoint writes the payload of the original CoAP message into the plaintext {{plaintext}} input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 
 ## CoAP Options {#coap-options}
@@ -333,9 +335,9 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be Inner.
+Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be of class E.
 
-Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. A new COAP option SHOULD be Inner unless it requires proxy processing.
+Specifications of new CoAP options SHOULD define how they are processed with OSCOAP. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
 ### Inner Options {#inner-options}
 
