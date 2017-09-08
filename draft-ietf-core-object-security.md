@@ -648,9 +648,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 2. Discard the message Code and all Outer options of Class non I and non U from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
 
-3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If the response is a CON message and either the decompression or the COSE message fails to decode, then the client SHALL send an empty ACK back and stop processing the response. If the response is a NON message and any of the previous conditions appear, then the client SHALL simply stop processing the response.
+3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, the client SHALL stop processing the response and, in the case of CON send an empty ACK back.
+4. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, then go to 11.
 
 5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
@@ -662,7 +662,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 7. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the client MUST stop processing the response and, if the response is a CON message, the client MUST respond with an empty ACK back.
+   * If decryption fails, then go to 11.
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
 
@@ -673,6 +673,8 @@ A client receiving a response containing the Object-Security option SHALL perfor
    * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
 10. The decrypted CoAP response is processed according to {{RFC7252}}
+
+11. (Optional) In case any of the previous erroneous conditions apply: if the response is a CON message, then the client SHALL send an empty ACK back and stop processing the response; if the response is a NON message, then the client SHALL simply stop processing the response.
 
 ## Nonce generation examples {#nonce-generation}
 
