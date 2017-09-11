@@ -419,7 +419,7 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 * Proxy-Uri = "coap://example.com"
 
-(See Section 6.1 of {{RFC7252.}}
+(See Section 6.1 of {{RFC7252}})
 
 #### Observe {#observe}
 
