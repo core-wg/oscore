@@ -77,7 +77,7 @@ This document defines the security protocol Object Security of CoAP (OSCOAP), pr
 
 OSCOAP is designed for constrained nodes and networks and provides an in-layer security protocol for CoAP which does not depend on underlying layers. OSCOAP can be used anywhere where CoAP can be used, including non-IP transport {{I-D.bormann-6lo-coap-802-15-ie}}. An extension of OSCOAP may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCOAP does not affect the URI scheme and OSCOAP can therefore be used with any URI scheme defined for CoAP. The application decides the conditions for which OSCOAP is required. 
 
-OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP protects as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
+OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, see {{compression}}. The use of OSCOAP is signaled with the CoAP option Object-Security, defined in {{option}}. OSCOAP is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCOAP provides protection of CoAP payload, most options, and certain header fields. The solution transforms a CoAP message into an "OSCOAP message" before sending, and vice versa after receiving. The OSCOAP message is a CoAP message related to the original CoAP message in the following way: the original CoAP message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCOAP message, and instead the Object-Security option and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                            Server
@@ -99,7 +99,7 @@ Client                                            Server
 
 OSCOAP may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCOAP can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with hop-by-hop protection of the Messaging Layer, during transport between end-point and intermediary node. Examples of the use of OSCOAP are given in {{examples}}.
 
-An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCOAP aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP.
+An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCOAP aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective part of this specification to work with OSCOAP (see {{proxy-operations}}).
 
 ## Terminology
 
@@ -127,9 +127,7 @@ Except in the case of an Observe request, the Object-Security option SHALL be em
 
 In case of a CoAP request with the Observe option (GET, see {{RFC7641}}), the compressed COSE object SHALL be the value of the Object-Security option. In this case the length of the Object-Security option is equal to the size of the compressed COSE object, i.e. the sum of the length of the compressed COSE header, the encrypted CoAP Code header field (1 byte), the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size. (The same conclusion about message expansion of OSCOAP messages is independent of whether the compressed COSE object is in the Object-Security option or in the CoAP payload as described above).
 
-A CoAP endpoint SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
-
-TODO: Move the previous paragraph to {{coap-coap-proxy}}.
+A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
 
 # The Security Context {#context}
@@ -401,8 +399,6 @@ The Proxy-Uri option of the OSCOAP message SHALL be set to the composition of Pr
 
 Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCOAP-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1. of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In other documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCOAP class they belong.
 
-TODO: Consider move previous para to Proxy section
-
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
 * Proxy-Uri = "coap://example.com/resource?q=1"
@@ -425,9 +421,7 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1.2).
 
-In order for an OSCOAP-unaware proxy to support forwarding of Observe messages ({{RFC7641}}), there SHALL be an Outer Observe option, i.e. present in the options part of the OSCOAP message. OSCOAP-aware proxies MAY look at the Partial IV value instead of the Outer Observe option. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
-
-TODO: Consider move previous para to proxy section
+In order for an OSCOAP-unaware proxy to support forwarding of Observe messages ({{RFC7641}}), there SHALL be an Outer Observe option, i.e. present in the options part of the OSCOAP message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
 To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
@@ -852,16 +846,23 @@ A value MUST NOT be given for the "osc" attribute; any present value MUST be ign
 
 # Proxy Operations {#proxy-operations}
 
-Different proxy operations are compatible with OSCOAP. This section describes the operations of a OSCOAP aware CoAP forwarding proxy (as defined in {{I-D.hartke-core-e2e-security-reqs}} and {{RFC7252}}) and proxies translating between CoAP and HTTP (including {{RFC8075}}).
+RFC7252 defines operations for a CoAP-to-CoAP proxy (see Section 5.7 of {{RFC7252}}) and for proxying between CoAP and HTTP (Section 10 of {{RFC7252}}). A more detailed description of the HTTP-to-CoAP mapping is provided by {{RFC8075}}.
+This section describes the operations of OSCOAP-aware proxies.
 
 
-## CoAP-CoAP Forwarding Proxy {#coap-coap-proxy}
+## CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
-This section addresses the proxy operations defined in 
+OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCOAP-aware proxies provides certain simplifications as specified in this section. 
 
+The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. A OSCOAP-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
+Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
-## HTTP-CoAP Translation Proxy
+Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.amsuess-core-repeat-request-tag}}.
+
+Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCOAP-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
+
+## HTTP-to-CoAP Translation Proxy
 
 As requested in Section 1 of {{RFC8075}}, this section describes the
 HTTP mapping for the OSCOAP protocol extension of CoAP.
@@ -916,7 +917,7 @@ Example:
 Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
 
-## CoAP-HTTP Translation Proxy 
+## CoAP-to-HTTP Translation Proxy 
 
 
 
