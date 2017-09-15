@@ -1087,7 +1087,8 @@ Client   Proxy   Server
    |       |       |                  {Code:2.05,
    |       |       |                   Content-Format:0, "180"}]
    |       |       |
-~~~~~~~~~~~{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+~~~~~~~~~~~
+{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 The request/response Codes are encrypted by OSCOAP and only dummy Codes (FETCH/Content) are visible in the header of the OSCOAP message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
 
