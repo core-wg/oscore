@@ -1036,61 +1036,60 @@ The server verifies that the Partial IV has not been received before. The client
 This example targets the scenario in Section 3.2 of {{I-D.hartke-core-e2e-security-reqs}} and illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), first receiving the value 220 mg/dl and then a second value 180 mg/dl.
 
 ~~~~~~~~~~~
-Client  Proxy  Server
-   |      |      |
-   +----->|      |            Code: 0.01 (GET)
-   | GET  |      |           Token: 0x83
-   |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, Partial IV:15,
-   |      |      |                  {Code:0.01,
-   |      |      |                   Uri-Path:"glucose"}]
-   |      |      |         Payload: -
-   |      |      |
-   |      +----->|            Code: 0.01 (GET)
-   |      | GET  |           Token: 0xbe
-   |      |      |         Observe: 0
-   |      |      | Object-Security: [kid:ca, Partial IV:15,
-   |      |      |                  {Code:0.01,
-   |      |      |                   Uri-Path:"glucose"}]
-   |      |      |         Payload: -
-   |      |      |
-   |      |<-----+            Code: 2.05 (Content)
-   |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 7
-   |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:32,
-   |      |      |                  {Code:2.05,   
-   |      |      |                   Content-Format:0, "220"}]
-   |      |      |
-   |<-----+      |            Code: 2.05 (Content)
-   | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 7
-   |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:32,
-   |      |      |                  {Code:2.05,   
-   |      |      |                   Content-Format:0, "220"}]
-     ...    ...    ...
-   |      |      |
-   |      |<-----+            Code: 2.05 (Content)
-   |      | 2.05 |           Token: 0xbe
-   |      |      |         Observe: 8
-   |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:36,
-   |      |      |                  {Code:2.05,
-   |      |      |                   Content-Format:0, "180"}]
-   |      |      |
-   |<-----+      |            Code: 2.05 (Content)
-   | 2.05 |      |           Token: 0x83
-   |      |      |         Observe: 8
-   |      |      | Object-Security: -
-   |      |      |         Payload: [Partial IV:36,
-   |      |      |                  {Code:2.05,
-   |      |      |                   Content-Format:0, "180"}]
-   |      |      |
-~~~~~~~~~~~
-{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+Client   Proxy   Server
+   |       |       |
+   +------>|       |            Code: 0.05 (FETCH)
+   | FETCH |       |           Token: 0x83
+   |       |       |         Observe: 0
+   |       |       | Object-Security: [kid:ca, Partial IV:15,
+   |       |       |                  {Code:0.01,
+   |       |       |                   Uri-Path:"glucose"}]
+   |       |       |         Payload: -
+   |       |       |
+   |       +------>|            Code: 0.01 (FETCH)
+   |       | FETCH |           Token: 0xbe
+   |       |       |         Observe: 0
+   |       |       | Object-Security: [kid:ca, Partial IV:15,
+   |       |       |                  {Code:0.01,
+   |       |       |                   Uri-Path:"glucose"}]
+   |       |       |         Payload: -
+   |       |       |
+   |       |<------+            Code: 2.05 (Content)
+   |       |  2.05 |           Token: 0xbe
+   |       |       |         Observe: 7
+   |       |       | Object-Security: -
+   |       |       |         Payload: [Partial IV:32,
+   |       |       |                  {Code:2.05,   
+   |       |       |                   Content-Format:0, "220"}]
+   |       |       |
+   |<------+       |            Code: 2.05 (Content)
+   |  2.05 |       |           Token: 0x83
+   |       |       |         Observe: 7
+   |       |       | Object-Security: -
+   |       |       |         Payload: [Partial IV:32,
+   |       |       |                  {Code:2.05,   
+   |       |       |                   Content-Format:0, "220"}]
+  ...     ...     ...
+   |       |       |
+   |       |<------+            Code: 2.05 (Content)
+   |       |  2.05 |           Token: 0xbe
+   |       |       |         Observe: 8
+   |       |       | Object-Security: -
+   |       |       |         Payload: [Partial IV:36,
+   |       |       |                  {Code:2.05,
+   |       |       |                   Content-Format:0, "180"}]
+   |       |       |
+   |<------+       |            Code: 2.05 (Content)
+   |  2.05 |       |           Token: 0x83
+   |       |       |         Observe: 8
+   |       |       | Object-Security: -
+   |       |       |         Payload: [Partial IV:36,
+   |       |       |                  {Code:2.05,
+   |       |       |                   Content-Format:0, "180"}]
+   |       |       |
+~~~~~~~~~~~{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-The request/response Codes are encrypted by OSCOAP but since this is Observe, the Codes are visible in the header of the OSCOAP message. Since the method (GET) doesn't allow payload, the Object-Security option carries the COSE object as its value. The options Content-Format (0) and the payload ("220" and "180"), are encrypted. 
+The request/response Codes are encrypted by OSCOAP and only dummy Codes (FETCH/Content) are visible in the header of the OSCOAP message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
 
 The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36).
 
