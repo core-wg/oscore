@@ -44,6 +44,7 @@ normative:
   RFC7252:
   RFC7641:
   RFC7959:
+  RFC8132:
   RFC8152:
   I-D.amsuess-core-repeat-request-tag:
   
