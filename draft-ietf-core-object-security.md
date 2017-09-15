@@ -115,21 +115,20 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV,
 The Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCOAP message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+-----------+-----------+
-| No. | C | U | N | R | Name            | Format    | Length    |
-+-----+---+---+---+---+-----------------+-----------+-----------|
-| TBD | x |   |   |   | Object-Security | see below | see below |
-+-----+---+---+---+---+-----------------+-----------+-----------+
++-----+---+---+---+---+-----------------+--------+--------+---------+
+| No. | C | U | N | R | Name            | Format | Length | Default | 
++-----+---+---+---+---+-----------------+--------+--------+---------+
+| TBD | x |   |   |   | Object-Security | empty  | 0      | (none)  |
++-----+---+---+---+---+-----------------+--------+--------+---------+
    C = Critical,  U = Unsafe,  N = NoCacheKey,  R = Repeatable   
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-Except in the case of an Observe request, the Object-Security option SHALL be empty (length zero), and the compressed COSE object is the payload of the OSCOAP message. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
+The Object-Security option SHALL be empty (length zero), and the compressed COSE object is the payload of the OSCOAP message. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
 
-In case of a CoAP request with the Observe option (see {{RFC7641}}), the compressed COSE object SHALL be the value of the Object-Security option. In this case the length of the Object-Security option is equal to the size of the compressed COSE object, i.e. the sum of the length of the compressed COSE header, the encrypted CoAP Code header field (1 byte), the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size. (The same conclusion about message expansion of OSCOAP messages is independent of whether the compressed COSE object is in the Object-Security option or in the CoAP payload as described above).
+Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
-A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
-
+A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}.
 
 # The Security Context {#context}
 
