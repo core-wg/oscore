@@ -864,13 +864,9 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 ## HTTP-to-CoAP Translation Proxy
 
-As requested in Section 1 of {{RFC8075}}, this section describes the
-HTTP mapping for the OSCOAP protocol extension of CoAP.
+As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCOAP protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and
-responses, is expressed in a HTTP header field named Object-Security in the
-mapped request or response. The value of the field is the COSE Object of the OSCOAP message in base64url encoding without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
-
+The presence of the Object-Security option, both in requests and responses, is expressed in a HTTP header field named Object-Security in the mapped request or response. The value of the field is the compressed COSE Object of the OSCOAP message in base64url encoding without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 Example:
 
