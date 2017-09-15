@@ -44,6 +44,7 @@ normative:
   RFC7252:
   RFC7641:
   RFC7959:
+  RFC8132:
   RFC8152:
   I-D.amsuess-core-repeat-request-tag:
   
@@ -125,7 +126,7 @@ The Object-Security option (see {{fig-option}}) indicates that the CoAP message 
 
 Except in the case of an Observe request, the Object-Security option SHALL be empty (length zero), and the compressed COSE object is the payload of the OSCOAP message. An endpoint receiving a CoAP message with payload, that also contains a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an empty Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
 
-In case of a CoAP request with the Observe option (GET, see {{RFC7641}}), the compressed COSE object SHALL be the value of the Object-Security option. In this case the length of the Object-Security option is equal to the size of the compressed COSE object, i.e. the sum of the length of the compressed COSE header, the encrypted CoAP Code header field (1 byte), the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size. (The same conclusion about message expansion of OSCOAP messages is independent of whether the compressed COSE object is in the Object-Security option or in the CoAP payload as described above).
+In case of a CoAP request with the Observe option (GET/FETCH, see {{RFC7641}},{{RFC8132}}), the compressed COSE object SHALL be the value of the Object-Security option. In this case the length of the Object-Security option is equal to the size of the compressed COSE object, i.e. the sum of the length of the compressed COSE header, the encrypted CoAP Code header field (1 byte), the lengths of the encrypted options and payload present in the original CoAP message, and the length of the authentication tag. Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size. (The same conclusion about message expansion of OSCOAP messages is independent of whether the compressed COSE object is in the Object-Security option or in the CoAP payload as described above).
 
 A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. The Object-Security option is included in the cache key for backward compatibility with proxies not recognizing the Object-Security option. The effect is that messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}. 
 
@@ -435,7 +436,7 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) to responses, except for Observe messages, for which it SHALL be 0.01 (GET) for registrations and 2.05 (Content) for notifications ({{RFC7641}}). The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) to responses, except for Observe messages. For Observe messages, the Outer Code in the OSCOAP message SHALL be the same as in the original CoAP message. The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies.
 
 The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
