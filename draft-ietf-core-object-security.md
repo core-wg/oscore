@@ -435,7 +435,7 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCOAP message SHALL be set to 0.01 (GET) for requests and to 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCOAP message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies. The choice of FETCH allows all OSCOAP messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -465,7 +465,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (not Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV (Sender IV or Recipient IV), with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
 
 ## Plaintext {#plaintext}
 
