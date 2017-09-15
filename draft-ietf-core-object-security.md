@@ -1046,7 +1046,7 @@ Client   Proxy   Server
    |       |       |                   Uri-Path:"glucose"}]
    |       |       |         Payload: -
    |       |       |
-   |       +------>|            Code: 0.01 (FETCH)
+   |       +------>|            Code: 0.05 (FETCH)
    |       | FETCH |           Token: 0xbe
    |       |       |         Observe: 0
    |       |       | Object-Security: [kid:ca, Partial IV:15,
