@@ -1041,18 +1041,18 @@ Client  Proxy  Server
   +------>|       |            Code: 0.05 (FETCH)
   | FETCH |       |           Token: 0x83
   |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: -
+  |       |       |         Payload: [kid:ca, Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
-  |       |       |         Payload: -
   |       |       |
   |       +------>|            Code: 0.05 (FETCH)
   |       | FETCH |           Token: 0xbe
   |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: -
+  |       |       |         Payload: [kid:ca, Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
-  |       |       |         Payload: -
   |       |       |
   |       |<------+            Code: 2.05 (Content)
   |       |  2.05 |           Token: 0xbe
