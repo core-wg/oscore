@@ -741,8 +741,8 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 * The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
 * The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
-* The following 1 byte encode the length of the auxilliary data, l, if the auxilliary data flag is set (a = 1).
-* The following l bytes encode the auxilliary data, if the auxilliary data flag is set (a = 1).
+* The following 1 byte encode the length of the auxilliary data, s, if the auxilliary data flag is set (a = 1).
+* The following s bytes encode the auxilliary data, if the auxilliary data flag is set (a = 1).
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
