@@ -734,12 +734,12 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 The payload of the OSCOAP message SHALL contain the compressed COSE object which is encoded as follows:
 
 * The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV length, n. If their value is 0, the Partial IV is not present in the compressed COSE object.
-    - The fourth least significant bit k is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
+    - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object.
+    - The fourth least significant bit k is the kid flag: it is set to 1 if the kid is present in the compressed COSE object.
+    - The fifth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-* The following 1 byte encodes the length of the kid, if the kid is present (k = 1). 
-* The following m bytes encode the value of the kid, if the kid is present (k = 1). 
+* The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
+* The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
@@ -766,6 +766,8 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 +--------------------------+-----+-----+
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
+
+
 
 ## Compression Examples
 
