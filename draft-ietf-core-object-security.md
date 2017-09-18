@@ -124,7 +124,7 @@ The Object-Security option (see {{fig-option}}) indicates that the CoAP message 
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option SHALL be empty (length zero), and the compressed COSE object is the payload of the OSCOAP message. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
+The Object-Security option SHALL be empty (length zero), and the payload of the OSCOAP message is the compressed COSE object. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
 
 Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
@@ -729,25 +729,30 @@ Remarks:
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-## Encoding of the Object-Security Option
+## Encoding of the OSCOAP Payload
 
-The value of the Object-Security option SHALL be encoded as follows:
+The payload of the OSCOAP message SHALL contain the compressed COSE object which is encoded as follows:
 
-* The first byte encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV size n. If their value is 0, the Partial IV is not present in the compressed message.
-    - The fourth least significant bit k is set to 1 if the kid is present in the compressed message.
+* The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
+    - The three least significant bits encode the Partial IV length, n. If their value is 0, the Partial IV is not present in the compressed COSE object.
+    - The fourth least significant bit k is set to 1 if the kid is present in the compressed COSE object.
     - The fifth-eighth least significant bits (= most significant half-byte) are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-* The following 1 byte encodes the kid size m, if the kid is present (k = 1). 
-* The following m bytes encode the value of the kid, if the kid is present (k = 1).
+* The following 1 byte encodes the length of the kid, if the kid is present (k = 1). 
+* The following m bytes encode the value of the kid, if the kid is present (k = 1). 
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
- 7 6 5 4 3 2 1 0   
-+-+-+-+-+-+-+-+-+  k: kid flag bit
-|0 0 0 0|k|  n  |  n: Partial IV size (3 bits)
+ 0 1 2 3 4 5 6 7 
 +-+-+-+-+-+-+-+-+
+|  Flag Byte    |                       
++-+-+-+-+-+-+-+-+
+|  n  |k|0|0 0 0|    
++-+-+-+-+-+-+-+-+
+n: Partial IV length (3 bits)
+k: kid flag bit
 ~~~~~~~~~~~
+{: #fig-flag-byte title="Flag Byte for OSCOAP Compression" artwork-align="center"}
 
 The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
 
@@ -760,7 +765,7 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 | Response with Observe    |  0  | > 0 |
 +--------------------------+-----+-----+
 ~~~~~~~~~~~
-{: #fig-byte-flag title="Flag byte for OSCOAP compression" artwork-align="center"}
+{: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
 
 ## Compression Examples
 
