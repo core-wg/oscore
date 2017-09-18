@@ -1004,7 +1004,7 @@ Client  Proxy  Server
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}]
   |       |       |
-  |       +------>|            Code: 0.02 (POST))
+  |       +------>|            Code: 0.02 (POST)
   |       | POST  |           Token: 0x7b
   |       |       | Object-Security: -
   |       |       |         Payload: [kid:5f, Partial IV:42,
