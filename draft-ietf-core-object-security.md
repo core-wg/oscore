@@ -735,11 +735,14 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 
 * The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object.
-    - The fourth least significant bit k is the kid flag: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
+    - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
+    - The fifth least significant bit is the auxilliary data flag, a: it is set to 1 if the compressed COSE object contains auxilliary data, see {{auxilliary-data}}.
+    - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 * The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
 * The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
+* The following 1 byte encode the length of the auxilliary data, l, if the auxilliary data flag is set (a = 1).
+* The following l bytes encode the auxilliary data, if the auxilliary data flag is set (a = 1).
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
@@ -747,10 +750,11 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 +-+-+-+-+-+-+-+-+
 |  Flag Byte    |                       
 +-+-+-+-+-+-+-+-+
-|  n  |k|0|0 0 0|    
+|  n  |k|a|0 0 0|    
 +-+-+-+-+-+-+-+-+
 n: Partial IV length (3 bits)
 k: kid flag bit
+a: auxilliary data flag bit
 ~~~~~~~~~~~
 {: #fig-flag-byte title="Flag Byte for OSCOAP Compression" artwork-align="center"}
 
@@ -767,6 +771,15 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
 
+## Auxilliary Data  {#auxilliary-data}
+
+For certain use cases, it is necessary or favorable for the sending endpoint to provide some auxilliary data in order for the receiving endpoint to retrieve the recipient context. One use case is if the same kid is used with multiple master keys, in which case some other identifier can be included as auxilliary data to enable the receiving endpoint to find the right security context. The auxilliary data is not protected, and so may be eavesdropped or manipulated in transfer. Applications need to make the appropriate security and privacy considerations of sending auxilliary data. 
+
+Examples:
+
+* If the sending endpoint has an identifier in some other namespace which can be used to retrive or establish the security context, then that identifier can be used as auxilliary data.
+
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the sender endpoint belongs to multiple groups involving the same endpoints, then a group identifier can be used as auxilliary data to enable the receiving endpoint to find the right group security context.
 
 
 ## Compression Examples
