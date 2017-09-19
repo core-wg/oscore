@@ -228,9 +228,9 @@ The following input parameters MAY be pre-established. In case any of these para
 
 All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
-### Derivation of Sender Key/IV, Recipient Key/IV 
+### Derivation of Sender Key, Recipient Key, and Context IV 
 
-The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key/IV and Recipient Key/IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Context IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -244,21 +244,21 @@ where:
 
 ~~~~~~~~~~~ CDDL
    info = [
-       id : bstr,
+       id : bstr / nil,
        alg : int,
        type : tstr,
        L : int
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
-   * id is the Sender ID or Recipient ID
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Context IV.
 
    * type is "Key" or "IV"
 ~~~~~~~~~~~
 
 * L is the size of the key/IV for the AEAD algorithm used, in octets.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for IVs.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Context IV.
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
@@ -439,9 +439,9 @@ The other CoAP header fields are Unprotected (Class U). The sending endpoint SHA
 
 # The COSE Object {#cose-object}
 
-This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV lengths, nonce length, and maximum Sender Sequence Number are algorithm dependent.
+This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV length, nonce length, and maximum Sender Sequence Number are algorithm dependent.
  
-The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce, Sender IV, and Recipient IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
+The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Context IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
