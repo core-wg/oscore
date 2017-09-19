@@ -108,7 +108,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
-The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key/IV, Recipient ID/Key/IV and Context IV are defined in {{context-definition}}.
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Context IV are defined in {{context-definition}}.
 
 # The Object-Security Option {#option}
 
@@ -170,19 +170,19 @@ The Common Context contains the following parameters:
 
 * AEAD Algorithm (alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Sender IV, Recipient Key, and Recipient IV.
+* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Context IV.
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 * Master Salt (OPTIONAL). Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
+
+* Context IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 The Sender Context contains the following parameters:
 
 * Sender ID. Variable length byte string identifying the Sender Context. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
-
-* Sender IV. Byte string containing the IV to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
@@ -192,13 +192,9 @@ The Recipient Context contains the following parameters:
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
-* Recipient IV. Byte string containing the IV to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
-
 * Replay Window (Server only). The replay window to verify requests received.
 
-When it is understood which context is referred to (Sender Context or Recipient Context), the term "Context IV" is used to denote the IV currently used with this context.
-
-An endpoint may free up memory by not storing the Sender Key, Sender IV, Recipient Key, and Recipient IV, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Context IV, Sender Key, and Recipient Key, deriving them from the Common Context when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
