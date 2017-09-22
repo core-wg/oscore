@@ -431,7 +431,7 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCOAP. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g. changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCOAP message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies. The choice of FETCH allows all OSCOAP messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCOAP message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCOAP message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. The exception allows OSCOAP to be compliant with the Observe processing in OSCOAP-unaware proxies. The choice of POST and FETCH allows all OSCOAP messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCOAP message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
