@@ -357,7 +357,7 @@ Some options require special processing, marked with an asterisk ('*') in {{fig-
 
 The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCOAP as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCOAP responses at intermediary nodes. Since OSCOAP binds CoAP responses to requests, a cached response would not be used for any other request, so caching is useless. A server MAY set a Class U Max-Age option with value zero to OSCOAP responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCOAP client.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCOAP responses at OSCOAP unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to OSCOAP responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCOAP client.
 
 
 #### The Block Options {#block-options}
