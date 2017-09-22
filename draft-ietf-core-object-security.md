@@ -282,7 +282,7 @@ Message fields of the original CoAP message may be protected end-to-end between 
 * Class I: integrity protected only, or
 * Class U: unprotected.
 
-The sending endpoint SHALL transfer Class E message fields in the ciphertext of the COSE object in the OSCOAP message. The sending endpoint SHALL included Class I message fields in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields SHALL NOT be protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCOAP message which is visible to proxies.
+The sending endpoint SHALL transfer Class E message fields in the ciphertext of the COSE object in the OSCOAP message. The sending endpoint SHALL include Class I message fields in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields SHALL NOT be protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCOAP message which is visible to proxies.
 
 Message fields not visible to proxies, i.e. transported in the ciphertext of the COSE object, are called "Inner". Message fields transferred in the header or options part of the OSCOAP message, which is visible to proxies, are called "Outer".
 
