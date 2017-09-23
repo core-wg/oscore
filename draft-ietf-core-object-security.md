@@ -461,7 +461,23 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV, with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}. 
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV, with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}.
+
+~~~~~~~~~~~
+ 00 01 02 03 04 05 06 07 08 09 10 11 12      
++--+--+--+--+--+--+--+--+--+--+--+--+--+     
+|      Sender ID     |    Partial IV   |<--+ 
++--+--+--+--+--+--+--+--+--+--+--+--+--+   | 
+                                           | 
++--+--+--+--+--+--+--+--+--+--+--+--+--+   | 
+|              Conttext IV             |->(+)
++--+--+--+--+--+--+--+--+--+--+--+--+--+   | 
+                                           | 
++--+--+--+--+--+--+--+--+--+--+--+--+--+   | 
+|                 Nonce                |<--+ 
++--+--+--+--+--+--+--+--+--+--+--+--+--+     
+~~~~~~~~~~~
+{: #fig-sketch title="AES-CCM-16-64-128 Nonce Formation" artwork-align="center"}
 
 ## Plaintext {#plaintext}
 
