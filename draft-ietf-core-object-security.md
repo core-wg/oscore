@@ -477,7 +477,7 @@ The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by pad
 |                  Nonce                  |<--+ 
 +-----------------------------------------+     
 ~~~~~~~~~~~
-{: #fig-sketch title="Nonce Formation" artwork-align="center"}
+{: #fig-nonce title="Nonce Formation" artwork-align="center"}
 
 ## Plaintext {#plaintext}
 
