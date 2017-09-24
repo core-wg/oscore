@@ -554,7 +554,7 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
-In the case of Observe, a client receiving an notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
+In the case of Observe, a client receiving a notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the partial IV and updating the replay protection data MUST be atomic.
 
@@ -748,13 +748,13 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 * The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the auxilliary data flag, a: it is set to 1 if the compressed COSE object contains auxilliary data, see {{auxilliary-data}}.
+    - The fifth least significant bit is the auxiliary data flag, a: it is set to 1 if the compressed COSE object contains auxiliary data, see {{auxiliary-data}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 * The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
 * The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
-* The following 1 byte encode the length of the auxilliary data, s, if the auxilliary data flag is set (a = 1).
-* The following s bytes encode the auxilliary data, if the auxilliary data flag is set (a = 1).
+* The following 1 byte encode the length of the auxiliary data, s, if the auxiliary data flag is set (a = 1).
+* The following s bytes encode the auxiliary data, if the auxiliary data flag is set (a = 1).
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
@@ -766,7 +766,7 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 +-+-+-+-+-+-+-+-+
 n: Partial IV length (3 bits)
 k: kid flag bit
-a: auxilliary data flag bit
+a: auxiliary data flag bit
 ~~~~~~~~~~~
 {: #fig-flag-byte title="Flag Byte for OSCOAP Compression" artwork-align="center"}
 
@@ -783,15 +783,15 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
 
-## Auxilliary Data  {#auxilliary-data}
+## Auxiliary Data  {#auxiliary-data}
 
-For certain use cases, it is necessary or favorable for the sending endpoint to provide some auxilliary data in order for the receiving endpoint to retrieve the recipient context. One use case is if the same kid is used with multiple master keys, in which case some other identifier can be included as auxilliary data to enable the receiving endpoint to find the right security context. The auxilliary data is not protected, and so may be eavesdropped or manipulated in transfer. Applications need to make the appropriate security and privacy considerations of sending auxilliary data. 
+For certain use cases, it is necessary or favorable for the sending endpoint to provide some auxiliary data in order for the receiving endpoint to retrieve the recipient context. One use case is if the same kid is used with multiple master keys, in which case some other identifier can be included as auxiliary data to enable the receiving endpoint to find the right security context. The auxiliary data is not protected, and so may be eavesdropped or manipulated in transfer. Applications need to make the appropriate security and privacy considerations of sending auxiliary data. 
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used to retrive or establish the security context, then that identifier can be used as auxilliary data.
+* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as auxiliary data.
 
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the sender endpoint belongs to multiple groups involving the same endpoints, then a group identifier can be used as auxilliary data to enable the receiving endpoint to find the right group security context.
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the sender endpoint belongs to multiple groups involving the same endpoints, then a group identifier can be used as auxiliary data to enable the receiving endpoint to find the right group security context.
 
 
 ## Compression Examples
@@ -884,7 +884,7 @@ This section describes the operations of OSCOAP-aware proxies.
 
 ## CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
-OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCOAP-aware proxies provides certain simplifications as specified in this section. 
+OSCOAP is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCOAP-aware proxies provide certain simplifications as specified in this section. 
 
 The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. A OSCOAP-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
