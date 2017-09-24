@@ -478,7 +478,7 @@ When observe is not used, the request and the response uses the same nonce. In t
 |                  Nonce                  |<--+ 
 +-----------------------------------------+     
 ~~~~~~~~~~~
-{: #fig-nonce title="Nonce Formation" artwork-align="center"}
+{: #fig-nonce title="AEAD Nonce Formation" artwork-align="center"}
 
 ## Plaintext {#plaintext}
 
