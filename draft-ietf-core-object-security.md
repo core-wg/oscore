@@ -461,7 +461,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Common IV, with the following addition: The most significant bit in the first byte of the Common IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}.
+The nonce is constructed by padding the partial IV (in network byte order) with zeroes to exactly 6 bytes, padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes, concatenating the padded partial IV, with the padded ID, and then XORing with the Common IV. For detailed processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
 +-----------------------+--+--+--+--+--+--+
