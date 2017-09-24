@@ -266,8 +266,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g. using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of the Sender ID is given by nonce length - 6.
-For AES-CCM-16-64-128 the maximum length of the Sender ID is 7. Note that that the empty string is a valid Sender ID and that Sender IDs of different lengths can be used with the same Common Context. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g. using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 48) - 1, For AES-CCM-16-64-128 the maximum Sender ID is 2^56 - 1. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
