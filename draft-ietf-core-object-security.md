@@ -465,7 +465,7 @@ The nonce is constructed by padding the partial IV (in network byte order) with 
 
 ~~~~~~~~~~~
 +-----------------------+--+--+--+--+--+--+
-|  ID of PIV generator  |    Partial IV   |---+ 
+|  ID of PIV generator  |   Partial IV    |---+ 
 +-----------------------+--+--+--+--+--+--+   | 
                                               | 
 +-----------------------------------------+   | 
