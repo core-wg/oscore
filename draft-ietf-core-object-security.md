@@ -593,7 +593,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compute the AEAD nonce by XORing the Common IV with the partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -619,7 +619,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-6. Compute the AEAD nonce by XORing the Common IV with the padded 'Partial IV' parameter, received in the COSE Object.
+6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
 7. Decrypt the COSE object using the Recipient Key.
 
@@ -643,9 +643,9 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 3. Compute the AEAD nonce
 
-   * If Observe is not used, compute the AEAD nonce by XORing the Common IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
- 
-   * If Observe is used, compute the AEAD nonce by XORing the Common IV with the Partial IV of the response (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is not used, the nonce from the request is used.
+    
+   * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -667,10 +667,10 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 6. Compute the AEAD nonce
 
-      * If the Observe option is not present in the response, compute the AEAD nonce by XORing the Common IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, the nonce from the request is used.
  
-      * If the Observe option is present in the response, compute the AEAD nonce by XORing the Common IV with the padded Partial IV parameter from the response.
-
+      * If the Observe option is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+      
 7. Decrypt the COSE object using the Recipient Key.
 
    * If decryption fails, then go to 11.
