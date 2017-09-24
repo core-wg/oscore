@@ -84,15 +84,15 @@ OSCOAP builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providin
 Client                                            Server
    |  OSCOAP request:                               |
    |    POST example.com                            |
-   |    [Header, Token, Options: {...,              |
-   |     Object-Security:-},                        |
-   |     Payload: Compressed COSE object]           |
+   |      Header, Token,                            |
+   |      Options: {Object-Security:-, ...},        |
+   |      Payload: Compressed COSE object           |
    +----------------------------------------------->|
    |  OSCOAP response:                              |
    |    2.04 (Changed)                              |
-   |    [Header, Token, Options: {...,              |
-   |     Object-Security:-},                        |
-   |     Payload: Compressed COSE object]           |
+   |      Header, Token,                            |
+   |      Options: {Object-Security:-, ...},        |
+   |      Payload: Compressed COSE object           |
    |<-----------------------------------------------+
    |                                                |
 ~~~~~~~~~~~
