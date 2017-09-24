@@ -143,11 +143,11 @@ The endpoints protect messages to send using the Sender Context and verify messa
 An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
-               .------------.           .------------.
-               |  Common,   |           |  Common,   |
-               |  Sender,   |           |  Recipient,|
-               |  Recipient |           |  Sender    |
-               '------------'           '------------'
+              .-------------.           .-------------.
+              |  Common,    |           |  Common,    |
+              |  Sender,    |           |  Recipient, |
+              |  Recipient  |           |  Sender     |
+              '-------------'           '-------------'
                    Client                   Server
                       |                       |
 Retrieve context for  | OSCOAP request:       |
@@ -493,7 +493,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Code       |    Class E options (if any) ...                             
+|     Code      |    Class E options (if any) ...                             
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
