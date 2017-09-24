@@ -180,7 +180,7 @@ The Common Context contains the following parameters:
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Variable length byte string identifying the Sender Context. Its value is immutable once the security context is established.
+* Sender ID. Non-negative integer used to identify the Sender Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -188,7 +188,7 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Variable length byte string identifying the Recipient Context. Its value is immutable once the security context is established.
+* Recipient ID. Non-negative integer used to identify the Recipient Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -244,10 +244,10 @@ where:
 
 ~~~~~~~~~~~ CDDL
    info = [
-       id : bstr / nil,
+       id : uint / nil,
        alg : int,
        type : tstr,
-       L : int
+       L : uint
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
