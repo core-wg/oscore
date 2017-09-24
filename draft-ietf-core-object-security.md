@@ -108,7 +108,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
-The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Context IV are defined in {{context-definition}}.
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
 # The Object-Security Option {#option}
 
@@ -170,13 +170,13 @@ The Common Context contains the following parameters:
 
 * AEAD Algorithm (alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Context IV.
+* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Common IV.
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 * Master Salt (OPTIONAL). Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
-* Context IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Common IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 The Sender Context contains the following parameters:
 
@@ -194,7 +194,7 @@ The Recipient Context contains the following parameters:
 
 * Replay Window (Server only). The replay window to verify requests received.
 
-An endpoint may free up memory by not storing the Context IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
@@ -228,9 +228,9 @@ The following input parameters MAY be pre-established. In case any of these para
 
 All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
-### Derivation of Sender Key, Recipient Key, and Context IV 
+### Derivation of Sender Key, Recipient Key, and Common IV 
 
-The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Context IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -251,14 +251,14 @@ where:
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Context IV.
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV.
 
    * type is "Key" or "IV"
 ~~~~~~~~~~~
 
 * L is the size of the key/IV for the AEAD algorithm used, in octets.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Context IV.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Common IV.
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
@@ -442,7 +442,7 @@ The other CoAP header fields are Unprotected (Class U). The sending endpoint SHA
 
 This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original CoAP message. OSCOAP uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV length, nonce length, and maximum Sender Sequence Number are algorithm dependent.
  
-The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Context IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
+The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Common IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
@@ -462,7 +462,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV, with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}.
+The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by padding the partial IV (in network byte order) with zeroes and XORing it with the Common IV, with the following addition: The most significant bit in the first byte of the Common IV SHALL be flipped for responses, in case there is a single response (i.e. not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
 +-----------------------+--+--+--+--+--+--+
@@ -470,7 +470,7 @@ The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e. by pad
 +-----------------------+--+--+--+--+--+--+   | 
                                               | 
 +-----------------------------------------+   | 
-|                Context IV               |->(+)
+|                Common IV                |->(+)
 +-----------------------------------------+   | 
                                               | 
 +-----------------------------------------+   | 
@@ -596,7 +596,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compute the AEAD nonce by XORing the Context IV with the partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce by XORing the Common IV with the partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -622,7 +622,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-6. Compute the AEAD nonce by XORing the Context IV with the padded 'Partial IV' parameter, received in the COSE Object.
+6. Compute the AEAD nonce by XORing the Common IV with the padded 'Partial IV' parameter, received in the COSE Object.
 
 7. Decrypt the COSE object using the Recipient Key.
 
@@ -646,9 +646,9 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 3. Compute the AEAD nonce
 
-   * If Observe is not used, compute the AEAD nonce by XORing the Context IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
+   * If Observe is not used, compute the AEAD nonce by XORing the Common IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
-   * If Observe is used, compute the AEAD nonce by XORing the Context IV with the Partial IV of the response (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is used, compute the AEAD nonce by XORing the Common IV with the Partial IV of the response (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -670,9 +670,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 6. Compute the AEAD nonce
 
-      * If the Observe option is not present in the response, compute the AEAD nonce by XORing the Context IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, compute the AEAD nonce by XORing the Common IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
  
-      * If the Observe option is present in the response, compute the AEAD nonce by XORing the Context IV with the padded Partial IV parameter from the response.
+      * If the Observe option is present in the response, compute the AEAD nonce by XORing the Common IV with the padded Partial IV parameter from the response.
 
 7. Decrypt the COSE object using the Recipient Key.
 
