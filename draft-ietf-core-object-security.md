@@ -445,9 +445,9 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the Sender Sequence Number. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the Sender Sequence Number, i.e. the first byte SHALL only be zero when the Partial IV is zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
+   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). The kid SHALL be of minimum length needed to encode the Sender ID. This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
