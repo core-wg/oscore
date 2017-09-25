@@ -692,7 +692,7 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 The payload of the OSCOAP message SHALL contain the compressed COSE object which is encoded as follows:
 
 * The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object.
+    - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the auxiliary data flag, a: it is set to 1 if the compressed COSE object contains auxiliary data, see {{auxiliary-data}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
@@ -705,8 +705,6 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 
 ~~~~~~~~~~~
  0 1 2 3 4 5 6 7 
-+-+-+-+-+-+-+-+-+
-|  Flag Byte    |                       
 +-+-+-+-+-+-+-+-+
 |  n  |k|a|0 0 0|    
 +-+-+-+-+-+-+-+-+
