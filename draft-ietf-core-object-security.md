@@ -581,7 +581,7 @@ To prevent accepting replay of previously received notification responses, the c
 
 # Processing {#processing}
 
-This section describes the OSCOAP message processing. An illustration of the nonce generation used in the processing is given in {{nonce-generation}}.
+This section describes the OSCOAP message processing.
 
 ## Protecting the Request {#prot-req}
 
