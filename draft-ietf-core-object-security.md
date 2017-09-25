@@ -122,7 +122,9 @@ The Object-Security option (see {{fig-option}}) indicates that the CoAP message 
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option SHALL be empty (length zero), and the payload of the OSCOAP message is the compressed COSE object. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
+The Object-Security option SHALL be empty (length zero), and the payload of the OSCOAP message is the compressed COSE object. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+
+A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
 Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCOAP message, the processing of these fields does not expand the total message size.
 
