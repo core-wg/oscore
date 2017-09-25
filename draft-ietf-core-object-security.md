@@ -683,7 +683,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
    
 10. The decrypted CoAP response is processed according to {{RFC7252}}
 
-11. (Optional) In case any of the previous erroneous conditions apply: if the response is a CON message, then the client SHALL send an empty ACK back and stop processing the response; if the response is a NON message, then the client SHALL simply stop processing the response.
+11. (Optional) In case any of the previous erroneous conditions apply: if the response is a CON message, then the client SHALL send an empty ACK back and stop processing the response; if the response is a ACK or a NON message, then the client SHALL simply stop processing the response.
 
 # OSCOAP Compression {#compression}
 
