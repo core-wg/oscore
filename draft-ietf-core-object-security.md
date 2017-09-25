@@ -694,13 +694,13 @@ The payload of the OSCOAP message SHALL contain the compressed COSE object which
 * The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the context hint flag, a: it is set to 1 if the compressed COSE object contains a context hint, see {{auxiliary-data}}.
+    - The fifth least significant bit is the context hint flag, h: it is set to 1 if the compressed COSE object contains a context hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 * The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
 * The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
-* The following 1 byte encode the length of the context hint, s, if the auxiliary data flag is set (a = 1).
-* The following s bytes encode the context hint, if the context hint flag is set (a = 1).
+* The following 1 byte encode the length of the context hint, s, if the context hint flag is set (h = 1).
+* The following s bytes encode the context hint, if the context hint flag is set (h = 1).
 * The remaining bytes encode the ciphertext.
 
 ~~~~~~~~~~~
@@ -727,15 +727,15 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
 
-## Context Hint  {#context-hint}
+## Context Hint {#context-hint}
 
-For certain use cases, it is necessary or favorable for the sending endpoint to provide some auxiliary data in order for the receiving endpoint to retrieve the recipient context. One use case is if the same kid is used with multiple master keys, in which case some other identifier can be included as auxiliary data to enable the receiving endpoint to find the right security context. The auxiliary data is not protected, and so may be eavesdropped or manipulated in transfer. Applications need to make the appropriate security and privacy considerations of sending auxiliary data. 
+For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the sending endpoint to provide a context hint in order for the receiving endpoint to retrieve the recipient context. The context hint is implicitly integrity protected, as any manipulation leads to verification error.
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as auxiliary data.
+* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as context hint.
 
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the sender endpoint belongs to multiple groups involving the same endpoints, then a group identifier can be used as auxiliary data to enable the receiving endpoint to find the right group security context.
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, the g involving the same endpoints, then a group identifier can be used as context hint to enable the receiving endpoint to find the right group security context.
 
 ## Compression Examples
 
