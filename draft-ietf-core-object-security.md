@@ -678,8 +678,6 @@ A client receiving a response containing the Object-Security option SHALL perfor
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
 9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
-
-   * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
 10. The decrypted CoAP response is processed according to {{RFC7252}}
 
