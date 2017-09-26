@@ -113,16 +113,16 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 The Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCOAP message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| No. | C | U | N | R | Name            | Format | Length | Default | 
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| TBD | x |   |   |   | Object-Security | empty  | 0      | (none)  |
-+-----+---+---+---+---+-----------------+--------+--------+---------+
++-----+---+---+---+---+-----------------+-----------+--------+---------+
+| No. | C | U | N | R | Name            | Format    | Length | Default | 
++-----+---+---+---+---+-----------------+-----------+--------+---------+
+| TBD | x |   |   |   | Object-Security | see below | 0-255  | (none)  |
++-----+---+---+---+---+-----------------+-----------+--------+---------+
    C = Critical,  U = Unsafe,  N = NoCacheKey,  R = Repeatable   
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option SHALL be empty (length zero), and the payload of the OSCOAP message is the compressed COSE object. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option SHALL contain the OSCOAP flag byte and the Sender ID (see {{compression}}) If the flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
@@ -151,14 +151,14 @@ An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other
                    Client                   Server
                       |                       |
 Retrieve context for  | OSCOAP request:       |
- target resource      | [Token = Token1,      |
-Protect request with  |  kid = SID, ...]      |
+ target resource      |   Token = Token1,     |
+Protect request with  |   kid = SID, ...      |
   Sender Context      +---------------------->| Retrieve context with
                       |                       |  RID = kid
                       |                       | Verify request with
                       |                       |  Recipient Context
                       | OSCOAP response:      | Protect response with
-                      | [Token = Token1, ...] |  Sender Context
+                      |   Token = Token1, ... |  Sender Context
 Retrieve context with |<----------------------+
  Token = Token1       |                       |
 Verify request with   |                       |
@@ -244,14 +244,14 @@ where:
 
 ~~~~~~~~~~~ CDDL
    info = [
-       id : uint / nil,
+       id : bstr / nil,
        alg : int,
        type : tstr,
        L : uint
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV.
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are encoded as described in {{cose-object}}.
 
    * type is "Key" or "IV"
 ~~~~~~~~~~~
@@ -447,9 +447,9 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the Sender Sequence Number, i.e. the first byte SHALL only be zero when the Partial IV is zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). The kid SHALL be of minimum length needed to encode the Sender ID. This parameter SHALL be present in requests and SHALL NOT be present in responses.
+   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -457,7 +457,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed by padding the partial IV (in network byte order) with zeroes to exactly 6 bytes, padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
+The nonce is constructed by left-padding the partial IV (in network byte order) with zeroes to exactly 6 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
 
 When observe is not used, the request and the response uses the same nonce. In this way, the partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
@@ -689,32 +689,25 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCOAP, which significantly reduces the per-packet overhead.
 
-## Encoding of the OSCOAP Payload
+## Encoding of the OSCOAP Option Value
 
-The payload of the OSCOAP message SHALL contain the compressed COSE object which is encoded as follows:
+The value of the Object-Security option SHALL contain the OSCOAP flag byte and the kid parameter as follows:
 
-* The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
+~~~~~~~~~~~
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|0 0 0|h|k|  n  |    kid (if any) ...                             
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #fig-option-value title="OSCOAP Option Value" artwork-align="center"}
+
+* The first byte (the flag byte) encodes a set of flags and the length of the Partial IV parameter.
+    - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the context hint flag, h: it is set to 1 if the compressed COSE object contains a context hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
-* The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-* The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
-* The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
-* The following 1 byte encode the length of the context hint, s, if the context hint flag is set (h = 1).
-* The following s bytes encode the context hint, if the context hint flag is set (h = 1).
-* The remaining bytes encode the ciphertext.
-
-~~~~~~~~~~~
- 0 1 2 3 4 5 6 7 
-+-+-+-+-+-+-+-+-+
-|  n  |k|h|0 0 0|    
-+-+-+-+-+-+-+-+-+
-n: Partial IV length (3 bits)
-k: kid flag bit
-h: context hint flag bit
-~~~~~~~~~~~
-{: #fig-flag-byte title="Flag Byte for OSCOAP Compression" artwork-align="center"}
+* The remaining bytes encode the value of the kid, if the kid is present (k = 1)
 
 The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
 
@@ -728,6 +721,18 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 +--------------------------+-----+-----+
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCOAP header" artwork-align="center"}
+
+## Encoding of the OSCOAP Payload
+
+The payload of the OSCOAP message SHALL be encoded as follows:
+
+* The first n - 1 bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
+
+* The following 1 byte encode the length of the context hint, s, if the context hint flag is set (h = 1).
+
+* The following s bytes encode the context hint, if the context hint flag is set (h = 1).
+
+* The remaining bytes encode the ciphertext.
 
 ## Context Hint {#context-hint}
 
@@ -760,11 +765,12 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00001001 = 0x09
-
 ~~~~~~~~~~~
-0x09 05 01 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9 (18 bytes)
+Flag byte: 0b00001011 = 0x0b
+
+Option Value: 0b 25 (2 bytes)
+
+Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (without Observe)
@@ -784,11 +790,12 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00000000 = 0x00
-
 ~~~~~~~~~~~
-0x00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-(15 bytes)
+Flag byte: 0b00000000 = 0x00
+
+Option Value: (0 bytes)
+
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (with Observe)
@@ -808,11 +815,12 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00000001 = 0x01
-
 ~~~~~~~~~~~
-0x01 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-(16 bytes)
+Flag byte: 0b00000010 = 0x02
+
+Option Value: 02 (1 bytes)
+
+Payload: 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
 # Web Linking
@@ -976,15 +984,15 @@ Client  Proxy  Server
   |       |       |
   +------>|       |            Code: 0.02 (POST)
   | POST  |       |           Token: 0x8c
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:5f, Partial IV:42,
+  |       |       | Object-Security: [kid:5f]
+  |       |       |         Payload: [Partial IV:42,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}]
   |       |       |
   |       +------>|            Code: 0.02 (POST)
   |       | POST  |           Token: 0x7b
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:5f, Partial IV:42,
+  |       |       | Object-Security: [kid:5f]
+  |       |       |         Payload: [Partial IV:42,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}]
   |       |       |
@@ -1017,16 +1025,16 @@ Client  Proxy  Server
   +------>|       |            Code: 0.05 (FETCH)
   | FETCH |       |           Token: 0x83
   |       |       |         Observe: 0
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: [kid:ca]
+  |       |       |         Payload: [Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
   |       |       |
   |       +------>|            Code: 0.05 (FETCH)
   |       | FETCH |           Token: 0xbe
   |       |       |         Observe: 0
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: [kid:ca]
+  |       |       |         Payload: [Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
   |       |       |
