@@ -67,7 +67,7 @@ informative:
 
 --- abstract
 
-This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP) and HTTP, using CBOR Object Signing and Encryption (COSE).  OSCORE provides end-to-end encryption, integrity and replay protection, as well as a secure message binding. OSCORE is designed for constrained nodes and networks and can be used across intermediaries and over any layer.
+This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP) and HTTP, using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end encryption, integrity and replay protection, as well as a secure message binding. OSCORE is designed for constrained nodes and networks and can be used across intermediaries and over any layer.
 
 --- middle
 
@@ -83,15 +83,15 @@ OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providin
 
 ~~~~~~~~~~~
 Client                                          Server
-   |     OSCORE request - POST example.com:       |   
-   |       Header, Token,                         |   
-   |       Options: {Object-Security:-, ...},     |   
-   |       Payload: Compressed COSE object        |   
+   |      OSCORE request - POST example.com:      |   
+   |        Header, Token,                        |   
+   |        Options: {Object-Security, ...},      |   
+   |        Payload: Compressed COSE object       |   
    +--------------------------------------------->|   
-   |     OSCORE response - 2.04 (Changed):        |   
-   |       Header, Token,                         |   
-   |       Options: {Object-Security:-, ...},     |   
-   |       Payload: Compressed COSE object        |   
+   |      OSCORE response - 2.04 (Changed):       |   
+   |        Header, Token,                        |   
+   |        Options: {Object-Security, ...},      |   
+   |        Payload: Compressed COSE object       |   
    |<---------------------------------------------+   
    |                                              | 
 ~~~~~~~~~~~
@@ -119,11 +119,11 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 +-----+---+---+---+---+-----------------+-----------+--------+---------+
 | TBD | x |   |   |   | Object-Security | see below | 0-255  | (none)  |
 +-----+---+---+---+---+-----------------+-----------+--------+---------+
-   C = Critical,  U = Unsafe,  N = NoCacheKey,  R = Repeatable   
+     C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable          
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option SHALL contain the OSCORE flag byte and the Sender ID (see {{compression}}) If the flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option contains the OSCORE flag byte and for requests, the Sender ID (see {{compression}}). If the flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
@@ -365,7 +365,6 @@ The Outer Max-Age option is used to avoid unnecessary caching of OSCORE response
 
 Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the message for the next hop (Outer options).
 
-
 ##### Inner Block Options {#inner-block-options}
 
 The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
@@ -588,7 +587,6 @@ To prevent accepting replay of previously received notification responses, the c
 
 This section describes the OSCORE message processing.
 
-
 ## Protecting the Request {#prot-req}
 
 Given a CoAP request, the client SHALL perform the following steps to create an OSCORE request:
@@ -770,9 +768,9 @@ h'aea0155667924dff8a24e4cb35b9'
 After compression:
 
 ~~~~~~~~~~~
-Flag byte: 0b00001011 = 0x0b
+Flag byte: 0b00001010 = 0x0a
 
-Option Value: 0b 25 (2 bytes)
+Option Value: 0a 25 (2 bytes)
 
 Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
