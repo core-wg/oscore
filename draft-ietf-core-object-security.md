@@ -82,20 +82,18 @@ OSCORE is designed for constrained nodes and networks and provides an in-layer s
 OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, most options, and non-message layer header fields. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
-Client                                            Server
-   |  OSCORE request:                               |
-   |    POST example.com                            |
-   |    [Header, Token, Options: {...,              |
-   |     Object-Security:-},                        |
-   |     Payload: Compressed COSE object]           |
-   +----------------------------------------------->|
-   |  OSCORE response:                              |
-   |    2.04 (Changed)                              |
-   |    [Header, Token, Options: {...,              |
-   |     Object-Security:-},                        |
-   |     Payload: Compressed COSE object]           |
-   |<-----------------------------------------------+
-   |                                                |
+Client                                          Server
+   |     OSCORE request - POST example.com:       |   
+   |       Header, Token,                         |   
+   |       Options: {Object-Security:-, ...},     |   
+   |       Payload: Compressed COSE object        |   
+   +--------------------------------------------->|   
+   |     OSCORE response - 2.04 (Changed):        |   
+   |       Header, Token,                         |   
+   |       Options: {Object-Security:-, ...},     |   
+   |       Payload: Compressed COSE object        |   
+   |<---------------------------------------------+   
+   |                                              | 
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of OSCORE" artwork-align="center"}
 
@@ -109,23 +107,25 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
-The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Context IV are defined in {{context-definition}}.
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
 # The CoAP Object-Security Option {#option}
 
 The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| No. | C | U | N | R | Name            | Format | Length | Default | 
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| TBD | x |   |   |   | Object-Security | empty  | 0      | (none)  |
-+-----+---+---+---+---+-----------------+--------+--------+---------+
++-----+---+---+---+---+-----------------+-----------+--------+---------+
+| No. | C | U | N | R | Name            | Format    | Length | Default | 
++-----+---+---+---+---+-----------------+-----------+--------+---------+
+| TBD | x |   |   |   | Object-Security | see below | 0-255  | (none)  |
++-----+---+---+---+---+-----------------+-----------+--------+---------+
    C = Critical,  U = Unsafe,  N = NoCacheKey,  R = Repeatable   
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option SHALL be empty (length zero), and the payload of the OSCORE message is the compressed COSE object. An endpoint receiving a non-empty Object-Security option SHALL treat it as malformed and reject it. An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it. A successful response to a request with the Object-Security option SHALL contain the Object-Security option. 
+The Object-Security option SHALL contain the OSCORE flag byte and the Sender ID (see {{compression}}) If the flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+
+A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
 Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCORE message, the processing of these fields does not expand the total message size.
 
@@ -144,22 +144,22 @@ The endpoints protect messages to send using the Sender Context and verify messa
 An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}.
 
 ~~~~~~~~~~~
-               .------------.           .------------.
-               |  Common,   |           |  Common,   |
-               |  Sender,   |           |  Recipient,|
-               |  Recipient |           |  Sender    |
-               '------------'           '------------'
+              .-------------.           .-------------.
+              |  Common,    |           |  Common,    |
+              |  Sender,    |           |  Recipient, |
+              |  Recipient  |           |  Sender     |
+              '-------------'           '-------------'
                    Client                   Server
                       |                       |
 Retrieve context for  | OSCORE request:       |
- target resource      | [Token = Token1,      |
-Protect request with  |  kid = SID, ...]      |
+ target resource      |   Token = Token1,     |
+Protect request with  |   kid = SID, ...      |
   Sender Context      +---------------------->| Retrieve context with
                       |                       |  RID = kid
                       |                       | Verify request with
                       |                       |  Recipient Context
                       | OSCORE response:      | Protect response with
-                      | [Token = Token1, ...] |  Sender Context
+                      |   Token = Token1, ... |  Sender Context
 Retrieve context with |<----------------------+
  Token = Token1       |                       |
 Verify request with   |                       |
@@ -171,17 +171,17 @@ The Common Context contains the following parameters:
 
 * AEAD Algorithm (alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Context IV.
+* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Common IV.
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 * Master Salt (OPTIONAL). Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
-* Context IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Common IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Variable length byte string identifying the Sender Context. Its value is immutable once the security context is established.
+* Sender ID. Non-negative integer used to identify the Sender Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -189,13 +189,13 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Variable length byte string identifying the Recipient Context. Its value is immutable once the security context is established.
+* Recipient ID. Non-negative integer used to identify the Recipient Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Replay Window (Server only). The replay window to verify requests received.
 
-An endpoint may free up memory by not storing the Context IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 The endpoints MAY interchange the client and server roles while maintaining the same security context. When this happens, the former server still protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The same is also true for the former client. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
@@ -229,9 +229,9 @@ The following input parameters MAY be pre-established. In case any of these para
 
 All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
-### Derivation of Sender Key, Recipient Key, and Context IV 
+### Derivation of Sender Key, Recipient Key, and Common IV 
 
-The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Context IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -248,18 +248,18 @@ where:
        id : bstr / nil,
        alg : int,
        type : tstr,
-       L : int
+       L : uint
    ]
 ~~~~~~~~~~~
 ~~~~~~~~~~~
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Context IV.
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are encoded as described in {{cose-object}}.
 
    * type is "Key" or "IV"
 ~~~~~~~~~~~
 
 * L is the size of the key/IV for the AEAD algorithm used, in octets.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Context IV.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Common IV.
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
@@ -267,8 +267,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of the Sender ID is given by nonce length - 6.
-For AES-CCM-16-64-128 the maximum length of the Sender ID is 7. Note that that the empty string is a valid Sender ID and that Sender IDs of different lengths can be used with the same Common Context. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 48) - 1, For AES-CCM-16-64-128 the maximum Sender ID is 2^56 - 1. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
@@ -295,7 +294,6 @@ CoAP message fields are either Inner or Outer: Inner if the value is intended fo
 ## CoAP Payload
 
 The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus a Class E message field. The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
-
 
 ## CoAP Options {#coap-options}
 
@@ -363,7 +361,6 @@ The Inner Max-Age option is used to specify the freshness (as defined in {{RFC72
 
 The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCORE client.
 
-
 #### The Block Options {#block-options}
 
 Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the message for the next hop (Outer options).
@@ -377,7 +374,6 @@ For blockwise request operations using Block1, an endpoint MUST comply with the 
 
 For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
 
-
 ##### Outer Block Options
 
 Proxies MAY fragment an OSCORE message using {{RFC7959}}, which then introduces Outer Block options not generated by the sending endpoint. Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCORE message and verify its integrity. Therefore, applications supporting OSCORE and {{RFC7959}} MUST specify a security policy defining a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
@@ -386,7 +382,6 @@ An endpoint receiving an OSCORE message with an Outer Block option SHALL first p
 
 To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}.
 
- 
 #### Proxy-Uri
 
 Proxy-Uri, when present, is split by OSCORE into class U options and class E options, which are processed accordingly. When Proxy-Uri is used in the original CoAP message, Uri-* are not present {{RFC7252}}.
@@ -445,7 +440,7 @@ The other CoAP header fields are Unprotected (Class U). The sending endpoint SHA
 
 This section defines how to use COSE {{RFC8152}} to wrap and protect data in the original message. OSCORE uses the untagged COSE_Encrypt0 structure with an Authenticated Encryption with Additional Data (AEAD) algorithm. The key lengths, IV length, nonce length, and maximum Sender Sequence Number are algorithm dependent.
  
-The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Context IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
+The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Common IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
 We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
 
@@ -455,9 +450,9 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. The Partial IV SHALL be of minimum length needed to encode the Sender Sequence Number. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). This parameter SHALL be present in requests and SHALL NOT be present in responses.
+   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and SHALL NOT be present in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -465,22 +460,24 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed as described in Section 3.1 of {{RFC8152}}, i.e., by padding the partial IV (in network byte order) with zeroes and XORing it with the Context IV, with the following addition: The most significant bit in the first byte of the Context IV SHALL be flipped for responses, in case there is a single response (i.e., not in the case of Observe). In this way, the partial IV can be reused for the corresponding responses, which reduces the size of the response. For detailed processing instructions, see {{processing}}.
+The nonce is constructed by left-padding the partial IV (in network byte order) with zeroes to exactly 6 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
+
+When observe is not used, the request and the response uses the same nonce. In this way, the partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
 +-----------------------+--+--+--+--+--+--+
-|  ID of PIV generator  |    Partial IV   |---+ 
+|  ID of PIV generator  |   Partial IV    |---+ 
 +-----------------------+--+--+--+--+--+--+   | 
                                               | 
 +-----------------------------------------+   | 
-|                Context IV               |->(+)
+|                Common IV                |->(+)
 +-----------------------------------------+   | 
                                               | 
 +-----------------------------------------+   | 
 |                  Nonce                  |<--+ 
 +-----------------------------------------+     
 ~~~~~~~~~~~
-{: #fig-nonce title="Nonce Formation" artwork-align="center"}
+{: #fig-nonce title="AEAD Nonce Formation" artwork-align="center"}
 
 ## Plaintext {#plaintext}
 
@@ -496,7 +493,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Code       |    Class E options (if any) ...                             
+|     Code      |    Class E options (if any) ...                             
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -557,7 +554,7 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
-In the case of Observe, a client receiving an notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
+In the case of Observe, a client receiving a notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
 
 If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the partial IV and updating the replay protection data MUST be atomic.
 
@@ -589,7 +586,8 @@ To prevent accepting replay of previously received notification responses, the c
 
 # Processing {#processing}
 
-This section describes the OSCORE message processing. An illustration of the nonce generation used in the processing is given in {{nonce-generation}}.
+This section describes the OSCORE message processing.
+
 
 ## Protecting the Request {#prot-req}
 
@@ -599,7 +597,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compute the AEAD nonce by XORing the Context IV with the partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -625,7 +623,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-6. Compute the AEAD nonce by XORing the Context IV with the padded 'Partial IV' parameter, received in the COSE Object.
+6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
 7. Decrypt the COSE object using the Recipient Key.
 
@@ -649,9 +647,9 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 3. Compute the AEAD nonce
 
-   * If Observe is not used, compute the AEAD nonce by XORing the Context IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
- 
-   * If Observe is used, compute the AEAD nonce by XORing the Context IV with the Partial IV of the response (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is not used, the nonce from the request is used.
+    
+   * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -673,10 +671,10 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 6. Compute the AEAD nonce
 
-      * If the Observe option is not present in the response, compute the AEAD nonce by XORing the Context IV (with the most significant bit in the first byte flipped) with the padded Partial IV parameter from the request.
+      * If the Observe option is not present in the response, the nonce from the request is used.
  
-      * If the Observe option is present in the response, compute the AEAD nonce by XORing the Context IV with the padded Partial IV parameter from the response.
-
+      * If the Observe option is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+      
 7. Decrypt the COSE object using the Recipient Key.
 
    * If decryption fails, then go to 11.
@@ -686,92 +684,34 @@ A client receiving a response containing the Object-Security option SHALL perfor
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
 9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
-
-   * If Observe is used, replace the Observe value with the 3 least significant bytes in the corresponding Notification Number.
    
 10. The decrypted CoAP response is processed according to {{RFC7252}}
 
-11. (Optional) In case any of the previous erroneous conditions apply: if the response is a CON message, then the client SHALL send an empty ACK back and stop processing the response; if the response is a NON message, then the client SHALL simply stop processing the response.
-
-## Nonce generation examples {#nonce-generation}
-
-This section illustrates the nonce generation in the different processing steps. Assume that:
-
-* Endpoint A has the following security context parameters: Sender Key=K1, Sender IV=IV1, Sender Sequence Number=PIV1 and Recipient Key=K2, Recipient IV=IV2
-
-* Endpoint B has the following security context parameters: Sender Key=K2, Sender IV=IV2, Sender Sequence Number=PIV2 and Recipient Key=K1, Recipient IV=IV1
-
-The examples below illustrate the key and nonce used with the given parameters above.
-
-Example 1. Endpoint A as client and endpoint B as server. 
-
-* Example 1a. Ordinary request/response.
-
-    * Endpoint A sends a request, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1. 
-
-    * Endpoint B sends a response, which is verified by Endpoint A: key=K2, nonce=BF(IV2) XOR PIV1, where BF(.) means that the most significant bit in the first byte is flipped.
-
-* Example 1b. Observe.
-
-   * Endpoint A sends a request, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1. 
-
-   * Endpoint B sends a notification, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2.
-
-Example 2. Endpoint B as client and endpoint A as server. 
-
-* Example 2a. Ordinary request/response.
-
-   * Endpoint B sends a request, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2. 
-
-   * Endpoint A sends a response, which is verified by Endpoint B: key=K1, nonce=BF(IV1) XOR PIV2, where BF(.) means that the most significant bit in the first byte is flipped.
-
-* Example 2b. Observe.
-
-   * Endpoint B sends a request, which is verified by Endpoint A: key=K2, nonce=IV2 XOR PIV2. 
-
-   * Endpoint A sends a notification, which is verified by Endpoint B: key=K1, nonce=IV1 XOR PIV1.
-
-
-Remarks:
-
-* Note that endpoint A always uses key K1 for encrypting and K2 for verification, and vice versa for endpoint B. 
-
-* All examples are individually based on the assumption on the endpoints stated above - the update of the security context parameters after each operation is omitted from these examples.
-
-
+11. (Optional) In case any of the previous erroneous conditions apply: if the response is a CON message, then the client SHALL send an empty ACK back and stop processing the response; if the response is a ACK or a NON message, then the client SHALL simply stop processing the response.
 
 # OSCORE Compression {#compression}
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCORE, which significantly reduces the per-packet overhead.
 
-## Encoding of the OSCORE Payload
+## Encoding of the OSCORE Option Value
 
-The payload of the OSCORE message SHALL contain the compressed COSE object which is encoded as follows:
+The value of the Object-Security option SHALL contain the OSCORE flag byte and the kid parameter as follows:
 
-* The first byte (Flag Byte, see {{fig-flag-byte}}) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV length, n. If n = 0 then the Partial IV is not present in the compressed COSE object.
+~~~~~~~~~~~
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|0 0 0|h|k|  n  |    kid (if any) ...                             
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #fig-option-value title="OSCORE Option Value" artwork-align="center"}
+
+* The first byte (the flag byte) encodes a set of flags and the length of the Partial IV parameter.
+    - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the auxiliary data flag, a: it is set to 1 if the compressed COSE object contains auxiliary data, see {{auxiliary-data}}.
+    - The fifth least significant bit is the context hint flag, h: it is set to 1 if the compressed COSE object contains a context hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
-* The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-* The following 1 byte encodes the length of the kid, m, if the kid flag is set (k = 1). 
-* The following m bytes encode the value of the kid, if the kid flag is set (k = 1). 
-* The following 1 byte encode the length of the auxiliary data, s, if the auxiliary data flag is set (a = 1).
-* The following s bytes encode the auxiliary data, if the auxiliary data flag is set (a = 1).
-* The remaining bytes encode the ciphertext.
-
-~~~~~~~~~~~
- 0 1 2 3 4 5 6 7 
-+-+-+-+-+-+-+-+-+
-|  Flag Byte    |                       
-+-+-+-+-+-+-+-+-+
-|  n  |k|a|0 0 0|    
-+-+-+-+-+-+-+-+-+
-n: Partial IV length (3 bits)
-k: kid flag bit
-a: auxiliary data flag bit
-~~~~~~~~~~~
-{: #fig-flag-byte title="Flag Byte for OSCORE Compression" artwork-align="center"}
+* The remaining bytes encode the value of the kid, if the kid is present (k = 1)
 
 The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
 
@@ -786,16 +726,27 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in compressed OSCORE header" artwork-align="center"}
 
-## Auxiliary Data  {#auxiliary-data}
+## Encoding of the OSCORE Payload
 
-For certain use cases, it is necessary or favorable for the sending endpoint to provide some auxiliary data in order for the receiving endpoint to retrieve the recipient context. One use case is if the same 'kid' is used with multiple master keys, in which case some other identifier can be included as auxiliary data to enable the receiving endpoint to find the right security context. The auxiliary data is not protected, and so may be eavesdropped or manipulated in transfer. Applications need to make the appropriate security and privacy considerations of sending auxiliary data. 
+The payload of the OSCORE message SHALL be encoded as follows:
+
+* The first n - 1 bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
+
+* The following 1 byte encode the length of the context hint, s, if the context hint flag is set (h = 1).
+
+* The following s bytes encode the context hint, if the context hint flag is set (h = 1).
+
+* The remaining bytes encode the ciphertext.
+
+## Context Hint {#context-hint}
+
+For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the sending endpoint to provide a context hint in order for the receiving endpoint to retrieve the recipient context. The context hint is implicitly integrity protected, as any manipulation leads to verification error.
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used to retrive or establish the security context, then that identifier can be used as auxiliary data.
+* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as context hint.
 
-* In case of a group communication scenario (e.g., {{I-D.tiloca-core-multicast-oscoap}}), if the sender endpoint belongs to multiple groups involving the same endpoints, then a group identifier can be used as auxiliary data to enable the receiving endpoint to find the right group security context.
-
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, the g involving the same endpoints, then a group identifier can be used as context hint to enable the receiving endpoint to find the right group security context.
 
 ## Compression Examples
 
@@ -818,11 +769,37 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00001001 = 0x09
+~~~~~~~~~~~
+Flag byte: 0b00001011 = 0x0b
+
+Option Value: 0b 25 (2 bytes)
+
+Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+~~~~~~~~~~~
+
+### Example: Request 2
+
+Before compression:
 
 ~~~~~~~~~~~
-0x09 05 01 25 ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9 (18 bytes)
+[
+h'',
+{ 4:h'00', 6:h'00' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+
+0x83 40 a2 04 41 00 06 41 00 4e ae a0 15 56 67 92
+4d ff 8a 24 e4 cb 35 b9 (24 bytes)
+~~~~~~~~~~~
+
+After compression:
+
+~~~~~~~~~~~
+Flag byte: 0b00001001 = 0x09
+
+Option Value: 09 (1 bytes)
+
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (without Observe)
@@ -842,11 +819,12 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00000000 = 0x00
-
 ~~~~~~~~~~~
-0x00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-(15 bytes)
+Flag byte: 0b00000000 = 0x00
+
+Option Value: (0 bytes)
+
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (with Observe)
@@ -866,11 +844,12 @@ h'aea0155667924dff8a24e4cb35b9'
 
 After compression:
 
-First byte: 0b00000001 = 0x01
-
 ~~~~~~~~~~~
-0x01 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9
-(16 bytes)
+Flag byte: 0b00000010 = 0x02
+
+Option Value: 02 (1 bytes)
+
+Payload: 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
 # Web Linking
@@ -1077,15 +1056,15 @@ Client  Proxy  Server
   |       |       |
   +------>|       |            Code: 0.02 (POST)
   | POST  |       |           Token: 0x8c
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:5f, Partial IV:42,
+  |       |       | Object-Security: [kid:5f]
+  |       |       |         Payload: [Partial IV:42,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}]
   |       |       |
   |       +------>|            Code: 0.02 (POST)
   |       | POST  |           Token: 0x7b
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:5f, Partial IV:42,
+  |       |       | Object-Security: [kid:5f]
+  |       |       |         Payload: [Partial IV:42,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}]
   |       |       |
@@ -1118,16 +1097,16 @@ Client  Proxy  Server
   +------>|       |            Code: 0.05 (FETCH)
   | FETCH |       |           Token: 0x83
   |       |       |         Observe: 0
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: [kid:ca]
+  |       |       |         Payload: [Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
   |       |       |
   |       +------>|            Code: 0.05 (FETCH)
   |       | FETCH |           Token: 0xbe
   |       |       |         Observe: 0
-  |       |       | Object-Security: -
-  |       |       |         Payload: [kid:ca, Partial IV:15,
+  |       |       | Object-Security: [kid:ca]
+  |       |       |         Payload: [Partial IV:15,
   |       |       |                  {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}]
   |       |       |
