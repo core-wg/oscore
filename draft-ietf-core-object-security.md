@@ -773,6 +773,31 @@ Option Value: 0b 25 (2 bytes)
 Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
+### Example: Request 2
+
+Before compression:
+
+~~~~~~~~~~~
+[
+h'',
+{ 4:h'00', 6:h'00' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+
+0x83 40 a2 04 41 00 06 41 00 4e ae a0 15 56 67 92
+4d ff 8a 24 e4 cb 35 b9 (24 bytes)
+~~~~~~~~~~~
+
+After compression:
+
+~~~~~~~~~~~
+Flag byte: 0b00001001 = 0x09
+
+Option Value: 09 (1 bytes)
+
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+~~~~~~~~~~~
+
 ### Example: Response (without Observe)
 
 Before compression:
