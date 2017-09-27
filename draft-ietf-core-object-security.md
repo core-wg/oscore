@@ -744,7 +744,7 @@ Examples:
 
 * If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as context hint.
 
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, the g involving the same endpoints, then a group identifier can be used as context hint to enable the receiving endpoint to find the right group security context.
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, involving the same endpoints, then a group identifier can be used as context hint to enable the receiving endpoint to find the right group security context.
 
 ## Compression Examples
 
