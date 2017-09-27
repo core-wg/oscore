@@ -888,7 +888,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 ~~~~~~~~~~~
 [HTTP request -- Before object security processing]
 
-  GET http://proxy.local/hc/??arget_uri=coap://device.local/orders HTTP/1.1
+  GET http://proxy.local/hc/?target_uri=coap://device.local/orders HTTP/1.1
  
 [HTTP request -- HTTP Client to Proxy]
 
@@ -931,12 +931,12 @@ Example:
 ~~~~~~~~~~~
 [CoAP request -- Before object security processing]
 
-  GET coap://proxy.local/ch
+  GET coap://proxy.local/
   Proxy-Uri=http://device.local/orders
 
 [CoAP request -- CoAP Client to Proxy]
 
-  POST coap://proxy.local/ch
+  POST coap://proxy.local/
   Proxy-Uri=http://device.local/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
