@@ -894,13 +894,13 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP request -- HTTP Client to Proxy]
 
   POST http://proxy.local/hc/?coap://device.local/ HTTP/1.1
-  Object-Security: [empty]
+  Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
 [CoAP request -- Proxy to CoAP Server]
 
   POST coap://device.local/
-  Object-Security: [empty]
+  Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [CoAP response -- CoAP Server to Proxy]
@@ -940,14 +940,14 @@ Example:
 
   POST /
   Uri-Host: proxy.local
-  Object-Security: [empty]
+  Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP request -- Proxy to HTTP Server]
 
   POST /hc/coap://device.local/ HTTP/1.1
   Host: device.local
-  Object-Security: [empty]
+  Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP response -- HTTP Server to Proxy]
