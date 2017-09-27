@@ -705,7 +705,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte and t
 {: #fig-option-value title="OSCORE Option Value" artwork-align="center"}
 
 * The first byte (the flag byte) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object.
+    - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the context hint flag, h: it is set to 1 if the compressed COSE object contains a context hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
