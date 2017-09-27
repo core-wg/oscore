@@ -931,20 +931,19 @@ Example:
 ~~~~~~~~~~~
 [CoAP request -- Before object security processing]
 
-  GET /hc/http://device.local/orders
-  Uri-Host: proxy.local
+  GET coap://proxy.local/ch
+  Proxy-Uri=http://device.local/orders
 
 [CoAP request -- CoAP Client to Proxy]
 
-  POST /
-  Uri-Host: proxy.local
+  POST coap://proxy.local/ch
+  Proxy-Uri=http://device.local/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP request -- Proxy to HTTP Server]
 
-  POST /hc/coap://device.local/ HTTP/1.1
-  Host: device.local
+  POST http://device.local/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
