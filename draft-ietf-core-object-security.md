@@ -883,23 +883,23 @@ The presence of the Object-Security option, both in requests and responses, is e
 
 Example:
 
-~~~~~~~~~~~
-[HTTP request -- Before object security processing]
+Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC8075}}).
 
-  GET /hc/coap://device.local/orders HTTP/1.1
-  Host: proxy.local
+~~~~~~~~~~~
+[HTTP request -- Before object security processing ]
+
+  GET http://proxy.local/hc/?coap://device.local/orders HTTP/1.1
+ 
 
 [HTTP request -- HTTP Client to Proxy]
 
-  POST /hc/coap://device.local/ HTTP/1.1
-  Host: proxy.local
+  POST http://proxy.local/hc/?coap://device.local/ HTTP/1.1
   Object-Security: [empty]
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
 [CoAP request -- Proxy to CoAP Server]
 
-  POST /
-  Uri-Host: device.local
+  POST coap://device.local/
   Object-Security: [empty]
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
@@ -921,7 +921,7 @@ Example:
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
 
-Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), encrypted within the compressed COSE object carried in the Body of the HTTP response.
+Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), which was encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
 
 ## CoAP-to-HTTP Translation Proxy 
