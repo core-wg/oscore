@@ -267,7 +267,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 48) - 1, For AES-CCM-16-64-128 the maximum Sender ID is 2^56 - 1. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 40) - 1, For AES-CCM-16-64-128 the maximum Sender ID is 2^64 - 1. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
 
@@ -459,14 +459,14 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed by left-padding the partial IV (in network byte order) with zeroes to exactly 6 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
+The nonce is constructed by left-padding the partial IV (in network byte order) with zeroes to exactly 5 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 5 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
 
 When observe is not used, the request and the response uses the same nonce. In this way, the partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
-+-----------------------+--+--+--+--+--+--+
-|  ID of PIV generator  |   Partial IV    |---+ 
-+-----------------------+--+--+--+--+--+--+   | 
++--------------------------+--+--+--+--+--+
+|    ID of PIV generator   |  Partial IV  |---+ 
++--------------------------+--+--+--+--+--+   | 
                                               | 
 +-----------------------------------------+   | 
 |                Common IV                |->(+)
