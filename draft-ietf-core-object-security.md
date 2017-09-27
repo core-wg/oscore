@@ -886,14 +886,14 @@ Example:
 Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC8075}}).
 
 ~~~~~~~~~~~
-[HTTP request -- Before object security processing ]
+[HTTP request -- Before object security processing]
 
-  GET http://proxy.local/hc/?coap://device.local/orders HTTP/1.1
+  GET http://proxy.local/hc/?target_uri=coap://device.local/orders HTTP/1.1
  
 
 [HTTP request -- HTTP Client to Proxy]
 
-  POST http://proxy.local/hc/?coap://device.local/ HTTP/1.1
+  POST http://proxy.local/hc/?target_uri=coap://device.local/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
