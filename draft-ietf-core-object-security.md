@@ -307,7 +307,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 |  3 | Uri-Host       |   |   | x |
 |  4 | ETag           | x |   |   |
 |  5 | If-None-Match  | x |   |   |
-|  6 | Observe        |   | * | * |
+|  6 | Observe        |   |   | * |
 |  7 | Uri-Port       |   |   | x |
 |  8 | Location-Path  | x |   |   |
 | 11 | Uri-Path       | x |   |   |
@@ -331,9 +331,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be of class E (and no special processing).
-
-Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
+Unknown CoAP options SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
 ### Inner Options {#inner-options}
 
