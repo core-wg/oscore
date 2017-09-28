@@ -67,19 +67,19 @@ informative:
 
 --- abstract
 
-This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP) and HTTP, using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end encryption, integrity and replay protection, as well as a secure message binding. OSCORE is designed for constrained nodes and networks and can be used across intermediaries and over any layer.
+This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP), using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end encryption, integrity and replay protection, as well as a secure message binding. OSCORE is designed for constrained nodes and networks and can be used over any layer and across intermediaries, and also with HTTP. OSCORE may be used to protect group communications as is specified in a separate draft.
 
 --- middle
 
 # Introduction {#intro}
 
-The Constrained Application Protocol (CoAP) is a web application protocol, designed for constrained nodes and networks {{RFC7228}}. CoAP specifies the use of proxies for scalability and efficiency, and a mapping to HTTP is also specified {{RFC8075}}. At the same time CoAP {{RFC7252}} references DTLS {{RFC6347}} for security. CoAP and HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of the message payload and metadata, in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
+The Constrained Application Protocol (CoAP) is a web application protocol, designed for constrained nodes and networks {{RFC7228}}. CoAP specifies the use of proxies for scalability and efficiency, and a mapping to HTTP is also specified {{RFC8075}}. CoAP {{RFC7252}} references DTLS {{RFC6347}} for security. CoAP and HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of the message payload and metadata, in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
 This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}} and Blockwise {{RFC7959}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE protects the Request/Response layer only, and not the CoAP Messaging Layer (Section 2 of {{RFC7252}}). Therefore, all the CoAP messages mentioned in this document refer to non-empty CON, NON, and ACK messages. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of Messaging Layer, OSCORE can be applied to both unreliable and reliable transports. 
 
 OSCORE is designed for constrained nodes and networks and provides an in-layer security protocol that does not depend on underlying layers. OSCORE can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). An extension of OSCORE may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
-OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, most options, and non-message layer header fields. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are added, see {{fig-sketch}}.
+OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{proxy-operations}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are added, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                          Server
@@ -95,7 +95,7 @@ Client                                          Server
    |<---------------------------------------------+   
    |                                              | 
 ~~~~~~~~~~~
-{: #fig-sketch title="Sketch of OSCORE" artwork-align="center"}
+{: #fig-sketch title="Sketch of OSCORE with CoAP" artwork-align="center"}
 
 OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with hop-by-hop protection of the Messaging Layer, during transport between end-point and intermediary node. Examples of the use of OSCORE are given in {{examples}}.
 
@@ -139,9 +139,9 @@ OSCORE requires that client and server establish a shared security context used 
 
 The security context is the set of information elements necessary to carry out the cryptographic operations in OSCORE. For each endpoint, the security context is composed of a "Common Context", a "Sender Context", and a "Recipient Context".
 
-The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Clients need to be able to retrieve the correct security context to use.
+The endpoints protect messages to send using the Sender Context and verify messages received using the Recipient Context, both contexts being derived from the Common Context and other data. Clients and Servers need to be able to retrieve the correct security context to use. 
 
-An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}.
+An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}. 
 
 ~~~~~~~~~~~
               .-------------.           .-------------.
@@ -171,7 +171,7 @@ The Common Context contains the following parameters:
 
 * AEAD Algorithm (alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
-* Key Derivation Function. The HMAC based HKDF used to derive Sender Key, Recipient Key, and Common IV.
+* Key Derivation Function. The HMAC based HKDF {{RFC5869}} used to derive Sender Key, Recipient Key, and Common IV.
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
@@ -213,7 +213,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * AEAD Algorithm (alg)
 
-   - Default is AES-CCM-16-64-128 (COSE abbreviation: 10)
+   - Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
 
 * Master Salt
 
@@ -251,13 +251,13 @@ where:
        L : uint
    ]
 ~~~~~~~~~~~
-~~~~~~~~~~~
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are encoded as described in {{cose-object}}.
+where:
+
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are encoded as described in {{cose-object}}
 
    * type is "Key" or "IV"
-~~~~~~~~~~~
 
-* L is the size of the key/IV for the AEAD algorithm used, in octets.
+   * L is the size of the key/IV for the AEAD algorithm used, in octets
 
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Common IV.
 
@@ -269,13 +269,13 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 40) - 1, For AES-CCM-16-64-128 the maximum Sender ID is 2^64 - 1. If Sender ID uniqueness cannot be guaranteed, random Sender IDs MUST be used. Random Sender IDs MUST be long enough so that the probability of collisions is negligible.
 
-To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint.
+To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a Context Hint {{context-hint}} to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
 # Protected Message Fields {#protected-fields} 
 
-OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{proxy-operations}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between the client and server (in any direction).  
+OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{proxy-operations}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
 
 The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular leg in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{proxy-operations}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
@@ -287,17 +287,17 @@ Message fields of the CoAP message may be protected end-to-end between CoAP clie
 
 The sending endpoint SHALL transfer Class E message fields in the ciphertext of the COSE object in the OSCORE message. The sending endpoint SHALL include Class I message fields in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields SHALL NOT be protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCORE message which is visible to proxies.
 
-Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner". Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer".
+Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner" (Class E). Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer" (Class I or U). 
 
 CoAP message fields are either Inner or Outer: Inner if the value is intended for the destination endpoint, Outer if the value is intended for a proxy. An OSCORE message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner and Outer message fields are processed independently.
 
 ## CoAP Payload
 
-The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus a Class E message field. The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
+The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field. The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may be both Inner and Outer, are denoted by '*'.
+A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may have both Inner and Outer message fields, are labelled with asterisks.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+---+
@@ -331,25 +331,28 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be of class E.
+Unless specified otherwise, CoAP options not listed in {{fig-option-protection}} SHALL be of class E (and no special processing).
 
 Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
 ### Inner Options {#inner-options}
 
-When using OSCORE, Inner options (marked with 'x' in column E of {{fig-option-protection}}) are sent in a way analogous to communicating in a protected manner directly with the other endpoint.
+When using OSCORE, Inner option message fields (marked in column E of {{fig-option-protection}}) are sent in a way analogous to communicating in a protected manner directly with the other endpoint.
 
-The sending endpoint SHALL write the class E options present in the original CoAP message into the plaintext of the COSE object {{plaintext}}, and then remove the class E options from the OSCORE message. 
+The sending endpoint SHALL write the Inner option message fields present in the original CoAP message into the plaintext of the COSE object {{plaintext}}, and then remove the Inner option message fields from the OSCORE message. 
 
-The processing of Inner options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
+The processing of Inner option message fields by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
 ### Outer Options {#outer-options}
 
-Outer options (marked with 'x' in column U or I of {{fig-option-protection}}) are used to support proxy operations. 
+Outer option message fields (marked in column U or I of {{fig-option-protection}}) are used to support proxy operations. 
 
-The sending endpoint SHALL include the class U and class I options present in the original message to the options part of the OSCORE message. Class I options (marked with 'x' in column I of {{fig-option-protection}}) SHALL be integrity protected between the endpoints as specified in {{AAD}}. All Outer options, including the Object-Security option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included outer option value. 
+The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including Object-Security, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Outer option message field. 
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
+
+A default procedure for integrity-protection-only of option message fields is specified in {{AAD}}. Non-special Class I options (marked with 'x' in column I of {{fig-option-protection}}) are designated for this procedure. Note: there are currently no non-special class I options defined.
+
 
 ### Special Options
 
@@ -401,7 +404,7 @@ During OSCORE processing, Proxy-Uri is split into:
 
 * Proxy-Scheme = "coap"
 * Uri-Host = "example.com"
-* Uri-Port = "5683"
+* Uri-Port = "5683"   
 * Uri-Path = "resource"
 * Uri-Query = "q=1"
 
@@ -409,7 +412,7 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 * Proxy-Uri = "coap://example.com"
 
-See Section 6.1 of {{RFC7252}} for more information.
+See Section 6.1 and 12.6 of {{RFC7252}} for more information.
 
 #### Observe {#observe}
 
@@ -417,7 +420,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for an OSCORE-unaware proxy to support forwarding of Observe messages ({{RFC7641}}), there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
-To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
+To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
 If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the Observe option value.
 
@@ -429,7 +432,7 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. The exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH allows all OSCORE messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. This exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH allows all OSCORE messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -707,7 +710,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte and t
 * The first byte (the flag byte) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the context hint flag, h: it is set to 1 if the compressed COSE object contains a context hint, see {{context-hint}}.
+    - The fifth least significant bit is the Context Hint flag, h: it is set to 1 if the compressed COSE object contains a Context Hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1)
 
@@ -730,21 +733,21 @@ The payload of the OSCORE message SHALL be encoded as follows:
 
 * The first n - 1 bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the context hint, s, if the context hint flag is set (h = 1).
+* The following 1 byte encode the length of the Context Hint, s, if the Context Hint flag is set (h = 1).
 
-* The following s bytes encode the context hint, if the context hint flag is set (h = 1).
+* The following s bytes encode the Context Hint, if the Context Hint flag is set (h = 1).
 
 * The remaining bytes encode the ciphertext.
 
 ## Context Hint {#context-hint}
 
-For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the sending endpoint to provide a context hint in order for the receiving endpoint to retrieve the recipient context. The context hint is implicitly integrity protected, as any manipulation leads to verification error.
+For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the sending endpoint to provide a Context Hint in order for the receiving endpoint to retrieve the recipient context. The Context Hint is implicitly integrity protected, as a manipulation leads to the wrong or no context being retrieved resulting in a verification error.
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as context hint.
+* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as Context Hint.
 
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, involving the same endpoints, then a group identifier can be used as context hint to enable the receiving endpoint to find the right group security context.
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, involving the same endpoints, then a group identifier can be used as Context Hint to enable the receiving endpoint to find the right group security context.
 
 ## Compression Examples
 
