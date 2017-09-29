@@ -510,7 +510,6 @@ The external_aad SHALL be a CBOR array as defined below:
 external_aad = [
    version : uint,
    options : bstr,
-   alg : int,
    request_kid : bstr,
    request_piv : bstr
 ]
