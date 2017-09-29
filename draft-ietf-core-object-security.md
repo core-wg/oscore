@@ -79,7 +79,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 
 OSCORE is designed for constrained nodes and networks and provides an in-layer security protocol that does not depend on underlying layers. OSCORE can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). An extension of OSCORE may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
-OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{proxy-operations}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are included, see {{fig-sketch}}.
+OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are included, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                          Server
@@ -360,7 +360,7 @@ Some options require special processing, marked with an asterisk ('*') in {{fig-
 
 The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCORE client.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. Non-Observe responses do not need to include a Max-Age option since they are non-cacheable by OSCORE construction (see {{coap-header}}). The Outer Max-Age option value SHALL be discarded by the OSCORE client.
 
 #### The Block Options {#block-options}
 
@@ -524,9 +524,9 @@ where:
 
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
-- request_kid: contains the value of the 'kid' in the COSE object of the request (see Section 5).
+- request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
-- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see Section 5).
+- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
@@ -690,11 +690,11 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 # OSCORE Compression {#compression}
 
-The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCORE called the "compressed COSE object", which significantly reduces the per-packet overhead. The compressed COSE object is divided in two parts, part 1 carried in the Object-Security option and part 2 in the payload of the OSCORE message, as described below.
+The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a simple stateless compression mechanism for OSCORE called the "compressed COSE object", which significantly reduces the per-packet overhead.
 
-## Encoding of the Object-Security Value
+## Encoding of the Object-Security Value {#obj-sec-value}
 
-The value of the Object-Security option SHALL contain part 1 of the compressed COSE object: the OSCORE flag byte and the kid parameter as follows:
+The value of the Object-Security option SHALL contain the OSCORE flag byte and the kid parameter as follows:
 
 ~~~~~~~~~~~
  0                   1                   2                   3
@@ -725,9 +725,9 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 ~~~~~~~~~~~
 {: #fig-byte-flag title="Presence of data fields in OSCORE flag byte" artwork-align="center"}
 
-## Encoding of the OSCORE Payload
+## Encoding of the OSCORE Payload {#oscore-payl}
 
-The payload of the OSCORE message contains part 2 of the compressed COSE object which SHALL be encoded as follows:
+The payload of the OSCORE message SHALL be encoded as follows:
 
 * The first n - 1 bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
@@ -875,12 +875,12 @@ Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
-## HTTP-to-CoAP Translation Proxy
+## HTTP-to-CoAP Translation Proxy {#http2coap}
 
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
 As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is part 1 of the compressed COSE Object {{compression}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding). The value of the payload is part 2 of the compressed COSE object, also base64url-encoded without padding. 
+The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is the value of the Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding). The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
 
 Example:
 
@@ -923,7 +923,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
 Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), which was encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
-## CoAP-to-HTTP Translation Proxy 
+## CoAP-to-HTTP Translation Proxy  {#coap2http}
 
 Section 10.1 of {{RFC7252}} describes the behavior of a CoAP-to-HTTP proxy.  RFC 8075 {{RFC8075}} does not cover this direction in any more detail and so an example instantiation of Section 10.1 of {{RFC7252}} is used below.
 
