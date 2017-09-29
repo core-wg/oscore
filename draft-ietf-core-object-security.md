@@ -185,7 +185,7 @@ The Sender Context contains the following parameters:
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
-* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as partial IV {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
+* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as "Partial IV" {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
 The Recipient Context contains the following parameters:
 
@@ -349,22 +349,26 @@ The sending endpoint SHALL include the Outer option message field present in the
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
-A default procedure for integrity-protection-only of option message fields is specified in {{AAD}}. Non-special Class I options (marked with 'x' in column I of {{fig-option-protection}}) are designated for this procedure. Note: there are currently no non-special class I options defined.
+A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. 
+
+Note: There are currently no Class I option message fields defined.
 
 
 ### Special Options
 
-Some options require special processing, marked with an asterisk ('*') in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be added as an Inner and/or Outer message by the sending endpoint; the processing is specified in this section.
+Some options require special processing, marked with an asterisk '*' in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be added as an Inner and/or Outer message by the sending endpoint; the processing is specified in this section.
 
 #### Max-Age {#max-age}
 
 The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. Non-Observe OSCORE responses do not need to include a Max-Age option since they are non-cacheable by construction (see {{coap-header}}). The Outer Max-Age option value SHALL be discarded by the OSCORE client.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) which is then processed according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCORE client.
+
+Non-Observe OSCORE responses do not need to include a Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the OSCORE message for the next hop (Outer options). Inner and outer block processing may have different performance properties depending on the underlying transport. The integrity of the message can be verified end-to-end both in case of Inner and Outer Block is used provided all blocks are received (see {{outer-block-options}}).
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the OSCORE message for the next hop (Outer options). Inner and Outer block processing may have different performance properties depending on the underlying transport. The integrity of the message can be verified end-to-end both in case of Inner and Outer Blockwise provided all blocks are received (see {{outer-block-options}}).
 
 
 ##### Inner Block Options {#inner-block-options}
@@ -419,7 +423,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 In order for an OSCORE-unaware proxy to support forwarding of Observe messages ({{RFC7641}}), there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
-To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
+To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration, see {{replay-protection}}. The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
 If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. The client MAY ignore the Observe option value.
 
@@ -461,9 +465,9 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed by left-padding the partial IV (in network byte order) with zeroes to exactly 5 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 5 bytes, concatenating the padded partial IV with the padded ID, and then XORing with the Common IV.
+The nonce is constructed by left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 5 bytes, concatenating the padded Partial IV with the padded ID, and then XORing with the Common IV.
 
-When observe is not used, the request and the response uses the same nonce. In this way, the partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
+When observe is not used, the request and the response uses the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
 +--------------------------+--+--+--+--+--+
@@ -533,7 +537,7 @@ where:
 
 ## Message Binding
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the request by including the request's ID (Sender ID or Recipient ID) and partial IV in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and partial IV until all responses have been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the request by including the request's ID (Sender ID or Recipient ID) and Partial IV in the AAD of the response. The server therefore needs to store the request's ID (Sender ID or Recipient ID) and Partial IV until all responses have been sent.
 
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
@@ -557,7 +561,7 @@ Responses to non-Observe requests are protected against replay as they are crypt
 
 In the case of Observe, a client receiving a notification SHALL verify that the Partial IV of a received notification is greater than the Notification Number bound to that Observe registration. If the verification fails, the client SHALL stop processing the response, and in the case of CON respond with an empty ACK. If the verification succeeds, the client SHALL overwrite the corresponding Notification Number with the received Partial IV. 
 
-If messages are processed concurrently, the partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the partial IV and updating the replay protection data MUST be atomic.
+If messages are processed concurrently, the Partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
 
 ## Losing Part of the Context State {#context-state}
 
@@ -577,7 +581,7 @@ To prevent reuse of Sender Sequence Numbers, a node MAY perform the following pr
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness and uses that to synchronize the replay window. If the server can verify the fresh request, the partial IV in the fresh request is set as the lower limit of the replay window.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server uses the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness and uses that to synchronize the replay window. If the server can verify the fresh request, the Partial IV in the fresh request is set as the lower limit of the replay window.
 
 ### Replay Protection of Observe Notifications
 
@@ -597,7 +601,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -611,7 +615,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
 
-2. Discard the message Code and all Outer options of Class non I and non U from the message. For example, If-Match Outer option is discarded, Uri-Host Outer option is not discarded.
+2. Discard the message Code and all non-special Inner option message fields (marked with 'x' in column E of {{fig-option-protection}}) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
 3. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If the request is a CON message, and:
 
@@ -631,7 +635,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Content-Format Inner and a Content-Format Outer option. The Outer Content-Format is discarded.
+8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
 9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
 
@@ -649,7 +653,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
    * If Observe is not used, the nonce from the request is used.
     
-   * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -661,7 +665,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received, see {{block-options}}.
 
-2. Discard the message Code and all Outer options of Class non I and non U from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
+2. Discard the message Code and all non-special Class E options from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
@@ -744,7 +748,7 @@ For certain use cases, e.g. deployments where the same Recipient ID is used with
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used to retrieve or establish the security context, then that identifier can be used as Context Hint.
+* If the sending endpoint has an identifier in some other namespace which can be used by the recipient endpoint to retrieve or establish the security context, then that identifier can be used as Context Hint.
 
 * In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, involving the same endpoints, then a group identifier can be used as Context Hint to enable the receiving endpoint to find the right group security context.
 
@@ -868,7 +872,7 @@ This section describes the operations of OSCORE-aware proxies.
 
 OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies provide certain simplifications as specified in this section. 
 
-The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. A OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
+The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
@@ -926,7 +930,7 @@ Note that the HTTP Status Code 200 in the next-to-last message is the mapping of
 
 ## CoAP-to-HTTP Translation Proxy  {#coap2http}
 
-Section 10.1 of {{RFC7252}} describes the behavior of a CoAP-to-HTTP proxy.  RFC 8075 {{RFC8075}} does not cover this direction in any more detail and so an example instantiation of Section 10.1 of {{RFC7252}} is used below.
+Section 10.1 of {{RFC7252}} describes the behavior of a CoAP-to-HTTP proxy.  RFC 8075 {{RFC8075}} does not cover this direction in any more detail and so an example instantiation of Section 10.1 of {{RFC7252}} is used below. 
 
 Example:
 
@@ -979,7 +983,7 @@ The use of COSE to protect messages as specified in this document requires an es
 
 Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit. The compression mechanism ({{compression}}) assumes that the partial IV is 40 bits or less. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit. The compression mechanism ({{compression}}) assumes that the Partial IV is 40 bits or less. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
 The inner block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
@@ -993,7 +997,7 @@ CoAP headers sent in plaintext allow for example matching of CON and ACK (CoAP M
 
 Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
-The length of message fields can reveal information about the message. Applications may use a padding scheme to protect against traffic analysis. As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms. Some information can be determined even from looking at boundary conditions. An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length. For example, using 0 and 1 instead of 'yes' and 'no'. 2) Use a character which is not part of the responses to pad to a fixed length. For example, pad with a space to three characters. 3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m. For example, appending a 0 to "YES" and two 1's to "NO". This style of padding means that all values need to be padded.
+The length of message fields can reveal information about the message. Applications may use a padding scheme to protect against traffic analysis. As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms. Some information can be determined even from looking at boundary conditions. An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length. For example, using 0 and 1 instead of 'yes' and 'no'. 2) Use a character which is not part of the responses to pad to a fixed length. For example, pad with a space to three characters. 3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m. For example, appending a 0 to "YES" and two 1's to "NO". This style of padding means that all values need to be padded. Similar arguments apply to other message fields such as resource names.
 
 # IANA Considerations
 
