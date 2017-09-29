@@ -520,13 +520,13 @@ where:
 
 - version: contains the OSCORE version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
 
-- options: contains the (non-special) Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
-
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
 - request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
+
+- options: contains the (non-special) Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
