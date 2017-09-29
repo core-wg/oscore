@@ -894,17 +894,17 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 ~~~~~~~~~~~
 [HTTP request -- Before object security processing]
 
-  GET http://proxy.url/hc/?target_uri=coap://device.url/orders HTTP/1.1
+  GET http://proxy.url/hc/?target_uri=coap://server.url/orders HTTP/1.1
  
 [HTTP request -- HTTP Client to Proxy]
 
-  POST http://proxy.url/hc/?target_uri=coap://device.url/ HTTP/1.1
+  POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
 [CoAP request -- Proxy to CoAP Server]
 
-  POST coap://device.url/
+  POST coap://server.url/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
@@ -938,18 +938,18 @@ Example:
 [CoAP request -- Before object security processing]
 
   GET coap://proxy.url/
-  Proxy-Uri=http://device.url/orders
+  Proxy-Uri=http://server.url/orders
 
 [CoAP request -- CoAP Client to Proxy]
 
   POST coap://proxy.url/
-  Proxy-Uri=http://device.url/
+  Proxy-Uri=http://server.url/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP request -- Proxy to HTTP Server]
 
-  POST http://device.url/ HTTP/1.1
+  POST http://server.url/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
