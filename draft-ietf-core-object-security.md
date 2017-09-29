@@ -360,7 +360,7 @@ Some options require special processing, marked with an asterisk ('*') in {{fig-
 
 The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. Non-Observe responses do not need to include a Max-Age option since they are non-cacheable by OSCORE construction (see {{coap-header}}). The Outer Max-Age option value SHALL be discarded by the OSCORE client.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) and process it according to {{outer-options}}. Non-Observe OSCORE responses do not need to include a Max-Age option since they are non-cacheable by construction (see {{coap-header}}). The Outer Max-Age option value SHALL be discarded by the OSCORE client.
 
 #### The Block Options {#block-options}
 
