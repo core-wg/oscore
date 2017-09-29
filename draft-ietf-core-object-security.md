@@ -435,7 +435,7 @@ Most CoAP header fields are required to be read and/or changed by CoAP proxies a
 
 The CoAP header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. This exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH allows all OSCORE messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. This exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -894,17 +894,17 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 ~~~~~~~~~~~
 [HTTP request -- Before object security processing]
 
-  GET http://proxy.local/hc/?target_uri=coap://device.local/orders HTTP/1.1
+  GET http://proxy.url/hc/?target_uri=coap://device.url/orders HTTP/1.1
  
 [HTTP request -- HTTP Client to Proxy]
 
-  POST http://proxy.local/hc/?target_uri=coap://device.local/ HTTP/1.1
+  POST http://proxy.url/hc/?target_uri=coap://device.url/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
 [CoAP request -- Proxy to CoAP Server]
 
-  POST coap://device.local/
+  POST coap://device.url/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
@@ -937,19 +937,19 @@ Example:
 ~~~~~~~~~~~
 [CoAP request -- Before object security processing]
 
-  GET coap://proxy.local/
-  Proxy-Uri=http://device.local/orders
+  GET coap://proxy.url/
+  Proxy-Uri=http://device.url/orders
 
 [CoAP request -- CoAP Client to Proxy]
 
-  POST coap://proxy.local/
-  Proxy-Uri=http://device.local/
+  POST coap://proxy.url/
+  Proxy-Uri=http://device.url/
   Object-Security: 0b 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP request -- Proxy to HTTP Server]
 
-  POST http://device.local/ HTTP/1.1
+  POST http://device.url/ HTTP/1.1
   Object-Security: 0b 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
