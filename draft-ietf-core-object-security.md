@@ -744,13 +744,13 @@ The payload of the OSCORE message SHALL be encoded as follows:
 
 ## Context Hint {#context-hint}
 
-For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the sending endpoint to provide a Context Hint in order for the receiving endpoint to retrieve the recipient context. The Context Hint is implicitly integrity protected, as a manipulation leads to the wrong or no context being retrieved resulting in a verification error.
+For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the client to provide a Context Hint in order for the server to retrieve the Recipient Context. The Context Hint is implicitly integrity protected, as manipulation leads to the wrong or no context being retrieved resulting in a verification error. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
 Examples:
 
-* If the sending endpoint has an identifier in some other namespace which can be used by the recipient endpoint to retrieve or establish the security context, then that identifier can be used as Context Hint.
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as Context Hint.
 
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the recipient endpoint belongs to multiple groups, involving the same endpoints, then a group identifier can be used as Context Hint to enable the receiving endpoint to find the right group security context.
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as Context Hint to enable the server to find the right security context.
 
 ## Compression Examples
 
