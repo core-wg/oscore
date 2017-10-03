@@ -752,13 +752,13 @@ Examples:
 
 * In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as Context Hint to enable the server to find the right security context.
 
-## Compression Examples
+## Examples of Compressed COSE Objects
 
-This section provides examples of COSE Objects before and after OSCORE compression.
+### Example: Requests 
 
-### Example: Request
+Request with kid = 25 and Partial IV = 5
 
-Before compression:
+Before compression (24 bytes):
 
 ~~~~~~~~~~~
 [
@@ -766,12 +766,9 @@ h'',
 { 4:h'25', 6:h'05' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
-
-0x83 40 a2 04 41 25 06 41 05 4e ae a0 15 56 67 92
-4d ff 8a 24 e4 cb 35 b9 (24 bytes)
 ~~~~~~~~~~~
 
-After compression:
+After compression (17 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00001010 = 0x0a
@@ -781,22 +778,9 @@ Option Value: 0a 25 (2 bytes)
 Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
-### Example: Request 2
+Request with kid = 0 and Partial IV = 0
 
-Before compression:
-
-~~~~~~~~~~~
-[
-h'',
-{ 4:h'00', 6:h'00' },
-h'aea0155667924dff8a24e4cb35b9'
-]
-
-0x83 40 a2 04 41 00 06 41 00 4e ae a0 15 56 67 92
-4d ff 8a 24 e4 cb 35 b9 (24 bytes)
-~~~~~~~~~~~
-
-After compression:
+After compression (15 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
@@ -806,9 +790,21 @@ Option Value: 09 (1 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
+Request with kid = 0, Partial IV = 5, and Context Hint = 0x44616c656b
+
+After compression (22  bytes):
+
+~~~~~~~~~~~
+Flag byte: 0b00011010 = 0x1a
+
+Option Value: 1a (1 bytes)
+
+Payload: 05 01 44 61 6c 65 6b ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (21 bytes)
+~~~~~~~~~~~
+
 ### Example: Response (without Observe)
 
-Before compression:
+Before compression (18 bytes):
 
 ~~~~~~~~~~~
 [
@@ -816,12 +812,9 @@ h'',
 {},
 h'aea0155667924dff8a24e4cb35b9'
 ]
-
-0x83 40 a0 4e ae a0 15 56 67 92 4d ff 8a 24 e4 cb
-35 b9 (18 bytes)
 ~~~~~~~~~~~
 
-After compression:
+After compression (14 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00000000 = 0x00
@@ -833,7 +826,7 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 
 ### Example: Response (with Observe)
 
-Before compression:
+Before compression (21 bytes):
 
 ~~~~~~~~~~~
 [
@@ -841,12 +834,9 @@ h'',
 { 6:h'07' },
 h'aea0155667924dff8a24e4cb35b9'
 ]
-
-0x83 40 a1 06 41 07 4e ae a0 15 56 67 92 4d ff
-8a 24 e4 cb 35 b9 (21 bytes)
 ~~~~~~~~~~~
 
-After compression:
+After compression (16 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00000010 = 0x02
