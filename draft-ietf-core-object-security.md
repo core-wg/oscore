@@ -247,7 +247,7 @@ where:
 ~~~~~~~~~~~ CDDL
    info = [
        id : bstr / nil,
-       alg : int,
+       alg : int / tstr,
        type : tstr,
        L : uint
    ]
@@ -515,7 +515,7 @@ The external_aad SHALL be a CBOR array as defined below:
 ~~~~~~~~~~~ CDDL
 external_aad = [
    version : uint,
-   alg : int,
+   alg : int / tstr,
    request_kid : bstr,
    request_piv : bstr,
    options : bstr
