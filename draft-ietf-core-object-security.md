@@ -1,5 +1,6 @@
 ---
 title: Object Security for Constrained RESTful Environments (OSCORE)
+abbrev: OSCORE
 docname: draft-ietf-core-object-security-latest
 
 ipr: trust200902
