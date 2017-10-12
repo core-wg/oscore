@@ -182,7 +182,7 @@ The Common Context contains the following parameters:
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Non-negative integer used to identify the Sender Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Sender ID. Non-negative integer used to identify the Sender Context and to assure unique nonces. Maximum value is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -190,7 +190,7 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Non-negative integer used to identify the Recipient Context and to assure unique nonces. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Recipient ID. Non-negative integer used to identify the Recipient Context and to assure unique nonces. Maximum value is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -255,7 +255,7 @@ where:
 ~~~~~~~~~~~
 where:
 
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are encoded as described in {{cose-object}}
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are non-negative integers represented by their CBOR byte strings. The encoding is described in {{cose-object}}
 
    * type is "Key" or "IV"
 
@@ -459,7 +459,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHALL NOT be present in responses.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and SHALL NOT be present in responses.
+   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Sender IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and MAY be omitted in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
