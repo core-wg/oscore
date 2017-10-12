@@ -538,7 +538,7 @@ where:
 
 ## Message Binding
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the request by including the request's kid (Sender ID or Recipient ID) and Partial IV in the AAD of the response. The server therefore needs to store the request's kid (Sender ID or Recipient ID) and Partial IV until all responses have been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the request by including the requestor's kid (Sender ID or Recipient ID) and Partial IV in the AAD of the response. The server therefore needs to store the requestor's kid (Sender ID or Recipient ID) and Partial IV until all responses have been sent.
 
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
