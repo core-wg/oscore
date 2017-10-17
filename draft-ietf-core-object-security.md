@@ -457,7 +457,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, i.e. the first byte SHALL NOT be zero unless the Partial IV is the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses.
 
    * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Sender ID, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and MAY be omitted in responses.
 
@@ -713,7 +713,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte and t
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
 * The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits, n, encode the Partial IV length + 1. If n = 0 then the Partial IV is not present in the compressed COSE object. The value n = 7 is reserved.
+    - The three least significant bits, n, encode the Partial IV length. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the Context Hint flag, h: it is set to 1 if the compressed COSE object contains a Context Hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
@@ -736,7 +736,7 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 
 The payload of the OSCORE message SHALL be encoded as follows:
 
-* The first n - 1 bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
+* The first n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
 * The following 1 byte encode the length of the Context Hint ({{context-hint}}), s, if the Context Hint flag is set (h = 1).
 
@@ -773,9 +773,9 @@ h'aea0155667924dff8a24e4cb35b9'
 After compression (17 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00001010 = 0x0a
+Flag byte: 0b00001001 = 0x09
 
-Option Value: 0a 25 (2 bytes)
+Option Value: 09 25 (2 bytes)
 
 Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
@@ -789,7 +789,7 @@ Flag byte: 0b00001001 = 0x09
 
 Option Value: 09 (1 bytes)
 
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+Payload: 00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
 Request with kid = 0, Partial IV = 5, and Context Hint = 0x44616c656b
@@ -797,9 +797,9 @@ Request with kid = 0, Partial IV = 5, and Context Hint = 0x44616c656b
 After compression (22  bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00011010 = 0x1a
+Flag byte: 0b00011001 = 0x19
 
-Option Value: 1a (1 bytes)
+Option Value: 19 (1 bytes)
 
 Payload: 05 01 44 61 6c 65 6b ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (21 bytes)
 ~~~~~~~~~~~
@@ -841,9 +841,9 @@ h'aea0155667924dff8a24e4cb35b9'
 After compression (16 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00000010 = 0x02
+Flag byte: 0b00000001 = 0x01
 
-Option Value: 02 (1 bytes)
+Option Value: 01 (1 bytes)
 
 Payload: 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
