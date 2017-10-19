@@ -779,33 +779,33 @@ After compression (17 bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 25 (2 bytes)
+Option Value: 09 05 25 (3 bytes)
 
-Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-Request with kid = 0 and Partial IV = 0
+Request with kid = empty string and Partial IV = 0
 
-After compression (15 bytes):
+After compression (16 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 (1 bytes)
+Option Value: 09 00 (2 bytes)
 
-Payload: 00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-Request with kid = 0, Partial IV = 5, and Context Hint = 0x44616c656b
+Request with kid = empty string, Partial IV = 5, and Context Hint = 0x44616c656b
 
 After compression (22  bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00011001 = 0x19
 
-Option Value: 19 (1 bytes)
+Option Value: 19 05 01 44 61 6c 65 6b (8 bytes)
 
-Payload: 05 01 44 61 6c 65 6b ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (21 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (without Observe)
@@ -847,9 +847,9 @@ After compression (16 bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00000001 = 0x01
 
-Option Value: 01 (1 bytes)
+Option Value: 01 07 (2 bytes)
 
-Payload: 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 # Web Linking
