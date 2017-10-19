@@ -780,9 +780,9 @@ Option Value: 09 25 (2 bytes)
 Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
-Request with kid = 0 and Partial IV = 0
+Request with kid = empty string and Partial IV = 0
 
-After compression (15 bytes):
+After compression (16 bytes):
 
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
@@ -792,7 +792,7 @@ Option Value: 09 (1 bytes)
 Payload: 00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
 ~~~~~~~~~~~
 
-Request with kid = 0, Partial IV = 5, and Context Hint = 0x44616c656b
+Request with kid = empty string, Partial IV = 5, and Context Hint = 0x44616c656b
 
 After compression (22  bytes):
 
