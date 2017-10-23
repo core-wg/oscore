@@ -469,7 +469,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 The nonce is constructed by left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 5 bytes, concatenating the padded Partial IV with the padded ID, and then XORing with the Common IV. Note that in this specification only algorithms that use nonces equal or greater than 6 bytes are supported.
 
-When observe is not used, the request and the response uses the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
+When observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
 +--------------------------+--+--+--+--+--+
@@ -652,12 +652,12 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
 3. Compute the AEAD nonce
-
-   * If Observe is not used, the nonce from the request is used.
-    
+  
    * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
-4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
+   * If Observe is not used, either the nonce from the request is used or a new Partial IV is used.
+
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If in 3. the nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
@@ -677,9 +677,11 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 6. Compute the AEAD nonce
 
-      * If the Observe option is not present in the response, the nonce from the request is used.
- 
-      * If the Observe option is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+      1. If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
+      
+      2. If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
+      
+      3. If the Partial IV is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
 7. Decrypt the COSE object using the Recipient Key.
 
