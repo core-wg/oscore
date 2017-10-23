@@ -124,7 +124,7 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option contains the OSCORE flag byte and for requests, the Sender ID (see {{compression}}). If the flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option contains the OSCORE flag byte, the Sender Sequence Number and the Sender ID when present, (see {{compression}}). If the flag byte is all zero (0x00) and no other fields are present, the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
@@ -701,23 +701,35 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
-The value of the Object-Security option SHALL contain the OSCORE flag byte and the kid parameter as follows:
+The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the Context Hint parameter (length and value), and the kid parameter as follows:
 
-~~~~~~~~~~~
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|0 0 0|h|k|  n  |    kid (if any) ...                             
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~                
+ 0 1 2 3 4 5 6 7 8       ...     8(1+n)       8(2+n)              
++-+-+-+-+-+-+-+-+---------------------+------------+---
+|0 0 0|h|k|  n  | Partial IV (if any) | s (if any) |  
++-+-+-+-+-+-+-+-+---------------------+------------+---
+                8(2+n+s)                              
+-----------------------+------------------------------+
+ Context Hint (if any) |    kid (if any) ...          |                  
+-----------------------+------------------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
 * The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits, n, encode the Partial IV length. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
+    - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the Context Hint flag, h: it is set to 1 if the compressed COSE object contains a Context Hint, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
+
+* The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
+
+* The following 1 byte encode the length of the Context Hint ({{context-hint}}) s, if the Context Hint flag is set (h = 1).
+
+* The following s bytes encode the Context Hint, if the Context Hint flag is set (h = 1).
+
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1)
+
+Note that the kid MUST be the last field of the object-security value, even in case reserved bits are used and additional fields are added to it.
 
 The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
 
@@ -734,15 +746,7 @@ The presence of Partial IV and kid in requests and responses is specified in {{c
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
-The payload of the OSCORE message SHALL be encoded as follows:
-
-* The first n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-
-* The following 1 byte encode the length of the Context Hint ({{context-hint}}), s, if the Context Hint flag is set (h = 1).
-
-* The following s bytes encode the Context Hint, if the Context Hint flag is set (h = 1).
-
-* The remaining bytes encode the ciphertext.
+The payload of the OSCORE message SHALL encode the ciphertext.
 
 ## Context Hint {#context-hint}
 
@@ -775,9 +779,9 @@ After compression (17 bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 25 (2 bytes)
+Option Value: 09 05 25 (3 bytes)
 
-Payload: 05 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 Request with kid = empty string and Partial IV = 0
@@ -787,9 +791,9 @@ After compression (16 bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 (1 bytes)
+Option Value: 09 00 (2 bytes)
 
-Payload: 00 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 Request with kid = empty string, Partial IV = 5, and Context Hint = 0x44616c656b
@@ -799,9 +803,9 @@ After compression (22  bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00011001 = 0x19
 
-Option Value: 19 (1 bytes)
+Option Value: 19 05 01 44 61 6c 65 6b (8 bytes)
 
-Payload: 05 01 44 61 6c 65 6b ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (21 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (without Observe)
@@ -843,9 +847,9 @@ After compression (16 bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00000001 = 0x01
 
-Option Value: 01 (1 bytes)
+Option Value: 01 07 (2 bytes)
 
-Payload: 07 ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (15 bytes)
+Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 # Web Linking
