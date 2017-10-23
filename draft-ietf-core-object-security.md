@@ -467,24 +467,33 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed by left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes, left-padding the Sender ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 5 bytes, concatenating the padded Partial IV with the padded ID, and then XORing with the Common IV. Note that in this specification only algorithms that use nonces equal or greater than 6 bytes are supported.
+The nonce is constructed in the following way:
+
+1. left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes,
+2. left-padding the (Sender) ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes,
+3. concatenating the size of the ID (S) with the padded ID and the padded Partial IV {{fig-nonce}},
+4. and then XORing with the Common IV.
+ 
+Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported.
 
 When observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
 
 ~~~~~~~~~~~
-+--------------------------+--+--+--+--+--+
-|    ID of PIV generator   |  Partial IV  |----+ 
-+--------------------------+--+--+--+--+--+    | 
-                                               | 
-+-----------------------------------------+    | 
-|                Common IV                |->(XOR)
-+-----------------------------------------+    | 
-                                               | 
-+-----------------------------------------+    | 
-|                  Nonce                  |<---+ 
-+-----------------------------------------+     
++---+-----------------------+--+--+--+--+--+
+| S | ID of PIV generator   |  Partial IV  |----+ 
++---+-----------------------+--+--+--+--+--+    | 
+                                                | 
++------------------------------------------+    | 
+|                Common IV                 |->(XOR)
++------------------------------------------+    | 
+                                                | 
++------------------------------------------+    | 
+|                  Nonce                   |<---+ 
++------------------------------------------+     
 ~~~~~~~~~~~
 {: #fig-nonce title="AEAD Nonce Formation" artwork-align="center"}
+
+
 
 ## Plaintext {#plaintext}
 
@@ -981,7 +990,7 @@ The use of COSE to protect messages as specified in this document requires an es
 
 Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
-The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 48 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
 The inner block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving node can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
