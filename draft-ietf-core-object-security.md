@@ -333,7 +333,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Unknown CoAP options SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
+Unknown CoAP options SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurences.
 
 ### Inner Options {#inner-options}
 
