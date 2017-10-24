@@ -544,7 +544,7 @@ where:
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
 
-NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, are already integrity protected in the requests.
+NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid need not be integrity protected in the requests.
 
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
