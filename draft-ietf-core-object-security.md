@@ -80,23 +80,23 @@ This document defines the Object Security for Constrained RESTful Environments (
 
 OSCORE is designed for constrained nodes and networks and provides an in-layer security protocol that does not depend on underlying layers. OSCORE can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). An extension of OSCORE may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
-OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original messages that are encrypted are not present in the OSCORE message, and instead the Object-Security option/header and the compressed COSE object are included, see {{fig-sketch}}.
+OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure message binding. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original message that are encrypted are transported in the payload of the OSCORE message, and the Object-Security option is included, see {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                          Server
    |      OSCORE request - POST example.com:      |   
    |        Header, Token,                        |   
    |        Options: {Object-Security, ...},      |   
-   |        Payload: Compressed COSE object       |   
+   |        Payload: COSE ciphertext              |   
    +--------------------------------------------->|   
+   |<---------------------------------------------+  
    |      OSCORE response - 2.04 (Changed):       |   
    |        Header, Token,                        |   
    |        Options: {Object-Security, ...},      |   
-   |        Payload: Compressed COSE object       |   
-   |<---------------------------------------------+   
+   |        Payload: COSE ciphertext              |    
    |                                              | 
 ~~~~~~~~~~~
-{: #fig-sketch title="Sketch of OSCORE with CoAP" artwork-align="center"}
+{: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
 OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with hop-by-hop protection of the Messaging Layer, during transport between end-point and intermediary node. Examples of the use of OSCORE are given in {{examples}}.
 
@@ -749,7 +749,7 @@ Note that the kid MUST be the last field of the object-security value, even in c
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
-The payload of the OSCORE message SHALL encode the ciphertext.
+The payload of the OSCORE message SHALL encode the ciphertext of the COSE object.
 
 ## Context Hint {#context-hint}
 
