@@ -124,7 +124,7 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option contains the OSCORE flag byte, the Sender Sequence Number and the Sender ID when present, (see {{compression}}). If the flag byte is all zero (0x00) and no other fields are present, the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option contains the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format is specified in {{compression}}). If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
@@ -182,7 +182,7 @@ The Common Context contains the following parameters:
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Non-negative integer used to identify the Sender Context and to assure unique nonces. Maximum value is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Sender ID. Byte string used to identify the Sender Context and to assure unique nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -190,7 +190,7 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Non-negative integer used to identify the Recipient Context and to assure unique nonces. Maximum value is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Recipient ID. Byte string used to identify the Recipient Context and to assure unique nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -255,7 +255,7 @@ where:
 ~~~~~~~~~~~
 where:
 
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. Sender ID and Recipient ID are non-negative integers represented by their CBOR byte strings. The encoding is described in {{cose-object}}
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. The encoding is described in {{cose-object}}
 
    * type is "Key" or "IV"
 
@@ -269,7 +269,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum Sender ID is 2^(nonce length in bits - 40) - 1. For AES-CCM-16-64-128 the maximum Sender ID is 2^64 - 1. If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be uniformly random distributed over a large range of integers such that the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of Sender ID is length of nonce - 6 bytes. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
 To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a Context Hint {{context-hint}} to help the Server find the right context.
 
@@ -291,7 +291,7 @@ The sending endpoint SHALL transfer Class E message fields in the ciphertext of 
 
 Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner" (Class E). Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer" (Class I or U). 
 
-CoAP message fields are either Inner or Outer: Inner if the value is intended for the destination endpoint, Outer if the value is intended for a proxy. An OSCORE message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner and Outer message fields are processed independently.
+An OSCORE message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner if the value is intended for the destination endpoint, Outer if the value is intended for a proxy. Inner and Outer message fields are processed independently.
 
 ## CoAP Payload
 
@@ -333,7 +333,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that do not specify the OSCORE processing, or that are unrecognized as CoAP options, SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurences.
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurences.
 
 ### Inner Options {#inner-options}
 
@@ -457,9 +457,9 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV MAY be present in responses.
 
-   * The "kid" parameter. The value is set to the Sender ID (see {{context}}). All leading zeroes SHALL be removed when encoding the Sender ID, i.e. the first byte (if any) SHALL never be zero. This parameter SHALL be present in requests and MAY be omitted in responses.
+   * The "kid" parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and MAY be present in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -467,11 +467,11 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Nonce {#nonce}
 
-The nonce is constructed in the following way:
+The nonce is constructed in the following way (see {{fig-nonce}}):
 
 1. left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes,
 2. left-padding the (Sender) ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes,
-3. concatenating the size of the ID (S) with the padded ID and the padded Partial IV {{fig-nonce}},
+3. concatenating the size of the ID (S) with the padded ID and the padded Partial IV,
 4. and then XORing with the Common IV.
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported.
@@ -542,13 +542,16 @@ where:
 
 - request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
 
-- options: contains the (non-special) Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
+- options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
+
+NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, are already integrity protected in the requests.
+
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
 
 ## Message Binding
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the request by including the requestor's kid (Sender ID or Recipient ID) and Partial IV in the AAD of the response. The server therefore needs to store the requestor's kid (Sender ID or Recipient ID) and Partial IV until all responses have been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the requests by including the kid and Partial IV of the request in the AAD of the response. The server therefore needs to store the kid and Partial IV of the request until all responses have been sent.
 
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
@@ -612,7 +615,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data, as described in {{cose-object}}.
 
-3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}}. Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -715,14 +718,15 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the Context Hint parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
- 0 1 2 3 4 5 6 7 <----- n bytes -----> <-- 1 byte --                    
-+-+-+-+-+-+-+-+-+---------------------+-------------
-|0 0 0|h|k|  n  | Partial IV (if any) | s (if any)   
-+-+-+-+-+-+-+-+-+---------------------+-------------
--> <------ s bytes ------>               
---+-----------------------+-------------------------+
-  | Context Hint (if any) |    kid (if any) ...     |                  
---+-----------------------+-------------------------+
+ 0 1 2 3 4 5 6 7 <--------- n bytes ------------->                    
++-+-+-+-+-+-+-+-+---------------------------------
+|0 0 0|h|k|  n  |        Partial IV (if any)    
++-+-+-+-+-+-+-+-+---------------------------------
+
+<-- 1 byte --> <------ s bytes ------>               
++------------+-----------------------+------------------+
+| s (if any) | Context Hint (if any) | kid (if any) ... |                  
++------------+-----------------------+------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
