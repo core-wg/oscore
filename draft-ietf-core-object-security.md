@@ -1042,7 +1042,7 @@ TODO: This section needs to be updated.
 
 # Examples {#examples}
 
-This section gives examples of OSCORE. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the COSE message format.
+This section gives examples of OSCORE. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the (compressed) COSE message format.
 
 ## Secure Access to Sensor
 
@@ -1053,30 +1053,28 @@ Client  Proxy  Server
   |       |       |
   +------>|       |            Code: 0.02 (POST)
   | POST  |       |           Token: 0x8c
-  |       |       | Object-Security: [kid:5f]
-  |       |       |         Payload: [Partial IV:42,
-  |       |       |                  {Code:0.01,
-  |       |       |                   Uri-Path:"alarm_status"}]
+  |       |       | Object-Security: [kid:5f,Partial IV:42]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"alarm_status"}
   |       |       |
   |       +------>|            Code: 0.02 (POST)
   |       | POST  |           Token: 0x7b
-  |       |       | Object-Security: [kid:5f]
-  |       |       |         Payload: [Partial IV:42,
-  |       |       |                  {Code:0.01,
-  |       |       |                   Uri-Path:"alarm_status"}]
+  |       |       | Object-Security: [kid:5f,Partial IV:42]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"alarm_status"}
   |       |       |
   |       |<------+            Code: 2.04 (Changed)
   |       |  2.04 |           Token: 0x7b
   |       |       | Object-Security: -
-  |       |       |         Payload: [{Code:2.05, "OFF"}]
+  |       |       |         Payload: {Code:2.05, "OFF"}
   |       |       |
   |<------+       |            Code: 2.04 (Changed)
   |  2.04 |       |           Token: 0x8c
   |       |       | Object-Security: -
-  |       |       |         Payload: [{Code:2.05, "OFF"}]
+  |       |       |         Payload: {Code:2.05, "OFF"}
   |       |       |
 ~~~~~~~~~~~
-{: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+{: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate content of compressed COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Changed) are visible in the header of the OSCORE message. The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
 
@@ -1094,54 +1092,48 @@ Client  Proxy  Server
   +------>|       |            Code: 0.05 (FETCH)
   | FETCH |       |           Token: 0x83
   |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca]
-  |       |       |         Payload: [Partial IV:15,
-  |       |       |                  {Code:0.01,
-  |       |       |                   Uri-Path:"glucose"}]
+  |       |       | Object-Security: [kid:ca,Partial IV:15]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"glucose"}
   |       |       |
   |       +------>|            Code: 0.05 (FETCH)
   |       | FETCH |           Token: 0xbe
   |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca]
-  |       |       |         Payload: [Partial IV:15,
-  |       |       |                  {Code:0.01,
-  |       |       |                   Uri-Path:"glucose"}]
+  |       |       | Object-Security: [kid:ca,Partial IV:15]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"glucose"}
   |       |       |
   |       |<------+            Code: 2.05 (Content)
   |       |  2.05 |           Token: 0xbe
   |       |       |         Observe: 7
-  |       |       | Object-Security: -
-  |       |       |         Payload: [Partial IV:32,
-  |       |       |                  {Code:2.05,   
-  |       |       |                   Content-Format:0, "220"}]
+  |       |       | Object-Security: [Partial IV:32]
+  |       |       |         Payload: {Code:2.05,   
+  |       |       |                   Content-Format:0, "220"}
   |       |       |
   |<------+       |            Code: 2.05 (Content)
   |  2.05 |       |           Token: 0x83
   |       |       |         Observe: 7
-  |       |       | Object-Security: -
-  |       |       |         Payload: [Partial IV:32,
-  |       |       |                  {Code:2.05,   
-  |       |       |                   Content-Format:0, "220"}]
+  |       |       | Object-Security: [Partial IV:32]
+  |       |       |         Payload: {Code:2.05,   
+  |       |       |                   Content-Format:0, "220"}
  ...     ...     ...
   |       |       |
   |       |<------+            Code: 2.05 (Content)
   |       |  2.05 |           Token: 0xbe
   |       |       |         Observe: 8
-  |       |       | Object-Security: -
-  |       |       |         Payload: [Partial IV:36,
-  |       |       |                  {Code:2.05,
-  |       |       |                   Content-Format:0, "180"}]
+  |       |       | Object-Security: [Partial IV:36]
+  |       |       |         Payload: {Code:2.05,
+  |       |       |                   Content-Format:0, "180"}
   |       |       |
   |<------+       |            Code: 2.05 (Content)
   |  2.05 |       |           Token: 0x83
   |       |       |         Observe: 8
-  |       |       | Object-Security: -
-  |       |       |         Payload: [Partial IV:36,
-  |       |       |                  {Code:2.05,
-  |       |       |                   Content-Format:0, "180"}]
+  |       |       | Object-Security: [Partial IV:36]
+  |       |       |         Payload: {Code:2.05,
+  |       |       |                   Content-Format:0, "180"}
   |       |       |
 ~~~~~~~~~~~
-{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate a COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate content of compressed COSE header. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
 The request/response Codes are encrypted by OSCORE and only dummy Codes (FETCH/Content) are visible in the header of the OSCORE message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
 
