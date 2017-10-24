@@ -746,18 +746,6 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 
 Note that the kid MUST be the last field of the object-security value, even in case reserved bits are used and additional fields are added to it.
 
-The presence of Partial IV and kid in requests and responses is specified in {{cose-object}}, and summarized in {{fig-byte-flag}}.
-
-~~~~~~~~~~~
-+--------------------------+-----+-----+
-|                          |  k  |  n  |
-+--------------------------+-----+-----+
-| Request                  |  1  | > 0 |
-| Response without Observe |  0  |   0 |
-| Response with Observe    |  0  | > 0 |
-+--------------------------+-----+-----+
-~~~~~~~~~~~
-{: #fig-byte-flag title="Presence of data fields in OSCORE flag byte" artwork-align="center"}
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
