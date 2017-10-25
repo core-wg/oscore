@@ -40,7 +40,7 @@ normative:
 
   RFC2119:
   RFC4648:
-  RFC5988:
+  RFC8288:
   RFC6347:
   RFC7049:
   RFC7252:
@@ -861,7 +861,7 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 
 # Web Linking
 
-The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC5988}} to a resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCORE. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCORE. 
+The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC8288}} to a resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCORE. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCORE. 
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
