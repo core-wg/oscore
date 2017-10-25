@@ -89,6 +89,7 @@ Client                                          Server
    |        Options: {Object-Security, ...},      |   
    |        Payload: COSE ciphertext              |   
    +--------------------------------------------->|   
+   |                                              |
    |<---------------------------------------------+  
    |      OSCORE response - 2.04 (Changed):       |   
    |        Header, Token,                        |   
@@ -115,12 +116,13 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+-----------+--------+---------+
-| No. | C | U | N | R | Name            | Format    | Length | Default | 
-+-----+---+---+---+---+-----------------+-----------+--------+---------+
-| TBD | x |   |   |   | Object-Security | see below | 0-255  | (none)  |
-+-----+---+---+---+---+-----------------+-----------+--------+---------+
-     C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable          
++-----+---+---+---+---+-----------------+--------+--------+---------+
+| No. | C | U | N | R | Name            | Format | Length | Default | 
++-----+---+---+---+---+-----------------+--------+--------+---------+
+| TBD | x |   |   |   | Object-Security |  (*)   | 0-255  | (none)  |
++-----+---+---+---+---+-----------------+--------+--------+---------+
+     C = Critical, U = Unsafe,   N = NoCacheKey,   R = Repeatable  
+     (*) See below.        
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
