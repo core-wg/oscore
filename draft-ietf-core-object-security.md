@@ -457,9 +457,9 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The "unprotected" field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV MAY be present in responses.
+   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
 
-   * The "kid" parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and MAY be present in responses.
+   * The "kid" parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and SHOULD NOT be present in responses. (An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.tiloca-core-multicast-oscoap}}.)
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -591,11 +591,11 @@ To prevent reuse of Sender Sequence Numbers, a node MAY perform the following pr
 
 * Each time the Sender Sequence Number is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the node initiates the Sender Sequence Number to the value stored in persistent memory + K - 1. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
 
-### Replay Window
+### Replay Window {#reboot-replay}
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce for the response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV the response.
 
 If the server using the Repeat option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
