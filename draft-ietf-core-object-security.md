@@ -597,7 +597,7 @@ To prevent reuse of Sender Sequence Numbers, a node MAY perform the following pr
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV the response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
 
 If the server using the Repeat option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
