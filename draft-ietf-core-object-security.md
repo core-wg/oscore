@@ -439,7 +439,7 @@ Most CoAP header fields (i.e. the message fields in the fixed 4-byte header) are
 
 The CoAP header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. This exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests without Observe option, to 0.05 (FETCH) for requests with Observe option, and to 2.04 (Changed) for responses. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -1107,30 +1107,30 @@ Client  Proxy  Server
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}
   |       |       |
-  |       |<------+            Code: 2.05 (Content)
-  |       |  2.05 |           Token: 0xbe
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
   |       |       |         Observe: 7
   |       |       | Object-Security: [Partial IV:32]
   |       |       |         Payload: {Code:2.05,   
   |       |       |                   Content-Format:0, "220"}
   |       |       |
-  |<------+       |            Code: 2.05 (Content)
-  |  2.05 |       |           Token: 0x83
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
   |       |       |         Observe: 7
   |       |       | Object-Security: [Partial IV:32]
   |       |       |         Payload: {Code:2.05,   
   |       |       |                   Content-Format:0, "220"}
  ...     ...     ...
   |       |       |
-  |       |<------+            Code: 2.05 (Content)
-  |       |  2.05 |           Token: 0xbe
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
   |       |       |         Observe: 8
   |       |       | Object-Security: [Partial IV:36]
   |       |       |         Payload: {Code:2.05,
   |       |       |                   Content-Format:0, "180"}
   |       |       |
-  |<------+       |            Code: 2.05 (Content)
-  |  2.05 |       |           Token: 0x83
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
   |       |       |         Observe: 8
   |       |       | Object-Security: [Partial IV:36]
   |       |       |         Payload: {Code:2.05,
