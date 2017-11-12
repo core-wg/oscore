@@ -453,7 +453,7 @@ A summary of how the header fields and payload are protected is shown in {{fig-h
  E = Encrypt and Integrity Protect (Inner)
  U = Unprotected (Outer)
 ~~~~~~~~~~~
-{: #fig-header-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}~~~~~~~~~~~
+{: #fig-header-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}
 
 Most CoAP header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
