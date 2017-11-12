@@ -357,7 +357,6 @@ A procedure for integrity-protection-only of Class I option message fields is sp
 
 Note: There are currently no Class I option message fields defined.
 
-
 ### Special Options
 
 Some options require special processing, marked with an asterisk '*' in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be added as an Inner and/or Outer message by the sending endpoint; the processing is specified in this section.
@@ -434,6 +433,27 @@ If the verification fails, the client SHALL stop processing the response, and in
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response, see {{processing}}.)
 
 ## CoAP Header {#coap-header}
+
+A summary of how the header fields and payload are protected is shown in {{fig-header-protection}}.
+
+~~~~~~~~~~~
++------------------+---+---+
+| Field            | E | U |
++------------------+---+---+
+| Version (UDP)    |   | x |
+| Type (UPD)       |   | x |
+| Length (TCP)     |   | x |
+| Token Length     |   | x |
+| Code             | x |   |
+| Message ID (UPD) |   | x |
+| Token            |   | x |
+| Payload          | x |   |
++------------------+---+---+
+
+ E = Encrypt and Integrity Protect (Inner)
+ U = Unprotected (Outer)
+~~~~~~~~~~~
+{: #fig-header-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}~~~~~~~~~~~
 
 Most CoAP header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
