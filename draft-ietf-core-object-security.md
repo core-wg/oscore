@@ -888,7 +888,12 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
 As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is the value of the Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding). The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
+The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is:
+
+  * '' (empty string) if the CoAP Object-Security option is empty, or
+  * the value of the CoAP Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+
+The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
 
 Example:
 
