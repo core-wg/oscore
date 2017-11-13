@@ -49,7 +49,7 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
-  I-D.amsuess-core-repeat-request-tag:
+  I-D.ietf-core-echo-request-tag:
   
 informative:
 
@@ -58,9 +58,9 @@ informative:
   RFC7228:
   RFC7515:
   I-D.ietf-ace-oauth-authz:
+  I-D.ietf-cbor-cddl:
   I-D.ietf-core-coap-tcp-tls:
   I-D.bormann-6lo-coap-802-15-ie:
-  I-D.greevenbosch-appsawg-cbor-cddl:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
   I-D.seitz-ace-oscoap-profile:
@@ -107,7 +107,7 @@ An implementation supporting this specification MAY only implement the client pa
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
-Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
+Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
 The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
@@ -201,7 +201,7 @@ The Recipient Context contains the following parameters:
 An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 Endpoints MAY operate in either or both roles as client and server and use the same security context for those roles.
-Indpendent of being client or server, the endpoint protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
+Independent of being client or server, the endpoint protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
 ## Establishment of Security Context Parameters {#context-derivation}
 
@@ -231,7 +231,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.ietf-core-echo-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -304,29 +304,29 @@ The CoAP Payload, if present in the original CoAP message, SHALL be encrypted an
 A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may have both Inner and Outer message fields, are labelled with asterisks.
 
 ~~~~~~~~~~~
-+----+----------------+---+---+---+
-| No.| Name           | E | I | U |
-+----+----------------+---+---+---+
-|  1 | If-Match       | x |   |   |
-|  3 | Uri-Host       |   |   | x |
-|  4 | ETag           | x |   |   |
-|  5 | If-None-Match  | x |   |   |
-|  6 | Observe        |   |   | * |
-|  7 | Uri-Port       |   |   | x |
-|  8 | Location-Path  | x |   |   |
-| 11 | Uri-Path       | x |   |   |
-| 12 | Content-Format | x |   |   |
-| 14 | Max-Age        | * |   | * |
-| 15 | Uri-Query      | x |   |   |
-| 17 | Accept         | x |   |   |
-| 20 | Location-Query | x |   |   |
-| 23 | Block2         | * |   | * |
-| 27 | Block1         | * |   | * |
-| 28 | Size2          | * |   | * |
-| 35 | Proxy-Uri      | * |   | * |
-| 39 | Proxy-Scheme   |   |   | x |
-| 60 | Size1          | * |   | * |
-+----+----------------+---+---+---+
++----+----------------+---+---+
+| No.| Name           | E | U |
++----+----------------+---+---+
+|  1 | If-Match       | x |   |
+|  3 | Uri-Host       |   | x |
+|  4 | ETag           | x |   |
+|  5 | If-None-Match  | x |   |
+|  6 | Observe        |   | * |
+|  7 | Uri-Port       |   | x |
+|  8 | Location-Path  | x |   |
+| 11 | Uri-Path       | x |   |
+| 12 | Content-Format | x |   |
+| 14 | Max-Age        | * | * |
+| 15 | Uri-Query      | x |   |
+| 17 | Accept         | x |   |
+| 20 | Location-Query | x |   |
+| 23 | Block2         | * | * |
+| 27 | Block1         | * | * |
+| 28 | Size2          | * | * |
+| 35 | Proxy-Uri      | * | * |
+| 39 | Proxy-Scheme   |   | x |
+| 60 | Size1          | * | * |
++----+----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
  I = Integrity Protect only (Outer)
@@ -335,7 +335,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurences.
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurrences.
 
 ### Inner Options {#inner-options}
 
@@ -356,7 +356,6 @@ The processing of Outer options by the receiving endpoint is specified in {{ver-
 A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. 
 
 Note: There are currently no Class I option message fields defined.
-
 
 ### Special Options
 
@@ -379,9 +378,9 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RF
 
 The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
 
-For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.ietf-core-echo-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.ietf-core-echo-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
+For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.ietf-core-echo-request-tag}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -389,7 +388,7 @@ Proxies MAY fragment an OSCORE message using {{RFC7959}}, which then introduces 
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}.
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
 
 #### Proxy-Uri
 
@@ -401,7 +400,7 @@ Uri-Path and Uri-Query are class E options and SHALL be protected and processed 
 
 The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host and Uri-Port options (if present) as specified in section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
 
-Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1. of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In other documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
+Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In other documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
 
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
@@ -435,11 +434,32 @@ The Observe option in the CoAP request may be legitimately removed by a proxy. I
 
 ## CoAP Header {#coap-header}
 
+A summary of how the header fields and payload are protected is shown in {{fig-header-protection}}.
+
+~~~~~~~~~~~
++------------------+---+---+
+| Field            | E | U |
++------------------+---+---+
+| Version (UDP)    |   | x |
+| Type (UDP)       |   | x |
+| Length (TCP)     |   | x |
+| Token Length     |   | x |
+| Code             | x |   |
+| Message ID (UDP) |   | x |
+| Token            |   | x |
+| Payload          | x |   |
++------------------+---+---+
+
+ E = Encrypt and Integrity Protect (Inner)
+ U = Unprotected (Outer)
+~~~~~~~~~~~
+{: #fig-header-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}
+
 Most CoAP header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
 The CoAP header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses, except for Observe messages. For Observe messages, the Outer Code of the OSCORE message SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. This exception allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object {{plaintext}}. After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests without Observe option, to 0.05 (FETCH) for requests with Observe option, and to 2.04 (Changed) for responses. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -563,7 +583,7 @@ The maximum Sender Sequence Number is algorithm dependent, see {{sec-considerati
 
 ## Freshness
 
-For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness {{I-D.amsuess-core-repeat-request-tag}}.
+For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness {{I-D.ietf-core-echo-request-tag}}.
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
 
@@ -581,7 +601,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Nofitifcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notififcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
@@ -597,7 +617,7 @@ To prevent reuse of Sender Sequence Numbers, a node MAY perform the following pr
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
 
 If the server using the Repeat option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
@@ -661,7 +681,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 ## Protecting the Response {#prot-res}
 
-Given a CoAP response, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3., 4., 7. in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
+Given a CoAP response, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
@@ -673,7 +693,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
    * If Observe is not used, either the nonce from the request is used or a new Partial IV is used.
 
-4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If in 3. the nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the nonce from the request was used, the Partial IV MUST NOT be included in the message.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
 
@@ -810,7 +830,7 @@ After compression (22  bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00011001 = 0x19
 
-Option Value: 19 05 01 44 61 6c 65 6b (8 bytes)
+Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
 
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
@@ -879,7 +899,7 @@ The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-cor
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
-Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.amsuess-core-repeat-request-tag}}.
+Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.ietf-core-echo-request-tag}}.
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
@@ -888,7 +908,12 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
 As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is the value of the Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding). The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
+The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is:
+
+  * "" (empty string) if the CoAP Object-Security option is empty, or
+  * the value of the CoAP Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+
+The value of the body is the OSCORE payload {{oscore-payl}}.
 
 Example:
 
@@ -902,13 +927,13 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP request -- HTTP Client to Proxy]
 
   POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
-  Object-Security: 0b 25
+  Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
   
 [CoAP request -- Proxy to CoAP Server]
 
   POST coap://server.url/
-  Object-Security: 0b 25
+  Object-Security: 09 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [CoAP response -- CoAP Server to Proxy]
@@ -920,7 +945,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [HTTP response -- After object security processing]
@@ -947,19 +972,19 @@ Example:
 
   POST coap://proxy.url/
   Proxy-Uri=http://server.url/
-  Object-Security: 0b 25
+  Object-Security: 09 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP request -- Proxy to HTTP Server]
 
   POST http://server.url/ HTTP/1.1
-  Object-Security: 0b 25
+  Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [CoAP response -- CoAP Server to Proxy]
@@ -1107,30 +1132,30 @@ Client  Proxy  Server
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}
   |       |       |
-  |       |<------+            Code: 2.05 (Content)
-  |       |  2.05 |           Token: 0xbe
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
   |       |       |         Observe: 7
   |       |       | Object-Security: [Partial IV:32]
   |       |       |         Payload: {Code:2.05,   
   |       |       |                   Content-Format:0, "220"}
   |       |       |
-  |<------+       |            Code: 2.05 (Content)
-  |  2.05 |       |           Token: 0x83
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
   |       |       |         Observe: 7
   |       |       | Object-Security: [Partial IV:32]
   |       |       |         Payload: {Code:2.05,   
   |       |       |                   Content-Format:0, "220"}
  ...     ...     ...
   |       |       |
-  |       |<------+            Code: 2.05 (Content)
-  |       |  2.05 |           Token: 0xbe
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
   |       |       |         Observe: 8
   |       |       | Object-Security: [Partial IV:36]
   |       |       |         Payload: {Code:2.05,
   |       |       |                   Content-Format:0, "180"}
   |       |       |
-  |<------+       |            Code: 2.05 (Content)
-  |  2.05 |       |           Token: 0x83
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
   |       |       |         Observe: 8
   |       |       | Object-Security: [Partial IV:36]
   |       |       |         Payload: {Code:2.05,
@@ -1139,7 +1164,7 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate content of compressed COSE header. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-The request/response Codes are encrypted by OSCORE and only dummy Codes (FETCH/Content) are visible in the header of the OSCORE message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
+The request/response Codes are encrypted by OSCORE and only dummy Codes (FETCH/Changed) are visible in the header of the OSCORE message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
 
 The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36).
 
