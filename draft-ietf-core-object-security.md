@@ -810,7 +810,7 @@ After compression (22  bytes):
 ~~~~~~~~~~~
 Flag byte: 0b00011001 = 0x19
 
-Option Value: 19 05 01 44 61 6c 65 6b (8 bytes)
+Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
 
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
