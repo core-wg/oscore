@@ -304,29 +304,29 @@ The CoAP Payload, if present in the original CoAP message, SHALL be encrypted an
 A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may have both Inner and Outer message fields, are labelled with asterisks.
 
 ~~~~~~~~~~~
-+----+----------------+---+---+---+
-| No.| Name           | E | I | U |
-+----+----------------+---+---+---+
-|  1 | If-Match       | x |   |   |
-|  3 | Uri-Host       |   |   | x |
-|  4 | ETag           | x |   |   |
-|  5 | If-None-Match  | x |   |   |
-|  6 | Observe        |   |   | * |
-|  7 | Uri-Port       |   |   | x |
-|  8 | Location-Path  | x |   |   |
-| 11 | Uri-Path       | x |   |   |
-| 12 | Content-Format | x |   |   |
-| 14 | Max-Age        | * |   | * |
-| 15 | Uri-Query      | x |   |   |
-| 17 | Accept         | x |   |   |
-| 20 | Location-Query | x |   |   |
-| 23 | Block2         | * |   | * |
-| 27 | Block1         | * |   | * |
-| 28 | Size2          | * |   | * |
-| 35 | Proxy-Uri      | * |   | * |
-| 39 | Proxy-Scheme   |   |   | x |
-| 60 | Size1          | * |   | * |
-+----+----------------+---+---+---+
++----+----------------+---+---+
+| No.| Name           | E | U |
++----+----------------+---+---+
+|  1 | If-Match       | x |   |
+|  3 | Uri-Host       |   | x |
+|  4 | ETag           | x |   |
+|  5 | If-None-Match  | x |   |
+|  6 | Observe        |   | * |
+|  7 | Uri-Port       |   | x |
+|  8 | Location-Path  | x |   |
+| 11 | Uri-Path       | x |   |
+| 12 | Content-Format | x |   |
+| 14 | Max-Age        | * | * |
+| 15 | Uri-Query      | x |   |
+| 17 | Accept         | x |   |
+| 20 | Location-Query | x |   |
+| 23 | Block2         | * | * |
+| 27 | Block1         | * | * |
+| 28 | Size2          | * | * |
+| 35 | Proxy-Uri      | * | * |
+| 39 | Proxy-Scheme   |   | x |
+| 60 | Size1          | * | * |
++----+----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
  I = Integrity Protect only (Outer)
