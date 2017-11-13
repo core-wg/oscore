@@ -473,7 +473,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 For certain use cases, e.g. deployments where the same 'kid' is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve the correct kid. The Context Hint parameter is used as an additional input to find the needed cryptographic key. The Context Hint is implicitly integrity protected, as manipulation leads to the wrong or no context being retrieved resulting in a verification error, as described in {{ver-req}}. Applications MUST NOT assume that 'context hint' values are unique. 
 
-A summary of the COSE header parameter 'context hint' defined above ican be found in {{tab-1}}.
+A summary of the COSE header parameter 'context hint' defined above can be found in {{tab-1}}.
 
 Some examples of relevant uses of Context Hint are the following:
 
