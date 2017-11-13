@@ -201,7 +201,7 @@ The Recipient Context contains the following parameters:
 An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 Endpoints MAY operate in either or both roles as client and server and use the same security context for those roles.
-Indpendent of being client or server, the endpoint protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
+Independent of being client or server, the endpoint protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
 ## Establishment of Security Context Parameters {#context-derivation}
 
@@ -335,7 +335,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurences.
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurrences.
 
 ### Inner Options {#inner-options}
 
@@ -601,7 +601,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Nofitifcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, a node needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notififcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, a node MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
