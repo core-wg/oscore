@@ -365,9 +365,9 @@ Some options require special processing, marked with an asterisk '*' in {{fig-op
 
 The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCORE responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to Observe responses (see Section 5.6.1 of {{RFC7252}}) which is then processed according to {{outer-options}}. The Outer Max-Age option value SHALL be discarded by the OSCORE client.
+The Outer Max-Age option is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to OSCORE error responses described in {{replay-protection}}, {{ver-req}} and {{ver-res}}, which is then processed according to {{outer-options}}.
 
-Non-Observe OSCORE responses do not need to include a Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
+Non-error OSCORE responses do not need to include a Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 #### The Block Options {#block-options}
 
@@ -615,7 +615,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 ## Replay Protection {#replay-protection}
 
-In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails and the message received is a CON message, the server SHALL respond with a 5.03 Service Unavailable error message with the inner Max-Age option set to 0. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message and, in case of CON respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
@@ -681,9 +681,9 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 3. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If the request is a NON message and either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If the request is a CON message, and:
 
-   * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
+   * either the decompression or the COSE message fails to decode, the server SHALL respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
-   * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The diagnostic payload MAY contain the string "Security context not found".
+   * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server SHALL respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Security context not found".
 
 4. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
 
@@ -693,7 +693,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 7. Decrypt the COSE object using the Recipient Key.
 
-   * If decryption fails, the server MUST stop processing the request and, if the request is a CON message, the server MUST respond with a 4.00 Bad Request error message. The diagnostic payload MAY contain the "Decryption failed" string.
+   * If decryption fails, the server MUST stop processing the request and, if the request is a CON message, the server MUST respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Decryption failed" string.
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
