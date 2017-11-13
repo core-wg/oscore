@@ -273,7 +273,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of Sender ID is length of nonce - 6 bytes. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
-To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a Context Hint {{context-hint}} to help the Server find the right context.
+To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a "kid context" parameter {{context-hint}} to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
@@ -482,10 +482,34 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
    * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
 
    * The "kid" parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and SHOULD NOT be present in responses. (An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.tiloca-core-multicast-oscoap}}.)
+   
+   * Optionally, a "kid context" parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
 -  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
+
+## Kid Context {#context-hint}
+
+For certain use cases, e.g. deployments where the same "kid" is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The "kid context" parameter is used to provide such additional input. The "kid context" is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
+
+A summary of the COSE header parameter "kid context" defined above can be found in {{tab-1}}.
+
+Some examples of relevant uses of kid context are the following:
+
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context.
+
+* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
+ 
+~~~~~~~~~~
++----------+--------+------------+----------------+-------------------+
+|   name   |  label | value type | value registry | description       |
++----------+--------+------------+----------------+-------------------+
+|   kid    | kidctx | bstr       |                | Identifies the    |
+| context  |        |            |                | kid context       |
++----------+--------+------------+----------------+-------------------+
+~~~~~~~~~~
+{: #tab-1 title="Additional common header parameter for the COSE object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
@@ -739,7 +763,7 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
-The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the Context Hint parameter (length and value), and the kid parameter as follows:
+The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <--------- n bytes ------------->                    
@@ -747,24 +771,24 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 |0 0 0|h|k|  n  |        Partial IV (if any)    
 +-+-+-+-+-+-+-+-+---------------------------------
 
-<-- 1 byte --> <------ s bytes ------>               
-+------------+-----------------------+------------------+
-| s (if any) | Context Hint (if any) | kid (if any) ... |                  
-+------------+-----------------------+------------------+
+<-- 1 byte --><------ s bytes ------>               
++------------+----------------------+------------------+
+| s (if any) | kid context (if any) | kid (if any) ... |                  
++------------+----------------------+------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
 * The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the Context Hint flag, h: it is set to 1 if the compressed COSE object contains a Context Hint, see {{context-hint}}.
+    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context, see {{context-hint}}.
     - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the Context Hint ({{context-hint}}) s, if the Context Hint flag is set (h = 1).
+* The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
 
-* The following s bytes encode the Context Hint, if the Context Hint flag is set (h = 1).
+* The following s bytes encode the kid context, if the kid context flag is set (h = 1).
 
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1)
 
@@ -774,16 +798,6 @@ Note that the kid MUST be the last field of the object-security value, even in c
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
 The payload of the OSCORE message SHALL encode the ciphertext of the COSE object.
-
-## Context Hint {#context-hint}
-
-For certain use cases, e.g. deployments where the same Recipient ID is used with multiple contexts, it is necessary or favorable for the client to provide a Context Hint in order for the server to retrieve the Recipient Context. The Context Hint is implicitly integrity protected, as manipulation leads to the wrong or no context being retrieved resulting in a verification error, as described in {{ver-req}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
-
-Examples:
-
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as Context Hint.
-
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as Context Hint to enable the server to find the right security context.
 
 ## Examples of Compressed COSE Objects
 
@@ -823,7 +837,7 @@ Option Value: 09 00 (2 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-Request with kid = empty string, Partial IV = 5, and Context Hint = 0x44616c656b
+Request with kid = empty string, Partial IV = 5, and kid context = 0x44616c656b
 
 After compression (22  bytes):
 
@@ -1030,6 +1044,17 @@ The length of message fields can reveal information about the message. Applicati
 # IANA Considerations
 
 Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
+
+## COSE Header Parameters Registry
+
+The 'kid context' paramter is added to the "COSE Header Parameters Registry":
+
+* Name: kid context
+* Label: kidctx
+* Value Type: bstr
+* Value Registry: 
+* Description: kid context
+* Reference: {{context-hint}} of this document
 
 ## CoAP Option Numbers Registry 
 
