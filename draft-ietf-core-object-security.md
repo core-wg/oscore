@@ -893,7 +893,7 @@ The presence of the Object-Security option, both in requests and responses, is e
   * "" (empty string) if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
-The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
+The value of the body is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
 
 Example:
 
