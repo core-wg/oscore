@@ -908,7 +908,12 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
 As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is the value of the Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding). The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
+The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is:
+
+  * "" (empty string) if the CoAP Object-Security option is empty, or
+  * the value of the CoAP Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+
+The value of the body is the OSCORE payload {{oscore-payl}}.
 
 Example:
 
@@ -940,7 +945,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [HTTP response -- After object security processing]
@@ -979,7 +984,7 @@ Example:
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [CoAP response -- CoAP Server to Proxy]
