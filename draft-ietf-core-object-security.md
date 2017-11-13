@@ -471,7 +471,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same 'kid' is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve the correct kid. The 'kid context' parameter is used as an additional input to find the needed cryptographic key. The 'kid context' is implicitly integrity protected, as manipulation leads to the wrong or no context being retrieved resulting in a verification error, as described in {{ver-req}}. Applications MUST NOT assume that 'kid context' values are unique. 
+For certain use cases, e.g. deployments where the same 'kid' is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve the correct key. The 'kid context' parameter is used as an additional input to find the needed cryptographic key. The 'kid context' is implicitly integrity protected, as manipulation leads to the wrong or no context being retrieved resulting in a verification error, as described in {{ver-req}}. Applications MUST NOT assume that 'kid context' values are unique. 
 
 A summary of the COSE header parameter 'kid context' defined above can be found in {{tab-1}}.
 
