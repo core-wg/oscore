@@ -890,7 +890,7 @@ As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mappin
 
 The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is:
 
-  * '' (empty string) if the CoAP Object-Security option is empty, or
+  * "" (empty string) if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option {{obj-sec-value}} in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 The value of the payload is the OSCORE payload {{oscore-payl}}, also base64url-encoded without padding. 
@@ -925,7 +925,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
-  Object-Security: '' (empty string)
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [HTTP response -- After object security processing]
@@ -964,7 +964,7 @@ Example:
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
-  Object-Security: '' (empty string)
+  Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [CoAP response -- CoAP Server to Proxy]
