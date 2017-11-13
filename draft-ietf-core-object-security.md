@@ -925,7 +925,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: '' (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [HTTP response -- After object security processing]
@@ -964,7 +964,7 @@ Example:
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
-  Object-Security: [empty]
+  Object-Security: '' (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
 [CoAP response -- CoAP Server to Proxy]
