@@ -49,7 +49,7 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
-  I-D.amsuess-core-repeat-request-tag:
+  I-D.ietf-core-echo-request-tag:
   
 informative:
 
@@ -231,7 +231,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.amsuess-core-repeat-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.ietf-core-echo-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -378,9 +378,9 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RF
 
 The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
 
-For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.amsuess-core-repeat-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.amsuess-core-repeat-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
+For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.ietf-core-echo-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.ietf-core-echo-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
 
-For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.amsuess-core-repeat-request-tag}}.
+For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.ietf-core-echo-request-tag}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -388,7 +388,7 @@ Proxies MAY fragment an OSCORE message using {{RFC7959}}, which then introduces 
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.amsuess-core-repeat-request-tag}}.
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
 
 #### Proxy-Uri
 
@@ -583,7 +583,7 @@ The maximum Sender Sequence Number is algorithm dependent, see {{sec-considerati
 
 ## Freshness
 
-For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness {{I-D.amsuess-core-repeat-request-tag}}.
+For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness {{I-D.ietf-core-echo-request-tag}}.
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
 
@@ -617,7 +617,7 @@ To prevent reuse of Sender Sequence Numbers, a node MAY perform the following pr
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.amsuess-core-repeat-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Repeat option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server  MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
 
 If the server using the Repeat option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
@@ -899,7 +899,7 @@ The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-cor
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
-Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.amsuess-core-repeat-request-tag}}.
+Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.ietf-core-echo-request-tag}}.
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
