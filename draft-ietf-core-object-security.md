@@ -441,11 +441,11 @@ A summary of how the header fields and payload are protected is shown in {{fig-h
 | Field            | E | U |
 +------------------+---+---+
 | Version (UDP)    |   | x |
-| Type (UPD)       |   | x |
+| Type (UDP)       |   | x |
 | Length (TCP)     |   | x |
 | Token Length     |   | x |
 | Code             | x |   |
-| Message ID (UPD) |   | x |
+| Message ID (UDP) |   | x |
 | Token            |   | x |
 | Payload          | x |   |
 +------------------+---+---+
