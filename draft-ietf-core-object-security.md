@@ -58,9 +58,9 @@ informative:
   RFC7228:
   RFC7515:
   I-D.ietf-ace-oauth-authz:
+  I-D.ietf-cbor-cddl:
   I-D.ietf-core-coap-tcp-tls:
   I-D.bormann-6lo-coap-802-15-ie:
-  I-D.greevenbosch-appsawg-cbor-cddl:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
   I-D.seitz-ace-oscoap-profile:
@@ -107,7 +107,7 @@ An implementation supporting this specification MAY only implement the client pa
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
-Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.greevenbosch-appsawg-cbor-cddl}}, and constrained environments {{RFC7228}}.
+Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
 The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
