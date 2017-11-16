@@ -782,7 +782,9 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context, see {{context-hint}}.
-    - The sixth-eighth least significant bits are reserved and SHALL be set to zero when not in use.
+    - The sixth least significant bit is reserved for indicating the presence of a signature. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
+    - The seventh least significant bit is reserved to expand the flag byte. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
+    - The eighth least significant bit is reserved for indicating if a non-compressed COSE object is used. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
