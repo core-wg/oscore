@@ -662,7 +662,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 1. Retrieve the Sender Context associated with the target resource.
 
-2. Compose the Additional Authenticated Data and the Plaintext, as described in {{aad}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the Plaintext, as described in {{AAD}} and {{plaintext}}.
 
 3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}}. Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
@@ -710,7 +710,7 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
-2. Compose the Additional Authenticated Data and the Plaintext, as described in {{aad}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the Plaintext, as described in {{AAD}} and {{plaintext}}.
 
 3. Compute the AEAD nonce
   
