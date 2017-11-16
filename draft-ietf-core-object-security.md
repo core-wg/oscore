@@ -564,6 +564,8 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 ~~~~~~~~~~~
 {: #fig-plaintext title="Plaintext" artwork-align="center"}
 
+NOTE: The Plaintext contains all CoAP data that needs to be encrypted end-to-end between the endpoints.
+
 ## Additional Authenticated Data {#AAD}
 
 The external_aad SHALL be a CBOR array as defined below:
