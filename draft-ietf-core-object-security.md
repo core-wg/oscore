@@ -291,7 +291,7 @@ Message fields of the CoAP message may be protected end-to-end between CoAP clie
 
 The sending endpoint SHALL transfer Class E message fields in the ciphertext of the COSE object in the OSCORE message. The sending endpoint SHALL include Class I message fields in the Additional Authenticated Data (AAD) of the AEAD algorithm, allowing the receiving endpoint to detect if the value has changed in transfer. Class U message fields SHALL NOT be protected in transfer. Class I and Class U message field values are transferred in the header or options part of the OSCORE message which is visible to proxies.
 
-Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner" (Class E). Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer" (Class I or U). 
+Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner" (Class E). Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer" (Class I or U). There are currently no Class I options defined.
 
 An OSCORE message may contain both an Inner and an Outer message field of certain CoAP message fields. Inner if the value is intended for the destination endpoint, Outer if the value is intended for a proxy. Inner and Outer message fields are processed independently.
 
@@ -301,7 +301,7 @@ The CoAP Payload, if present in the original CoAP message, SHALL be encrypted an
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Options which require special processing, in particular those which may have both Inner and Outer message fields, are labelled with asterisks.
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options which may have both Inner and Outer message fields. The options which require special processing are labelled with asterisks.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+
@@ -320,22 +320,21 @@ A summary of how options are protected is shown in {{fig-option-protection}}. Op
 | 15 | Uri-Query      | x |   |
 | 17 | Accept         | x |   |
 | 20 | Location-Query | x |   |
-| 23 | Block2         | * | * |
-| 27 | Block1         | * | * |
-| 28 | Size2          | * | * |
-| 35 | Proxy-Uri      | * | * |
+| 23 | Block2         | x | x |
+| 27 | Block1         | x | x |
+| 28 | Size2          | x | x |
+| 35 | Proxy-Uri      | x | x |
 | 39 | Proxy-Scheme   |   | x |
-| 60 | Size1          | * | * |
+| 60 | Size1          | x | x |
 +----+----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
- I = Integrity Protect only (Outer)
  U = Unprotected (Outer)
  * = Special
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurrences.
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. 
 
 ### Inner Options {#inner-options}
 
@@ -353,7 +352,7 @@ The sending endpoint SHALL include the Outer option message field present in the
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
-A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. 
+A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurrences.
 
 Note: There are currently no Class I option message fields defined.
 
