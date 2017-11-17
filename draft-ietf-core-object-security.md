@@ -315,7 +315,7 @@ The sending endpoint writes the payload of the original CoAP message into the Pl
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options which may have both Inner and Outer message fields. The options which require special processing are labelled with asterisks.
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks.
 
 ~~~~~~~~~~~
 +----+----------------+---+---+
@@ -334,10 +334,10 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
 | 15 | Uri-Query      | x |   |
 | 17 | Accept         | x |   |
 | 20 | Location-Query | x |   |
-| 23 | Block2         | x | x |
-| 27 | Block1         | x | x |
-| 28 | Size2          | x | x |
-| 35 | Proxy-Uri      | x | x |
+| 23 | Block2         | * | * |
+| 27 | Block1         | * | * |
+| 28 | Size2          | * | * |
+| 35 | Proxy-Uri      |   | * |
 | 39 | Proxy-Scheme   |   | x |
 | 60 | Size1          | x | x |
 +----+----------------+---+---+
@@ -352,7 +352,7 @@ Options that are unknown or for which OSCORE processing is not defined SHALL be 
 
 ### Inner Options {#inner-options}
 
-When using OSCORE, Inner option message fields (marked in column E of {{fig-option-protection}}) are sent in a way analogous to communicating in a protected manner directly with the other endpoint.
+Inner option message fields (class E) are used in a way analogous to communicating in a protected manner directly with the other endpoint.
 
 The sending endpoint SHALL write the Inner option message fields present in the original CoAP message into the plaintext of the COSE object {{plaintext}}, and then remove the Inner option message fields from the OSCORE message. 
 
@@ -360,7 +360,7 @@ The processing of Inner option message fields by the receiving endpoint is speci
 
 ### Outer Options {#outer-options}
 
-Outer option message fields (marked in column U or I of {{fig-option-protection}}) are used to support proxy operations. 
+Outer option message fields (Class U or I) are used to support proxy operations. 
 
 The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including Object-Security, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Outer option message field. 
 
@@ -372,19 +372,19 @@ Note: There are currently no Class I option message fields defined.
 
 ### Special Options
 
-Some options require special processing, marked with an asterisk '*' in {{fig-option-protection}}. An asterisk in the columns E and U indicate that the option may be added as an Inner and/or Outer message by the sending endpoint; the processing is specified in this section.
+Some options require special processing, marked with an asterisk '*' in {{fig-option-protection}}; the processing is specified in this section.
 
 #### Max-Age {#max-age}
 
-The Inner Max-Age option is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
+An Inner Max-Age message field is used to specify the freshness (as defined in {{RFC7252}}) of the resource, end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
 
-The Outer Max-Age option is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age option with value zero to OSCORE error responses described in {{replay-protection}}, {{ver-req}} and {{ver-res}}, which is then processed according to {{outer-options}}.
+An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses described in {{replay-protection}}, {{ver-req}} and {{ver-res}}, which is then processed according to {{outer-options}}.
 
 Non-error OSCORE responses do not need to include a Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options are used to secure message fragmentation end-to-end (Inner options) or for proxies to fragment the OSCORE message for the next hop (Outer options). Inner and Outer block processing may have different performance properties depending on the underlying transport. The integrity of the message can be verified end-to-end both in case of Inner and Outer Blockwise provided all blocks are received (see {{outer-block-options}}).
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options (Block1, Block2, Size1, Size2), when Inner message fields, provide  secure message fragmentation such that each fragment can be verified. The Block options, when Outer message fields, enables hop-by-hop fragmentation of the OSCORE message. Inner and Outer block processing may have different performance properties depending on the underlying transport. The end-to-end integrity of the message can be verified both in case of Inner and Outer Blockwise provided all blocks are received (see {{outer-block-options}}).
 
 
 ##### Inner Block Options {#inner-block-options}
@@ -397,7 +397,9 @@ For blockwise response operations using Block2, an endpoint MUST comply with the
 
 ##### Outer Block Options {#outer-block-options}
 
-Proxies MAY fragment an OSCORE message using {{RFC7959}}, which then introduces Outer Block options not generated by the sending endpoint. Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCORE message and verify its integrity. Therefore, applications supporting OSCORE and {{RFC7959}} MUST specify a security policy defining a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
+{RFC7959}} by introducing Block option message fields that are Outer {{outer-options}} and
+
+Proxies MAY fragment an OSCORE message using {{RFC7959}}, by introducing Block option message fields that are Outer {{outer-options}} and not generated by the sending endpoint. Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCORE message and verify its integrity. Therefore, applications supporting OSCORE and {{RFC7959}} MUST specify a security policy defining a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
