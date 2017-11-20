@@ -65,7 +65,7 @@ informative:
   I-D.seitz-ace-oscoap-profile:
   I-D.tiloca-core-multicast-oscoap:
   I-D.ietf-core-echo-request-tag:
-  
+  I-D.ietf-6tisch-minimal-security:
 
 --- abstract
 
@@ -517,17 +517,16 @@ A summary of the COSE header parameter "kid context" defined above can be found 
 
 Some examples of relevant uses of kid context are the following:
 
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context.
-
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt {{context-definition}} for additional entropy of the security contexts, see for example {{I-D.ietf-6tisch-minimal-security}}.
 * In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
  
 ~~~~~~~~~~
-+----------+--------+------------+----------------+-------------------+
-|   name   |  label | value type | value registry | description       |
-+----------+--------+------------+----------------+-------------------+
-|   kid    | kidctx | bstr       |                | Identifies the    |
-| context  |        |            |                | kid context       |
-+----------+--------+------------+----------------+-------------------+
++----------+--------+------------+----------------+-----------------+
+|   name   |  label | value type | value registry | description     |
++----------+--------+------------+----------------+-----------------+
+|   kid    | kidctx | bstr       |                | Identifies the  |
+| context  |        |            |                | kid context     |
++----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
 {: #tab-1 title="Additional common header parameter for the COSE object" artwork-align="center"}
 
