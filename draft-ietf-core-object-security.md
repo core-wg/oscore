@@ -533,7 +533,7 @@ Some examples of relevant uses of kid context are the following:
 The nonce is constructed in the following way (see {{fig-nonce}}):
 
 1. left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes,
-2. left-padding the (Sender) ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length – 6 bytes,
+2. left-padding the (Sender) ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length - 6 bytes,
 3. concatenating the size of the ID (S) with the padded ID and the padded Partial IV,
 4. and then XORing with the Common IV.
  
