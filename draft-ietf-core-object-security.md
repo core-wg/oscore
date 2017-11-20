@@ -315,32 +315,33 @@ The sending endpoint writes the payload of the original CoAP message into the Pl
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks.
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
 
 ~~~~~~~~~~~
-+----+----------------+---+---+
-| No.| Name           | E | U |
-+----+----------------+---+---+
-|  1 | If-Match       | x |   |
-|  3 | Uri-Host       |   | x |
-|  4 | ETag           | x |   |
-|  5 | If-None-Match  | x |   |
-|  6 | Observe        |   | * |
-|  7 | Uri-Port       |   | x |
-|  8 | Location-Path  | x |   |
-| 11 | Uri-Path       | x |   |
-| 12 | Content-Format | x |   |
-| 14 | Max-Age        | * | * |
-| 15 | Uri-Query      | x |   |
-| 17 | Accept         | x |   |
-| 20 | Location-Query | x |   |
-| 23 | Block2         | * | * |
-| 27 | Block1         | * | * |
-| 28 | Size2          | * | * |
-| 35 | Proxy-Uri      |   | * |
-| 39 | Proxy-Scheme   |   | x |
-| 60 | Size1          | x | x |
-+----+----------------+---+---+
++-----+-----------------+---+---+
+| No. | Name            | E | U |
++-----+-----------------+---+---+
+|  1  | If-Match        | x |   |
+|  3  | Uri-Host        |   | x |
+|  4  | ETag            | x |   |
+|  5  | If-None-Match   | x |   |
+|  6  | Observe         |   | * |
+|  7  | Uri-Port        |   | x |
+|  8  | Location-Path   | x |   |
+| TBD | Object-Security |   | * |
+| 11  | Uri-Path        | x |   |
+| 12  | Content-Format  | x |   |
+| 14  | Max-Age         | * | * |
+| 15  | Uri-Query       | x |   |
+| 17  | Accept          | x |   |
+| 20  | Location-Query  | x |   |
+| 23  | Block2          | * | * |
+| 27  | Block1          | * | * |
+| 28  | Size2           | * | * |
+| 35  | Proxy-Uri       |   | * |
+| 39  | Proxy-Scheme    |   | x |
+| 60  | Size1           | x | x |
++-----+-----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
  U = Unprotected (Outer)
@@ -348,7 +349,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. 
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
 ### Inner Options {#inner-options}
 
@@ -446,6 +447,12 @@ To secure the order of notifications, the client SHALL maintain a Notification N
 If the verification fails, the client SHALL stop processing the response. The client MAY ignore the Observe option value.
 
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. (The reverse case is covered in the verification of the response, see {{processing}}.)
+
+
+#### Object-Security 
+
+The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor inegrity protected as a whole but some part of the content of this option is protected, see {{AAD}}. "OSCORE within OSCORE" is not supported: If OSCORE processing detects an OSCORE option in the original CoAP message, then processing SHALL be stopped.
+
 
 ## CoAP Header {#coap-header}
 
