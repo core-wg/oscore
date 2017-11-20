@@ -49,7 +49,6 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
-  I-D.ietf-core-echo-request-tag:
   
 informative:
 
@@ -65,6 +64,8 @@ informative:
   I-D.mattsson-core-coap-actuators:
   I-D.seitz-ace-oscoap-profile:
   I-D.tiloca-core-multicast-oscoap:
+  I-D.ietf-core-echo-request-tag:
+  
 
 --- abstract
 
@@ -392,9 +393,7 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RF
 
 The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
 
-For blockwise request operations using Block1, an endpoint MUST comply with the Request-Tag processing defined in Section 3 of {{I-D.ietf-core-echo-request-tag}}. In particular, the rules in section 3.3.1 of {{I-D.ietf-core-echo-request-tag}} MUST be followed, which guarantee that a specific request body is assembled only from the corresponding request blocks.
-
-For blockwise response operations using Block2, an endpoint MUST comply with the ETag processing defined in Section 4 of {{I-D.ietf-core-echo-request-tag}}.
+For concurrent blockwise operations the sending endpoint MUST ensure that the receiving endpoint can distinguish between blocks from different operations. One mechanism enabling this is specified in {{I-D.ietf-core-echo-request-tag}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -630,7 +629,7 @@ The maximum Sender Sequence Number is algorithm dependent, see {{sec-considerati
 
 ## Freshness
 
-For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness {{I-D.ietf-core-echo-request-tag}}.
+For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
 
@@ -932,7 +931,7 @@ This section describes the operations of OSCORE-aware proxies.
 
 ## CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
-OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies provide certain simplifications as specified in this section. 
+OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies MAY provide certain simplifications as specified in this section. 
 
 The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
