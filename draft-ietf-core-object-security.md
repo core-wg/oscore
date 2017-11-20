@@ -33,8 +33,8 @@ author:
       -
         ins: L. Seitz
         name: Ludwig Seitz
-        org: SICS Swedish ICT
-        email: ludwig@sics.se
+        org: RISE SICS
+        email: ludwig.seitz@ri.se
 
 normative:
 
