@@ -131,7 +131,7 @@ The Object-Security option includes the OSCORE flag byte ({{compression}}), the 
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
-Since the payload and most options are encrypted {{protected-fields}}, and the corresponding plain text message fields of the original are not included in the OSCORE message, the processing of these fields does not expand the total message size.
+Since the payload and most options are encrypted (see {{protected-fields}}), and the corresponding plain text message fields of the original are not included in the OSCORE message, the processing of these fields does not expand the total message size.
 
 A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}.
 
