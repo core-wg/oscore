@@ -53,6 +53,7 @@ normative:
 informative:
 
   RFC3986:
+  RFC5116:
   RFC5869:
   RFC7228:
   RFC7515:
@@ -491,7 +492,7 @@ This section defines how to use COSE {{RFC8152}} to wrap and protect data in the
  
 The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Common IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
-We denote by Plaintext the data that is encrypted and integrity protected, and by Additional Authenticated Data (AAD) the data that is integrity protected only.
+As specified in {{RFC5116}}, Plaintext denotes the data that is encrypted and integrity protected, and Additional Authenticated Data (AAD) denotes the data that is integrity protected only.
 
 The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
