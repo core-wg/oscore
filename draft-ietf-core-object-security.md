@@ -81,7 +81,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 
 OSCORE is designed for constrained nodes and networks and provides an in-layer security protocol that does not depend on underlying layers. OSCORE can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). An extension of OSCORE may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
-OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure the binding of response to request. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original message that are encrypted are transported in the payload of the OSCORE message, and the Object-Security option is included, see {{fig-sketch}}.
+OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure the binding of response to request. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). OSCORE provides protection of message payload, almost all CoAP options, and the RESTful method. The solution transforms a message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is related to the original message in the following way: the original message is translated to CoAP (if not already in CoAP) and the resulting message payload (if present), options not processed by a proxy, and the request/response method (CoAP Code) are protected in a COSE object. The message fields of the original message that are encrypted are transported in the payload of the OSCORE message, and the Object-Security option is included (see {{fig-sketch}}).
 
 ~~~~~~~~~~~
 Client                                          Server
@@ -133,7 +133,7 @@ A successful response to a request with the Object-Security option SHALL contain
 
 Since the payload and most options are encrypted (see {{protected-fields}}), and the corresponding plain text message fields of the original are not included in the OSCORE message, the processing of these fields does not expand the total message size.
 
-A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request, see {{coap-coap-proxy}}. As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}.
+A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request (see {{coap-coap-proxy}}). As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing (see {{max-age}}).
 
 # The Security Context {#context}
 
@@ -415,7 +415,7 @@ Uri-Path and Uri-Query are class E options and SHALL be protected and processed 
 
 The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
 
-Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
+Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}). OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
 
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
@@ -450,7 +450,7 @@ The Observe option in the CoAP request may be legitimately removed by a proxy. I
 
 #### Object-Security 
 
-The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor inegrity protected as a whole but some part of the content of this option is protected, see {{AAD}}. "OSCORE within OSCORE" is not supported: If OSCORE processing detects an OSCORE option in the original CoAP message, then processing SHALL be stopped.
+The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor inegrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). "OSCORE within OSCORE" is not supported: If OSCORE processing detects an OSCORE option in the original CoAP message, then processing SHALL be stopped.
 
 
 ## CoAP Header {#coap-header}
@@ -517,7 +517,7 @@ A summary of the COSE header parameter "kid context" defined above can be found 
 
 Some examples of relevant uses of kid context are the following:
 
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt {{context-definition}} for additional entropy of the security contexts, see for example {{I-D.ietf-6tisch-minimal-security}}.
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt {{context-definition}} for additional entropy of the security contexts (see for example {{I-D.ietf-6tisch-minimal-security}}).
 * In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
  
 ~~~~~~~~~~
@@ -541,7 +541,7 @@ The nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported.
 
-When observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions, see {{processing}}.
+When observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions (see {{processing}}).
 
 ~~~~~~~~~~~
 +---+-----------------------+--+--+--+--+--+
@@ -638,7 +638,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 * The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context, see {{context-hint}}.
+    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
     - The sixth least significant bit is reserved for indicating the presence of a signature. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
     - The seventh least significant bit is reserved to expand the flag byte. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
     - The eighth least significant bit is reserved for indicating if a non-compressed COSE object is used. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
@@ -762,7 +762,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
-The maximum Sender Sequence Number is algorithm dependent, see {{sec-considerations}}, and no greater than 2^40 - 1. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and no greater than 2^40 - 1. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Freshness
 
@@ -826,7 +826,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
-5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
+5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added (see {{outer-options}}).
 
 6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
 
@@ -834,7 +834,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received, see {{block-options}}.
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 2. Discard the message Code and all non-special Inner option message fields (marked with 'x' in column E of {{fig-option-protection}}) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
@@ -878,13 +878,13 @@ Given a CoAP response, the server SHALL perform the following steps to create an
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
-5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added, see {{outer-options}}.
+5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added (see {{outer-options}}).
 
 ## Verifying the Response {#ver-res}
 
 A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received, see {{block-options}}.
+1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
 
 2. Discard the message Code and all non-special Class E options from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
 
