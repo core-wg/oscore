@@ -260,7 +260,8 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. The encoding is described in {{cose-object}}
 
-   * type is "Key" or "IV"
+   * type is "Key" or "IV". The label is an ASCII string, and does not
+   include a trailing NUL byte.
 
    * L is the size of the key/IV for the AEAD algorithm used, in octets
 
