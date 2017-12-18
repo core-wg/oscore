@@ -388,7 +388,7 @@ Non-error OSCORE responses do not need to include a Max-Age option since the res
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7959}}. The Block options (Block1, Block2, Size1, Size2), when Inner message fields, provide  secure message fragmentation such that each fragment can be verified. The Block options, when Outer message fields, enables hop-by-hop fragmentation of the OSCORE message. Inner and Outer block processing may have different performance properties depending on the underlying transport. The end-to-end integrity of the message can be verified both in case of Inner and Outer Blockwise provided all blocks are received (see {{outer-block-options}}).
+Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting Blockwise. The Block options (Block1, Block2, Size1, Size2), when Inner message fields, provide  secure message fragmentation such that each fragment can be verified. The Block options, when Outer message fields, enables hop-by-hop fragmentation of the OSCORE message. Inner and Outer block processing may have different performance properties depending on the underlying transport. The end-to-end integrity of the message can be verified both in case of Inner and Outer Blockwise provided all blocks are received (see {{outer-block-options}}).
 
 
 ##### Inner Block Options {#inner-block-options}
