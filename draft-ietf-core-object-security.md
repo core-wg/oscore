@@ -403,19 +403,19 @@ Proxies MAY fragment an OSCORE message using {{RFC7959}}, by introducing Block o
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
+To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in Section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
 
 #### Proxy-Uri
 
 Proxy-Uri, when present, is split by OSCORE into class U options and class E options, which are processed accordingly. When Proxy-Uri is used in the original CoAP message, Uri-* are not present {{RFC7252}}.
 
-The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to section 6.4 of {{RFC7252}}. 
+The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to Section 6.4 of {{RFC7252}}. 
 
 Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}). 
 
-The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host and Uri-Port options (if present) as specified in section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
+The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
 
-Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
+Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}. OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies. In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
 
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
@@ -433,7 +433,7 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 * Proxy-Uri = "coap://example.com"
 
-See Section 6.1 and 12.6 of {{RFC7252}} for more information.
+See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
 
 #### Observe {#observe}
 
