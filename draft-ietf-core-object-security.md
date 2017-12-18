@@ -127,7 +127,7 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option includes the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format is specified in {{compression}}). If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option includes the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format is specified in {{compression}}. If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
