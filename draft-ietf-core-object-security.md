@@ -355,7 +355,8 @@ Options that are unknown or for which OSCORE processing is not defined SHALL be 
 
 ### Inner Options {#inner-options}
 
-Inner option message fields (class E) are used in a way analogous to communicating in a protected manner directly with the other endpoint.
+Inner option message fields (class E) are used to communicate directly with
+the other endpoint.
 
 The sending endpoint SHALL write the Inner option message fields present in the original CoAP message into the plaintext of the COSE object {{plaintext}}, and then remove the Inner option message fields from the OSCORE message. 
 
