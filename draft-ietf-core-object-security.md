@@ -446,7 +446,7 @@ To secure the order of notifications, the client SHALL maintain a Notification N
 
 If the verification fails, the client SHALL stop processing the response. The client MAY ignore the Observe option value.
 
-The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client reveives a response to a non-Observe request with an observe response the processing is covered {{processing}}.
+The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client reveives a response to a non-Observe request with an outer Observe value, the processing is covered in {{processing}}.
 
 
 #### Object-Security 
