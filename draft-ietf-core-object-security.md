@@ -101,7 +101,7 @@ Client                                          Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
-OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with hop-by-hop protection of the Messaging Layer, during transport between end-point and intermediary node. Examples of the use of OSCORE are given in {{examples}}.
+OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with protection of the Messaging Layer between intermediries, during transport between end-points and intermediary nodes. Examples of the use of OSCORE are given in {{examples}}.
 
 An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective parts of this specification to work with OSCORE (see {{proxy-operations}}).
 
@@ -110,6 +110,8 @@ An implementation supporting this specification MAY only implement the client pa
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, and constrained environments {{RFC7228}}.
+
+The concept "hop-by-hop" (as in "hop-by-hop protection") opposed to "end-to-end", is used in this document to indicate that the messages are processed (as in decrypted/verified and re-encrypted, in the case of hop-by-hop protection) in the intermediaries, rather than just forwarded to the next node to finally reach the destination endpoint.
 
 The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
