@@ -260,14 +260,16 @@ where:
 ~~~~~~~~~~~
 where:
 
-   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. The encoding is described in {{cose-object}}
+   * id is the Sender ID or Recipient ID when deriving keys and nil when deriving the Common IV. The encoding is described in {{cose-object}}.
+   
+   * alg is the AEAD Algorithm (alg), encoded as defined in {{RFC8152}}. 
 
    * type is "Key" or "IV". The label is an ASCII string, and does not
    include a trailing NUL byte.
 
-   * L is the size of the key/IV for the AEAD algorithm used, in octets
+   * L is the size of the key/IV for the AEAD algorithm used, in octets.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the value for L is 16 for keys and 13 for the Common IV.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg is 10, the value for L is 16 for keys and 13 for the Common IV.
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
