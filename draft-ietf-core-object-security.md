@@ -131,11 +131,9 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option includes the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format is specified in {{compression}}. If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option includes the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format and length is specified in {{compression}}. If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
-
-Since the payload and most options are encrypted (see {{protected-fields}}), and the corresponding plain text message fields of the original are not included in the OSCORE message, the processing of these fields does not expand the total message size.
 
 A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original client's request (see {{coap-coap-proxy}}). As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing (see {{max-age}}).
 
@@ -656,6 +654,8 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1)
 
 Note that the kid MUST be the last field of the object-security value, even in case reserved bits are used and additional fields are added to it.
+
+The length of the Object-Security option thus depends on the presence and length of Partial IV, kid context, kid, as specified in this section and on the presence and length of the other parameters, as needs to be specified in separate documents.
 
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
