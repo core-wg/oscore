@@ -930,7 +930,7 @@ The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{R
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
-# Proxy Operations {#proxy-operations}
+# Proxy and HTTP Operations {#proxy-operations}
 
 RFC 7252 defines operations for a CoAP-to-CoAP proxy (see Section 5.7 of {{RFC7252}}) and for proxying between CoAP and HTTP (Section 10 of {{RFC7252}}). A more detailed description of the HTTP-to-CoAP mapping is provided by {{RFC8075}}.
 This section describes the operations of OSCORE-aware proxies.
