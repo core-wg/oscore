@@ -898,9 +898,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{sequence-numbers}}. If the client receives a notification for which no Observe request was sent, then go to 11.
+4. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}. If the client receives a notification for which no Observe request was sent, then go to 11.
 
-5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
+5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
 6. Compute the AEAD nonce
 
