@@ -872,7 +872,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 ## Protecting the Response {#prot-res}
 
-Given a CoAP response, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
+If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
