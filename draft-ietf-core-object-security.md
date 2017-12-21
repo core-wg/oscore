@@ -329,26 +329,26 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
 +-----+-----------------+---+---+
 | No. | Name            | E | U |
 +-----+-----------------+---+---+
-|  1  | If-Match        | x |   |
-|  3  | Uri-Host        |   | x |
-|  4  | ETag            | x |   |
-|  5  | If-None-Match   | x |   |
-|  6  | Observe         |   | * |
-|  7  | Uri-Port        |   | x |
-|  8  | Location-Path   | x |   |
+|   1 | If-Match        | x |   |
+|   3 | Uri-Host        |   | x |
+|   4 | ETag            | x |   |
+|   5 | If-None-Match   | x |   |
+|   6 | Observe         |   | * |
+|   7 | Uri-Port        |   | x |
+|   8 | Location-Path   | x |   |
 | TBD | Object-Security |   | * |
-| 11  | Uri-Path        | x |   |
-| 12  | Content-Format  | x |   |
-| 14  | Max-Age         | * | * |
-| 15  | Uri-Query       | x |   |
-| 17  | Accept          | x |   |
-| 20  | Location-Query  | x |   |
-| 23  | Block2          | * | * |
-| 27  | Block1          | * | * |
-| 28  | Size2           | * | * |
-| 35  | Proxy-Uri       |   | * |
-| 39  | Proxy-Scheme    |   | x |
-| 60  | Size1           | x | x |
+|  11 | Uri-Path        | x |   |
+|  12 | Content-Format  | x |   |
+|  14 | Max-Age         | * | * |
+|  15 | Uri-Query       | x |   |
+|  17 | Accept          | x |   |
+|  20 | Location-Query  | x |   |
+|  23 | Block2          | * | * |
+|  27 | Block1          | * | * |
+|  28 | Size2           | * | * |
+|  35 | Proxy-Uri       |   | * |
+|  39 | Proxy-Scheme    |   | x |
+|  60 | Size1           | x | x |
 +-----+-----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
@@ -390,7 +390,7 @@ An Inner Max-Age message field is used to specify the freshness (as defined in {
 
 An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses described in {{replay-protection}}, {{ver-req}} and {{ver-res}}, which is then processed according to {{outer-options}}.
 
-Non-error OSCORE responses do not need to include a Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
+Non-error OSCORE responses do not need to include a Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 #### The Block Options {#block-options}
 
@@ -456,7 +456,7 @@ The Observe option in the CoAP request may be legitimately removed by a proxy. I
 
 #### Object-Security 
 
-The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor inegrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). "OSCORE within OSCORE" is not supported: If OSCORE processing detects an OSCORE option in the original CoAP message, then processing SHALL be stopped.
+The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor inegrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). "OSCORE within OSCORE" is not supported: If OSCORE processing detects an Object-Security option in the original CoAP message, then processing SHALL be stopped.
 
 
 ## CoAP Header {#coap-header}
