@@ -348,7 +348,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
 |  28 | Size2           | * | * |
 |  35 | Proxy-Uri       |   | * |
 |  39 | Proxy-Scheme    |   | x |
-|  60 | Size1           | x | x |
+|  60 | Size1           | * | * |
 +-----+-----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
@@ -940,7 +940,7 @@ This section describes the operations of OSCORE-aware proxies.
 
 OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies MAY provide certain simplifications as specified in this section. 
 
-The targeted proxy operations are specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
+Security requirements for forwarding proxies are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}.  This document complies with the extended security requirements also addressing Blockwise ({{RFC7959}}) and CoAP-mappable HTTP. In particular caching is disabled since the CoAP response is only applicable to the original client's CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
