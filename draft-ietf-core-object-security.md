@@ -273,7 +273,7 @@ For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
-The Sender Sequence Number is initialized to 0.  The supported types of replay protection and replay window length is application specific and depends on the lower layers. The default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sender Sequence Number is initialized to 0.  The supported types of replay protection and replay window length is application specific and depends on how OSCORE is transported. The default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters
 
@@ -780,7 +780,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 ## Replay Protection {#replay-protection}
 
-In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message and, MAY optionally respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and lower protocol layers. In case of reliable and ordered transport from endpoint to endpoint, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1.
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message and, MAY optionally respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
