@@ -852,9 +852,9 @@ A server receiving a request containing the Object-Security option SHALL perform
    
    * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
 
-4. Verify the 'Partial IV' parameter using the Replay Window, as described in {{sequence-numbers}}.
+4. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
 
-5. Compose the Additional Authenticated Data, as described in {{cose-object}}.
+5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
 6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
