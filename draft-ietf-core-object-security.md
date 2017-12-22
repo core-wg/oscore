@@ -63,10 +63,11 @@ informative:
   I-D.bormann-6lo-coap-802-15-ie:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
-  I-D.seitz-ace-oscoap-profile:
+  I-D.ietf-ace-oscore-profile:
   I-D.tiloca-core-multicast-oscoap:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
+  I-D.mattsson-ace-tls-oscore:
 
 --- abstract
 
@@ -234,7 +235,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.ietf-core-echo-request-tag}}. How the input parameters are pre-established, is application specific. The ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oauth-authz}}. 
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.ietf-core-echo-request-tag}}. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}).
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -1054,7 +1055,7 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 (D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP message layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occuring during CoAP processing are protected end-to-end. Error messages occuring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error message are allowed as specified. Applications using unprotected error messages need to consider the threat that these messages may be spoofed. 
 
-The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.seitz-ace-oscoap-profile}}.
+The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}.
 
 Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
