@@ -951,6 +951,10 @@ Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
+## HTTP Processing {#http-proc}
+
+The HTTP processing specified in this document consists of mapping HTTP messages to CoAP and embedded
+
 ## HTTP-to-CoAP Translation Proxy {#http2coap}
 
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
@@ -968,7 +972,7 @@ Example:
 Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC8075}}).
 
 ~~~~~~~~~~~
-[HTTP request -- Before object security processing]
+[HTTP request -- Before client object security processing]
 
   GET http://proxy.url/hc/?target_uri=coap://server.url/orders HTTP/1.1
  
@@ -984,6 +988,16 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
   Object-Security: 09 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
+[CoAP request -- After server object security processing]
+
+  GET coap://server.url/orders 
+
+[CoAP response -- Before server object security processing]
+
+  2.05 Content
+  Content-Format: 0
+  Payload: Exterminate! Exterminate!
+
 [CoAP response -- CoAP Server to Proxy]
 
   2.04 Changed
@@ -996,9 +1010,10 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-[HTTP response -- After object security processing]
+[HTTP response -- After client object security processing]
 
   HTTP/1.1 200 OK
+  Content-Type: text/plain
   Body: Exterminate! Exterminate!
 ~~~~~~~~~~~
 
@@ -1011,7 +1026,7 @@ Section 10.1 of {{RFC7252}} describes the behavior of a CoAP-to-HTTP proxy.  RFC
 Example:
 
 ~~~~~~~~~~~
-[CoAP request -- Before object security processing]
+[CoAP request -- Before client object security processing]
 
   GET coap://proxy.url/
   Proxy-Uri=http://server.url/orders
@@ -1028,6 +1043,16 @@ Example:
   POST http://server.url/ HTTP/1.1
   Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+  
+[HTTP request -- After server object security processing]
+
+  GET http://server.url/orders 
+
+[HTTP response -- Before server object security processing]
+
+  HTTP/1.1 200 OK
+  Content-Type: text/plain
+  Body: Exterminate! Exterminate!
 
 [HTTP response -- HTTP Server to Proxy]
 
@@ -1041,9 +1066,10 @@ Example:
   Object-Security: [empty]
   Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-[CoAP response -- After object security processing]
+[CoAP response -- After client object security processing]
 
   2.05 Content
+  Content-Format: 0
   Payload: Exterminate! Exterminate!
 ~~~~~~~~~~~
 
