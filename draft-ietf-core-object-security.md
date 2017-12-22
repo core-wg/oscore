@@ -70,7 +70,7 @@ informative:
 
 --- abstract
 
-This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP), using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end encryption, integrity and replay protection, as well as a secure message binding. OSCORE is designed for constrained nodes and networks and can be used whereever CoAP can be used, and also with HTTP. OSCORE may be used to protect group communications as is specified in a separate draft.
+This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP), using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end protection between endpoints communicating using CoAP, or CoAP-mappable HTTP. OSCORE is designed for constrained nodes and networks, and works wherever CoAP does, supporting a range of proxy operations, including mapping between different transport protocols.
 
 --- middle
 
