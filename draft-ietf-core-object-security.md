@@ -451,7 +451,7 @@ To secure the order of notifications, the client SHALL maintain a Notification N
 
 If the verification fails, the client SHALL stop processing the response. The client MAY ignore the Observe option value.
 
-The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client reveives a response to a non-Observe request with an outer Observe value, the processing is covered in {{processing}}.
+The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client reveives a response to a non-Observe request with an Outer Observe value, the processing is covered in {{processing}}.
 
 
 #### Object-Security 
@@ -642,7 +642,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
 * The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
-    - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 is reserved.
+    - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
     - The sixth least significant bit is reserved for indicating the presence of a signature. This needs to be specified in a separate document. The bit SHALL be set to zero when not in use.
@@ -668,9 +668,9 @@ The payload of the OSCORE message SHALL encode the ciphertext of the COSE object
 
 ## Examples of Compressed COSE Objects
 
-### Example: Requests 
+### Examples: Requests 
 
-Request with kid = 25 and Partial IV = 5
+1. Request with kid = 25 and Partial IV = 5
 
 Before compression (24 bytes):
 
@@ -692,7 +692,8 @@ Option Value: 09 05 25 (3 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-Request with kid = empty string and Partial IV = 0
+
+2. Request with kid = empty string and Partial IV = 0
 
 After compression (16 bytes):
 
@@ -704,7 +705,8 @@ Option Value: 09 00 (2 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-Request with kid = empty string, Partial IV = 5, and kid context = 0x44616c656b
+
+3. Request with kid = empty string, Partial IV = 5, and kid context = 0x44616c656b
 
 After compression (22  bytes):
 
@@ -792,7 +794,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notififcation Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the Nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, an endpoint MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
@@ -816,7 +818,7 @@ If the server using the Echo option can verify a second request as fresh, then t
 
 To prevent accepting replay of previously received notification responses, the client MAY perform the following procedure after boot:
 
-* The client rejects notifications bound to the earlier registration, removes all Notification Numbers and re-register using Observe.
+* The client rejects notifications bound to the earlier registration, removes all Notification Numbers and re-registers using Observe.
 
 # Processing {#processing}
 
@@ -842,7 +844,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 A server receiving a request containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+1. Process Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 2. Discard the message Code and all non-special Inner option message fields (marked with 'x' in column E of {{fig-option-protection}}) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
@@ -892,7 +894,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 A client receiving a response containing the Object-Security option SHALL perform the following steps:
 
-1. Process outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
+1. Process Outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
 
 2. Discard the message Code and all non-special Class E options from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
 
@@ -1058,7 +1060,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-The inner block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving endpoint can verify blocks before having received the complete message. The outer block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the encrypted options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
+The Inner Block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving endpoint can verify blocks before having received the complete message. The Outer Block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the Inner Block options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
 # Privacy Considerations
 
@@ -1078,7 +1080,7 @@ Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with
 
 ## COSE Header Parameters Registry
 
-The 'kid context' paramter is added to the "COSE Header Parameters Registry":
+The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
 * Name: kid context
 * Label: kidctx
@@ -1115,7 +1117,7 @@ The HTTP header field Object-Security is added to the Message Headers registry:
 
 # Acknowledgments
 
-The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Dave Thaler, Marco Tiloca, and Mališa Vučinić.
+The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Dave Thaler, Marco Tiloca, and Mališa Vucinic.
 
 Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
