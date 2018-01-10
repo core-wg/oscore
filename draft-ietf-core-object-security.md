@@ -1154,7 +1154,79 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 # Test Vectors
 
-TODO: This section needs to be updated.
+This appendix includes the test vectors for different examples of CoAP exchanges using OSCORE.
+
+## Key Derivation
+
+Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
+
+### Client
+
+Inputs:
+
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
+* Sender Id : 0x636c69656e74
+* Recipient Id: 0x736572766572
+
+From the previous parameters,
+
+~~~~~~~~~~~
+* info: 0x8446636c69656e740a634b657910 
+Gives:
+* Sender Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+
+* info: 0x84467365727665720a634b657910 
+Gives:
+* Recipient Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+
+* info: 0x84400a6249560d
+Gives:
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+~~~~~~~~~~~
+
+Outputs:
+
+* Sender Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+* Recipient Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+
+### Server
+
+Inputs:
+
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
+* Sender Id : 0x736572766572
+* Recipient Id: 0x636c69656e74
+
+From the previous parameters,
+
+~~~~~~~~~~~
+* info: 0x84467365727665720a634b657910 
+Gives:
+* Sender Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+
+* info: 0x8446636c69656e740a634b657910 
+Gives:
+* Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+
+* info: 0x84400a6249560d
+Gives:
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+~~~~~~~~~~~
+
+Outputs:
+
+* Sender Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+* Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+
+## GET request
+
+todo
+
+## GET request, response with Partial IV
+
+todo
 
 # Examples {#examples}
 
