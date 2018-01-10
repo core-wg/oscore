@@ -1156,7 +1156,7 @@ Ludwig Seitz and Göran Selander worked on this document as part of the CelticPl
 
 This appendix includes the test vectors for different examples of CoAP exchanges using OSCORE.
 
-## Key Derivation
+## Key Derivation {#key-der-tv}
 
 Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
 
@@ -1165,7 +1165,7 @@ Given a set of inputs, OSCORE defines how to set up the Security Context in both
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
-* Sender Id : 0x636c69656e74
+* Sender Id: 0x636c69656e74
 * Recipient Id: 0x736572766572
 
 From the previous parameters,
@@ -1195,7 +1195,7 @@ Outputs:
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
-* Sender Id : 0x736572766572
+* Sender Id: 0x736572766572
 * Recipient Id: 0x636c69656e74
 
 From the previous parameters,
@@ -1222,7 +1222,71 @@ Outputs:
 
 ## GET request
 
-todo
+This section contains the test vector for the following exchange:
+
+* Client sends a CoAP GET /tv1 request protected with OSCORE to the server. 
+* Server replies with a 2.05 Content response, protected with OSCORE. The response does not contain a kid nor a Partial IV.
+
+The Security Context is the output of {{key-der-tv}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
+
+### Client: Sending the request
+
+Security Context:
+
+* alg: 10 (AES-CCM-16-64-128)
+* KDF: HKDF SHA-256
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+* Sender Id: 0x636c69656e74
+* Sender Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+* Sender Sequence Number: 20
+* Recipient Id: 0x736572766572
+* Recipient Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+
+The following COSE and cryptographic parameters are derived:
+
+* Partial IV: 0x14
+* kid: 0x636c69656e74
+* external_aad: 0x85010a46636c69656e74411440
+* plaintext: 0x01b3747631
+* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+* nonce: 0x6dd58c18fd22fba8b4a7a2d07f
+* ciphertext: 0x532afb94e8f433bfad7c3b841f
+
+From there:
+
+* Object-Security value: 0x0914636c69656e74
+* CoAP request: 0x4402226b0000b264396c6f63616c686f7374d8050914636c69656e74ff532afb94e8f433bfad7c3b841f
+
+### Server: Sending the response
+
+Security Context:
+
+* alg: 10 (AES-CCM-16-64-128)
+* KDF: HKDF SHA-256
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
+* Common IV: 0x6bd5ef74944795dcb4a7a2d06b
+* Sender Id: 0x736572766572
+* Sender Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+* Sender Sequence Number: 0
+* Recipient Id: 0x636c69656e74
+* Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
+* Replay Window: default, empty
+
+The following COSE and cryptographic parameters are derived:
+
+* external_aad: 0x85010a46636c69656e74411440
+* plaintext: 0x45ff48656c6c6f20576f726c6421
+* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* key: 0x4e48f7cbdc2e71899a6b3c82134fe509
+* nonce: 0x6dd58c18fd22fba8b4a7a2d07f
+* ciphertext: 0x6e0fb8085be5539adb5dad509334d4598341dfa15503
+
+From there:
+
+* Object-Security value: 0x
+* CoAP response: 0x6444226b0000b264d008ff6e0fb8085be5539adb5dad509334d4598341dfa15503
 
 ## GET request, response with Partial IV
 
