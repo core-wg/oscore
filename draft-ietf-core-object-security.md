@@ -598,7 +598,7 @@ The external_aad SHALL be a CBOR array as defined below:
 
 ~~~~~~~~~~~ CDDL
 external_aad = [
-   version : uint,
+   oscore_version : uint,
    alg : int / tstr,
    request_kid : bstr,
    request_piv : bstr,
@@ -608,7 +608,7 @@ external_aad = [
 
 where:
 
-- version: contains the OSCORE version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
+- oscore_version: contains the OSCORE version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
 
 - alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
