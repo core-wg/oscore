@@ -462,7 +462,8 @@ The Object-Security option is only defined to be present in OSCORE messages, as 
 
 ## CoAP Header {#coap-header}
 
-A summary of how the CoAP Header fields are protected is shown in {{fig-header-protection}}.
+A summary of how the CoAP Header fields are protected is shown in {{fig-header-protection}}, including fields specific to CoAP over UDP and
+CoAP over TCP (marked accordingly in the table).
 
 ~~~~~~~~~~~
 +------------------+---+---+
