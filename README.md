@@ -1,6 +1,6 @@
-# Object Security of CoAP (OSCOAP)
+# Object Security for Constrained RESTful Environments (OSCORE)
 
-This is the working area for the Working Group internet-draft, "Object Security of CoAP (OSCOAP)".
+This is the working area for the Working Group internet-draft, "Object Security for Constrained RESTful Environments (OSCORE)".
 
 * [Editor's copy](https://core-wg.github.io/oscoap/) [![Build Status](https://travis-ci.org/core-wg/oscoap.svg?branch=master)](https://travis-ci.org/core-wg/oscoap)
 * [Working Group Draft](https://tools.ietf.org/html/draft-ietf-core-object-security)
