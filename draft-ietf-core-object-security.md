@@ -79,7 +79,25 @@ This document defines Object Security for Constrained RESTful Environments (OSCO
 
 The Constrained Application Protocol (CoAP) {{RFC7252}} is a web application protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS ({{RFC6347}}) for security. CoAP and HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of the message payload and metadata, in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
-This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the RESTful method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE does neither protect the CoAP Messaging Layer nor the CoAP Token which may change between endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports. 
+This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the RESTful method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE does neither protect the CoAP Messaging Layer nor the CoAP Token which may change between endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
+
+~~~~~~~~~~~
++-----------------------------+
+|         Application         |
++-----------------------------+
++-----------------------------+  \
+|     Requests/Responses      |  |
+|-----------------------------|  |
+|           OSCORE            |  | CoAP
+|-----------------------------|  |
+|  Messages / Message Framing |  |
++-----------------------------+  /
++-----------------------------+
+|        UDP / TCP / ...      |
++-----------------------------+      
+~~~~~~~~~~~
+{: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
+
 
 OSCORE is designed for constrained nodes and networks, and does not depend on underlying layers. OSCORE can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). An extension of OSCORE may also be used to protect group communication for CoAP {{I-D.tiloca-core-multicast-oscoap}}. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
@@ -114,6 +132,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, and constrained environments {{RFC7228}}.
 
 The concept "hop-by-hop" (as in "hop-by-hop protection") opposed to "end-to-end", is used in this document to indicate that the messages are processed (as in decrypted/verified and re-encrypted, in the case of hop-by-hop protection) in the intermediaries, rather than just forwarded to the next node to finally reach the destination endpoint.
+
+The term "stop processing" is used throughout the document to denote that the message is not passed up to the CoAP Request/Response layer (see {{fig-stack}}). This is equivalent to silently dropping the message, unless otherwise specified (for example, sending an error response).
 
 The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
 
