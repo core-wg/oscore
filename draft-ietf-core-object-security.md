@@ -472,13 +472,13 @@ To secure the order of notifications, the client SHALL maintain a Notification N
 
 If the verification fails, the client SHALL stop processing the response.
 
-The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client reveives a response to a non-Observe request with an Outer Observe value, the processing is covered in {{processing}}.
+The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, the processing is covered in {{processing}}.
 
+Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE observation is refreshed, not only the ETags, but also the partial IV (and thus the payload and Object-Security option) change. The server uses the new request's Partial IV as the `request_piv` of new responses.
 
 #### Object-Security 
 
 The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor integrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). "OSCORE within OSCORE" is not supported: If OSCORE processing detects an Object-Security option in the original CoAP message, then processing SHALL be stopped.
-
 
 ## CoAP Header {#coap-header}
 
@@ -799,7 +799,7 @@ The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerati
 
 For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
 
-For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly restart the observation.
+For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation.
 
 For requests, and responses with Observe, OSCORE also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of responses.
 
@@ -946,6 +946,8 @@ A client receiving a response containing the Object-Security option SHALL perfor
 10. The decrypted CoAP response is processed according to {{RFC7252}}
 
 11. (Optional) In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+
+An error condition occuring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
 
 # Web Linking
 
