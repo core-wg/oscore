@@ -256,7 +256,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The replay window type and size is used by the client in the processing of the Request-Tag {{I-D.ietf-core-echo-request-tag}}. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}).
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}).
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -432,7 +432,8 @@ Proxies MAY fragment an OSCORE message using {{RFC7959}}, by introducing Block o
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
-To allow multiple concurrent request operations to the same server (not only same resource), a CoAP proxy SHOULD follow the Request-Tag processing specified in Section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
+Because of encryption of Uri-Path and Uri-Query, messages to the same server may, from the point of view of a proxy, look like they also target the same resource. A proxy SHOULD mitigate a potential mix-up of blocks from concurrent requests to the same server, for example using the Request-Tag processing specified in Section 3.3.2 of {{I-D.ietf-core-echo-request-tag}}.
+
 
 #### Proxy-Uri
 
