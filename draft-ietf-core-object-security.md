@@ -483,11 +483,13 @@ Clients can re-register observations to ensure that the observation is still act
 
 No-Response is defined in {{RFC7967}}. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with same value.
 
-The Inner No-Response option is used to communicate to the server the client's disinterest in some responses against a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}.
+The Inner No-Response option is used to communicate to the server the client's disinterest in certain classes of responses to a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. 
 
-The Outer No-Response option is used to keep proxies functionalities, specifically to avoid error transmissions from proxies to clients and network cut-offs of the servers, from proxies doing congestion control. The Outer No-Response option is processed according to {{outer-options}}.
+The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. The Outer No-Response option is processed according to {{outer-options}}. 
 
-Applications should consider that proxies may remove the Outer No-Response option from the requests. Applications can specify policies to deal with cases where servers receive an Inner No-Response option only, which means that the request comes from a No-Response unaware proxy. This would allow to avoid servers networks cut-offs and proxies error retransmissions due to No-Response unaware proxies. 
+In particular, step 8 of {{ver-res}} is applied to No-Response.
+
+Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
 
 #### Object-Security 
 
