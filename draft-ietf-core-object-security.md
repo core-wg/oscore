@@ -49,6 +49,7 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
+  RFC7967:
   
 informative:
 
@@ -370,6 +371,7 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
 |  35 | Proxy-Uri       |   | * |
 |  39 | Proxy-Scheme    |   | x |
 |  60 | Size1           | * | * |
+| 258 | No-Response     | * | * |
 +-----+-----------------+---+---+
 
  E = Encrypt and Integrity Protect (Inner)
@@ -475,6 +477,16 @@ If the verification fails, the client SHALL stop processing the response.
 The Observe option in the CoAP request may be legitimately removed by a proxy. If the Observe option is removed from a CoAP request by a proxy, then the server can still verify the request (as a non-Observe request), and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it MUST verify the response as a non-Observe response. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE observation is refreshed, not only the ETags, but also the partial IV (and thus the payload and Object-Security option) change. The server uses the new request's Partial IV as the 'request_piv' of new responses.
+
+#### No-Response {#no-resp}
+
+No-Response is defined in {{RFC7967}}. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with same value.
+
+The Inner No-Response option is used to communicate to the server the client's disinterest in some responses against a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}.
+
+The Outer No-Response option is used to keep proxies functionalities, specifically to avoid error transmissions from proxies to clients and network cut-offs of the servers, from proxies doing congestion control. The Outer No-Response option is processed according to {{outer-options}}.
+
+Applications should consider that proxies may remove the Outer No-Response option from the requests. Applications can specify policies to deal with cases where servers receive an Inner No-Response option only, which means that the request comes from a No-Response unaware proxy. This would allow to avoid servers networks cut-offs and proxies error retransmissions due to No-Response unaware proxies. 
 
 #### Object-Security 
 
