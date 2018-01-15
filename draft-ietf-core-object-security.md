@@ -213,7 +213,7 @@ The Sender Context contains the following parameters:
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
-* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as "Partial IV" {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
+* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as 'Partial IV' {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
 The Recipient Context contains the following parameters:
 
@@ -303,7 +303,7 @@ As collisions may lead to the loss of both confidentiality and integrity, Sender
 
 If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
-To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a "kid context" parameter ({{context-hint}}) to help the Server find the right context.
+To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a 'kid context' parameter ({{context-hint}}) to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
@@ -535,25 +535,25 @@ As specified in {{RFC5116}}, Plaintext denotes the data that is encrypted and in
 
 The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
-- The "protected" field is empty.
+- The 'protected' field is empty.
 
-- The "unprotected" field includes:
+- The 'unprotected' field includes:
 
-   * The "Partial IV" parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV SHOULD NOT be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
 
-   * The "kid" parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and SHOULD NOT be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.tiloca-core-multicast-oscoap}}.
+   * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and SHOULD NOT be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.tiloca-core-multicast-oscoap}}.
    
-   * Optionally, a "kid context" parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
+   * Optionally, a 'kid context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
--  The "ciphertext" field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
+-  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same "kid" is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The "kid context" parameter is used to provide such additional input. The "kid context" is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
+For certain use cases, e.g. deployments where the same 'kid' is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The 'kid context' parameter is used to provide such additional input. The 'kid context' is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
 
-A summary of the COSE header parameter "kid context" defined above can be found in {{tab-1}}.
+A summary of the COSE header parameter 'kid context' defined above can be found in {{tab-1}}.
 
 Some examples of relevant uses of kid context are the following:
 
@@ -1117,7 +1117,7 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}.
 
-Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field "Partial IV" is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
+Most AEAD algorithms require a unique nonce for each message, for which the sender sequence numbers in the COSE message field 'Partial IV' is used. If the recipient accepts any sequence number larger than the one previously received, then the problem of sequence number synchronization is avoided. With reliable transport, it may be defined that only messages with sequence number which are equal to previous sequence number + 1 are accepted. The alternatives to sequence numbers have their issues: very constrained devices may not be able to support accurate time, or to generate and store large numbers of random nonces. The requirement to change key at counter wrap is a complication, but it also forces the user of this specification to think about implementing key renewal.
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
@@ -1135,7 +1135,7 @@ CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP
 
 Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
-The length of message fields can reveal information about the message. Applications may use a padding scheme to protect against traffic analysis. As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms. Some information can be determined even from looking at boundary conditions. An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length. For example, using 0 and 1 instead of 'yes' and 'no'. 2) Use a character which is not part of the responses to pad to a fixed length. For example, pad with a space to three characters. 3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m. For example, appending a 0 to "YES" and two 1's to "NO". This style of padding means that all values need to be padded. Similar arguments apply to other message fields such as resource names.
+The length of message fields can reveal information about the message. Applications may use a padding scheme to protect against traffic analysis. As an example, the strings "YES" and "NO" even if encrypted can be distinguished from each other as there is no padding supplied by the current set of encryption algorithms. Some information can be determined even from looking at boundary conditions. An example of this would be returning an integer between 0 and 100 where lengths of 1, 2 and 3 will provide information about where in the range things are. Three different methods to deal with this are: 1) ensure that all messages are the same length. For example, using 0 and 1 instead of "yes" and "no". 2) Use a character which is not part of the responses to pad to a fixed length. For example, pad with a space to three characters. 3) Use the PKCS #7 style padding scheme where m bytes are appended each having the value of m. For example, appending a 0 to "YES" and two 1's to "NO". This style of padding means that all values need to be padded. Similar arguments apply to other message fields such as resource names.
 
 # IANA Considerations
 
