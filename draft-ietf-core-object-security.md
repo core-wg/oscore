@@ -489,7 +489,7 @@ The Outer No-Response option is used to support proxy functionality, specificall
 
 In particular, step 8 of {{ver-res}} is applied to No-Response.
 
-Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
+Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
 
 #### Object-Security 
 
