@@ -990,7 +990,28 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 ## HTTP Processing {#http-proc}
 
-The HTTP processing specified in this document assumes the capability of mapping between HTTP and CoAP, and vice versa (see {{RFC8075}}), and transforming between CoAP and OSCORE, and vice versa (as defined in this document).
+In order to use OSCORE with HTTP, an endpoint needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
+
+A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes an HTTP header field named Object-Security, whose value is:
+
+  * "" (empty string) if the CoAP Object-Security option is empty, or
+  * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+
+Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payload ({{oscore-payl}}).
+
+The resulting message is an OSCORE message that uses HTTP.
+
+A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the Object-Security header field, which is mapped to the CoAP Object-Security option in the following way. The CoAP Object-Security option value is:
+
+* empty if the value of the HTTP Object-Security header field is "" (empty string)
+* the value of the HTTP Object-Security header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
+
+Note that the value of the CoAP payload is the HTTP body, i.e. the OSCORE payload ({{oscore-payl}}).
+
+The resulting message is an OSCORE message that uses CoAP.
+
+The endpoint can then verify the message according to the OSCORE processing and get a verified CoAP message. It can then translate the verified CoAP message into a verified HTTP message.
+
 
 ## HTTP-to-CoAP Translation Proxy {#http2coap}
 
