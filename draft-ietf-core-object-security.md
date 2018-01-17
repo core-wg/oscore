@@ -95,7 +95,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 +-----------------------------+  /
 +-----------------------------+
 |        UDP / TCP / ...      |
-+-----------------------------+      
++-----------------------------+  
 ~~~~~~~~~~~
 {: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
 
@@ -119,7 +119,6 @@ Client                                          Server
    |        Payload: COSE ciphertext              |
    |                                              |
 ~~~~~~~~~~~
-
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
 OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options, and Code, in combination with protection of the Messaging Layer between intermediaries, during transport between end-points and intermediary nodes. Examples of the use of OSCORE are given in {{examples}}.
