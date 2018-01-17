@@ -122,7 +122,7 @@ Client                                          Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
-OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with protection of the Messaging Layer between intermediries, during transport between end-points and intermediary nodes. Examples of the use of OSCORE are given in {{examples}}.
+OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options and Code, in combination with protection of the Messaging Layer between intermediaries, during transport between end-points and intermediary nodes. Examples of the use of OSCORE are given in {{examples}}.
 
 An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies need to implement respective parts of this specification to work with OSCORE (see {{proxy-operations}}).
 
@@ -413,7 +413,7 @@ An Inner Max-Age message field is used to specify the freshness (as defined in {
 
 An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses described in {{replay-protection}}, {{ver-req}} and {{ver-res}}, which is then processed according to {{outer-options}}.
 
-Non-error OSCORE responses do not need to include a Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
+Non-error OSCORE responses do not need to include an Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 #### The Block Options {#block-options}
 
@@ -962,7 +962,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 11. (Optional) In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
-An error condition occuring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
+An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
 
 # Web Linking
 
@@ -1137,7 +1137,7 @@ Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mappin
 
 In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP message layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occuring during CoAP processing are protected end-to-end. Error messages occuring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error message are allowed as specified. Applications using unprotected error messages need to consider the threat that these messages may be spoofed. 
+(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP message layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error message are allowed as specified. Applications using unprotected error messages need to consider the threat that these messages may be spoofed. 
 
 The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}.
 
