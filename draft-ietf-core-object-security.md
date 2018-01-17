@@ -87,7 +87,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 |         Application         |
 +-----------------------------+
 +-----------------------------+  \
-|     Requests/Responses      |  |
+|     Requests / Responses    |  |
 |-----------------------------|  |
 |           OSCORE            |  | CoAP
 |-----------------------------|  |
