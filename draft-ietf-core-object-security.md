@@ -161,7 +161,7 @@ A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security op
 
 # The Security Context {#context}
 
-OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a common shared master secret and a key derivation function (KDF).
+OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a shared master secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
