@@ -1278,7 +1278,7 @@ Outputs:
 * Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * Common IV: 0x6bd5ef74944795dcb4a7a2d06b
 
-## GET request
+## GET Request
 
 This section contains the test vector for the following exchange:
 
@@ -1317,7 +1317,7 @@ From there:
 * Object-Security value: 0x0914636c69656e74
 * CoAP request: 0x4402226b0000b264396c6f63616c686f7374d8050914636c69656e74ff532afb94e8f433bfad7c3b841f
 
-### Server: Sending the response
+### Server: Sending the Response
 
 Security Context:
 
@@ -1346,7 +1346,7 @@ From there:
 * Object-Security value: 0x
 * CoAP response: 0x6444226b0000b264d008ff6e0fb8085be5539adb5dad509334d4598341dfa15503
 
-## GET request, response with Partial IV
+## GET Request, Response with Partial IV
 
 This section contains the test vector for the following exchange:
 
@@ -1355,7 +1355,7 @@ This section contains the test vector for the following exchange:
 
 The Security Context is the output of {{key-der-tv}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
 
-### Client: Sending the request
+### Client: Sending the Request
 
 Security Context:
 
@@ -1385,7 +1385,7 @@ From there:
 * Object-Security value: 0x0914636c69656e74
 * CoAP request: 0x4402226b0000b264396c6f63616c686f7374d8050914636c69656e74ff532afb94e8f433bfad7c3b841f
 
-### Server: Sending the response
+### Server: Sending the Response
 
 Security Context:
 
