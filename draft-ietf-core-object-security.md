@@ -1102,7 +1102,7 @@ Example:
   
 [HTTP request -- After server object security processing]
 
-  GET http://server.url/orders 
+  GET http://server.url/orders HTTP/1.1
 
 [HTTP response -- Before server object security processing]
 
