@@ -666,14 +666,14 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
- 0 1 2 3 4 5 6 7 <--------- n bytes ------------->                    
+ 0 1 2 3 4 5 6 7 <--------- n bytes ------------->
 +-+-+-+-+-+-+-+-+---------------------------------
-|0 0 0|h|k|  n  |        Partial IV (if any)    
+|0 0 0|h|k|  n  |      Partial IV (if any) ...    
 +-+-+-+-+-+-+-+-+---------------------------------
 
-<-- 1 byte --><------ s bytes ------>               
+ <- 1 byte -> <------ s bytes ----->                    
 +------------+----------------------+------------------+
-| s (if any) | kid context (if any) | kid (if any) ... |                  
+| s (if any) | kid context (if any) | kid (if any) ... |
 +------------+----------------------+------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
