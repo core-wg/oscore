@@ -1116,7 +1116,7 @@ Example:
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-[CoAP response -- CoAP Server to Proxy]
+[CoAP response – Proxy to CoAP Client]
 
   2.04 Changed
   Object-Security: [empty]
