@@ -330,14 +330,14 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field. See {{fig-payload-protection}}.
 
 ~~~~~~~~~~~
-+------------------+---+---+
-| Field            | E | U |
-+------------------+---+---+
-| Payload          | x |   |
-+------------------+---+---+
+      +------------------+---+---+
+      | Field            | E | U |
+      +------------------+---+---+
+      | Payload          | x |   |
+      +------------------+---+---+
 
- E = Encrypt and Integrity Protect (Inner)
- U = Unprotected (Outer)
+E = Encrypt and Integrity Protect (Inner)
+U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-payload-protection title="Protection of CoAP Payload" artwork-align="center"}
 
@@ -501,20 +501,20 @@ A summary of how the CoAP Header fields are protected is shown in {{fig-header-p
 CoAP over TCP (marked accordingly in the table).
 
 ~~~~~~~~~~~
-+------------------+---+---+
-| Field            | E | U |
-+------------------+---+---+
-| Version (UDP)    |   | x |
-| Type (UDP)       |   | x |
-| Length (TCP)     |   | x |
-| Token Length     |   | x |
-| Code             | x |   |
-| Message ID (UDP) |   | x |
-| Token            |   | x |
-+------------------+---+---+
+      +------------------+---+---+
+      | Field            | E | U |
+      +------------------+---+---+
+      | Version (UDP)    |   | x |
+      | Type (UDP)       |   | x |
+      | Length (TCP)     |   | x |
+      | Token Length     |   | x |
+      | Code             | x |   |
+      | Message ID (UDP) |   | x |
+      | Token            |   | x |
+      +------------------+---+---+
 
- E = Encrypt and Integrity Protect (Inner)
- U = Unprotected (Outer)
+E = Encrypt and Integrity Protect (Inner)
+U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-header-protection title="Protection of CoAP Header Fields" artwork-align="center"}
 
