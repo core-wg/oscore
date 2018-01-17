@@ -145,9 +145,9 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 +-----+---+---+---+---+-----------------+--------+--------+---------+
 | No. | C | U | N | R | Name            | Format | Length | Default |
 +-----+---+---+---+---+-----------------+--------+--------+---------+
-| TBD | x |   |   |   | Object-Security |  (*)   | 0-255  | (none)  |
+| TBD | x |   |   |   | Object-Security |  (*)   | 0-255  | (none)  |
 +-----+---+---+---+---+-----------------+--------+--------+---------+
-    C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable   
+    C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable   
     (*) See below.
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
