@@ -104,22 +104,22 @@ OSCORE is designed for constrained nodes and networks, and does not depend on un
 
 OSCORE builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure binding of response to request. A compressed version of COSE is used, as discussed in {{compression}}. The use of OSCORE is signaled with the new Object-Security CoAP option or HTTP header, defined in {{option}} and {{http2coap}}. OSCORE is designed to protect as much information as possible, while still allowing proxy operations ({{proxy-operations}}). The solution transforms a CoAP/HTTP message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is a CoAP/HTTP message related to the original message in the following way: the original CoAP/HTTP message is translated to CoAP (if not already in CoAP) and the resulting CoAP message payload (if present), CoAP options not processed by a proxy, and CoAP Code (= Request Method/Response Code) are protected in a COSE object. The encrypted message fields of this CoAP message are transported in the CoAP/HTTP payload of the OSCORE message, and the Object-Security option is included in the message. A sketch of an OSCORE message exchange in the case of the original message being CoAP is provided in {{fig-sketch}}).
 
-
 ~~~~~~~~~~~
 Client                                          Server
-   |      OSCORE request - POST example.com:      |   
-   |        Header, Token,                        |   
-   |        Options: {Object-Security, ...},      |   
-   |        Payload: COSE ciphertext              |   
-   +--------------------------------------------->|   
+   |      OSCORE request - POST example.com:      |
+   |        Header, Token,                        |
+   |        Options: {Object-Security, ...},      |
+   |        Payload: COSE ciphertext              |
+   +--------------------------------------------->|
    |                                              |
-   |<---------------------------------------------+  
-   |      OSCORE response - 2.04 (Changed):       |   
-   |        Header, Token,                        |   
-   |        Options: {Object-Security, ...},      |   
-   |        Payload: COSE ciphertext              |    
-   |                                              | 
+   |<---------------------------------------------+
+   |      OSCORE response - 2.04 (Changed):       |
+   |        Header, Token,                        |
+   |        Options: {Object-Security, ...},      |
+   |        Payload: COSE ciphertext              |
+   |                                              |
 ~~~~~~~~~~~
+
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
 OSCORE may be used in very constrained settings, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. OSCORE can be combined with transport layer security such as DTLS or TLS, thereby enabling end-to-end security of e.g. CoAP Payload, Options, and Code, in combination with protection of the Messaging Layer between intermediaries, during transport between end-points and intermediary nodes. Examples of the use of OSCORE are given in {{examples}}.
@@ -144,7 +144,7 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+--------+--------+---------+
-| No. | C | U | N | R | Name            | Format | Length | Default | 
+| No. | C | U | N | R | Name            | Format | Length | Default |
 +-----+---+---+---+---+-----------------+--------+--------+---------+
 | TBD | x |   |   |   | Object-Security |  (*)   | 0-255  | (none)  |
 +-----+---+---+---+---+-----------------+--------+--------+---------+
@@ -348,35 +348,35 @@ The sending endpoint writes the payload of the original CoAP message into the Pl
 A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
 
 ~~~~~~~~~~~
-+-----+-----------------+---+---+
-| No. | Name            | E | U |
-+-----+-----------------+---+---+
-|   1 | If-Match        | x |   |
-|   3 | Uri-Host        |   | x |
-|   4 | ETag            | x |   |
-|   5 | If-None-Match   | x |   |
-|   6 | Observe         |   | * |
-|   7 | Uri-Port        |   | x |
-|   8 | Location-Path   | x |   |
-| TBD | Object-Security |   | * |
-|  11 | Uri-Path        | x |   |
-|  12 | Content-Format  | x |   |
-|  14 | Max-Age         | * | * |
-|  15 | Uri-Query       | x |   |
-|  17 | Accept          | x |   |
-|  20 | Location-Query  | x |   |
-|  23 | Block2          | * | * |
-|  27 | Block1          | * | * |
-|  28 | Size2           | * | * |
-|  35 | Proxy-Uri       |   | * |
-|  39 | Proxy-Scheme    |   | x |
-|  60 | Size1           | * | * |
-| 258 | No-Response     | * | * |
-+-----+-----------------+---+---+
+    +-----+-----------------+---+---+
+    | No. | Name            | E | U |
+    +-----+-----------------+---+---+
+    |   1 | If-Match        | x |   |
+    |   3 | Uri-Host        |   | x |
+    |   4 | ETag            | x |   |
+    |   5 | If-None-Match   | x |   |
+    |   6 | Observe         |   | * |
+    |   7 | Uri-Port        |   | x |
+    |   8 | Location-Path   | x |   |
+    | TBD | Object-Security |   | * |
+    |  11 | Uri-Path        | x |   |
+    |  12 | Content-Format  | x |   |
+    |  14 | Max-Age         | * | * |
+    |  15 | Uri-Query       | x |   |
+    |  17 | Accept          | x |   |
+    |  20 | Location-Query  | x |   |
+    |  23 | Block2          | * | * |
+    |  27 | Block1          | * | * |
+    |  28 | Size2           | * | * |
+    |  35 | Proxy-Uri       |   | * |
+    |  39 | Proxy-Scheme    |   | x |
+    |  60 | Size1           | * | * |
+    | 258 | No-Response     | * | * |
+    +-----+-----------------+---+---+
 
- E = Encrypt and Integrity Protect (Inner)
- U = Unprotected (Outer)
- * = Special
+E = Encrypt and Integrity Protect (Inner)
+U = Unprotected (Outer)
+* = Special
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
@@ -614,10 +614,10 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 - the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
 ~~~~~~~~~~~
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ 0                   1                   2                   3   
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Code      |    Class E options (if any) ...                             
+|     Code      |    Class E options (if any) ...                
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |1 1 1 1 1 1 1 1|    Payload (if any) ...                        
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
