@@ -194,7 +194,7 @@ Verify request with   |                       |
 
 The Common Context contains the following parameters:
 
-* AEAD Algorithm (alg). The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
+* AEAD Algorithm. The COSE AEAD algorithm to use for encryption. Its value is immutable once the security context is established.
 
 * Key Derivation Function. The HMAC based HKDF {{RFC5869}} used to derive Sender Key, Recipient Key, and Common IV.
 
@@ -236,7 +236,7 @@ The parameters in the security context are derived from a small set of input par
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
 
-* AEAD Algorithm (alg)
+* AEAD Algorithm
 
    - Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
 
@@ -280,7 +280,7 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
    
-   * alg is the AEAD Algorithm (alg), encoded as defined in {{RFC8152}}. 
+   * alg is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
    * type is "Key" or "IV". The label is an ASCII string, and does not
    include a trailing NUL byte.
