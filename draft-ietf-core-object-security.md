@@ -1213,8 +1213,8 @@ Given a set of inputs, OSCORE defines how to set up the Security Context in both
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
-* Sender Id: 0x636c69656e74
-* Recipient Id: 0x736572766572
+* Sender ID: 0x636c69656e74
+* Recipient ID: 0x736572766572
 
 From the previous parameters,
 
@@ -1243,8 +1243,8 @@ Outputs:
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
-* Sender Id: 0x736572766572
-* Recipient Id: 0x636c69656e74
+* Sender ID: 0x736572766572
+* Recipient ID: 0x636c69656e74
 
 From the previous parameters,
 
@@ -1285,10 +1285,10 @@ Security Context:
 * KDF: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
 * Common IV: 0x6bd5ef74944795dcb4a7a2d06b
-* Sender Id: 0x636c69656e74
+* Sender ID: 0x636c69656e74
 * Sender Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * Sender Sequence Number: 20
-* Recipient Id: 0x736572766572
+* Recipient ID: 0x736572766572
 * Recipient Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 
 The following COSE and cryptographic parameters are derived:
@@ -1297,7 +1297,7 @@ The following COSE and cryptographic parameters are derived:
 * kid: 0x636c69656e74
 * external_aad: 0x85010a46636c69656e74411440
 * plaintext: 0x01b3747631
-* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* AAD: 0x8368456e637279707430404d85010a46636c69656e74411440
 * key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * nonce: 0x6dd58c18fd22fba8b4a7a2d07f
 * ciphertext: 0x532afb94e8f433bfad7c3b841f
@@ -1315,10 +1315,10 @@ Security Context:
 * KDF: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
 * Common IV: 0x6bd5ef74944795dcb4a7a2d06b
-* Sender Id: 0x736572766572
+* Sender ID: 0x736572766572
 * Sender Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 * Sender Sequence Number: 0
-* Recipient Id: 0x636c69656e74
+* Recipient ID: 0x636c69656e74
 * Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * Replay Window: default, empty
 
@@ -1326,7 +1326,7 @@ The following COSE and cryptographic parameters are derived:
 
 * external_aad: 0x85010a46636c69656e74411440
 * plaintext: 0x45ff48656c6c6f20576f726c6421
-* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* AAD: 0x8368456e637279707430404d85010a46636c69656e74411440
 * key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 * nonce: 0x6dd58c18fd22fba8b4a7a2d07f
 * ciphertext: 0x6e0fb8085be5539adb5dad509334d4598341dfa15503
@@ -1353,10 +1353,10 @@ Security Context:
 * KDF: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
 * Common IV: 0x6bd5ef74944795dcb4a7a2d06b
-* Sender Id: 0x636c69656e74
+* Sender ID: 0x636c69656e74
 * Sender Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * Sender Sequence Number: 20
-* Recipient Id: 0x736572766572
+* Recipient ID: 0x736572766572
 * Recipient Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 
 The following COSE and cryptographic parameters are derived:
@@ -1365,7 +1365,7 @@ The following COSE and cryptographic parameters are derived:
 * kid: 0x636c69656e74
 * external_aad: 0x85010a46636c69656e74411440
 * plaintext: 0x01b3747631
-* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* AAD: 0x8368456e637279707430404d85010a46636c69656e74411440
 * key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * nonce: 0x6dd58c18fd22fba8b4a7a2d07f
 * ciphertext: 0x532afb94e8f433bfad7c3b841f
@@ -1383,10 +1383,10 @@ Security Context:
 * KDF: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223
 * Common IV: 0x6bd5ef74944795dcb4a7a2d06b
-* Sender Id: 0x736572766572
+* Sender ID: 0x736572766572
 * Sender Key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 * Sender Sequence Number: 0
-* Recipient Id: 0x636c69656e74
+* Recipient ID: 0x636c69656e74
 * Recipient Key: 0x8d413ad659fa1cf0b07c2fd96a5375c3
 * Replay Window: default, empty
 
@@ -1395,7 +1395,7 @@ The following COSE and cryptographic parameters are derived:
 * Partial IV: 0x00
 * external_aad: 0x85010a46636c69656e74411440
 * plaintext: 0x45ff48656c6c6f20576f726c6421
-* aad: 0x8368456e637279707430404d85010a46636c69656e74411440
+* AAD: 0x8368456e637279707430404d85010a46636c69656e74411440
 * key: 0x4e48f7cbdc2e71899a6b3c82134fe509
 * nonce: 0x6dd59c11e631f0aeb4a7a2d06b
 * ciphertext: 0x8aebfa5ee377dd5b697ca1c9773d5a57066ecef5887f
