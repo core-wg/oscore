@@ -319,7 +319,7 @@ The sending endpoint SHALL transfer Class E message fields in the ciphertext of 
 
 Message fields not visible to proxies, i.e., transported in the ciphertext of the COSE object, are called "Inner" (Class E). Message fields transferred in the header or options part of the OSCORE message, which is visible to proxies, are called "Outer" (Class I or U). There are currently no Class I options defined.
 
-An OSCORE message may contain both an Inner and an Outer instance of a certain CoAP message field. Inner message fields are intended for the receiving endpoint, whereas Outer message fields are intended for a proxy. Inner and Outer message fields are processed independently.
+An OSCORE message may contain both an Inner and an Outer instance of a certain CoAP message field. Inner message fields are intended for the receiving endpoint, whereas Outer message fields are used to support proxy operations. Inner and Outer message fields are processed independently.
 
 ## CoAP Payload
 
