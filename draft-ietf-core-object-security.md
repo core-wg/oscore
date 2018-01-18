@@ -582,7 +582,7 @@ The nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported.
 
-When observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions (see {{processing}}).
+When Observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions (see {{processing}}).
 
 ~~~~~~~~~~~
 +---+-----------------------+--+--+--+--+--+
