@@ -1340,9 +1340,13 @@ Outputs:
 
 This section contains the test vector for the following messages:
 
-* CoAP GET /tv1 request protected with OSCORE 
-* 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid nor a Partial IV.
-* 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid, but contains a  Partial IV.
+* CoAP GET /tv1 request protected with OSCORE, includes:
+  - Uri-Path: "tv1"
+  - Object-Security option
+* 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid nor a Partial IV. The response includes:
+  - Object-Security option
+* 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid, but contains a  Partial IV. The response includes:
+  - Object-Security option
 
 The Security Context is the output of {{key-der-tv}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
 
@@ -1367,11 +1371,15 @@ The following COSE and cryptographic parameters are derived:
 
 * Partial IV: 0x14
 * kid: 0x00
-* external_aad: 0x8501810a4100411440
-* plaintext: 0x01b3747631
-* AAD: 0x8368456e63727970743040498501810a4100411440
 * key: 0xf8f3b887436285ed5a66f6026ac2cdc1
 * nonce: 0xd0a1949aa253278f34c528d2d8
+* external_aad: 0x8501810a4100411440
+
+From the previous parameter, the following is derived:
+
+* AAD: 0x8368456e63727970743040498501810a4100411440
+* plaintext: 0x01b3747631
+
 * ciphertext: 0x55b3710d47c611cd3924838a44
 
 From there:
@@ -1399,11 +1407,15 @@ Security Context:
 
 The following COSE and cryptographic parameters are derived:
 
-* external_aad: 0x8501810a4100411440
-* plaintext: 0x45ff48656c6c6f20576f726c6421
-* AAD: 0x8368456e63727970743040498501810a4100411440
 * key: 0xd904cb101f7341c3f4c56c300fa69941
 * nonce: 0xd0a1949aa253278f34c528d2d8
+* external_aad: 0x8501810a4100411440
+
+From the previous parameter, the following is derived:
+
+* AAD: 0x8368456e63727970743040498501810a4100411440
+* plaintext: 0x45ff48656c6c6f20576f726c6421
+
 * ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d
 
 From there:
@@ -1432,11 +1444,15 @@ Security Context:
 The following COSE and cryptographic parameters are derived:
 
 * Partial IV: 0x00
-* external_aad: 0x8501810a4100411440
-* plaintext: 0x45ff48656c6c6f20576f726c6421
-* AAD: 0x8368456e63727970743040498501810a4100411440
 * key: 0xd904cb101f7341c3f4c56c300fa69941
 * nonce: 0xd0a1949aa253278e34c528d2cc
+* external_aad: 0x8501810a4100411440
+
+From the previous parameter, the following is derived:
+
+* AAD: 0x8368456e63727970743040498501810a4100411440
+* plaintext: 0x45ff48656c6c6f20576f726c6421
+
 * ciphertext: 0xa7e3ca27f221f453c0ba68c350bf 652ea096b328a1bf
 
 From there:
