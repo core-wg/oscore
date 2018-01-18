@@ -1508,6 +1508,27 @@ The COSE header of the request contains an identifier (ca), indicating the secur
 
 The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any Partial IV previously received in a response bound to the request.
 
+# Deployment Settings
+
+
+OSCORE may be deployed in a variety of settings, a few examples are given in this section.
+
+## Master Secret Used Once
+
+For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key provides sufficient entropy for encrypting all data exchanged with the IoT device througout its lifetime.
+
+
+## Master Secret Used Multiple Times
+
+In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long random byte string as Master Salt, such that the probability of master salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
+
+
+## Client Aliveness
+
+The use of a single OSCORE request and response enables the client to verify that the server's identity and aliveness through actual communications.  While a verified OSCORE request enables the server to verify the identity of the entity who generated the message, it does not verify that the client is currently involved in the communication, since the message be the play out a previously generated request which now reaches the server. To verify the aliveness of the client the server may initiate an OSCORE protected message exchange with the client, e.g. by switching the roles of client and server as described in {{context-definition}}, or by using the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
+
+
+
 # Acknowledgments
 
 The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Dave Thaler, Marco Tiloca, and Mališa Vucinic.
