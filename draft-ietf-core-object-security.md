@@ -1202,7 +1202,73 @@ The length of message fields can reveal information about the message. Applicati
 
 # Test Vectors
 
-This appendix includes the test vectors for different examples of CoAP exchanges using OSCORE.
+This appendix includes the test vectors for different examples of CoAP messages using OSCORE.
+
+## Key Derivation with Master Salt {#key-der-tv-ms}
+
+Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
+
+### Client
+
+Inputs:
+
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x9e7ca92223786340838a91ee93f866639a3516264956c0e61cf5e6e952dd87d6ed43c297c871c37058465b63b7cbcb2f9f2e27424dd18dd475ef43829b047cff (64 bytes)
+* Sender ID: 0x00 (1 byte)
+* Recipient ID: 0x01 (1 byte)
+
+From the previous parameters,
+
+~~~~~~~~~~~
+* info: 0x8441000A634b657910 
+Gives:
+* Sender Key: 0x2ad0476a8aa20d9bea4094ce79631965
+
+* info: 0x8441010A634b657910 
+Gives:
+* Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081
+
+* info: 0x84400a6249560d
+Gives:
+* Common IV: 0xf9c29aceebf28cfe299f41f4f1
+~~~~~~~~~~~
+
+Outputs:
+
+* Sender Key: 0x2ad0476a8aa20d9bea4094ce79631965 (16 bytes)
+* Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
+* Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+
+### Server
+
+Inputs:
+
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x9e7ca92223786340838a91ee93f866639a3516264956c0e61cf5e6e952dd87d6ed43c297c871c37058465b63b7cbcb2f9f2e27424dd18dd475ef43829b047cff (64 bytes)
+* Sender ID: 0x01 (1 byte)
+* Recipient ID: 0x00 (1 byte)
+
+From the previous parameters,
+
+~~~~~~~~~~~
+* info: 0x8441010A634b657910 
+Gives:
+* Sender Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081
+
+* info: 0x8441000A634b657910 
+Gives:
+* Recipient Key: 0x2ad0476a8aa20d9bea4094ce79631965
+
+* info: 0x84400a6249560d
+Gives:
+* Common IV: 0xf9c29aceebf28cfe299f41f4f1
+~~~~~~~~~~~
+
+Outputs:
+
+* Sender Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
+* Recipient Key: 0x2ad0476a8aa20d9bea4094ce79631965 (16 bytes)
+* Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
 
 ## Key Derivation without Master Salt {#key-der-tv}
 
@@ -1245,7 +1311,7 @@ Inputs:
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 * Sender ID: 0x01 (1 byte)
 * Recipient ID: 0x00 (1 byte)
-* 
+
 From the previous parameters,
 
 ~~~~~~~~~~~
