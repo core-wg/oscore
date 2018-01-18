@@ -206,7 +206,7 @@ The Common Context contains the following parameters:
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Byte string used to identify the Sender Context and to assure unique nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Sender ID. Byte string used to identify the Sender Context and to assure unique AEAD nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -214,7 +214,7 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Byte string used to identify the Recipient Context and to assure unique nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
+* Recipient ID. Byte string used to identify the Recipient Context and to assure unique AEAD nonces. Maximum length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
@@ -295,7 +295,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. Sender IDs MAY be uniformly random distributed byte strings if the probability of collisions is negligible.
+As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. Sender IDs MAY be uniformly random distributed byte strings if the probability of collisions is negligible.
 
 If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
@@ -337,7 +337,7 @@ U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-payload-protection title="Protection of CoAP Payload" artwork-align="center"}
 
-The sending endpoint writes the payload of the original CoAP message into the Plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
+The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 ## CoAP Options {#coap-options}
 
@@ -520,7 +520,7 @@ The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and i
 
 The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests without Observe option, to 0.05 (FETCH) for requests with Observe option, and to 2.04 (Changed) for responses. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
 
-The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the Plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
+The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
 The other CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
@@ -530,7 +530,7 @@ This section defines how to use COSE {{RFC8152}} to wrap and protect data in the
  
 The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of {{RFC8152}} is mandatory to implement. For AES-CCM-16-64-128 the length of Sender Key and Recipient Key is 128 bits, the length of nonce and Common IV is 13 bytes. The maximum Sender Sequence Number is specified in {{sec-considerations}}.
 
-As specified in {{RFC5116}}, Plaintext denotes the data that is encrypted and integrity protected, and Additional Authenticated Data (AAD) denotes the data that is integrity protected only.
+As specified in {{RFC5116}}, plaintext denotes the data that is encrypted and integrity protected, and Additional Authenticated Data (AAD) denotes the data that is integrity protected only.
 
 The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
@@ -544,7 +544,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
    
    * Optionally, a 'kid context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
--  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), Nonce (see {{nonce}}), Plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
+-  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
@@ -571,7 +571,7 @@ Some examples of relevant uses of kid context are the following:
 
 ## Nonce {#nonce}
 
-The nonce is constructed in the following way (see {{fig-nonce}}):
+The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
 
 1. left-padding the Partial IV (in network byte order) with zeroes to exactly 5 bytes,
 2. left-padding the (Sender) ID of the endpoint that generated the Partial IV (in network byte order) with zeroes to exactly nonce length - 6 bytes,
@@ -601,7 +601,7 @@ When Observe is not used, the request and the response may use the same nonce. I
 
 ## Plaintext {#plaintext}
 
-The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
+The plaintext is formatted as a CoAP message without Header (see {{fig-plaintext}}) consisting of:
 
 - the Code of the original CoAP message as defined in Section 3 of {{RFC7252}}; and
 
@@ -622,7 +622,7 @@ The Plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 ~~~~~~~~~~~
 {: #fig-plaintext title="Plaintext" artwork-align="center"}
 
-NOTE: The Plaintext contains all CoAP data that needs to be encrypted end-to-end between the endpoints.
+NOTE: The plaintext contains all CoAP data that needs to be encrypted end-to-end between the endpoints.
 
 ## Additional Authenticated Data {#AAD}
 
@@ -826,7 +826,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of the Nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of the AEAD nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
 After boot, an endpoint MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
@@ -842,7 +842,7 @@ To prevent reuse of Sender Sequence Numbers, an endpoint MAY perform the followi
 
 To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Partial IV when generating the nonce and MUST include the Partial IV in the response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Partial IV when generating the AEAD nonce and MUST include the Partial IV in the response.
 
 If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
@@ -862,7 +862,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 1. Retrieve the Sender Context associated with the target resource.
 
-2. Compose the Additional Authenticated Data and the Plaintext, as described in {{AAD}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
 3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}} and (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
@@ -910,15 +910,15 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
-2. Compose the Additional Authenticated Data and the Plaintext, as described in {{AAD}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
 3. Compute the AEAD nonce
   
-   * If Observe is used, Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is used, compute the nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
    * If Observe is not used, either the nonce from the request is used or a new Partial IV is used.
 
-4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the nonce from the request was used, the Partial IV MUST NOT be included in the message.
+4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added (see {{outer-options}}).
 
@@ -942,7 +942,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
       
       2. If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
       
-      3. If the Partial IV is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+      3. If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
 7. Decrypt the COSE object using the Recipient Key.
 
