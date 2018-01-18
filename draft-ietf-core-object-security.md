@@ -1279,6 +1279,7 @@ Given a set of inputs, OSCORE defines how to set up the Security Context in both
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x (0 bytes)
 * Sender ID: 0x00 (1 byte)
 * Recipient ID: 0x01 (1 byte)
 
@@ -1309,6 +1310,7 @@ Outputs:
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x (0 bytes)
 * Sender ID: 0x01 (1 byte)
 * Recipient ID: 0x00 (1 byte)
 
@@ -1353,6 +1355,7 @@ Security Context:
 * Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
+* Master Salt: 0x (0 bytes)
 * Common IV: 0xd1a1949aa253278f34c528d2cc
 * Sender ID: 0x00
 * Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
@@ -1385,6 +1388,7 @@ Security Context:
 * Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
+* Master Salt: 0x (0 bytes)
 * Common IV: 0xd1a1949aa253278f34c528d2cc
 * Sender ID: 0x01
 * Sender Key: 0xd904cb101f7341c3f4c56c300fa69941
@@ -1416,6 +1420,7 @@ Security Context:
 * Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
+* Master Salt: 0x (0 bytes)
 * Common IV: 0xd1a1949aa253278f34c528d2cc
 * Sender ID: 0x01
 * Sender Key: 0xd904cb101f7341c3f4c56c300fa69941
