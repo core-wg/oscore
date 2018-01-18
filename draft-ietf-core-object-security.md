@@ -152,7 +152,7 @@ The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP mes
 ~~~~~~~~~~~
 {: #fig-option title="The Object-Security Option" artwork-align="center"}
 
-The Object-Security option includes the OSCORE flag byte ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format and length is specified in {{compression}}. If the OSCORE flag byte is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
+The Object-Security option includes the OSCORE flag bits ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format and length is specified in {{compression}}. If the OSCORE flag bits is all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an Object-Security option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
@@ -661,7 +661,7 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small 
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
-The value of the Object-Security option SHALL contain the OSCORE flag byte, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
+The value of the Object-Security option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <--------- n bytes ------------->
@@ -676,11 +676,11 @@ The value of the Object-Security option SHALL contain the OSCORE flag byte, the 
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
-* The first byte (= the OSCORE flag byte) encodes a set of flags and the length of the Partial IV parameter.
+* The first byte of flag bits encodes the follwing set of flags and the length of the Partial IV parameter:
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
-    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use.
+    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
