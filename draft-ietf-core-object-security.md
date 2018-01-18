@@ -200,7 +200,7 @@ The Common Context contains the following parameters:
 
 * Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
-* Master Salt (OPTIONAL). Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
+* Master Salt. Variable length byte string containing the salt used to derive traffic keys and IVs. Its value is immutable once the security context is established.
 
 * Common IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm. Its value is immutable once the security context is established.
 
