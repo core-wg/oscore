@@ -158,7 +158,7 @@ A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security op
 
 # The Security Context {#context}
 
-OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a shared master secret and a key derivation function (KDF).
+OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a shared secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
@@ -285,7 +285,7 @@ where:
    * type is "Key" or "IV". The label is an ASCII string, and does not
    include a trailing NUL byte.
 
-   * L is the size of the key/IV for the AEAD algorithm used, in octets.
+   * L is the size of the key/IV for the AEAD algorithm used, in bytes.
 
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg is 10, the value for L is 16 for keys and 13 for the Common IV.
 
@@ -418,9 +418,9 @@ Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RF
 
 ##### Inner Block Options {#inner-block-options}
 
-The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing blockwise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing Blockwise as defined in {{RFC7959}}.
 
-For concurrent blockwise operations the sending endpoint MUST ensure that the receiving endpoint can distinguish between blocks from different operations. One mechanism enabling this is specified in {{I-D.ietf-core-echo-request-tag}}.
+For concurrent Blockwise operations the sending endpoint MUST ensure that the receiving endpoint can distinguish between blocks from different operations. One mechanism enabling this is specified in {{I-D.ietf-core-echo-request-tag}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -864,7 +864,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data and the Plaintext, as described in {{AAD}} and {{plaintext}}.
 
-3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}}. Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}} and (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -1174,7 +1174,7 @@ The HTTP header field Object-Security is added to the Message Headers registry:
 
 In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP message layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error message are allowed as specified. Applications using unprotected error messages need to consider the threat that these messages may be spoofed. 
+(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP messaging layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error message are allowed as specified. Applications using unprotected error messages need to consider the threat that these messages may be spoofed. 
 
 The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}.
 
