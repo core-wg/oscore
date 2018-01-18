@@ -83,19 +83,19 @@ The Constrained Application Protocol (CoAP) {{RFC7252}} is a web application pro
 This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, No-Response {{RFC7967}}, and PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE does neither protect the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
 ~~~~~~~~~~~
-+-----------------------------+
-|         Application         |
-+-----------------------------+
-+-----------------------------+  \
-|     Requests / Responses    |  |
-|-----------------------------|  |
-|           OSCORE            |  | CoAP
-|-----------------------------|  |
-|  Messages / Message Framing |  |
-+-----------------------------+  /
-+-----------------------------+
-|        UDP / TCP / ...      |
-+-----------------------------+  
++-----------------------------------+
+|            Application            |
++-----------------------------------+
++-----------------------------------+  \
+|  Requests / Responses / Signaling |  |
+|-----------------------------------|  |
+|               OSCORE              |  | CoAP
+|-----------------------------------|  |
+| Messaging Layer / Message Framing |  |
++-----------------------------------+  /
++-----------------------------------+
+|          UDP / TCP / ...          |
++-----------------------------------+  
 ~~~~~~~~~~~
 {: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
 
