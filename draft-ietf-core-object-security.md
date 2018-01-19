@@ -1210,11 +1210,11 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 The Object-Security option is added to the CoAP Signaling Option Numbers registry:
 
 ~~~~~~~~~~~
-+------------+--------+---------------------+-----------+
++------------+--------+---------------------+-------------------+
 | Applies to | Number | Name                | Reference         |
-+------------+--------+---------------------+-----------+
++------------+--------+---------------------+-------------------+
 | 7.xx       |  TBD   | Object-Security     | [[this document]] |
-+------------+--------+---------------------+-----------+
++------------+--------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
