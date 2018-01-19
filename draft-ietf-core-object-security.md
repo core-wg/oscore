@@ -1382,7 +1382,7 @@ CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 byt
 
 Security Context:
 
-* Algorithm: 10 (AES-CCM-16-64-128)
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
 * Master Salt: 0x (0 bytes)
@@ -1405,7 +1405,6 @@ From the previous parameter, the following is derived:
 
 * AAD: 0x8368456e63727970743040498501810a4100411440
 * plaintext: 0x01b3747631
-
 * ciphertext: 0x55b3710d47c611cd3924838a44
 
 From there:
@@ -1419,7 +1418,7 @@ CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 byte
 
 Security Context:
 
-* Algorithm: 10 (AES-CCM-16-64-128)
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
 * Master Salt: 0x (0 bytes)
@@ -1441,7 +1440,6 @@ From the previous parameter, the following is derived:
 
 * AAD: 0x8368456e63727970743040498501810a4100411440
 * plaintext: 0x45ff48656c6c6f20576f726c6421
-
 * ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d
 
 From there:
@@ -1455,7 +1453,7 @@ CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 byte
 
 Security Context:
 
-* Algorithm: 10 (AES-CCM-16-64-128)
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10
 * Master Salt: 0x (0 bytes)
