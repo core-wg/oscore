@@ -1084,42 +1084,56 @@ Example:
 
   GET coap://proxy.url/
   Proxy-Uri=http://server.url/orders
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP request -- CoAP Client to Proxy]
 
   POST coap://proxy.url/
   Proxy-Uri=http://server.url/
   Object-Security: 09 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [HTTP request -- Proxy to HTTP Server]
 
   POST http://server.url/ HTTP/1.1
   Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+~~~~~~~~~~~
   
+~~~~~~~~~~~
 [HTTP request -- After server object security processing]
 
   GET http://server.url/orders HTTP/1.1
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [HTTP response -- Before server object security processing]
 
   HTTP/1.1 200 OK
   Content-Type: text/plain
   Body: Exterminate! Exterminate!
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP response – Proxy to CoAP Client]
 
   2.04 Changed
   Object-Security: [empty]
   Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP response -- After client object security processing]
 
   2.05 Content
