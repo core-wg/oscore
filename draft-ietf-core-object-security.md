@@ -1578,6 +1578,7 @@ In cases where the Master Secret is used to derive security context multiple tim
 The use of a single OSCORE request and response enables the client to verify that the server's identity and aliveness through actual communications.  While a verified OSCORE request enables the server to verify the identity of the entity who generated the message, it does not verify that the client is currently involved in the communication, since the message be the play out a previously generated request which now reaches the server. To verify the aliveness of the client the server may initiate an OSCORE protected message exchange with the client, e.g. by switching the roles of client and server as described in {{context-definition}}, or by using the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
 
 # Acknowledgments
+{: numbered="no"}
 
 The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Dave Thaler, Marco Tiloca, and Mališa Vucinic.
 
