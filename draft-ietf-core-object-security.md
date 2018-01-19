@@ -1029,41 +1029,55 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP request -- Before client object security processing]
 
   GET http://proxy.url/hc/?target_uri=coap://server.url/orders HTTP/1.1
+~~~~~~~~~~~
  
+~~~~~~~~~~~
 [HTTP request -- HTTP Client to Proxy]
 
   POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
   Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+~~~~~~~~~~~
   
+~~~~~~~~~~~
 [CoAP request -- Proxy to CoAP Server]
 
   POST coap://server.url/
   Object-Security: 09 25
   Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP request -- After server object security processing]
 
   GET coap://server.url/orders 
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP response -- Before server object security processing]
 
   2.05 Content
   Content-Format: 0
   Payload: Exterminate! Exterminate!
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [CoAP response -- CoAP Server to Proxy]
 
   2.04 Changed
   Object-Security: [empty]
   Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+~~~~~~~~~~~
 
+~~~~~~~~~~~
 [HTTP response -- After client object security processing]
 
   HTTP/1.1 200 OK
