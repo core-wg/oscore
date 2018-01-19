@@ -271,7 +271,7 @@ where:
 ~~~~~~~~~~~ CDDL
    info = [
        id : bstr,
-       alg : int / tstr,
+       alg_aead : int / tstr,
        type : tstr,
        L : uint
    ]
@@ -280,14 +280,13 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
    
-   * alg is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
+   * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
-   * type is "Key" or "IV". The label is an ASCII string, and does not
-   include a trailing NUL byte.
+   * type is "Key" or "IV". The label is an ASCII string, and does not include a trailing NUL byte.
 
    * L is the size of the key/IV for the AEAD algorithm used, in bytes.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg is 10, the value for L is 16 for keys and 13 for the Common IV.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV.
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
@@ -649,7 +648,7 @@ The external_aad SHALL be a CBOR array as defined below:
 ~~~~~~~~~~~ CDDL
 external_aad = [
    oscore_version : uint,
-   [alg : int / tstr],
+   [alg_aead : int / tstr],
    request_kid : bstr,
    request_piv : bstr,
    options : bstr
@@ -660,7 +659,7 @@ where:
 
 - oscore_version: contains the OSCORE version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
 
-- alg: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
+- alg_aead: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
@@ -1371,7 +1370,7 @@ This section contains the test vector for the following messages:
 * 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid, but contains a  Partial IV. The response includes:
   - Object-Security option
 
-The Security Context is the output of {{key-der-tv}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
+The Security Context is the output of {{key-der-tv}}, with default values for AEAD algorithm, KDF, and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
 
 ### Client: OSCORE Request
 
