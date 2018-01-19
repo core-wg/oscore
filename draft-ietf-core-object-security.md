@@ -1311,19 +1311,9 @@ Inputs:
 
 From the previous parameters,
 
-~~~~~~~~~~~
-* info: 0x8441000A634b657910 
-Gives:
-* Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
-
-* info: 0x8441010A634b657910 
-Gives:
-* Recipient Key: 0xd904cb101f7341c3f4c56c300fa69941
-
-* info: 0x84400a6249560d
-Gives:
-* Common IV: 0xd1a1949aa253278f34c528d2cc
-~~~~~~~~~~~
+* info (for derivation of Sender Key): 0x8441000A634b657910 (9 bytes)
+* info (for derivation of Recipient Key): 0x8441010A634b657910 (9 bytes) 
+* info (for derivation of Common IV): 0x84400a6249560d (7 bytes)
 
 Outputs:
 
@@ -1342,19 +1332,9 @@ Inputs:
 
 From the previous parameters,
 
-~~~~~~~~~~~
-* info: 0x8441010A634b657910 
-Gives:
-* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941
-
-* info: 0x8441000A634b657910 
-Gives:
-* Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
-
-* info: 0x84400a6249560d
-Gives:
-* Common IV: 0xd1a1949aa253278f34c528d2cc
-~~~~~~~~~~~
+* info (for derivation of Sender Key): 0x8441010A634b657910 (9 bytes)
+* info (for derivation of Recipient Key): 0x8441000A634b657910 (9 bytes)
+* info (for derivation of Common IV): 0x84400a6249560d (7 bytes)
 
 Outputs:
 
