@@ -1277,21 +1277,21 @@ Given a set of inputs, OSCORE defines how to set up the Security Context in both
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
-* Master Salt: 0x9e7ca92223786340838a91ee93f866639a3516264956c0e61cf5e6e952dd87d6ed43c297c871c37058465b63b7cbcb2f9f2e27424dd18dd475ef43829b047cff (64 bytes)
-* Sender ID: 0x00 (1 byte)
+* Master Salt: 0x9e7ca92223786340 (8 bytes)
+* Sender ID: 0x (0 byte)
 * Recipient ID: 0x01 (1 byte)
 
 From the previous parameters,
 
-* info (for derivation of Sender Key): 0x8441000A634b657910 (16 bytes)
-* info (for derivation of Recipient Key): 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
-* info (for derivation of Common IV): 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+* info (for derivation of Sender Key): 0x84400A634b657910 (8 bytes)
+* info (for derivation of Recipient Key): 0x8441010A634b657910 (9 bytes)
+* info (for derivation of Common IV): 0x84400a6249560d (7 bytes)
 
 Outputs:
 
-* Sender Key: 0x2ad0476a8aa20d9bea4094ce79631965 (16 bytes)
-* Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
-* Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+* Sender Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
+* Recipient Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
+* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
 
 ### Server
 
@@ -1304,15 +1304,15 @@ Inputs:
 
 From the previous parameters,
 
-* info (for derivation of Sender Key): 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
-* info (for derivation of Recipient Key): 0x8441000A634b657910  (16 bytes)
-* info (for derivation of Common IV): 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+* info (for derivation of Sender Key): 0x8441010A634b657910 (9 bytes)
+* info (for derivation of Recipient Key): 0x84400A634b657910 (8 bytes)
+* info (for derivation of Common IV): 0x84400a6249560d (7 bytes)
 
 Outputs:
 
-* Sender Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
-* Recipient Key: 0x2ad0476a8aa20d9bea4094ce79631965 (16 bytes)
-* Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+* Sender Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
+* Recipient Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
+* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
 
 ## Key Derivation without Master Salt {#key-der-tv}
 
