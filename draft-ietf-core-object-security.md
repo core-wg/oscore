@@ -309,7 +309,8 @@ OSCORE transforms a CoAP message (which may have been generated from an HTTP mes
 
 The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular leg in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{proxy-operations}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
-Protection of signaling messages (see Section 5 of {{I-D.ietf-core-coap-tcp-tls}}) is specified in {{coap-signaling}}, the other parts of this section targets non-signaling messages.
+Protection of signaling messages (see Section 5 of {{I-D.ietf-core-coap-tcp-tls}}) is specified in 
+{{coap-signaling}}. The other parts of this section target request and response messages.
 
 Message fields of the CoAP message may be protected end-to-end between CoAP client and CoAP server in different ways:
 
@@ -527,19 +528,19 @@ The receiving endpoint SHALL discard the Code in the OSCORE message and write th
 The other CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
 
-## Signaling {#coap-signaling}
+## Signaling Messages {#coap-signaling}
 
 Signaling messages were specifically introduced only for CoAP over reliable transports ({{I-D.ietf-core-coap-tcp-tls}}), 
-and are indicated with a CoAP Code in the 7.00-7.31 range. The signaling messages are dependent of the underlying transport, but since the transport layer may change, signaling may be terminated in an intermediate device, and hence protection of the signaling message is not end-to-end. 
+and are indicated with a CoAP Code in the 7.00-7.31 range. The signaling messages are dependent of the underlying transport, but since the transport layer may change, signaling may be terminated in an intermediate device. 
 
-The use of OSCORE for protecting signalling is application dependent. The signalling messages MAY be unprotected or MAY be encrypted and integrity protected end-to-end. 
+The use of OSCORE for protecting signaling is application dependent. The signaling messages MAY be unprotected or MAY be encrypted and integrity protected end-to-end. In the former case OSCORE SHALL leave the signaling message unaltered, in the latter case OSCORE SHALL protect the signaling message as a request/response CoAP message. All signaling message options are Class E.
 
- * In the former case OSCORE SHALL leave the signalling message unaltered.
-
- * In the latter case OSCORE SHALL protect the signalling message as a request/response CoAP message with a Class E option. The signaling messages defined in {{I-D.ietf-core-coap-tcp-tls}}) are mapped as defined in Table TBD.
+The Code of the signaling messages defined in {{I-D.ietf-core-coap-tcp-tls}}) are mapped as follows:
  
+* the Outer Code of the OSCORE message of the signaling messages with Code 7.01, 7.02, 7.04, and 7.05 SHALL be set to 0.02 (POST).
 
-
+* the Outer Code of the OSCORE message of the signaling messages with Code 7.03 SHALL be set to 2.04 (Changed).
+    
 
 
 # The COSE Object {#cose-object}
@@ -1179,6 +1180,9 @@ Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mappin
 
 Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
 
+Note to IANA: Please note all occurrences of "TBD" in this specification should be assigned the same number.
+
+
 ## COSE Header Parameters Registry
 
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
@@ -1202,6 +1206,20 @@ The Object-Security option is added to the CoAP Option Numbers registry:
 +--------+-----------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
+
+## CoAP Signaling Option Numbers Registry 
+
+The Object-Security option is added to the CoAP Signaling Option Numbers registry:
+
+~~~~~~~~~~~
++------------+--------+---------------------+-----------+
+| Applies to | Number | Name                | Reference         |
++------------+--------+---------------------+-----------+
+| 7.xx       |  TBD   | Object-Security     | [[this document]] |
++------------+--------+---------------------+-----------+
+~~~~~~~~~~~
+{: artwork-align="center"}
+
 
 ## Header Field Registrations
 
