@@ -1567,7 +1567,7 @@ OSCORE may be deployed in a variety of settings, a few examples are given in thi
 
 ## Master Secret Used Once
 
-For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key provides sufficient entropy for encrypting all data exchanged with the IoT device throughout its lifetime.
+For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime.
 
 ## Master Secret Used Multiple Times
 
