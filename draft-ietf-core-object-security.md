@@ -1298,9 +1298,9 @@ Outputs:
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
-* Master Salt: 0x9e7ca92223786340838a91ee93f866639a3516264956c0e61cf5e6e952dd87d6ed43c297c871c37058465b63b7cbcb2f9f2e27424dd18dd475ef43829b047cff (64 bytes)
+* Master Salt: 0x9e7ca92223786340 (64 bytes)
 * Sender ID: 0x01 (1 byte)
-* Recipient ID: 0x00 (1 byte)
+* Recipient ID: 0x (0 byte)
 
 From the previous parameters,
 
@@ -1366,15 +1366,18 @@ This section contains the test vector for the following messages:
 
 * CoAP GET /tv1 request protected with OSCORE, includes:
   - Uri-Path: "tv1"
-  - Object-Security option
+  - Object-Security option (1 byte Sender ID)
+* CoAP GET /tv1 request protected with OSCORE, includes:
+  - Uri-Path: "tv1"
+  - Object-Security option (0 byte Sender ID)
 * 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid nor a Partial IV. The response includes:
   - Object-Security option
 * 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid, but contains a  Partial IV. The response includes:
   - Object-Security option
 
-The Security Context is the output of {{key-der-tv}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
+The Security Context is the output of {{key-der-tv}} or {{key-der-tv-ms}}, with default values for alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
 
-### Client: OSCORE Request
+### Test Vector 1: OSCORE Request, Client
 
 CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
@@ -1382,14 +1385,14 @@ Security Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Master Secret: 0x0102030405060708090a0b0c0d0e0f10
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 * Master Salt: 0x (0 bytes)
-* Common IV: 0xd1a1949aa253278f34c528d2cc
-* Sender ID: 0x00
-* Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
+* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Sender ID: 0x00 (1 byte)
+* Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 byte)
 * Sender Sequence Number: 20
-* Recipient ID: 0x01
-* Recipient Key: 0xd904cb101f7341c3f4c56c300fa69941
+* Recipient ID: 0x01 (1 byte)
+* Recipient Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 byte)
 
 The following COSE and cryptographic parameters are derived:
 
@@ -1401,16 +1404,56 @@ The following COSE and cryptographic parameters are derived:
 
 From the previous parameter, the following is derived:
 
-* AAD: 0x8368456e63727970743040498501810a4100411440
-* plaintext: 0x01b3747631
-* ciphertext: 0x55b3710d47c611cd3924838a44
+* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* plaintext: 0x01b3747631 (5 bytes)
+
+
+* ciphertext: 0x55b3710d47c611cd3924838a44 (13 bytes)
 
 From there:
 
 * Object-Security value: 0x091400 (3 bytes)
 * CoAP request (OSCORE message): 0x44026dd30000acc5396c6f63616c686f7374d305091400ff55b3710d47c611cd3924838a44 (37 bytes)
 
-### Server: OSCORE Response
+### Test Vector 2: OSCORE Request, Client
+
+CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
+
+Security Context:
+
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
+* Key Derivation Function: HKDF SHA-256
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x9e7ca92223786340 (8 bytes)
+* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
+* Sender ID: 0x (0 byte)
+* Sender Key: 0x7230aab3b549d94c9224aacc744e93ab (16 byte)
+* Sender Sequence Number: 20
+* Recipient ID: 0x01 (1 byte)
+* Recipient Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 byte)
+
+The following COSE and cryptographic parameters are derived:
+
+* Partial IV: 0x14
+* kid: 0x
+* key: 0x7230aab3b549d94c9224aacc744e93ab
+* nonce: 0x01727733ab49ead385b18f7d85
+* external_aad: 0x8501810a40411440
+
+From the previous parameter, the following is derived:
+
+* AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+* plaintext: 0x01b3747631 (5 bytes)
+
+
+* ciphertext: 0x6be9214aad448260ff1be1f594 (13 bytes)
+
+From there:
+
+* Object-Security value: 0x0914 (2 bytes)
+* CoAP request (OSCORE message): 0x44023bfc000066ef396c6f63616c686f7374d2050914ff6be9214aad448260ff1be1f594 (36 bytes)
+
+### Test Vector 3: OSCORE Response, Server
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -1418,15 +1461,15 @@ Security Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Master Secret: 0x0102030405060708090a0b0c0d0e0f10
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 * Master Salt: 0x (0 bytes)
-* Common IV: 0xd1a1949aa253278f34c528d2cc
-* Sender ID: 0x01
-* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941
+* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Sender ID: 0x01 (1 bytes)
+* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
 * Sender Sequence Number: 0
-* Recipient ID: 0x00
-* Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
-* Replay Window: seen: {"00": [20]}
+* Recipient ID: 0x00 (1 bytes)
+* Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
+* Replay Window: has last received sequence number 20
 
 The following COSE and cryptographic parameters are derived:
 
@@ -1436,16 +1479,18 @@ The following COSE and cryptographic parameters are derived:
 
 From the previous parameter, the following is derived:
 
-* AAD: 0x8368456e63727970743040498501810a4100411440
-* plaintext: 0x45ff48656c6c6f20576f726c6421
-* ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d
+* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* plaintext: 0x45ff48656c6c6f20576f726c6421 (28 bytes)
+
+
+* ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
 
 From there:
 
 * Object-Security value: 0x (0 bytes)
 * CoAP response (OSCORE message): 0x64446dd30000acc5d008ffe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (33 bytes)
 
-### Server: OSCORE Response with Partial IV
+###  Test Vector 4: OSCORE Response with Partial IV, Server
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -1453,15 +1498,15 @@ Security Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Master Secret: 0x0102030405060708090a0b0c0d0e0f10
-* Master Salt: 0x (0 bytes)
-* Common IV: 0xd1a1949aa253278f34c528d2cc
-* Sender ID: 0x01
-* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941
-* Sender Sequence Number: 0
-* Recipient ID: 0x00
-* Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1
-* Replay Window: seen: {"00": [20]}
+* Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+* Master Salt: 0x (0 bytes) 
+* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Sender ID: 0x01 (1 bytes)
+* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
+* Sender Sequence Number: 0 
+* Recipient ID: 0x00 (1 bytes)
+* Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
+* Replay Window: has last received sequence number 20
 
 The following COSE and cryptographic parameters are derived:
 
@@ -1472,10 +1517,11 @@ The following COSE and cryptographic parameters are derived:
 
 From the previous parameter, the following is derived:
 
-* AAD: 0x8368456e63727970743040498501810a4100411440
-* plaintext: 0x45ff48656c6c6f20576f726c6421
+* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* plaintext: 0x45ff48656c6c6f20576f726c6421 (28 bytes)
 
-* ciphertext: 0xa7e3ca27f221f453c0ba68c350bf 652ea096b328a1bf
+
+* ciphertext: 0xa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (22 bytes)
 
 From there:
 
