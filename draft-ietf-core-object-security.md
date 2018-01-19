@@ -1266,17 +1266,17 @@ Inputs:
 From the previous parameters,
 
 ~~~~~~~~~~~
-* info: 0x8441000A634b657910 
+o info: 0x8441000A634b657910 (9 bytes) 
 Gives:
-* Sender Key: 0x2ad0476a8aa20d9bea4094ce79631965
+o Sender Key: 0x2ad0476a8aa20d9bea4094ce79631965 (16 bytes)
 
-* info: 0x8441010A634b657910 
+o info: 0x8441010A634b657910 (9 bytes) 
 Gives:
-* Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081
+o Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
 
-* info: 0x84400a6249560d
+o info: 0x84400a6249560d (7 bytes)
 Gives:
-* Common IV: 0xf9c29aceebf28cfe299f41f4f1
+o Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
 ~~~~~~~~~~~
 
 Outputs:
