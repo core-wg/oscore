@@ -309,6 +309,8 @@ OSCORE transforms a CoAP message (which may have been generated from an HTTP mes
 
 The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular leg in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{proxy-operations}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
+Protection of signaling messages (see Section 5 of {{I-D.ietf-core-coap-tcp-tls}}) is specified in {{coap-signaling}}, the other parts of this section targets non-signaling messages.
+
 Message fields of the CoAP message may be protected end-to-end between CoAP client and CoAP server in different ways:
 
 * Class E: encrypted and integrity protected, 
@@ -523,6 +525,22 @@ The sending endpoint SHALL write the Code of the original CoAP message into the 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
 The other CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
+
+
+## Signaling {#coap-signaling}
+
+Signaling messages were specifically introduced only for CoAP over reliable transports ({{I-D.ietf-core-coap-tcp-tls}}), 
+and are indicated with a CoAP Code in the 7.00-7.31 range. The signaling messages are dependent of the underlying transport, but since the transport layer may change, signaling may be terminated in an intermediate device, and hence protection of the signaling message is not end-to-end. 
+
+The use of OSCORE for protecting signalling is application dependent. The signalling messages MAY be unprotected or MAY be encrypted and integrity protected end-to-end. 
+
+ * In the former case OSCORE SHALL leave the signalling message unaltered.
+
+ * In the latter case OSCORE SHALL protect the signalling message as a request/response CoAP message with a Class E option. The signaling messages defined in {{I-D.ietf-core-coap-tcp-tls}}) are mapped as defined in Table TBD.
+ 
+
+
+
 
 # The COSE Object {#cose-object}
 
