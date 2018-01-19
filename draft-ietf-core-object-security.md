@@ -496,8 +496,7 @@ The Object-Security option is only defined to be present in OSCORE messages, as 
 
 ## CoAP Header {#coap-header}
 
-A summary of how the CoAP Header fields are protected is shown in {{fig-header-protection}}, including fields specific to CoAP over UDP and
-CoAP over TCP (marked accordingly in the table).
+A summary of how the CoAP Header fields are protected is shown in {{fig-header-protection}}, including fields specific to CoAP over UDP and CoAP over TCP (marked accordingly in the table).
 
 ~~~~~~~~~~~
       +------------------+---+---+
@@ -706,7 +705,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag bits, the 
 
 * The following s bytes encode the kid context, if the kid context flag is set (h = 1).
 
-* The remaining bytes encode the value of the kid, if the kid is present (k = 1)
+* The remaining bytes encode the value of the kid, if the kid is present (k = 1).
 
 Note that the kid MUST be the last field of the object-security value, even in case reserved bits are used and additional fields are added to it.
 
