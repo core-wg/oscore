@@ -1267,7 +1267,7 @@ From the previous parameters,
 
 * info for derivation of Sender Key: 0x8441000A634b657910 (16 bytes)
 * info for derivation of Recipient Key: 0xc3b9d76fa68f1ebada11a6a0d85d5081 (16 bytes)
-* info for derivation of 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
+* info for derivation of Common IV: 0xf9c29aceebf28cfe299f41f4f1 (13 bytes)
 
 Outputs:
 
