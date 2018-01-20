@@ -1266,6 +1266,123 @@ The length of message fields can reveal information about the message. Applicati
 
 --- back
 
+# Scenario examples {#examples}
+
+This section gives examples of OSCORE, targeting scenarios in Section 2.2.1.1 of {{I-D.hartke-core-e2e-security-reqs}}. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the (compressed) COSE message format.
+
+## Secure Access to Sensor
+
+This example illustrates a client requesting the alarm status from a server.
+
+~~~~~~~~~~~
+Client  Proxy  Server
+  |       |       |
+  +------>|       |            Code: 0.02 (POST)
+  | POST  |       |           Token: 0x8c
+  |       |       | Object-Security: [kid:5f,Partial IV:42]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"alarm_status"}
+  |       |       |
+  |       +------>|            Code: 0.02 (POST)
+  |       | POST  |           Token: 0x7b
+  |       |       | Object-Security: [kid:5f,Partial IV:42]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"alarm_status"}
+  |       |       |
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0x7b
+  |       |       | Object-Security: -
+  |       |       |         Payload: {Code:2.05, "OFF"}
+  |       |       |
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x8c
+  |       |       | Object-Security: -
+  |       |       |         Payload: {Code:2.05, "OFF"}
+  |       |       |
+~~~~~~~~~~~
+{: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate content of compressed COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+
+The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Changed) are visible in the header of the OSCORE message. The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
+
+The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). 
+
+The server verifies that the Partial IV has not been received before. The client verifies that the response is bound to the request.
+
+## Secure Subscribe to Sensor
+
+This example illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), first receiving the value 220 mg/dl and then a second value 180 mg/dl.
+
+~~~~~~~~~~~
+Client  Proxy  Server
+  |       |       |
+  +------>|       |            Code: 0.05 (FETCH)
+  | FETCH |       |           Token: 0x83
+  |       |       |         Observe: 0
+  |       |       | Object-Security: [kid:ca,Partial IV:15]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"glucose"}
+  |       |       |
+  |       +------>|            Code: 0.05 (FETCH)
+  |       | FETCH |           Token: 0xbe
+  |       |       |         Observe: 0
+  |       |       | Object-Security: [kid:ca,Partial IV:15]
+  |       |       |         Payload: {Code:0.01,
+  |       |       |                   Uri-Path:"glucose"}
+  |       |       |
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
+  |       |       |         Observe: 7
+  |       |       | Object-Security: [Partial IV:32]
+  |       |       |         Payload: {Code:2.05,   
+  |       |       |                   Content-Format:0, "220"}
+  |       |       |
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
+  |       |       |         Observe: 7
+  |       |       | Object-Security: [Partial IV:32]
+  |       |       |         Payload: {Code:2.05,   
+  |       |       |                   Content-Format:0, "220"}
+ ...     ...     ...
+  |       |       |
+  |       |<------+            Code: 2.04 (Changed)
+  |       |  2.04 |           Token: 0xbe
+  |       |       |         Observe: 8
+  |       |       | Object-Security: [Partial IV:36]
+  |       |       |         Payload: {Code:2.05,
+  |       |       |                   Content-Format:0, "180"}
+  |       |       |
+  |<------+       |            Code: 2.04 (Changed)
+  |  2.04 |       |           Token: 0x83
+  |       |       |         Observe: 8
+  |       |       | Object-Security: [Partial IV:36]
+  |       |       |         Payload: {Code:2.05,
+  |       |       |                   Content-Format:0, "180"}
+  |       |       |
+~~~~~~~~~~~
+{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate content of compressed COSE object header. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
+
+The request/response Codes are encrypted by OSCORE and only dummy Codes (FETCH/Changed) are visible in the header of the OSCORE message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
+
+The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36).
+
+The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any Partial IV previously received in a response bound to the request.
+
+# Deployment examples {#deployment-examples}
+
+OSCORE may be deployed in a variety of settings, a few examples are given in this section.
+
+## Master Secret Used Once
+
+For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime.
+
+## Master Secret Used Multiple Times
+
+In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long random byte string as Master Salt, such that the probability of Master Salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
+
+## Client Aliveness
+
+The use of a single OSCORE request and response enables the client to verify that the server's identity and aliveness through actual communications.  While a verified OSCORE request enables the server to verify the identity of the entity who generated the message, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may initiate an OSCORE protected message exchange with the client, e.g. by switching the roles of client and server as described in {{context-definition}}, or by using the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
+
 # Test Vectors
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE.
@@ -1530,123 +1647,6 @@ From there:
 
 * Object-Security value: 0x0100 (2 bytes)
 * CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
-
-# Scenario examples {#examples}
-
-This section gives examples of OSCORE, targeting scenarios in Section 2.2.1.1 of {{I-D.hartke-core-e2e-security-reqs}}. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the (compressed) COSE message format.
-
-## Secure Access to Sensor
-
-This example illustrates a client requesting the alarm status from a server.
-
-~~~~~~~~~~~
-Client  Proxy  Server
-  |       |       |
-  +------>|       |            Code: 0.02 (POST)
-  | POST  |       |           Token: 0x8c
-  |       |       | Object-Security: [kid:5f,Partial IV:42]
-  |       |       |         Payload: {Code:0.01,
-  |       |       |                   Uri-Path:"alarm_status"}
-  |       |       |
-  |       +------>|            Code: 0.02 (POST)
-  |       | POST  |           Token: 0x7b
-  |       |       | Object-Security: [kid:5f,Partial IV:42]
-  |       |       |         Payload: {Code:0.01,
-  |       |       |                   Uri-Path:"alarm_status"}
-  |       |       |
-  |       |<------+            Code: 2.04 (Changed)
-  |       |  2.04 |           Token: 0x7b
-  |       |       | Object-Security: -
-  |       |       |         Payload: {Code:2.05, "OFF"}
-  |       |       |
-  |<------+       |            Code: 2.04 (Changed)
-  |  2.04 |       |           Token: 0x8c
-  |       |       | Object-Security: -
-  |       |       |         Payload: {Code:2.05, "OFF"}
-  |       |       |
-~~~~~~~~~~~
-{: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate content of compressed COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
-
-The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Changed) are visible in the header of the OSCORE message. The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
-
-The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). 
-
-The server verifies that the Partial IV has not been received before. The client verifies that the response is bound to the request.
-
-## Secure Subscribe to Sensor
-
-This example illustrates a client requesting subscription to a blood sugar measurement resource (GET /glucose), first receiving the value 220 mg/dl and then a second value 180 mg/dl.
-
-~~~~~~~~~~~
-Client  Proxy  Server
-  |       |       |
-  +------>|       |            Code: 0.05 (FETCH)
-  | FETCH |       |           Token: 0x83
-  |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca,Partial IV:15]
-  |       |       |         Payload: {Code:0.01,
-  |       |       |                   Uri-Path:"glucose"}
-  |       |       |
-  |       +------>|            Code: 0.05 (FETCH)
-  |       | FETCH |           Token: 0xbe
-  |       |       |         Observe: 0
-  |       |       | Object-Security: [kid:ca,Partial IV:15]
-  |       |       |         Payload: {Code:0.01,
-  |       |       |                   Uri-Path:"glucose"}
-  |       |       |
-  |       |<------+            Code: 2.04 (Changed)
-  |       |  2.04 |           Token: 0xbe
-  |       |       |         Observe: 7
-  |       |       | Object-Security: [Partial IV:32]
-  |       |       |         Payload: {Code:2.05,   
-  |       |       |                   Content-Format:0, "220"}
-  |       |       |
-  |<------+       |            Code: 2.04 (Changed)
-  |  2.04 |       |           Token: 0x83
-  |       |       |         Observe: 7
-  |       |       | Object-Security: [Partial IV:32]
-  |       |       |         Payload: {Code:2.05,   
-  |       |       |                   Content-Format:0, "220"}
- ...     ...     ...
-  |       |       |
-  |       |<------+            Code: 2.04 (Changed)
-  |       |  2.04 |           Token: 0xbe
-  |       |       |         Observe: 8
-  |       |       | Object-Security: [Partial IV:36]
-  |       |       |         Payload: {Code:2.05,
-  |       |       |                   Content-Format:0, "180"}
-  |       |       |
-  |<------+       |            Code: 2.04 (Changed)
-  |  2.04 |       |           Token: 0x83
-  |       |       |         Observe: 8
-  |       |       | Object-Security: [Partial IV:36]
-  |       |       |         Payload: {Code:2.05,
-  |       |       |                   Content-Format:0, "180"}
-  |       |       |
-~~~~~~~~~~~
-{: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate content of compressed COSE object header. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
-
-The request/response Codes are encrypted by OSCORE and only dummy Codes (FETCH/Changed) are visible in the header of the OSCORE message. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
-
-The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36).
-
-The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any Partial IV previously received in a response bound to the request.
-
-# Deployment examples {#deployment-examples}
-
-OSCORE may be deployed in a variety of settings, a few examples are given in this section.
-
-## Master Secret Used Once
-
-For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime.
-
-## Master Secret Used Multiple Times
-
-In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long random byte string as Master Salt, such that the probability of Master Salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
-
-## Client Aliveness
-
-The use of a single OSCORE request and response enables the client to verify that the server's identity and aliveness through actual communications.  While a verified OSCORE request enables the server to verify the identity of the entity who generated the message, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may initiate an OSCORE protected message exchange with the client, e.g. by switching the roles of client and server as described in {{context-definition}}, or by using the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
 
 # Acknowledgments
 {: numbered="no"}
