@@ -1387,7 +1387,7 @@ The use of a single OSCORE request and response enables the client to verify tha
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE.
 
-## Test Vector 1: Key Derivation with Master Salt
+## Test Vector 1: Key Derivation with Master Salt {#key-der-tv-ms}
 
 Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm and KDF.
 
@@ -1433,7 +1433,7 @@ Outputs:
 * Recipient Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
 * Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
 
-## Test Vector 2: Key Derivation without Master Salt
+## Test Vector 2: Key Derivation without Master Salt {#key-der-tv}
 
 Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm, KDF, and Master Salt.
 
@@ -1479,7 +1479,7 @@ Outputs:
 
 ## Test Vector 3: OSCORE Request, Client {#tv3}
 
-This section contains a test vector for a CoAP GET /tv1 request protected with OSCORE. The unprotected request only contains the Uri-Path option.
+This section contains a test vector for a OSCORE protected CoAP GET request using the security context derived in {{key-der-tv-ms}}. The unprotected request only contains the Uri-Path option.
 
 Unprotected CoAP request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
@@ -1516,7 +1516,7 @@ From there:
 
 ## Test Vector 4: OSCORE Request, Client
 
-This section contains a test vector for a CoAP GET /tv1 request protected with OSCORE. The unprotected request only contains the Uri-Path option.
+This section contains a test vector for a OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path option.
 
 CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
