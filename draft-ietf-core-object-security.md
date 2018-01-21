@@ -1387,7 +1387,7 @@ The use of a single OSCORE request and response enables the client to verify tha
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE.
 
-## Key Derivation with Master Salt {#key-der-tv-ms}
+## Test Vector 1: Key Derivation with Master Salt {#key-der-tv-ms}
 
 Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm and KDF.
 
@@ -1433,7 +1433,7 @@ Outputs:
 * Recipient Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
 * Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
 
-## Key Derivation without Master Salt {#key-der-tv}
+## Test Vector 1: Key Derivation without Master Salt {#key-der-tv}
 
 Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm, KDF, and Master Salt.
 
@@ -1492,10 +1492,7 @@ This section contains the test vector for the following messages:
 * 2.05 Content response, with payload: "Hello World!", protected with OSCORE. The response does not contain a kid, but contains a  Partial IV. The response includes:
   - Object-Security option
 
-The Security Context is the output of {{key-der-tv}} or {{key-der-tv-ms}}, with default values for AEAD alg, KDF and replay window, and with Sender Sequence Number 20 for the client and 0 for the server. All the values are reported in the following sections.
-
-
-### Test Vector 1: OSCORE Request, Client
+### Test Vector 3: OSCORE Request, Client
 
 Unprotected CoAP request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
@@ -1531,7 +1528,7 @@ From there:
 * Protected CoAP request (OSCORE message): 0x44026dd30000acc5396c6f63616c686f7374d305091400ff55b3710d47c611cd3924838a44 (37 bytes)
 
 
-### Test Vector 2: OSCORE Request, Client
+### Test Vector 4: OSCORE Request, Client
 
 CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
@@ -1566,7 +1563,7 @@ From there:
 
 * CoAP request (OSCORE message): 0x44023bfc000066ef396c6f63616c686f7374d2050914ff6be9214aad448260ff1be1f594 (36 bytes)
 
-### Test Vector 3: OSCORE Response, Server
+### Test Vector 5: OSCORE Response, Server
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -1599,7 +1596,7 @@ From there:
 
 * CoAP response (OSCORE message): 0x64446dd30000acc5d008ffe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (33 bytes)
 
-###  Test Vector 4: OSCORE Response with Partial IV, Server
+###  Test Vector 6: OSCORE Response with Partial IV, Server
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
