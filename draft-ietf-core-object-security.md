@@ -123,7 +123,7 @@ Client                                          Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
-An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{proxy-operations}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specfied in {{proxy-operations}}.
+An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{proxy-operations}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{proxy-operations}}.
 
 ## Terminology
 
@@ -674,7 +674,7 @@ NOTE: The format of the external_aad is for simplicity the same for requests and
 
 # OSCORE Compression {#compression}
 
-The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section we define a stateless compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
+The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a stateless compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
@@ -693,7 +693,7 @@ The value of the Object-Security option SHALL contain the OSCORE flag bits, the 
 ~~~~~~~~~~~
 {: #fig-option-value title="Object-Security Value" artwork-align="center"}
 
-* The first byte of flag bits encodes the follwing set of flags and the length of the Partial IV parameter:
+* The first byte of flag bits encodes the following set of flags and the length of the Partial IV parameter:
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
