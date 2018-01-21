@@ -1573,7 +1573,7 @@ The following COSE and cryptographic parameters are derived:
 
 * external_aad: 0x8501810a4100411440 (9 bytes)
 * AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
-* plaintext: 0x45ff48656c6c6f20576f726c6421 (28 bytes)
+* plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
 * encryption key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
 * nonce: 0xd0a1949aa253278f34c528d2d8 (13 bytes)
 
@@ -1609,7 +1609,7 @@ The following COSE and cryptographic parameters are derived:
 * Partial IV: 0x00 (1 byte)
 * external_aad: 0x8501810a4100411440 (9 bytes)
 * AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
-* plaintext: 0x45ff48656c6c6f20576f726c6421 (28 bytes)
+* plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
 * encryption key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
 * nonce: 0xd0a1949aa253278e34c528d2cc (13 bytes)
 
