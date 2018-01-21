@@ -1477,7 +1477,7 @@ Outputs:
 * Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
 * Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
 
-## Test Vector 3: OSCORE Request, Client
+## Test Vector 3: OSCORE Request, Client {#tv3}
 
 This section contains a test vector for a CoAP GET /tv1 request protected with OSCORE. The unprotected request only contains the Uri-Path option.
 
@@ -1553,7 +1553,7 @@ From there:
 
 ## Test Vector 5: OSCORE Response, Server
 
-This section contains a test vector for a 2.05 Content response protected with OSCORE. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV.
+This section contains a test vector for a OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV.
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -1588,7 +1588,7 @@ From there:
 
 ##  Test Vector 6: OSCORE Response with Partial IV, Server
 
-This section contains a test vector for a 2.05 Content response protected with OSCORE. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV.
+This section contains a test vector for a OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV.
 
 CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
