@@ -1389,7 +1389,7 @@ This appendix includes the test vectors for different examples of CoAP messages 
 
 ## Key Derivation with Master Salt {#key-der-tv-ms}
 
-Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
+Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm and KDF.
 
 ### Client
 
@@ -1435,14 +1435,13 @@ Outputs:
 
 ## Key Derivation without Master Salt {#key-der-tv}
 
-Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
+Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server. The default values are used for AEAD Algorithm, KDF, and Master Salt.
 
 ### Client
 
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
-* Master Salt: 0x (0 bytes)
 * Sender ID: 0x00 (1 byte)
 * Recipient ID: 0x01 (1 byte)
 
@@ -1463,7 +1462,6 @@ Outputs:
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
-* Master Salt: 0x (0 bytes)
 * Sender ID: 0x01 (1 byte)
 * Recipient ID: 0x00 (1 byte)
 
