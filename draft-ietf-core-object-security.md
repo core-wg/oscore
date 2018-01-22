@@ -254,7 +254,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}). Some examples of deploying OSCORE are given in {{deployment-examples}}.
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}) providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -1197,7 +1197,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-The security level of a system with m Masters Keys of length k used together with Master Salts with entropy n is k + n - log2(m). Similarly, the security level of a system with m AEAD keys of length k used together with AEAD nonces of length n is k + n - log2(m). Security level here means that an attacker can recover one of the m keys with complexity 2^(k + n) / m. Protection against such attacks can be provided by increasing the size of the keys or the entropy of the Master Salt. The complexity of recovering a specific key is still 2^k (assuming the Master Salt/AEAD nonce is public). The Master Secret, Sender Key, and Recipient Key MUST be secret, the rest of the parameters MAY be public. The Master Secret MUST be random.
+The security level of a system with m Masters Keys of length k used together with Master Salts with entropy n is k + n - log2(m). Similarly, the security level of a system with m AEAD keys of length k used together with AEAD nonces of length n is k + n - log2(m). Security level here means that an attacker can recover one of the m keys with complexity 2^(k + n) / m. Protection against such attacks can be provided by increasing the size of the keys or the entropy of the Master Salt. The complexity of recovering a specific key is still 2^k (assuming the Master Salt/AEAD nonce is public). The Master Secret, Sender Key, and Recipient Key MUST be secret, the rest of the parameters MAY be public. The Master Secret MUST be uniformly random.
 
 ## Message Fragmentation
 
@@ -1385,11 +1385,12 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 ## Master Secret Used Multiple Times
 
-In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long random byte string as Master Salt, such that the probability of Master Salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
+In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long uniformly random byte string as Master Salt, such that the probability of Master Salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
 
 ## Client Aliveness
 
 The use of a single OSCORE request and response enables the client to verify that the server's identity and aliveness through actual communications.  While a verified OSCORE request enables the server to verify the identity of the entity who generated the message, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may initiate an OSCORE protected message exchange with the client, e.g. by switching the roles of client and server as described in {{context-definition}}, or by using the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
+
 
 # Test Vectors
 
