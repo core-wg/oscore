@@ -1526,7 +1526,7 @@ From there:
 
 This section contains a test vector for a OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path option.
 
-CoAP unprotected request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
+Unprotected CoAP request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
 
 Common Context:
 
@@ -1557,13 +1557,13 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* CoAP request (OSCORE message): 0x44023bfc000066ef396c6f63616c686f7374d2050914ff6be9214aad448260ff1be1f594 (36 bytes)
+* Protected CoAP request (OSCORE message): 0x44023bfc000066ef396c6f63616c686f7374d2050914ff6be9214aad448260ff1be1f594 (36 bytes)
 
 ## Test Vector 5: OSCORE Response, Server
 
 This section contains a test vector for a OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV.
 
-CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
+Unprotected CoAP response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
 Common Context:
 
@@ -1592,13 +1592,13 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* CoAP response (OSCORE message): 0x64446dd30000acc5d008ffe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (33 bytes)
+* Protected CoAP response (OSCORE message): 0x64446dd30000acc5d008ffe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (33 bytes)
 
 ##  Test Vector 6: OSCORE Response with Partial IV, Server
 
 This section contains a test vector for a OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV.
 
-CoAP unprotected response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
+Unprotected CoAP response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
 
 Common Context:
 
@@ -1628,7 +1628,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
+* Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
 
 
 # Acknowledgments
