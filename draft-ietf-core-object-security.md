@@ -49,7 +49,7 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
-  RFC7967:
+  
   
 informative:
 
@@ -58,6 +58,7 @@ informative:
   RFC5869:
   RFC7228:
   RFC7515:
+  RFC7967:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-coap-tcp-tls:
