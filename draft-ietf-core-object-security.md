@@ -651,7 +651,7 @@ The external_aad SHALL be a CBOR array as defined below:
 ~~~~~~~~~~~ CDDL
 external_aad = [
    oscore_version : uint,
-   [alg_aead : int / tstr],
+   algorithms : [alg_aead : int / tstr],
    request_kid : bstr,
    request_piv : bstr,
    options : bstr
