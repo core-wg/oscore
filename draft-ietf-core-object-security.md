@@ -130,7 +130,7 @@ An implementation supporting this specification MAY only implement the client pa
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
-Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, and constrained environments {{RFC7228}}.
+Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}} as summarized in {{cddl-sum}}, and constrained environments {{RFC7228}}.
 
 The term "hop" is used to denote a particular leg in the end-to-end path. The concept "hop-by-hop" (as in "hop-by-hop encryption" or "hop-by-hop fragmentation") opposed to "end-to-end", is used in this document to indicate that the messages are processed accordingly in the intermediaries, rather than just forwarded to the next node.
 
@@ -1631,6 +1631,38 @@ From the previous parameter, the following is derived:
 From there:
 
 * Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
+
+
+# CDDL Summary {#cddl-sum}
+
+Data structure definitions in the present specification employ the
+CDDL language for conciseness and precision.  CDDL is defined in
+{{I-D.ietf-cbor-cddl}}, which at the time of writing this appendix is
+in the process of completion.  As the document is not yet available
+for a normative reference, the present appendix defines the small
+subset of CDDL that is being used in the present specification.
+
+Within the subset being used here, a CDDL rule is of the form `name =
+type`, where `name` is the name given to the `type`.
+A `type` can be one of:
+
+* a reference to another named type, by giving its name.  The
+  predefined named types used in the present specification are:
+  `uint`, an unsigned integer (as represented in CBOR by major type 0);
+  `int`, an unsigned or negative integer (as represented in CBOR by major
+  type 0 or 1);
+  `bstr`, a byte string (as represented in CBOR by major type 2);
+  `tstr`, a text string (as represented in CBOR by major type 3);
+* a choice between two types, by giving both types separated by a `/`;
+* an array type (as represented in CBOR by major type 4), where the
+  sequence of elements of the array is described by giving a sequence
+  of entries separated by commas `,`, and this sequence is enclosed by
+  square brackets `[` and `]`.
+  Arrays described by an array description contain elements that
+  correspond one-to-one to the sequence of entries given.
+  Each entry of an array description is of the form `name : type`, where
+  `name` is the name given to the entry and `type` is the type of the
+  array element corresponding to this entry.
 
 
 # Acknowledgments
