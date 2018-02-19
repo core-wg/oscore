@@ -59,9 +59,9 @@ informative:
   RFC7228:
   RFC7515:
   RFC7967:
+  RFC8323:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-cbor-cddl:
-  I-D.ietf-core-coap-tcp-tls:
   I-D.bormann-6lo-coap-802-15-ie:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
@@ -81,7 +81,7 @@ This document defines Object Security for Constrained RESTful Environments (OSCO
 
 The Constrained Application Protocol (CoAP) {{RFC7252}} is a web application protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS ({{RFC6347}}) for security. CoAP and HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of the message payload and metadata, in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
-This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, No-Response {{RFC7967}}, and PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE does neither protect the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{I-D.ietf-core-coap-tcp-tls}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
+This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, No-Response {{RFC7967}}, and PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE does neither protect the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
 ~~~~~~~~~~~
 +-----------------------------------+
@@ -161,7 +161,7 @@ A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security op
 
 # The Security Context {#context}
 
-OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a shared secret and a key derivation function (KDF).
+OSCORE requires that client and server establish a shared security context used to process the COSE objects. OSCORE uses COSE with an Authenticated Encryption with Additional Data (AEAD, {{RFC5116}}) algorithm for protecting message data between a client and a server. In this section, we define the security context and how it is derived in client and server based on a shared secret and a key derivation function (KDF).
 
 ## Security Context Definition {#context-definition}
 
@@ -301,7 +301,8 @@ As collisions may lead to the loss of both confidentiality and integrity, Sender
 
 If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
-To enable retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. The Client MAY provide a 'kid context' parameter ({{context-hint}}) to help the Server find the right context.
+To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. (If an endpoint have the same Recipient ID with different Recipient Contexts, i.e. derived from different Master Secrets, then the endpoint may need try multiple times before finding the right security context.)
+The Client MAY provide a 'kid context' parameter ({{context-hint}}) to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
@@ -311,7 +312,7 @@ OSCORE transforms a CoAP message (which may have been generated from an HTTP mes
 
 The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{proxy-operations}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
-Protection of Signaling messages (Section 5 of {{I-D.ietf-core-coap-tcp-tls}}) is specified in {{coap-signaling}}. The other parts of this section target Request/Response messages.
+Protection of Signaling messages (Section 5 of {{RFC8323}}) is specified in {{coap-signaling}}. The other parts of this section target Request/Response messages.
 
 Message fields of the CoAP message may be protected end-to-end between CoAP client and CoAP server in different ways:
 
@@ -530,7 +531,7 @@ The other CoAP Header fields are Unprotected (Class U). The sending endpoint SHA
 
 ## Signaling Messages {#coap-signaling}
 
-Signaling messages (CoAP Code 7.00-7.31) were introduced to exchange information related to an underlying transport connection in the specific case of CoAP over reliable transports ({{I-D.ietf-core-coap-tcp-tls}}). The use of OSCORE for protecting Signaling is application dependent. 
+Signaling messages (CoAP Code 7.00-7.31) were introduced to exchange information related to an underlying transport connection in the specific case of CoAP over reliable transports ({{RFC8323}}). The use of OSCORE for protecting Signaling is application dependent. 
 
 OSCORE MAY be used to protect Signaling if the endpoints for OSCORE coincide with the endpoints for the connection. If OSCORE is used to protect Signaling then:
 
@@ -539,7 +540,7 @@ For example, 7.02 (Ping) is protected as a CoAP Request and 7.03 (Pong) as a CoA
 * The Outer Code for Signaling messages SHALL be set to 0.02 (POST), unless it is a response to a previous Signaling message, in which case it SHALL be set to 2.04 (Changed). 
 * All Signaling options, except the Object-Security option, SHALL be Inner (Class E).
 
-NOTE: Option numbers for Signaling messages are specific to the CoAP Code (see Section 5.2 of {{I-D.ietf-core-coap-tcp-tls}}).
+NOTE: Option numbers for Signaling messages are specific to the CoAP Code (see Section 5.2 of {{RFC8323}}).
 
 If OSCORE is not used to protect Signaling, Signaling messages SHALL be unaltered by OSCORE.
 
@@ -673,9 +674,11 @@ where:
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid need not be integrity protected in the requests.
 
 
-# OSCORE Compression {#compression}
+# OSCORE Header Compression {#compression}
 
-The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a stateless compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
+The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a stateless header compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
+
+The COSE_Encrypt0 object used by OSCORE is transported in the Object-Security option and in the Payload. The Payload contains the Ciphertext and the headers of the COSE object are compactly encoded as described in the next section.
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
@@ -936,7 +939,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
   
    * If Observe is used, compute the nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
-   * If Observe is not used, either the nonce from the request is used or a new Partial IV is used.
+   * If Observe is not used, either the nonce from the request is used or a new Partial IV is used (see bullet on 'Partial IV' in the beginning of {{cose-object}}).
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
@@ -1000,7 +1003,7 @@ Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.har
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
-Proxy processing of the (Outer) Block options is as defined in {{RFC7959}} and {{I-D.ietf-core-echo-request-tag}}.
+Proxy processing of the (Outer) Block options is as defined in {{RFC7959}}.
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
@@ -1014,6 +1017,8 @@ A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP mes
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payload ({{oscore-payl}}).
+
+The HTTP header field Content-Type is set to TBD.
 
 The resulting message is an OSCORE message that uses HTTP.
 
