@@ -1297,7 +1297,7 @@ These media types are used to indicate that the content is an OSCORE message.
 
       Required parameters: N/A
 
-      Optional parameters: TBD
+      Optional parameters: ToDo
 
       Encoding considerations: binary
 
@@ -1319,7 +1319,7 @@ These media types are used to indicate that the content is an OSCORE message.
 
       *  Magic number(s): N/A
 
-      *  File extension(s): TBD
+      *  File extension(s): ToDo
 
       *  Macintosh file type code(s): N/A
 
