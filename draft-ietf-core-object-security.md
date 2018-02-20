@@ -1279,6 +1279,57 @@ The HTTP header field Object-Security is added to the Message Headers registry:
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
+
+## Media Type Registrations
+
+This section registers the 'application/oscore' media type in the "Media Types" registry.  
+These media types are used to indicate that the content is an OSCORE message.
+
+      Type name: application
+
+      Subtype name: oscore
+
+      Required parameters: N/A
+
+      Optional parameters: TBD
+
+      Encoding considerations: binary
+
+      Security considerations: See the Security Considerations section
+      of [[This document]].
+
+      Interoperability considerations: N/A
+
+      Published specification: [[This document]]
+
+      Applications that use this media type: IoT applications sending
+      security content over HTTP(S) transports.
+
+      Fragment identifier considerations: N/A
+
+      Additional information:
+
+      *  Deprecated alias names for this type: N/A
+
+      *  Magic number(s): N/A
+
+      *  File extension(s): TBD
+
+      *  Macintosh file type code(s): N/A
+
+      Person & email address to contact for further information:
+      iesg@ietf.org
+
+      Intended usage: COMMON
+
+      Restrictions on usage: N/A
+
+      Author: Göran Selander, goran.selander@ericsson.com
+
+      Change Controller: IESG
+
+      Provisional registration?  No
+
 --- back
 
 # Scenario examples {#examples}
