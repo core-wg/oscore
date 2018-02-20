@@ -1019,7 +1019,7 @@ A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP mes
 
 Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payload ({{oscore-payl}}).
 
-The HTTP header field Content-Type is set to TBD.
+The HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}).
 
 The resulting message is an OSCORE message that uses HTTP.
 
@@ -1045,6 +1045,8 @@ The presence of the Object-Security option, both in requests and responses, is e
   * "" (empty string) if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
+The header field Content-Type 'application/oscore' (see {{oscore-media-type}}) is used for OSCORE messages transported in HTTP. The CoAP Content-Format option is omitted for OSCORE messages transported in CoAP.
+
 The value of the body is the OSCORE payload ({{oscore-payl}}).
 
 Example:
@@ -1061,6 +1063,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP request -- HTTP Client to Proxy]
 
   POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
+  Content-Type: application/oscore
   Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
@@ -1099,6 +1102,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 [HTTP response -- Proxy to HTTP Client]
 
   HTTP/1.1 200 OK
+  Content-Type: application/oscore
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
@@ -1139,6 +1143,7 @@ Example:
 [HTTP request -- Proxy to HTTP Server]
 
   POST http://server.url/ HTTP/1.1
+  Content-Type: application/oscore
   Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
@@ -1161,6 +1166,7 @@ Example:
 [HTTP response -- HTTP Server to Proxy]
 
   HTTP/1.1 200 OK
+  Content-Type: application/oscore
   Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
@@ -1280,7 +1286,7 @@ The HTTP header field Object-Security is added to the Message Headers registry:
 {: artwork-align="center"}
 
 
-## Media Type Registrations
+## Media Type Registrations {#oscore-media-type}
 
 This section registers the 'application/oscore' media type in the "Media Types" registry.  
 These media types are used to indicate that the content is an OSCORE message.
