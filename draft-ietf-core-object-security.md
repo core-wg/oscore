@@ -40,7 +40,6 @@ normative:
 
   RFC2119:
   RFC4648:
-  RFC8288:
   RFC6347:
   RFC7049:
   RFC7252:
@@ -302,7 +301,7 @@ As collisions may lead to the loss of both confidentiality and integrity, Sender
 
 If Sender ID uniqueness cannot be guaranteed by construction, Sender IDs MUST be long uniformly random distributed byte strings such that the probability of collisions is negligible.
 
-To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. (If an endpoint have the same Recipient ID with different Recipient Contexts, i.e. derived from different Master Secrets, then the endpoint may need try multiple times before finding the right security context.)
+To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. If an endpoint has the same Recipient ID with different Recipient Contexts, i.e. the Recipient Contexts are derived from different keying material, then the endpoint may need to try multiple times before finding the right security context associated to the Recipient ID.
 The Client MAY provide a 'kid context' parameter ({{context-hint}}) to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
@@ -679,7 +678,7 @@ NOTE: The format of the external_aad is for simplicity the same for requests and
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a stateless header compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
 
-The COSE_Encrypt0 object used by OSCORE is transported in the Object-Security option and in the Payload. The Payload contains the Ciphertext and the headers of the COSE object are compactly encoded as described in the next section.
+The COSE_Encrypt0 object used in OSCORE is transported in the Object-Security option and in the Payload. The Payload contains the Ciphertext and the headers of the COSE object are compactly encoded as described in the next section.
 
 ## Encoding of the Object-Security Value {#obj-sec-value}
 
@@ -916,7 +915,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
-7. Decrypt the COSE object using the Recipient Key.
+7. Verify and decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3.
 
    * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the "Decryption failed" string.
 
@@ -940,7 +939,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
   
    * If Observe is used, compute the nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
 
-   * If Observe is not used, either the nonce from the request is used or a new Partial IV is used (see bullet on 'Partial IV' in the beginning of {{cose-object}}).
+   * If Observe is not used, either the nonce from the request is used or a new Partial IV is used (see bullet on 'Partial IV' in {{cose-object}}).
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
@@ -968,7 +967,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
       
       3. If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-7. Decrypt the COSE object using the Recipient Key.
+7. Verify and decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3.
 
    * If decryption fails, then go to 11.
 
