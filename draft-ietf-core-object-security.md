@@ -919,7 +919,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
-7. Verify and decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3.
+7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
    * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the "Decryption failed" string.
 
@@ -971,7 +971,7 @@ A client receiving a response containing the Object-Security option SHALL perfor
       
       3. If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-7. Verify and decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3.
+7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
    * If decryption fails, then go to 11.
 
@@ -1303,7 +1303,7 @@ These media types are used to indicate that the content is an OSCORE message.
 
       Required parameters: N/A
 
-      Optional parameters: ToDo
+      Optional parameters: N/A
 
       Encoding considerations: binary
 
@@ -1325,7 +1325,7 @@ These media types are used to indicate that the content is an OSCORE message.
 
       *  Magic number(s): N/A
 
-      *  File extension(s): ToDo
+      *  File extension(s): N/A
 
       *  Macintosh file type code(s): N/A
 
