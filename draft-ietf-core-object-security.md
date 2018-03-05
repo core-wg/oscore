@@ -570,13 +570,15 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same 'kid' is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The 'kid context' parameter is used to provide such additional input. The 'kid context' is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
+For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The kid context parameter is used to provide such additional input. The kid context and kid are used to determine the security context, or to establish the necessary input parameters to derive the security context (see {{context-derivation}}). The application defines how this is done.
 
-A summary of the COSE header parameter 'kid context' defined above can be found in {{tab-1}}.
+The kid context is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
+
+A summary of the COSE header parameter kid context defined above can be found in {{tab-1}}.
 
 Some examples of relevant uses of kid context are the following:
 
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{I-D.ietf-6tisch-minimal-security}}).
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{master-salt-transport}} or {{I-D.ietf-6tisch-minimal-security}}).
 * In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
  
 ~~~~~~~~~~
@@ -1384,9 +1386,22 @@ OSCORE may be deployed in a variety of settings, a few examples are given in thi
 
 For settings where the Master Secret is only used during deployment, the uniqueness of AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime.
 
-## Master Secret Used Multiple Times
+## Master Secret Used Multiple Times {#master-salt-transport}
 
-In cases where the Master Secret is used to derive security context multiple times, e.g. during recommissioning or where the security context is not persistently stored, the reuse of AEAD nonce may be prevented by providing a sufficiently long uniformly random byte string as Master Salt, such that the probability of Master Salt re-use is negligible. The Master Salt may be transported in the Kid Context parameter of the request (see {{context-hint}})
+In cases where the Master Secret needs to be used to derive multiple security contexts, e.g. due to recommissioning or where the security context is not persistently stored, a stochastially unique Master Salt prevents the reuse of AEAD nonce and key. The Master Salt may be transported between client and server in the kid context parameter (see {{context-hint}}) of the request.
+
+In this section we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt which is transported in kid context.
+
+1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64 bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context, and sends the message with kid context set to the Master Salt.
+
+2. The server, receiving an OSCORE request with a non-empty kid context derives the new security context using the received kid context as Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
+
+3. The client, receiving a response with an Echo option to a request which used a new security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the kid context.
+
+4. The server, receiving a request with a kid context and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error then the new security context is established  and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
+
+If the server receives a request without kid context from a client with which no security context is established, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Security context not found". This could be the result of the server having lost its security context or that a new security context has not been sucessfully established, which may be a trigger for the client to run this procedure.
+
 
 ## Client Aliveness
 
