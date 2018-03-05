@@ -42,6 +42,8 @@ normative:
   RFC4648:
   RFC6347:
   RFC7049:
+  RFC7230:
+  RFC7231:
   RFC7252:
   RFC7641:
   RFC7959:
@@ -1013,7 +1015,9 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 In order to use OSCORE with HTTP, an endpoint needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
 
-A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes an HTTP header field named Object-Security, whose value is:
+For this purpose this specification defines a new HTTP header field named CoAP-Object-Security, see {{iana-http}}. The CoAP-Object-Security header field is only used with CoAP-mappable HTTP and therefore only in POST requests and 200 (OK) responses. All field semantics is given within the CoAP-Object-Security header field. The header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). Intermediaries are not allowed to insert, delete, or modify the field's value. The header field is not preserved across redirects.
+
+A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP header field CoAP-Object-Security, whose value is:
 
   * "" (empty string) if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
@@ -1022,12 +1026,13 @@ Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payloa
 
 The HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}).
 
+
 The resulting message is an OSCORE message that uses HTTP.
 
-A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the Object-Security header field, which is mapped to the CoAP Object-Security option in the following way. The CoAP Object-Security option value is:
+A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the CoAP-Object-Security header field, which is mapped to the CoAP Object-Security option in the following way. The CoAP Object-Security option value is:
 
-* empty if the value of the HTTP Object-Security header field is "" (empty string)
-* the value of the HTTP Object-Security header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
+* empty if the value of the HTTP CoAP-Object-Security header field is "" (empty string)
+* the value of the HTTP CoAP-Object-Security header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
 
 Note that the value of the CoAP payload is the HTTP body, i.e. the OSCORE payload ({{oscore-payl}}).
 
@@ -1041,7 +1046,7 @@ The endpoint can then verify the message according to the OSCORE processing and 
 Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy.
 As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
 
-The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named Object-Security in the mapped request or response. The value of the field is:
+The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named CoAP-Object-Security in the mapped request or response. The value of the field is:
 
   * "" (empty string) if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
@@ -1065,7 +1070,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
   POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
   Content-Type: application/oscore
-  Object-Security: 09 25
+  CoAP-Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
   
@@ -1104,7 +1109,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
   HTTP/1.1 200 OK
   Content-Type: application/oscore
-  Object-Security: "" (empty string)
+  CoAP-Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
 
@@ -1145,7 +1150,7 @@ Example:
 
   POST http://server.url/ HTTP/1.1
   Content-Type: application/oscore
-  Object-Security: 09 25
+  CoAP-Object-Security: 09 25
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
   
@@ -1168,7 +1173,7 @@ Example:
 
   HTTP/1.1 200 OK
   Content-Type: application/oscore
-  Object-Security: "" (empty string)
+  CoAP-Object-Security: "" (empty string)
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
 
@@ -1221,7 +1226,7 @@ The Inner Block options enable the sender to split large messages into OSCORE-pr
 
 Privacy threats executed through intermediary nodes are considerably reduced by means of OSCORE. End-to-end integrity protection and encryption of the message payload and all options that are not used for proxy operations, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
-The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis.
+The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not mapped to CoAP. 
 
 Unprotected error messages reveal information about the security state in the communication between the endpoints. Unprotected signalling messages reveal information about the reliable transport used on a leg of the path. Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
@@ -1273,16 +1278,16 @@ The Object-Security option is added to the CoAP Signaling Option Numbers registr
 {: artwork-align="center"}
 
 
-## Header Field Registrations
+## Header Field Registrations {#iana-http}
 
-The HTTP header field Object-Security is added to the Message Headers registry:
+The HTTP header field CoAP-Object-Security is added to the Message Headers registry:
 
 ~~~~~~~~~~~
-+-------------------+----------+----------+-------------------+
-| Header Field Name | Protocol | Status   | Reference         |
-+-------------------+----------+----------+-------------------+
-| Object-Security   | http     | standard | [[this document]] |
-+-------------------+----------+----------+-------------------+
++----------------------+----------+----------+-------------------+
+| Header Field Name    | Protocol | Status   | Reference         |
++----------------------+----------+----------+-------------------+
+| CoAP-Object-Security | http     | standard | [[this document]] |
++----------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
