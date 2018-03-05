@@ -1226,7 +1226,7 @@ The Inner Block options enable the sender to split large messages into OSCORE-pr
 
 Privacy threats executed through intermediary nodes are considerably reduced by means of OSCORE. End-to-end integrity protection and encryption of the message payload and all options that are not used for proxy operations, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
-The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not mapped to CoAP. 
+The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not CoAP-mappable. 
 
 Unprotected error messages reveal information about the security state in the communication between the endpoints. Unprotected signalling messages reveal information about the reliable transport used on a leg of the path. Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
