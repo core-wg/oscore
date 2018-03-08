@@ -520,7 +520,7 @@ The sending endpoint SHALL write the Code of the original CoAP message into the 
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
-The other CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
+The other currently defined CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
 
 ## Signaling Messages {#coap-signaling}
