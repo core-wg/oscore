@@ -143,7 +143,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 
 # The CoAP Object-Security Option {#option}
 
-The CoAP Object-Security option (see {{fig-option}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable. 
+The CoAP Object-Security option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The Object-Security option is critical, safe to forward, part of the cache key, and not repeatable.
 
 ~~~~~~~~~~~
 +-----+---+---+---+---+-----------------+--------+--------+---------+
