@@ -50,6 +50,7 @@ normative:
   RFC8075:
   RFC8132:
   RFC8152:
+  RFC8174:
   RFC8288:
   RFC8323:
   
@@ -331,58 +332,48 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 
 ## CoAP Payload
 
-The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field. See {{fig-payload-protection}}.
-
-~~~~~~~~~~~
-      +------------------+---+---+
-      | Field            | E | U |
-      +------------------+---+---+
-      | Payload          | x |   |
-      +------------------+---+---+
-
-E = Encrypt and Integrity Protect (Inner)
-U = Unprotected (Outer)
-~~~~~~~~~~~
-{: #fig-payload-protection title="Protection of CoAP Payload" artwork-align="center"}
+The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field.
 
 The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
+A summary of how options an payload are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
 
 ~~~~~~~~~~~
-    +-----+-----------------+---+---+
-    | No. | Name            | E | U |
-    +-----+-----------------+---+---+
-    |   1 | If-Match        | x |   |
-    |   3 | Uri-Host        |   | x |
-    |   4 | ETag            | x |   |
-    |   5 | If-None-Match   | x |   |
-    |   6 | Observe         |   | * |
-    |   7 | Uri-Port        |   | x |
-    |   8 | Location-Path   | x |   |
-    | TBD | Object-Security |   | * |
-    |  11 | Uri-Path        | x |   |
-    |  12 | Content-Format  | x |   |
-    |  14 | Max-Age         | * | * |
-    |  15 | Uri-Query       | x |   |
-    |  17 | Accept          | x |   |
-    |  20 | Location-Query  | x |   |
-    |  23 | Block2          | * | * |
-    |  27 | Block1          | * | * |
-    |  28 | Size2           | * | * |
-    |  35 | Proxy-Uri       |   | * |
-    |  39 | Proxy-Scheme    |   | x |
-    |  60 | Size1           | * | * |
-    | 258 | No-Response     | * | * |
-    +-----+-----------------+---+---+
+  +---------+-----------------+---+---+
+  | Opt No. | Name            | E | U |
+  +---------+-----------------+---+---+
+  |       1 | If-Match        | x |   |
+  |       3 | Uri-Host        |   | x |
+  |       4 | ETag            | x |   |
+  |       5 | If-None-Match   | x |   |
+  |       6 | Observe         |   | * |
+  |       7 | Uri-Port        |   | x |
+  |       8 | Location-Path   | x |   |
+  |     TBD | Object-Security |   | * |
+  |      11 | Uri-Path        | x |   |
+  |      12 | Content-Format  | x |   |
+  |      14 | Max-Age         | * | * |
+  |      15 | Uri-Query       | x |   |
+  |      17 | Accept          | x |   |
+  |      20 | Location-Query  | x |   |
+  |      23 | Block2          | * | * |
+  |      27 | Block1          | * | * |
+  |      28 | Size2           | * | * |
+  |      35 | Proxy-Uri       |   | * |
+  |      39 | Proxy-Scheme    |   | x |
+  |      60 | Size1           | * | * |
+  |     258 | No-Response     | * | * |
+  +---------+-----------------+---+---+
+  |     N/A | Payload         | x |   |
+  +---------+-----------------+---+---+
 
 E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
 * = Special
 ~~~~~~~~~~~
-{: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
+{: #fig-option-protection title="Protection of CoAP fields" artwork-align="center"}
 
 Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
