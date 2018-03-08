@@ -127,7 +127,7 @@ Client                                          Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
-An implementation supporting this specification MAY only implement the client part, MAY only implement the server part, or MAY only implement one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{proxy-operations}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{proxy-operations}}.
+An implementation supporting this specification MAY implement only the client part, MAY implement only the server part, or MAY implement only one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{proxy-operations}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{proxy-operations}}.
 
 ## Terminology
 
