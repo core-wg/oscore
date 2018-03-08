@@ -827,7 +827,7 @@ The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerati
 
 ## Freshness
 
-For requests, OSCORE provides weak absolute freshness as the only guarantee is that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
+For requests, OSCORE provides only the guarantee that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
 
 For responses, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives strong absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation.
 
