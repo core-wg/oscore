@@ -721,7 +721,7 @@ The payload of the OSCORE message SHALL encode the ciphertext of the COSE object
 
 ### Examples: Requests 
 
-1. Request with kid = 25 and Partial IV = 5
+1. Request with kid = 0x25 and Partial IV = 5
 
 Before compression (24 bytes):
 
