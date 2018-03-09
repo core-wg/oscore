@@ -843,9 +843,9 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 To prevent reuse of the AEAD nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
-After boot, an endpoint MAY reject to use existing security contexts from before it booted and MAY establish a new security context with each party it communicates. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
+After boot, an endpoint MAY reject to use pre-existing security contexts, and MAY establish a new security context with each endpoint it communicates with. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
-After boot, an endpoint MAY use a partly persistently stored security context, but then the endpoint MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this is described below:
+After boot, an endpoint MAY use a partly persistently stored security context, but then the endpoint MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously accepted messages. Some ways to achieve this are described in the following sections.
 
 ### Sequence Number
 
