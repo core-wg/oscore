@@ -69,7 +69,7 @@ informative:
   I-D.hartke-core-e2e-security-reqs:
   I-D.mattsson-core-coap-actuators:
   I-D.ietf-ace-oscore-profile:
-  I-D.tiloca-core-multicast-oscoap:
+  I-D.ietf-core-oscore-groupcomm:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
   I-D.mattsson-ace-tls-oscore:
@@ -549,7 +549,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
 
-   * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.tiloca-core-multicast-oscoap}}.
+   * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
    * Optionally, a 'kid context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
@@ -568,7 +568,7 @@ A summary of the COSE header parameter kid context defined above can be found in
 Some examples of relevant uses of kid context are the following:
 
 * If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{master-salt-transport}} or {{I-D.ietf-6tisch-minimal-security}}).
-* In case of a group communication scenario {{I-D.tiloca-core-multicast-oscoap}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
+* In case of a group communication scenario {{I-D.ietf-core-oscore-groupcomm}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
