@@ -1057,7 +1057,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
   POST http://proxy.url/hc/?target_uri=coap://server.url/ HTTP/1.1
   Content-Type: application/oscore
-  CoAP-Object-Security: 09 25
+  CoAP-Object-Security: CSU
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
   
@@ -1137,7 +1137,7 @@ Example:
 
   POST http://server.url/ HTTP/1.1
   Content-Type: application/oscore
-  CoAP-Object-Security: 09 25
+  CoAP-Object-Security: CSU
   Body: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 ~~~~~~~~~~~
   
