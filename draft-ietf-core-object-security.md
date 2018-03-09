@@ -386,7 +386,7 @@ The sending endpoint SHALL include the Outer option message field present in the
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
-A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. New CoAP options which are repeatable and of class I MUST specify that proxies MUST NOT change the order of the option's occurrences.
+A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. Proxies MUST NOT change the order of option's occurrences, for options repeatable and of class I.
 
 Note: There are currently no Class I option message fields defined.
 
