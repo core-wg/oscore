@@ -330,50 +330,42 @@ Message fields not visible to proxies, i.e., transported in the ciphertext of th
 
 An OSCORE message may contain both an Inner and an Outer instance of a certain CoAP message field. Inner message fields are intended for the receiving endpoint, whereas Outer message fields are used to support proxy operations. Inner and Outer message fields are processed independently.
 
-## CoAP Payload
-
-The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field.
-
-The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
-
 ## CoAP Options {#coap-options}
 
-A summary of how options an payload are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
 
 ~~~~~~~~~~~
-  +---------+-----------------+---+---+
-  | Opt No. | Name            | E | U |
-  +---------+-----------------+---+---+
-  |       1 | If-Match        | x |   |
-  |       3 | Uri-Host        |   | x |
-  |       4 | ETag            | x |   |
-  |       5 | If-None-Match   | x |   |
-  |       6 | Observe         |   | * |
-  |       7 | Uri-Port        |   | x |
-  |       8 | Location-Path   | x |   |
-  |     TBD | Object-Security |   | * |
-  |      11 | Uri-Path        | x |   |
-  |      12 | Content-Format  | x |   |
-  |      14 | Max-Age         | * | * |
-  |      15 | Uri-Query       | x |   |
-  |      17 | Accept          | x |   |
-  |      20 | Location-Query  | x |   |
-  |      23 | Block2          | * | * |
-  |      27 | Block1          | * | * |
-  |      28 | Size2           | * | * |
-  |      35 | Proxy-Uri       |   | * |
-  |      39 | Proxy-Scheme    |   | x |
-  |      60 | Size1           | * | * |
-  |     258 | No-Response     | * | * |
-  +---------+-----------------+---+---+
-  |     N/A | Payload         | x |   |
-  +---------+-----------------+---+---+
+  +-----+-----------------+---+---+
+  | No. | Name            | E | U |
+  +-----+-----------------+---+---+
+  |   1 | If-Match        | x |   |
+  |   3 | Uri-Host        |   | x |
+  |   4 | ETag            | x |   |
+  |   5 | If-None-Match   | x |   |
+  |   6 | Observe         |   | * |
+  |   7 | Uri-Port        |   | x |
+  |   8 | Location-Path   | x |   |
+  | TBD | Object-Security |   | * |
+  |  11 | Uri-Path        | x |   |
+  |  12 | Content-Format  | x |   |
+  |  14 | Max-Age         | * | * |
+  |  15 | Uri-Query       | x |   |
+  |  17 | Accept          | x |   |
+  |  20 | Location-Query  | x |   |
+  |  23 | Block2          | * | * |
+  |  27 | Block1          | * | * |
+  |  28 | Size2           | * | * |
+  |  35 | Proxy-Uri       |   | * |
+  |  39 | Proxy-Scheme    |   | x |
+  |  60 | Size1           | * | * |
+  | 258 | No-Response     | * | * |
+  +-----+-----------------+---+---+
 
 E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
 * = Special
 ~~~~~~~~~~~
-{: #fig-option-protection title="Protection of CoAP fields" artwork-align="center"}
+{: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
 Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
 
@@ -490,9 +482,9 @@ Applications should consider that a proxy may remove the Outer No-Response optio
 
 The Object-Security option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the Object-Security option is neither encrypted nor integrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). "OSCORE within OSCORE" is not supported: If OSCORE processing detects an Object-Security option in the original CoAP message, then processing SHALL be stopped.
 
-## CoAP Header {#coap-header}
+## CoAP Header Fields and Payload {#coap-header}
 
-A summary of how the CoAP Header fields are protected is shown in {{fig-header-protection}}, including fields specific to CoAP over UDP and CoAP over TCP (marked accordingly in the table).
+A summary of how the CoAP header fields and payload are protected is shown in {{fig-fields-protection}}, including fields specific to CoAP over UDP and CoAP over TCP (marked accordingly in the table).
 
 ~~~~~~~~~~~
       +------------------+---+---+
@@ -505,12 +497,13 @@ A summary of how the CoAP Header fields are protected is shown in {{fig-header-p
       | Code             | x |   |
       | Message ID (UDP) |   | x |
       | Token            |   | x |
+      | Payload          | x |   |
       +------------------+---+---+
 
 E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
 ~~~~~~~~~~~
-{: #fig-header-protection title="Protection of CoAP Header Fields" artwork-align="center"}
+{: #fig-fields-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}
 
 Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
@@ -522,6 +515,7 @@ The receiving endpoint SHALL discard the Code in the OSCORE message and write th
 
 The other currently defined CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
+The CoAP Payload, if present in the original CoAP message, SHALL be encrypted and integrity protected and is thus an Inner message field. The sending endpoint writes the payload of the original CoAP message into the plaintext ({{plaintext}}) input to the COSE object. The receiving endpoint verifies and decrypts the COSE object, and recreates the payload of the original CoAP message.
 
 ## Signaling Messages {#coap-signaling}
 
