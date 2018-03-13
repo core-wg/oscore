@@ -1230,7 +1230,7 @@ Note to IANA: Please note all occurrences of "TBD" in this specification should 
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
 * Name: kid context
-* Label: TBD1
+* Label: TBD1 (Integer value between 1 and 255)
 * Value Type: bstr
 * Value Registry: 
 * Description: kid context
