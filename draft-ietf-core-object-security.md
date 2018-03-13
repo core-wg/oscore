@@ -1003,7 +1003,7 @@ For this purpose, this specification defines a new HTTP header field named CoAP-
 
 A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP header field CoAP-Object-Security, whose value is:
 
-  * "" (empty string) if the CoAP Object-Security option is empty, or
+  * "" if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payload ({{oscore-payl}}).
@@ -1015,7 +1015,7 @@ The resulting message is an OSCORE message that uses HTTP.
 
 A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the CoAP-Object-Security header field, which is mapped to the CoAP Object-Security option in the following way. The CoAP Object-Security option value is:
 
-* empty if the value of the HTTP CoAP-Object-Security header field is "" (empty string)
+* empty if the value of the HTTP CoAP-Object-Security header field is ""
 * the value of the HTTP CoAP-Object-Security header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
 
 Note that the value of the CoAP payload is the HTTP body, i.e. the OSCORE payload ({{oscore-payl}}).
@@ -1032,7 +1032,7 @@ As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mappin
 
 The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named CoAP-Object-Security in the mapped request or response. The value of the field is:
 
-  * "" (empty string) if the CoAP Object-Security option is empty, or
+  * "" if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 The header field Content-Type 'application/oscore' (see {{oscore-media-type}}) is used for OSCORE messages transported in HTTP. The CoAP Content-Format option is omitted for OSCORE messages transported in CoAP.
@@ -1094,7 +1094,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
   HTTP/1.1 200 OK
   Content-Type: application/oscore
-  CoAP-Object-Security: "" (empty string)
+  CoAP-Object-Security: "" 
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
 
@@ -1158,7 +1158,7 @@ Example:
 
   HTTP/1.1 200 OK
   Content-Type: application/oscore
-  CoAP-Object-Security: "" (empty string)
+  CoAP-Object-Security: ""
   Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 ~~~~~~~~~~~
 
