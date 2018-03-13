@@ -1329,7 +1329,7 @@ These media types are used to indicate that the content is an OSCORE message.
 
 --- back
 
-# Scenario examples {#examples}
+# Scenario Examples {#examples}
 
 This section gives examples of OSCORE, targeting scenarios in Section 2.2.1.1 of {{I-D.hartke-core-e2e-security-reqs}}. The message exchanges are made, based on the assumption that there is a security context established between client and server. For simplicity, these examples only indicate the content of the messages without going into detail of the (compressed) COSE message format.
 
