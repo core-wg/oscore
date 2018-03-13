@@ -1369,7 +1369,7 @@ The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Ch
 
 The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). 
 
-The server verifies that the Partial IV has not been received before. The client verifies that the response is bound to the request.
+The server verifies the request as specified in {{ver-req}}. The client verifies the response as specified in {{ver-res}}.
 
 ## Secure Subscribe to Sensor
 
