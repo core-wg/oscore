@@ -881,7 +881,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 5. Format the OSCORE message according to {{protected-fields}}. The Object-Security option is added (see {{outer-options}}).
 
-6. Store the association Token - Security Context. The client SHALL be able to find the Recipient Context from the Token in the response.
+6. Store the association Token - Security Context, in order to be able to find the Recipient Context from the Token in the response.
 
 ## Verifying the Request {#ver-req}
 
