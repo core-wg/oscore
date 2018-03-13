@@ -382,7 +382,7 @@ The processing of Inner option message fields by the receiving endpoint is speci
 
 Outer option message fields (Class U or I) are used to support proxy operations. 
 
-The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including Object-Security, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Outer option message field. 
+The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including Object-Security, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of Outer option message field. 
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
@@ -616,7 +616,7 @@ The plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 
 - the Code of the original CoAP message as defined in Section 3 of {{RFC7252}}; and
 
-- all Inner option message fields (see {{inner-options}}) present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included Class E option; and
+- all Inner option message fields (see {{inner-options}}) present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of Class E option; and
 
 - the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
 
@@ -659,7 +659,7 @@ where:
 
 - request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
 
-- options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included class I option.
+- options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid need not be integrity protected in the requests.
 
