@@ -738,6 +738,16 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 
 2\. Request with kid = empty string and Partial IV = 0x00
 
+Before compression (23 bytes):
+
+~~~~~~~~~~~
+[
+h'',
+{ 4:h'', 6:h'00' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+~~~~~~~~~~~
+
 After compression (16 bytes):
 
 ~~~~~~~~~~~
@@ -750,6 +760,16 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 
 
 3\. Request with kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
+
+Before compression (30 bytes):
+
+~~~~~~~~~~~
+[
+h'',
+{ 4:h'', 6:h'05', 8:h'44616c656b' },
+h'aea0155667924dff8a24e4cb35b9'
+]
+~~~~~~~~~~~
 
 After compression (22  bytes):
 
