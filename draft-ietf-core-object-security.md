@@ -1705,7 +1705,7 @@ From there:
 
 This appendix discusses security properties of OSCORE.
 
-[Editors note: This section is work in progress.]
+\[Editors note: This section is work in progress.\]
 
 ## Security layer
 
@@ -1741,7 +1741,7 @@ OSCORE depends on a pre-established strong Master Secret which can be used to de
 * Binding of CoAP response to CoAP request
 
 
-Informally, OSCORE provides these properties by AEAD protecting the plaintext with a strong key.  AEAD encryption [RFC5116] provides confidentiality and integrity for the data.  Non-replayability of requests is provided by XX. 
+Informally, OSCORE provides these properties by AEAD protecting the plaintext with a strong key.  AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data.  Non-replayability of requests is provided by XX. 
 
 
 ## Unprotected Message Fields
@@ -1760,7 +1760,7 @@ Informally, OSCORE provides these properties by AEAD protecting the plaintext wi
 
 ##### Length
 
-### CoAP Options
+### CoAP Options {#sec-coap-opt}
 
 
 
