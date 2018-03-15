@@ -712,9 +712,11 @@ The payload of the OSCORE message SHALL encode the ciphertext of the COSE object
 
 ## Examples of Compressed COSE Objects
 
+This section covers a list of OSCORE Header Compression examples for requests and responses. The examples assume the COSE\_Encrypt0 object is set (which means the CoAP message and cryptographic material is known). Note that the full CoAP unprotected message, as well as the full security context, is not reported in the examples, but only the input necessary to the compression mechanism, i.e. the COSE\_Encrypt0 object. The output is the compressed COSE object as defined in {{compression}}, divided into two parts, since the object is transported in two CoAP fields: Object-Security option value and CoAP payload.
+
 ### Examples: Requests 
 
-1\. Request with kid = 0x25 and Partial IV = 0x05
+1\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = 0x25 and Partial IV = 0x05
 
 Before compression (24 bytes):
 
@@ -737,7 +739,7 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 
-2\. Request with kid = empty string and Partial IV = 0x00
+2\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string and Partial IV = 0x00
 
 Before compression (23 bytes):
 
@@ -760,7 +762,7 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 
-3\. Request with kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
+3\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
 
 Before compression (30 bytes):
 
@@ -784,6 +786,8 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 
 ### Example: Response (without Observe)
 
+1\. Response not including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9
+
 Before compression (18 bytes):
 
 ~~~~~~~~~~~
@@ -805,6 +809,8 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (with Observe)
+
+1\. Response including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
 
 Before compression (21 bytes):
 
