@@ -40,6 +40,7 @@ normative:
 
   RFC2119:
   RFC4648:
+  RFC5234:
   RFC6347:
   RFC7049:
   RFC7230:
@@ -1022,6 +1023,15 @@ OSCORE was initially designed to work between CoAP endpoints only, but the inter
 In order to use OSCORE with HTTP, an endpoint needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
 
 For this purpose, this specification defines a new HTTP header field named CoAP-Object-Security, see {{iana-http}}. The CoAP-Object-Security header field is only used in POST requests and 200 (OK) responses. All field semantics is given within the CoAP-Object-Security header field. The header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). Intermediaries are not allowed to insert, delete, or modify the field's value. The header field is not preserved across redirects.
+
+Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters), DIGIT (decimal digits), DQUOTE (double quote), the CoAP-Object-Security header field is as follows.
+
+~~~~~~~~~~~~~~
+base64-char = ALPHA / DIGIT / "/" / "+"
+
+CoAP-Object-Security = 1*base64-char / DQUOTE
+~~~~~~~~~~~~~~
+
 
 A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP header field CoAP-Object-Security, whose value is:
 
