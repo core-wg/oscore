@@ -46,6 +46,7 @@ normative:
   RFC7230:
   RFC7231:
   RFC7252:
+  RFC7390:
   RFC7641:
   RFC7959:
   RFC8075:
@@ -300,7 +301,7 @@ For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}
 
 The Sender Sequence Number is initialized to 0.  The supported types of replay protection and replay window length is application specific and depends on how OSCORE is transported, see {{replay-protection}}. The default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
-## Requirements on the Security Context Parameters
+## Requirements on the Security Context Parameters {#req-params}
 
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. When a trusted third party assigns identifiers (e.g., using {{I-D.ietf-ace-oauth-authz}}) or by using a protocol that allows the parties to negotiate locally unique identifiers in each endpoint, the Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. Sender IDs MAY be uniformly random distributed byte strings if the probability of collisions is negligible.
 
@@ -1737,11 +1738,73 @@ From there:
 
 * Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
 
-# Security properties
+# Security Properties
 
 This appendix discusses security properties of OSCORE.
 
+## Supporting Proxy Operations
+
+CoAP is designed to work with proxies reading and/or changing CoAP message fields and performing supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
+
+Securing CoAP on transport layer protects the entire message between the endpoints in which case CoAP proxy operations are not possible. In order to enable proxy operations, security on transport layer needs to be terminated at the proxy in which case the CoAP message in its entirety is unprotected in the proxy. 
+
+Requirements for CoAP end-to-end security are specified in 
+{{I-D.hartke-core-e2e-security-reqs}}. The client and server are assumed to trust each other, but proxies are only trusted to perform its intended operations. Forwarding is specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. HTTP-CoAP translation is specified in {{RFC8075}}. Proxies translating between different transport layers are intended to perform just that.
+
+By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyse how OSCORE protects the protected message fields and the consequences of unprotected message fields being unprotected.
+
+
+## Protected Message Fields 
+
+Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object using an AEAD algorithm. 
+
+OSCORE depends on a pre-established strong Master Secret which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
+
+* Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message ({{plaintext}}). 
+
+* Integrity: An attacker should not be able to craft a new OSCORE message with plaintext different from an existing OSCORE message which will be accepted by the receiver. 
+
+* Binding of response to request: An attacker should not be able to craft an OSCORE response to an OSCORE request which will be accepted by the receiver.
+
+* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
+
+Informally, OSCORE provides these properties by AEAD protecting the plaintext with a strong key and uniqueness of (key,nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Binding of response to request is provided by the Partial IV of the request in the external_aad. Non-replayability of requests is provided by the use of a replay protection mechanism (application dependent, see {{replay-protection}}). Non-replayability of responses follow from the binding of request to response. 
+
+OSCORE is susceptible to a variety of traffic analysis attacks based on observing the length and timing of encrypted packets. OSCORE does not provide any specific defenses against this form of attack but the application use a padding mechanism to prevent an attacker from directly determine the length of the padding. However, information about padding may still be revealed by side-channel attacks observing differences in timing.
+
+##  Uniqueness of (key, nonce) {#kn-uniqueness}
+
+In this section we show (key, nonce) pairs are not reused in the encryption of OSCORE messages.
+
+Fix a Security Context complying with the requirements {{req-params}}) and an endpoint. Endpoints may alternate between Client and Server roles, but each endpoint encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF from unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
+
+Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV), and are unique for different (ID_PIV, PIV) pairs ({{nonce}}).
+
+For requests and notifications (GET Observe responses):
+
+* ID_PIV = Sender ID of the encrypting endpoint
+* PIV = current Partial IV of the encrypting endpoint
+
+Since the encrypting endpoint steps the Partial IV for each use, the nonces used in requests and notifications are all unique as long as the number of encrypted messages are kept within the required range ({{nonce-uniqueness}}).
+
+For responses to requests:
+
+* ID_PIV = Sender ID of the endpoint generating the request
+* PIV = Partial IV of the request
+
+Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore the nonces used in responses are different compared to nonces in requests and notifications. Since the Partial IV of the request is verified for replay ({{replay-protection}}), PIV is unique for responses and so are nonces used in responses.
+
+Note that the argument does not depend on if the nonce in the first response to GET Observe is generated as a notification or as a response to a request. In the former case the Partial IV of the encrypting endpoint is stepped. In the latter case, the nonce is in the 
+the requesting endpoint's subset of nonces and would otherwise not be used by the encrypting endpoint.
+
+The argumentation also holds for group communication as specified in {{RFC7390}} although Observe is not defined for that setting (see {{I-D.ietf-core-oscore-groupcomm}}).
+
+
+
+## Unprotected Message Fields
+
 TODO
+
 
 # CDDL Summary {#cddl-sum}
 
