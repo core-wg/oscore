@@ -1738,7 +1738,7 @@ From there:
 
 * Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
 
-# Security Properties
+# Overview of Security Properties
 
 ## Supporting Proxy Operations
 
@@ -1757,17 +1757,17 @@ Protected message fields are included in the Plaintext ({{plaintext}}) and the A
 
 OSCORE depends on a pre-established strong Master Secret which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
 
-* Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message ({{plaintext}}). 
+* Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
-* Integrity: An attacker should not be able to craft a new OSCORE message with plaintext different from an existing OSCORE message which will be accepted by the receiver. 
+* Integrity: An attacker should not be able to craft a new OSCORE message with protected message fields different from an existing OSCORE message which will be accepted by the receiver. 
 
-* Binding of response to request: An attacker should not be able to craft an OSCORE response to an OSCORE request which will be accepted by the receiver.
+* Request-response binding: An attacker should not be able to make a client match a response to the wrong request.
 
 * Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
 
-Informally, OSCORE provides these properties by AEAD protecting the plaintext with a strong key and uniqueness of (key,nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Binding of response to request is provided by the Partial IV of the request in the external_aad. Non-replayability of requests is provided by the use of a replay protection mechanism (application dependent, see {{replay-protection}}). Non-replayability of responses follow from the binding of request to response. 
+Informally, OSCORE provides these properties by AEAD protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Binding of response to request is provided by the Partial IV of the request in the external_aad. Non-replayability of requests is provided by the use of a replay protection mechanism (application dependent, see {{replay-protection}}). Non-replayability of responses follow from the binding of request to response. 
 
-OSCORE is susceptible to a variety of traffic analysis attacks based on observing the length and timing of encrypted packets. OSCORE does not provide any specific defenses against this form of attack but the application use a padding mechanism to prevent an attacker from directly determine the length of the padding. However, information about padding may still be revealed by side-channel attacks observing differences in timing.
+OSCORE is susceptible to a variety of traffic analysis attacks based on observing the length and timing of encrypted packets. OSCORE does not provide any specific defenses against this form of attack but the application may use a padding mechanism to prevent an attacker from directly determine the length of the padding. However, information about padding may still be revealed by side-channel attacks observing differences in timing.
 
 ##  Uniqueness of (key, nonce) {#kn-uniqueness}
 
