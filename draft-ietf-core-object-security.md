@@ -1740,8 +1740,6 @@ From there:
 
 # Security Properties
 
-This appendix discusses security properties of OSCORE.
-
 ## Supporting Proxy Operations
 
 CoAP is designed to work with intermediaries reading and/or changing CoAP message fields and performing supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
