@@ -1792,14 +1792,55 @@ Since the request has been verified using the Recipient Context, ID_PIV is the S
 Note that the argument does not depend on if the nonce in the first response to GET Observe is generated as a notification or as a response to a request. In the former case the Partial IV of the encrypting endpoint is stepped. In the latter case, the nonce is in the 
 the requesting endpoint's subset of nonces and would otherwise not be used by the encrypting endpoint.
 
-The argumentation also holds for group communication as specified in {{RFC7390}} although Observe is not defined for that setting (see {{I-D.ietf-core-oscore-groupcomm}}).
-
-
+The argumentation also holds for group communication as specified in {{RFC7390}} although Observe is not used for that setting (see {{I-D.ietf-core-oscore-groupcomm}}).
 
 ## Unprotected Message Fields
 
-TODO
+This section lists and discusses issues with unprotected CoAP message fields.
 
+### CoAP Header Fields {#sec-coap-headers}
+
+* Version 
+
+The CoAP version will be in plaintext. A change of this parameter is potentially a denial of service attack. Currently there is only one CoAP version defined. Future versions of CoAP need to analyse attacks to OSCORE protected messages due to an adversary changing the CoAP version.
+
+* Token/Token Length 
+
+The Token field is a client-local identifier for differentiating between concurrent requests. Change of Token is a denial of service attack, since the client may not be able to identify the request or verify integrity of the response, which depends on the request.
+
+* Type/Message ID
+
+These fields reveal information about the UDP transport binding. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP, and does not impact the request/response message. A change of these fields is a denial of service attack similar to changing UDP header fields.
+
+* Length
+
+This field reveal information about the TCP transport binding.  These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial of service attack similar to changing TCP header fields.
+
+### CoAP Options  {#sec-coap-options}
+
+* Max-Age   
+
+The Outer Max-Age is used to avoid unnecessary caching of OSCORE error responses. Changing this value is a potential denial of service attack.
+
+* Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port    
+
+With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy.
+
+* Observe  
+
+The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages. Changing this option may lead to notifications not being forwarded.
+
+* Block1/Block2/Size1/Size2
+
+The Outer Block options enables segmentation of OSCORE messages in addition to Inner Block options, i.e. segmentation of OSCORE  segments which are still too large. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments up to the MAX_UNFRAGMENTED_SIZE, at which the message will be dropped.
+ 
+* No-Response
+
+The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Changing this option is a potential denial of service attack.
+
+* Object-Security 
+
+The Object-Security option contains information about the compressed COSE header. A change of this field may result in not being able to verify the OSCORE message.
 
 # CDDL Summary {#cddl-sum}
 
