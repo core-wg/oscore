@@ -85,9 +85,9 @@ This document defines Object Security for Constrained RESTful Environments (OSCO
 
 # Introduction {#intro}
 
-The Constrained Application Protocol (CoAP) {{RFC7252}} is a web application protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS ({{RFC6347}}) for security. CoAP-to-CoAP, HTTP-to-CoAP, and CoAP-to-HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of, the message payload and metadata in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
+The Constrained Application Protocol (CoAP) {{RFC7252}} is a web transfer protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS {{RFC6347}} for security. CoAP-to-CoAP, HTTP-to-CoAP, and CoAP-to-HTTP proxies require (D)TLS to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of, the message payload and metadata in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
-This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Blockwise {{RFC7959}}, No-Response {{RFC7967}}, and PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
+This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Block-wise {{RFC7959}}, No-Response {{RFC7967}}, and PATCH and FETCH {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
 ~~~~~~~~~~~
 +-----------------------------------+
@@ -107,7 +107,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 {: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
 
 
-OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE does not depend on underlying layers, and can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may be used together with (D)TLS over one or more hops in the end-to-end path, e.g. with HTTPs in one hop and with plain CoAP in another hop.
+OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE does not depend on underlying layers, and can be used anywhere where CoAP or HTTP can be used, including non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may be used together with (D)TLS over one or more hops in the end-to-end path, e.g. with HTTPS in one hop and with plain CoAP in another hop.
 
 The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
@@ -136,7 +136,7 @@ An implementation supporting this specification MAY implement only the client pa
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all capitals, as shown here.
 
-Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Blockwise {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}} as summarized in {{cddl-sum}}, and constrained environments {{RFC7228}}.
+Readers are expected to be familiar with the terms and concepts described in CoAP {{RFC7252}}, Observe {{RFC7641}}, Block-wise  {{RFC7959}}, COSE {{RFC8152}}, CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}} as summarized in {{cddl-sum}}, and constrained environments {{RFC7228}}.
 
 The term "hop" is used to denote a particular leg in the end-to-end path. The concept "hop-by-hop" (as in "hop-by-hop encryption" or "hop-by-hop fragmentation") opposed to "end-to-end", is used in this document to indicate that the messages are processed accordingly in the intermediaries, rather than just forwarded to the next node.
 
@@ -163,7 +163,7 @@ The Object-Security option includes the OSCORE flag bits ({{compression}}), the 
 
 A successful response to a request with the Object-Security option SHALL contain the Object-Security option. Whether error responses contain the Object-Security option depends on the error type (see {{processing}}).
 
-A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original request (see {{coap-coap-proxy}}). As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing (see {{max-age}}).
+A CoAP proxy SHOULD NOT cache a response to a request with an Object-Security option, since the response is only applicable to the original request (see {{coap-coap-proxy}}). As the compressed COSE Object is included in the cache key, messages with the Object-Security option will never generate cache hits. For Max-Age processing, see {{max-age}}.
 
 # The Security Context {#context}
 
@@ -259,13 +259,13 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * Replay Window Type and Size
 
-   - Default is DTLS-type replay protection with a window size of 32 ({{RFC6347}})
+   - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. How the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters ({{I-D.ietf-ace-oscore-profile}}), or a key exchange protocol such as the TLS/DTLS handshake ({{I-D.mattsson-ace-tls-oscore}}) or EDHOC ({{I-D.selander-ace-cose-ecdhe}}) providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol such as the TLS/DTLS handshake {{I-D.mattsson-ace-tls-oscore}} or EDHOC {{I-D.selander-ace-cose-ecdhe}} providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
-The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps ({{RFC5869}}):
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps {{RFC5869}}:
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -404,12 +404,12 @@ Successful OSCORE responses do not need to include an Outer Max-Age option since
 
 #### The Block Options {#block-options}
 
-Blockwise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting Blockwise. The Block options (Block1, Block2, Size1, Size2), when Inner message fields, provide  secure message fragmentation such that each fragment can be verified. The Block options, when Outer message fields, enables hop-by-hop fragmentation of the OSCORE message. Inner and Outer block processing may have different performance properties depending on the underlying transport. The end-to-end integrity of the message can be verified both in case of Inner and Outer Blockwise provided all blocks are received.
+Block-wise {{RFC7959}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting block-wise transfers. The Block options (Block1, Block2, Size1, Size2), when Inner message fields, provide secure message segmentation such that each segment can be verified. The Block options, when Outer message fields, enables hop-by-hop fragmentation of the OSCORE message. Inner and Outer block processing may have different performance properties depending on the underlying transport. The end-to-end integrity of the message can be verified both in case of Inner and Outer Block-wise transfers provided all blocks are received.
 
 
 ##### Inner Block Options {#inner-block-options}
 
-The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing Blockwise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing Block-wise as defined in {{RFC7959}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -454,7 +454,7 @@ See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the Object-Security option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-In order for an OSCORE-unaware proxy to support forwarding of Observe messages ({{RFC7641}}), there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
+In order for an OSCORE-unaware proxy to support forwarding of Observe messages {{RFC7641}}, there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
 To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. The client MAY ignore the Observe option value.
 
@@ -505,9 +505,9 @@ U = Unprotected (Outer)
 
 Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
-The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping or manipulating the Code (e.g., changing from GET to DELETE). 
+The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping on or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests without Observe option, to 0.05 (FETCH) for requests with Observe option, and to 2.04 (Changed) for responses. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH ({{RFC8132}}) allows all OSCORE messages to have payload.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the Outer Code of the OSCORE message SHALL be set to 0.02 (POST) for requests without Observe option, to 0.05 (FETCH) for requests with Observe option, and to 2.04 (Changed) for responses. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware proxies. The choice of POST and FETCH {{RFC8132}} allows all OSCORE messages to have payload.
 
 The receiving endpoint SHALL discard the Code in the OSCORE message and write the Code of the plaintext in the COSE object ({{plaintext}}) into the decrypted CoAP message.
 
@@ -517,10 +517,11 @@ The CoAP Payload, if present in the original CoAP message, SHALL be encrypted an
 
 ## Signaling Messages {#coap-signaling}
 
-Signaling messages (CoAP Code 7.00-7.31) were introduced to exchange information related to an underlying transport connection in the specific case of CoAP over reliable transports ({{RFC8323}}). The use of OSCORE for protecting Signaling is application dependent. 
+Signaling messages (CoAP Code 7.00-7.31) were introduced to exchange information related to an underlying transport connection in the specific case of CoAP over reliable transports {{RFC8323}}.  
 
-OSCORE MAY be used to protect Signaling if the endpoints for OSCORE coincide with the endpoints for the connection. If OSCORE is used to protect Signaling then:
+OSCORE MAY be used to protect Signaling if the endpoints for OSCORE coincide with the endpoints for the signaling message. If OSCORE is used to protect Signaling then:
 
+* To comply with {{RFC8323}}, an initial empty CSM message SHALL be sent. The subsequent signaling message SHALL be protected. 
 * Signaling messages SHALL be protected as CoAP Request messages, except in the case the Signaling message is a response to a previous Signaling message, in which case it SHALL be protected as a CoAP Response message. 
 For example, 7.02 (Ping) is protected as a CoAP Request and 7.03 (Pong) as a CoAP response.
 * The Outer Code for Signaling messages SHALL be set to 0.02 (POST), unless it is a response to a previous Signaling message, in which case it SHALL be set to 2.04 (Changed). 
@@ -545,7 +546,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV. The value 0 encodes to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -650,6 +651,8 @@ external_aad = [
 where:
 
 - oscore_version: contains the OSCORE version number. Implementations of this specification MUST set this field to 1. Other values are reserved for future versions.
+
+- algorithms: contains (for extensibility) an array of algorithms, according to this specification only containing alg_aead.
 
 - alg_aead: contains the AEAD Algorithm from the security context used for the exchange (see {{context-definition}}).
 
@@ -841,7 +844,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. In order to assure unique nonces, each Sender Context contains a Sender Sequence Number used to protect requests, and - in case of Observe - responses. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
-The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and no greater than 2^40 - 1. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
+The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and SHALL be less than 2^40. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. The endpoint SHOULD acquire a new security context (and consequently inform the other endpoint) before this happens. The latter is out of scope of this document.
 
 ## Freshness
 
@@ -853,7 +856,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 ## Replay Protection {#replay-protection}
 
-In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay protection failed" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
 Responses to non-Observe requests are protected against replay as they are cryptographically bound to the request. 
 
@@ -931,7 +934,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
-   * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the "Decryption failed" string.
+   * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Decryption failed" string.
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
@@ -939,7 +942,7 @@ A server receiving a request containing the Object-Security option SHALL perform
 
 9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
 
-10. The decrypted CoAP request is processed according to {{RFC7252}}
+10. The decrypted CoAP request is processed according to {{RFC7252}}.
 
 ## Protecting the Response {#prot-res}
 
@@ -991,9 +994,9 @@ A client receiving a response containing the Object-Security option SHALL perfor
 
 9. Add decrypted code, options and payload to the decrypted request. The Object-Security option is removed.
    
-10. The decrypted CoAP response is processed according to {{RFC7252}}
+10. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-11. (Optional) In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+11. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
 An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
 
@@ -1013,7 +1016,7 @@ This section describes the operations of OSCORE-aware proxies.
 
 OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies MAY provide certain simplifications as specified in this section. 
 
-Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. OSCORE complies with the extended security requirements also addressing Blockwise ({{RFC7959}}) and CoAP-mappable HTTP. In particular caching is disabled since the CoAP response is only applicable to the original CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
+Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. OSCORE complies with the extended security requirements also addressing Block-wise {{RFC7959}} and CoAP-mappable HTTP. In particular caching is disabled since the CoAP response is only applicable to the original CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an Object-Security option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
@@ -1023,22 +1026,21 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 ## HTTP Processing {#http-proc}
 
-OSCORE was initially designed to work between CoAP endpoints only, but the interest in use cases with one endpoint being an HTTP endpoint has driven the extension specified here. OSCORE is intended to be used with at least one endpoint being a CoAP endpoint. 
-
-In order to use OSCORE with HTTP, an endpoint needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
+In order to use OSCORE over HTTP hops, a node needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
 
 For this purpose, this specification defines a new HTTP header field named CoAP-Object-Security, see {{iana-http}}. The CoAP-Object-Security header field is only used in POST requests and 200 (OK) responses. All field semantics is given within the CoAP-Object-Security header field. The header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). Intermediaries are not allowed to insert, delete, or modify the field's value. The header field is not preserved across redirects.
 
-Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters), DIGIT (decimal digits), DQUOTE (double quote), the CoAP-Object-Security header field is as follows.
+\[Ed. Note: Reconsider use of Vary\]
+
+Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the CoAP-Object-Security header field is as follows.
 
 ~~~~~~~~~~~~~~
-base64-char = ALPHA / DIGIT / "/" / "+"
+base64-char = ALPHA / DIGIT / "_" / "-"
 
-CoAP-Object-Security = 1*base64-char / DQUOTE
+CoAP-Object-Security = 2*base64-char
 ~~~~~~~~~~~~~~
 
-
-A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and add the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP header field CoAP-Object-Security, whose value is:
+A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and adds the Object-Security option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP header field CoAP-Object-Security, whose value is:
 
   * "" if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
@@ -1052,7 +1054,7 @@ The resulting message is an OSCORE message that uses HTTP.
 
 A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the CoAP-Object-Security header field, which is mapped to the CoAP Object-Security option in the following way. The CoAP Object-Security option value is:
 
-* empty if the value of the HTTP CoAP-Object-Security header field is ""
+* empty if the value of the HTTP CoAP-Object-Security header field is a single zero byte (0x00) represented by AA
 * the value of the HTTP CoAP-Object-Security header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
 
 Note that the value of the CoAP payload is the HTTP body, i.e. the OSCORE payload ({{oscore-payl}}).
@@ -1069,7 +1071,7 @@ As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mappin
 
 The presence of the Object-Security option, both in requests and responses, is expressed in an HTTP header field named CoAP-Object-Security in the mapped request or response. The value of the field is:
 
-  * "" if the CoAP Object-Security option is empty, or
+  * AA if the CoAP Object-Security option is empty, or
   * the value of the CoAP Object-Security option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
 
 The header field Content-Type 'application/oscore' (see {{oscore-media-type}}) is used for OSCORE messages transported in HTTP. The CoAP Content-Format option is omitted for OSCORE messages transported in CoAP.
@@ -1222,13 +1224,13 @@ Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mappin
 
 ## End-to-end protection
 
-In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases, where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
+In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
 (D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP messaging layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Hop-by-hop protection of signaling messages can be achieved with (D)TLS. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
 
 ## Security Context Establishment
 
-The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common shared secret material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}.
+The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common keying material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}. The key establishement procedure need to ensure same key is not installed twice, even in error situations.
 
 ## Replay Protection {#replay-protection2}
 
@@ -1236,11 +1238,11 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 ## Cryptographic Considerations
 
-The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number SHALL be 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bit-long, and the Partial IV is at most 40 bit-long. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
 The security level of a system with m Masters Keys of length k used together with Master Salts with entropy n is k + n - log2(m). Similarly, the security level of a system with m AEAD keys of length k used together with AEAD nonces of length n is k + n - log2(m). Security level here means that an attacker can recover one of the m keys with complexity 2^(k + n) / m. Protection against such attacks can be provided by increasing the size of the keys or the entropy of the Master Salt. The complexity of recovering a specific key is still 2^k (assuming the Master Salt/AEAD nonce is public). The Master Secret, Sender Key, and Recipient Key MUST be secret, the rest of the parameters MAY be public. The Master Secret MUST be uniformly random.
 
-## Message Fragmentation
+## Message Segmentation
 
 The Inner Block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving endpoint can verify blocks before having received the complete message. The Outer Block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the Inner Block options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
@@ -1294,7 +1296,7 @@ The Object-Security option is added to the CoAP Signaling Option Numbers registr
 +------------+--------+---------------------+-------------------+
 | Applies to | Number | Name                | Reference         |
 +------------+--------+---------------------+-------------------+
-| 7.xx       |  TBD   | Object-Security     | [[this document]] |
+| 7.xx (any) |  TBD   | Object-Security     | [[this document]] |
 +------------+--------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1363,6 +1365,10 @@ These media types are used to indicate that the content is an OSCORE message.
       Change Controller: IESG
 
       Provisional registration?  No
+
+## CoAP Content-Formats Registry
+
+TODO
 
 --- back
 
@@ -1832,7 +1838,7 @@ The Outer Observe option is intended for an OSCORE-unaware proxy to support forw
 
 * Block1/Block2/Size1/Size2
 
-The Outer Block options enables segmentation of OSCORE messages in addition to Inner Block options, i.e. segmentation of OSCORE  segments which are still too large. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments up to the MAX_UNFRAGMENTED_SIZE, at which the message will be dropped.
+The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments up to the MAX_UNFRAGMENTED_SIZE, at which the message will be dropped.
  
 * No-Response
 
