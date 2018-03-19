@@ -1028,7 +1028,7 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 In order to use OSCORE over HTTP hops, a node needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
 
-For this purpose, this specification defines a new HTTP header field named CoAP-Object-Security, see {{iana-http}}. The CoAP-Object-Security header field is only used in POST requests and 200 (OK) responses. All field semantics is given within the CoAP-Object-Security header field. The header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). Intermediaries are not allowed to insert, delete, or modify the field's value. The header field is not preserved across redirects.
+For this purpose, this specification defines a new HTTP header field named CoAP-Object-Security, see {{iana-http}}. The CoAP-Object-Security header field is only used in POST requests and 200 (OK) responses. All field semantics is given within the CoAP-Object-Security header field. The header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). Intermediaries cannot insert, delete, or modify the field's value without being detected. The header field is not preserved across redirects.
 
 \[Ed. Note: Reconsider use of Vary\]
 
