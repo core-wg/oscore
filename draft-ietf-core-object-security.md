@@ -74,8 +74,6 @@ informative:
   I-D.ietf-core-oscore-groupcomm:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
-  I-D.mattsson-ace-tls-oscore:
-  I-D.selander-ace-cose-ecdhe:
 
 --- abstract
 
@@ -261,7 +259,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol such as the TLS/DTLS handshake {{I-D.mattsson-ace-tls-oscore}} or EDHOC {{I-D.selander-ace-cose-ecdhe}} providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
