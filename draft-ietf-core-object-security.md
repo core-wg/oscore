@@ -1785,30 +1785,27 @@ OSCORE is susceptible to a variety of traffic analysis attacks based on observin
 
 ##  Uniqueness of (key, nonce) {#kn-uniqueness}
 
-In this section we show that (key, nonce) pairs are not reused in the encryption of OSCORE messages.
+In this section we show that (key, nonce) pairs are unique as long as the requirements {{req-params}} and {{nonce-uniqueness}} are followed.
 
-Fix a Security Context complying with the requirements {{req-params}}) and an endpoint. Endpoints may alternate between Client and Server roles, but each endpoint encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF from unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
+Fix a security context and an endpoint, called the encrypting endpoint. Endpoints may alternate between client and server roles, but each endpoint encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF from unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
 
 Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV), and are unique for different (ID_PIV, PIV) pairs ({{nonce}}).
 
-For requests and notifications (GET Observe responses):
+For requests and responses with Partial IV (e.g. observe notifications):
 
 * ID_PIV = Sender ID of the encrypting endpoint
 * PIV = current Partial IV of the encrypting endpoint
 
-Since the encrypting endpoint steps the Partial IV for each use, the nonces used in requests and notifications are all unique as long as the number of encrypted messages are kept within the required range ({{nonce-uniqueness}}).
+Since the encrypting endpoint steps the Partial IV for each use, the nonces used are all unique as long as the number of encrypted messages are kept within the required range ({{nonce-uniqueness}}).
 
-For responses to requests:
+For responses without Partial IV (requires a single response):
 
 * ID_PIV = Sender ID of the endpoint generating the request
 * PIV = Partial IV of the request
 
-Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore the nonces used in responses are different compared to nonces in requests and notifications. Since the Partial IV of the request is verified for replay ({{replay-protection}}), PIV is unique for responses and so are nonces used in responses.
+Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint genereated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}), PIV is unique for the Sender ID.
 
-Note that the argument does not depend on if the nonce in the first response to GET Observe is generated as a notification or as a response to a request. In the former case the Partial IV of the encrypting endpoint is stepped. In the latter case, the nonce is in the 
-the requesting endpoint's subset of nonces and would otherwise not be used by the encrypting endpoint.
-
-The argumentation also holds for group communication as specified in {{RFC7390}} although Observe is not used for that setting (see {{I-D.ietf-core-oscore-groupcomm}}).
+The argumentation also holds for group communication as specified in {{RFC7390}} (see {{I-D.ietf-core-oscore-groupcomm}}).
 
 ## Unprotected Message Fields
 
