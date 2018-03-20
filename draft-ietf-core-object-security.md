@@ -75,6 +75,15 @@ informative:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
 
+  MF10:
+    title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security
+    author:
+      -
+        ins: D. McGrew
+      -
+        ins: S. Fluhrer
+    date: 2010
+
 --- abstract
 
 This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP), using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end protection between endpoints communicating using CoAP or CoAP-mappable HTTP. OSCORE is designed for constrained nodes and networks supporting a range of proxy operations, including translation between different transport protocols. 
@@ -1242,7 +1251,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-The security level of a system with m Masters Keys of length k used together with Master Salts with entropy n is k + n - log2(m). Similarly, the security level of a system with m AEAD keys of length k used together with AEAD nonces of length n is k + n - log2(m). Security level here means that an attacker can recover one of the m keys with complexity 2^(k + n) / m. Protection against such attacks can be provided by increasing the size of the keys or the entropy of the Master Salt. The complexity of recovering a specific key is still 2^k (assuming the Master Salt/AEAD nonce is public) (see [MF00] for a overview). The Master Secret, Sender Key, and Recipient Key must be secret, the rest of the parameters may be public. The Master Secret must be uniformly random.
+The security level of a system with m Masters Keys of length k used together with Master Salts with entropy n is k + n - log2(m). Similarly, the security level of a system with m AEAD keys of length k used together with AEAD nonces of length n is k + n - log2(m). Security level here means that an attacker can recover one of the m keys with complexity 2^(k + n) / m. Protection against such attacks can be provided by increasing the size of the keys or the entropy of the Master Salt. The complexity of recovering a specific key is still 2^k (assuming the Master Salt/AEAD nonce is public) (see {{MF10}} for an overview). The Master Secret, Sender Key, and Recipient Key must be secret, the rest of the parameters may be public. The Master Secret must be uniformly random.
 
 ## Message Segmentation
 
