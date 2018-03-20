@@ -1035,15 +1035,15 @@ Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSC
 
 In order to use OSCORE over HTTP hops, a node needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
 
-For this purpose, this specification defines a new HTTP header field named OSCORE, see {{iana-http}}. The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses, i.e. essentially using HTTP as a transport of an encrypted CoAP mappable message contained in the payload. 
+For this purpose, this specification defines a new HTTP header field named OSCORE, see {{iana-http}}. The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses, i.e. essentially using HTTP as a transport of an encrypted CoAP mappable message contained in the payload. The presence of an OSCORE header field indicates that the HTTP body of this message contains a protected message. No additional semantics is provided by the other message fields, such as existing request methods or status codes.
 
 The OSCORE header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). 
 
 \[Ed. Note: Reconsider use of Vary\]
 
-Intermediaries cannot insert, delete, or modify the field's value without being detected. The header field is not preserved across redirects.
+Intermediaries must not insert, delete, or modify the value of the OSCORE header field since that violates its integrity and leads to an OSCORE error. 
 
-\[Ed. Note: Reconsider support for redirects\]
+In case of HTTP redirects the OSCORE header field should be preserved. However, in order for a server to which the message is redirected to suceessfully process the request it needs to support OSCORE as well as have access to the relevant security context.
 
 Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field is as follows.
 
