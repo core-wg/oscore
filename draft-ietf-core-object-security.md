@@ -1041,11 +1041,11 @@ The OSCORE header field is neither appropriate to list in the Connection header 
 
 \[Ed. Note: Reconsider use of Vary\]
 
-Intermediaries must not insert, delete, or modify the value of the OSCORE header field since that violates its integrity and leads to an OSCORE error. 
+Intermediaries must not insert, delete, or modify the OSCORE header since that violates its integrity and leads to an OSCORE error. 
 
-In case of HTTP redirects the OSCORE header field should be preserved. However, in order for a server to which the message is redirected to suceessfully process the request it needs to support OSCORE as well as have access to the relevant security context.
+In case of HTTP redirects the OSCORE header field should be preserved. However, in order for a server to which the message is redirected to succeessfully process the request it needs to support OSCORE as well as have access to the relevant security context.
 
-Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field is as follows.
+Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field value is as follows.
 
 ~~~~~~~~~~~~~~
 base64-char = ALPHA / DIGIT / "_" / "-"
