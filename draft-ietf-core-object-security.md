@@ -1048,9 +1048,9 @@ In case of HTTP redirects the OSCORE header field should be preserved. However, 
 Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field value is as follows.
 
 ~~~~~~~~~~~~~~
-base64-char = ALPHA / DIGIT / "_" / "-"
+base64url-char = ALPHA / DIGIT / "-" / "_"
 
-OSCORE = 2*base64-char
+OSCORE = 2*base64url-char
 ~~~~~~~~~~~~~~
 
 A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and adds the OSCORE option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP OSCORE header field, whose value is:
