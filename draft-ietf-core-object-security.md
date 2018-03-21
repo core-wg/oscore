@@ -321,7 +321,7 @@ While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the sam
 
 OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{coap-coap-proxy}} and {{http-op}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
 
-The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{http-op}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
+The remainder of this section and later sections focus on the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{http-op}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
 Protection of Signaling messages (Section 5 of {{RFC8323}}) is specified in {{coap-signaling}}. The other parts of this section target Request/Response messages.
 
@@ -339,7 +339,7 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. The options which require special processing are labelled with asterisks. 
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. Certain options required special processing as is described in {{special-options}}.
 
 ~~~~~~~~~~~
   +-----+-----------------+---+---+
@@ -349,28 +349,27 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
   |   3 | Uri-Host        |   | x |
   |   4 | ETag            | x |   |
   |   5 | If-None-Match   | x |   |
-  |   6 | Observe         |   | * |
+  |   6 | Observe         |   | x |
   |   7 | Uri-Port        |   | x |
   |   8 | Location-Path   | x |   |
-  | TBD | OSCORE          |   | * |
+  | TBD | OSCORE          |   | x |
   |  11 | Uri-Path        | x |   |
   |  12 | Content-Format  | x |   |
-  |  14 | Max-Age         | * | * |
+  |  14 | Max-Age         | x | x |
   |  15 | Uri-Query       | x |   |
   |  17 | Accept          | x |   |
   |  20 | Location-Query  | x |   |
-  |  23 | Block2          | * | * |
-  |  27 | Block1          | * | * |
-  |  28 | Size2           | * | * |
-  |  35 | Proxy-Uri       |   | * |
+  |  23 | Block2          | x | x |
+  |  27 | Block1          | x | x |
+  |  28 | Size2           | x | x |
+  |  35 | Proxy-Uri       |   | x |
   |  39 | Proxy-Scheme    |   | x |
-  |  60 | Size1           | * | * |
-  | 258 | No-Response     | * | * |
+  |  60 | Size1           | x | x |
+  | 258 | No-Response     | x | x |
   +-----+-----------------+---+---+
 
 E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
-* = Special
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
@@ -397,13 +396,13 @@ A procedure for integrity-protection-only of Class I option message fields is sp
 
 Note: There are currently no Class I option message fields defined.
 
-### Special Options
+### Special Options {#special-options}
 
-Some options require special processing, marked with an asterisk '*' in {{fig-option-protection}}; the processing is specified in this section.
+Some options require special processing as specified in this section.
 
 #### Max-Age {#max-age}
 
-An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as specified in {{inner-options}}.
+An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in {{inner-options}}.
 
 An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses, which are described in {{replay-protection}}, {{ver-req}} and {{ver-res}}. Such message field is then processed according to {{outer-options}}.
 
@@ -416,11 +415,11 @@ Block-wise {{RFC7959}} is an optional feature. An implementation MAY support {{R
 
 ##### Inner Block Options {#inner-block-options}
 
-The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to {{inner-options}} before processing Block-wise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as normal Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to normal {{inner-options}} before processing Block-wise as defined in {{RFC7959}}.
 
 ##### Outer Block Options {#outer-block-options}
 
-Proxies MAY fragment an OSCORE message using {{RFC7959}}, by introducing Block option message fields that are Outer ({{outer-options}}) and not generated by the sending endpoint. Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCORE message and verify its integrity. Therefore, applications supporting OSCORE and {{RFC7959}} MUST specify a security policy defining a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
+Proxies MAY fragment an OSCORE message using {{RFC7959}}, by introducing Block option message fields that are Outer ({{outer-options}}). Note that the Outer Block options are neither encrypted nor integrity protected. As a consequence, a proxy can maliciously inject block fragments indefinitely, since the receiving endpoint needs to receive the last block (see {{RFC7959}}) to be able to compose the OSCORE message and verify its integrity. Therefore, applications supporting OSCORE and {{RFC7959}} MUST specify a security policy defining a maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering the maximum size of message which can be handled by the endpoints. Messages exceeding this size SHOULD be fragmented by the sending endpoint using Inner Block options ({{inner-block-options}}).
 
 An endpoint receiving an OSCORE message with an Outer Block option SHALL first process this option according to {{RFC7959}}, until all blocks of the OSCORE message have been received, or the cumulated message size of the blocks exceeds MAX_UNFRAGMENTED_SIZE.  In the former case, the processing of the OSCORE message continues as defined in this document. In the latter case the message SHALL be discarded.
 
@@ -473,15 +472,13 @@ Clients can re-register observations to ensure that the observation is still act
 
 #### No-Response {#no-resp}
 
-No-Response is defined in {{RFC7967}}. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with same value.
+No-Response is defined in {{RFC7967}}. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with the same value.
 
 The Inner No-Response option is used to communicate to the server the client's disinterest in certain classes of responses to a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. 
 
 The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. The Outer No-Response option is processed according to {{outer-options}}. 
 
-In particular, step 8 of {{ver-res}} is applied to No-Response.
-
-Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
+Note the effect in step 8 of {{ver-res}} when applied to No-Response. Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
 
 #### The OSCORE Option
 
@@ -1075,7 +1072,7 @@ Restricted to subsets of HTTP and CoAP supporting a bijective mapping, OSCORE ca
 
 The sending HTTP endpoint uses {{RFC8075}} to translate the HTTP message into a CoAP message. The CoAP message is then processed with OSCORE as defined in this document. The OSCORE message is then mapped to HTTP as described in {{coap2http}} and sent in compliance with the rules in {{header-field}}.
 
-The receiving HTTP endpoint maps the HTTP message to a CoAP message using {{RFC8075}} and {{http2coap}}. The resulting OSCORE message is processed as defined in this document. If successful, the plaintext CoAP message is translated to HTTP for normal processing in the endpoint
+The receiving HTTP endpoint maps the HTTP message to a CoAP message using {{RFC8075}} and {{http2coap}}. The resulting OSCORE message is processed as defined in this document. If successful, the plaintext CoAP message is translated to HTTP for normal processing in the endpoint.
 
 ## Example: HTTP Client and CoAP Server
 
