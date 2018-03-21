@@ -118,7 +118,7 @@ OSCORE works in very constrained nodes and networks, thanks to its small message
 
 The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
-OSCORE uses pre-shared keys which may have been established out-of-band or with a key establishment protocol (see {{context-derivation}}). The technical solution builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure binding of response to request. A compressed version of COSE is used, as specified in {{compression}}. The use of OSCORE is signaled with the new OSCORE CoAP option or HTTP header field, defined in {{option}} and {{http2coap}}. The solution transforms a CoAP/HTTP message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is a CoAP/HTTP message related to the original message in the following way: the original CoAP/HTTP message is translated to CoAP (if not already in CoAP) and protected in a COSE object. The encrypted message fields of this COSE object are transported in the CoAP payload/HTTP body of the OSCORE message, and the OSCORE option/header field is included in the message. A sketch of an exchange of OSCORE messages, in the case of the original message being CoAP, is provided in {{fig-sketch}}).
+OSCORE uses pre-shared keys which may have been established out-of-band or with a key establishment protocol (see {{context-derivation}}). The technical solution builds on CBOR Object Signing and Encryption (COSE) {{RFC8152}}, providing end-to-end encryption, integrity, replay protection, and secure binding of response to request. A compressed version of COSE is used, as specified in {{compression}}. The use of OSCORE is signaled in CoAP with a new option ({{option}}), and in HTTP with a new header field ({{header-field}}) and content type 'application/oscore' ({{oscore-media-type}}). The solution transforms a CoAP/HTTP message into an "OSCORE message" before sending, and vice versa after receiving. The OSCORE message is a CoAP/HTTP message related to the original message in the following way: the original CoAP/HTTP message is translated to CoAP (if not already in CoAP) and protected in a COSE object. The encrypted message fields of this COSE object are transported in the CoAP payload/HTTP body of the OSCORE message, and the OSCORE option/header field is included in the message. A sketch of an exchange of OSCORE messages, in the case of the original message being CoAP, is provided in {{fig-sketch}}.
 
 ~~~~~~~~~~~
 Client                                          Server
@@ -137,7 +137,7 @@ Client                                          Server
 ~~~~~~~~~~~
 {: #fig-sketch title="Sketch of CoAP with OSCORE" artwork-align="center"}
 
-An implementation supporting this specification MAY implement only the client part, MAY implement only the server part, or MAY implement only one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{proxy-operations}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{proxy-operations}}.
+An implementation supporting this specification MAY implement only the client part, MAY implement only the server part, or MAY implement only one of the proxy parts. OSCORE is designed to protect as much information as possible while still allowing proxy operations ({{coap-coap-proxy}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{http-op}}.
 
 ## Terminology
 
@@ -170,7 +170,7 @@ The OSCORE option includes the OSCORE flag bits ({{compression}}), the Sender Se
 
 A successful response to a request with the OSCORE option SHALL contain the OSCORE option. Whether error responses contain the OSCORE option depends on the error type (see {{processing}}).
 
-A CoAP proxy SHOULD NOT cache a response to a request with an OSCORE option, since the response is only applicable to the original request (see {{coap-coap-proxy}}). As the compressed COSE Object is included in the cache key, messages with the OSCORE option will never generate cache hits. For Max-Age processing, see {{max-age}}.
+For CoAP proxy operations, see {{coap-coap-proxy}}.
 
 # The Security Context {#context}
 
@@ -319,9 +319,9 @@ While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the sam
 
 # Protected Message Fields {#protected-fields} 
 
-OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{proxy-operations}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
+OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{coap-coap-proxy}} and {{http-op}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
 
-The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{proxy-operations}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
+The remainder of this section and later sections discuss the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{http-op}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
 Protection of Signaling messages (Section 5 of {{RFC8323}}) is specified in {{coap-signaling}}. The other parts of this section target Request/Response messages.
 
@@ -1013,17 +1013,11 @@ The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{R
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
-# Proxy and HTTP Operations {#proxy-operations}
+# CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
-RFC 7252 defines operations for a CoAP-to-CoAP proxy (see Section 5.7 of {{RFC7252}}) and for proxying between CoAP and HTTP (Section 10 of {{RFC7252}}). A more detailed description of the HTTP-to-CoAP mapping is provided by {{RFC8075}}.
-This section describes the operations of OSCORE-aware proxies.
+CoAP is designed for proxy operations (see Section 5.7 of {{RFC7252}}). Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. 
 
-
-## CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
-
-OSCORE is designed to work with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but OSCORE-aware proxies MAY provide certain simplifications as specified in this section. 
-
-Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. OSCORE complies with the extended security requirements also addressing Block-wise {{RFC7959}} and CoAP-mappable HTTP. In particular caching is disabled since the CoAP response is only applicable to the original CoAP request. An OSCORE-aware proxy SHALL NOT cache a response to a request with an OSCORE option. As a consequence, the search for cache hits and CoAP freshness/Max-Age processing can be omitted. 
+OSCORE is designed to work with legacy CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
@@ -1031,19 +1025,15 @@ Proxy processing of the (Outer) Block options is as defined in {{RFC7959}}.
 
 Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
 
-## HTTP Processing {#http-proc}
+# HTTP Operations {#http-op}
 
-In order to use OSCORE over HTTP hops, a node needs to be able to map HTTP messages to CoAP messages (see {{RFC8075}}), and to apply OSCORE to CoAP messages (as defined in this document).
+The CoAP request/response model may be mapped to HTTP and vice versa as described in Section 10 of {{RFC7252}}. The HTTP-CoAP mapping is further detailed in {{RFC8075}}. This section defines the components needed to map and transport OSCORE messages over HTTP hops. By mapping between HTTP and CoAP and by using cross-protocol proxies OSCORE may be used end-to-end between e.g. an HTTP client and a CoAP server. Examples are provided at the end of the section.
 
-For this purpose, this specification defines a new HTTP header field named OSCORE, see {{iana-http}}. The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses, i.e. essentially using HTTP as a transport of an encrypted CoAP mappable message contained in the payload. The presence of an OSCORE header field indicates that the HTTP body of this message contains a protected message. No additional semantics is provided by the other message fields, such as existing request methods or status codes.
+## The HTTP OSCORE Header Field {#header-field}
 
-The OSCORE header field is neither appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}), nor in a Vary response header field (see Section 7.1.4 of {{RFC7231}}), nor allowed in trailers (see Section 4.1 of {{RFC7230}}). 
+The HTTP OSCORE Header Field (see {{iana-http}}) is used for carrying the content of the CoAP OSCORE option when transporting OSCORE messages over HTTP hops. 
 
-\[Ed. Note: Reconsider use of Vary\]
-
-Intermediaries must not insert, delete, or modify the OSCORE header since that violates its integrity and leads to an OSCORE error. 
-
-In case of HTTP redirects the OSCORE header field should be preserved. However, in order for a server to which the message is redirected to succeessfully process the request it needs to support OSCORE as well as have access to the relevant security context.
+The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses. When used, the HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}) indicating that the HTTP body of this message contains the OSCORE payload (see {{oscore-payl}}}. The HTTP OSCORE header field may be listed in a Vary response header field (see Section 7.1.4 of {{RFC7231}}) to indicate that it is used by an origin server in generating content. No additional semantics is provided by other message fields.
 
 Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field value is as follows.
 
@@ -1053,45 +1043,43 @@ base64url-char = ALPHA / DIGIT / "-" / "_"
 OSCORE = 2*base64url-char
 ~~~~~~~~~~~~~~
 
-A sending endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message. It then protects the message with OSCORE processing, and adds the OSCORE option (as defined in this document). Then, the endpoint maps the resulting CoAP message to an HTTP message that includes the HTTP OSCORE header field, whose value is:
+The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. The HTTP OSCORE header field is not useful in trailers (see Section 4.1 of {{RFC7230}}).
 
-  * AA if the CoAP OSCORE option is empty, or
-  * the value of the CoAP OSCORE option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. A CoAP-to-HTTP proxy receiving a request for redirect may copy the HTTP OSCORE header field to the new request, although the condition for this being successful is that the server to which the OSCORE message is redirected needs to be a clone of the server for which the OSCORE message was intended (same target resource, same OSCORE security context etc.). If an HTTP/OSCORE client receives a redirect it should instead generate a new OSCORE request for the server it was redirected to. 
 
-Note that the value of the HTTP body is the CoAP payload, i.e. the OSCORE payload ({{oscore-payl}}).
+## CoAP-to-HTTP Mapping {#coap2http}
 
-The HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}).
+Section 10.1 of {{RFC7252}} describes the fundamentals of the CoAP-to-HTTP cross-protocol mapping process. The additional rules for OSCORE messages are:
 
-The resulting message is an OSCORE message that uses HTTP.
+* The HTTP OSCORE header field value is set to
 
-A receiving endpoint uses {{RFC8075}} to translate an HTTP message into a CoAP message, with the following addition. The HTTP message includes the HTTP OSCORE header field, which is mapped to the CoAP OSCORE option in the following way. The CoAP OSCORE option value is:
+  * AA if the CoAP OSCORE option is empty, otherwise
+  * the value of the CoAP OSCORE option ({{obj-sec-value}}) in base64url (Section 5 of {{RFC4648}}) encoding without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}. 
 
-* empty if the value of the HTTP OSCORE header field is a single zero byte (0x00) represented by AA
-* the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this decoding).
+* The HTTP Content-Type is set to 'application/oscore' (see {{oscore-media-type}}), independent of CoAP Content-Format.
 
-Note that the value of the CoAP payload is the HTTP body, i.e. the OSCORE payload ({{oscore-payl}}).
+## HTTP-to-CoAP Mapping {#http2coap}
 
-The resulting message is an OSCORE message that uses CoAP.
+Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy. 
+The additional rules for HTTP messages with the OSCORE header field are:
 
-The endpoint can then verify the message according to the OSCORE processing and get a verified CoAP message. It can then translate the verified CoAP message into a verified HTTP message.
+* The CoAP OSCORE option is set as follows:
 
+  * empty if the value of the HTTP OSCORE header field is a single zero byte (0x00) represented by AA, otherwise
+  * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.	
+* The CoAP Content-Format option is omitted.
 
-## HTTP-to-CoAP Translation Proxy {#http2coap}
+## HTTP Endpoints
 
-Section 10.2 of {{RFC7252}} and {{RFC8075}} specify the behavior of an HTTP-to-CoAP proxy. As requested in Section 1 of {{RFC8075}}, this section describes the HTTP mapping for the OSCORE protocol extension of CoAP.
+Restricted to subsets of HTTP and CoAP supporting a bijective mapping, OSCORE can be originated or terminated in HTTP endpoints.
 
-The presence of the CoAP OSCORE option, both in requests and responses, is expressed with HTTP OSCORE header in the mapped request or response. The value of the field is:
+The sending HTTP endpoint uses {{RFC8075}} to translate the HTTP message into a CoAP message. The CoAP message is then processed with OSCORE as defined in this document. The OSCORE message is then mapped to HTTP as described in {{coap2http}} and sent in compliance with the rules in {{header-field}}.
 
-  * AA if the CoAP OSCORE option is empty, or
-  * the value of the CoAP OSCORE option ({{obj-sec-value}}) in base64url encoding (Section 5 of {{RFC4648}}) without padding (see {{RFC7515}} Appendix C for implementation notes for this encoding).
+The receiving HTTP endpoint maps the HTTP message to a CoAP message using {{RFC8075}} and {{http2coap}}. The resulting OSCORE message is processed as defined in this document. If successful, the plaintext CoAP message is translated to HTTP for normal processing in the endpoint
 
-The header field Content-Type 'application/oscore' (see {{oscore-media-type}}) is used for OSCORE messages transported in HTTP. The CoAP Content-Format option is omitted for OSCORE messages transported in CoAP.
+## Example: HTTP Client and CoAP Server
 
-The value of the body is the OSCORE payload ({{oscore-payl}}).
-
-Example:
-
-Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC8075}}).
+Mapping and notation here is based on "Simple Form" (Section 5.4.1 of {{RFC8075}}).
 
 ~~~~~~~~~~~
 [HTTP request -- Before client object security processing]
@@ -1157,11 +1145,7 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1.1 of {{RFC807
 
 Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), which was encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
-## CoAP-to-HTTP Translation Proxy  {#coap2http}
-
-Section 10.1 of {{RFC7252}} describes the behavior of a CoAP-to-HTTP proxy.  RFC 8075 {{RFC8075}} does not cover this direction in any more detail and so an example instantiation of Section 10.1 of {{RFC7252}} is used below. 
-
-Example:
+## Example: CoAP Client and HTTP Server
 
 ~~~~~~~~~~~
 [CoAP request -- Before client object security processing]
@@ -1260,7 +1244,7 @@ The Inner Block options enable the sender to split large messages into OSCORE-pr
 
 Privacy threats executed through intermediary nodes are considerably reduced by means of OSCORE. End-to-end integrity protection and encryption of the message payload and all options that are not used for proxy operations, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
-The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not CoAP-mappable. 
+The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not both CoAP-mappable and class E. 
 
 Unprotected error messages reveal information about the security state in the communication between the endpoints. Unprotected signalling messages reveal information about the reliable transport used on a leg of the path. Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
