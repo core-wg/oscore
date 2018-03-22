@@ -722,49 +722,49 @@ This section covers a list of OSCORE Header Compression examples for requests an
 
 ### Examples: Requests 
 
-1\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = 0x25 and Partial IV = 0x05
+1\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = 0x25, and Partial IV = 0x05
 
 Before compression (24 bytes):
 
 ~~~~~~~~~~~
-[
-h'',
-{ 4:h'25', 6:h'05' },
-h'aea0155667924dff8a24e4cb35b9'
-]
+  [
+  h'',
+  { 4:h'25', 6:h'05' },
+  h'aea0155667924dff8a24e4cb35b9'
+  ]
 ~~~~~~~~~~~
 
 After compression (17 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00001001 = 0x09
+  Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 05 25 (3 bytes)
+  Option Value: 09 05 25 (3 bytes)
 
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+  Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 
-2\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string and Partial IV = 0x00
+2\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, and Partial IV = 0x00
 
 Before compression (23 bytes):
 
 ~~~~~~~~~~~
-[
-h'',
-{ 4:h'', 6:h'00' },
-h'aea0155667924dff8a24e4cb35b9'
-]
+  [
+  h'',
+  { 4:h'', 6:h'00' },
+  h'aea0155667924dff8a24e4cb35b9'
+  ]
 ~~~~~~~~~~~
 
 After compression (16 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00001001 = 0x09
+  Flag byte: 0b00001001 = 0x09
 
-Option Value: 09 00 (2 bytes)
+  Option Value: 09 00 (2 bytes)
 
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+  Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 
@@ -773,69 +773,69 @@ Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 Before compression (30 bytes):
 
 ~~~~~~~~~~~
-[
-h'',
-{ 4:h'', 6:h'05', 8:h'44616c656b' },
-h'aea0155667924dff8a24e4cb35b9'
-]
+  [
+  h'',
+  { 4:h'', 6:h'05', 8:h'44616c656b' },
+  h'aea0155667924dff8a24e4cb35b9'
+  ]
 ~~~~~~~~~~~
 
 After compression (22  bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00011001 = 0x19
+  Flag byte: 0b00011001 = 0x19
 
-Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
+  Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
 
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+  Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (without Partial IV)
 
-1\. Response not including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9
+1\. Response not including an Partial IV, with ciphertext = 0xaea0155667924dff8a24e4cb35b9
 
 Before compression (18 bytes):
 
 ~~~~~~~~~~~
-[
-h'',
-{},
-h'aea0155667924dff8a24e4cb35b9'
-]
+  [
+  h'',
+  {},
+  h'aea0155667924dff8a24e4cb35b9'
+  ]
 ~~~~~~~~~~~
 
 After compression (14 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00000000 = 0x00
+  Flag byte: 0b00000000 = 0x00
+ 
+  Option Value: (0 bytes)
 
-Option Value: (0 bytes)
-
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+  Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 ### Example: Response (with Partial IV)
 
-1\. Response including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
+1\. Response including an Partial IV (e.g. an Observe notification), with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
 
 Before compression (21 bytes):
 
 ~~~~~~~~~~~
-[
-h'',
-{ 6:h'07' },
-h'aea0155667924dff8a24e4cb35b9'
-]
+  [
+  h'',
+  { 6:h'07' },
+  h'aea0155667924dff8a24e4cb35b9'
+  ]
 ~~~~~~~~~~~
 
 After compression (16 bytes):
 
 ~~~~~~~~~~~
-Flag byte: 0b00000001 = 0x01
+  Flag byte: 0b00000001 = 0x01
 
-Option Value: 01 07 (2 bytes)
+  Option Value: 01 07 (2 bytes)
 
-Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+  Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
 # Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
