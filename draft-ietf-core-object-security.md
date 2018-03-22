@@ -841,7 +841,7 @@ This section covers a list of OSCORE Header Compression examples for requests an
 
 ## Message Binding
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised proxies, OSCORE binds responses to the requests by including the kid and Partial IV of the request in the AAD of the response. The server therefore needs to store the kid and Partial IV of the request until all responses have been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised intermediaries, OSCORE binds responses to the requests by including the kid and Partial IV of the request in the AAD of the response. The server therefore needs to store the kid and Partial IV of the request until all responses have been sent. Note that the binding does not guarantee that the response was created after the server received the request.
 
 ## AEAD Nonce Uniqueness {#nonce-uniqueness}
 
