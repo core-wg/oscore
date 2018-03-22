@@ -75,14 +75,16 @@ informative:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
   
-  MF10:
+  MF00:
     title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security
     author:
       -
         ins: D. McGrew
       -
         ins: S. Fluhrer
-    date: 2010
+    date: 2000
+    seriesinfo:
+      the Proceedings of the Seventh Annual Workshop on Selected Areas in Cryptography (SAC 2000), Springer-Verlag.
 
 --- abstract
 
@@ -1232,7 +1234,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF10}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must be uniformly random.
+In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must be uniformly random.
 
 ## Message Segmentation
 
