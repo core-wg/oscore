@@ -597,17 +597,20 @@ Note that in this specification only algorithms that use nonces equal or greater
 When Observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions see {{processing}}.
 
 ~~~~~~~~~~~
-+---+-----------------------+--+--+--+--+--+
-| S | ID of PIV generator   |  Partial IV  |----+ 
-+---+-----------------------+--+--+--+--+--+    | 
-                                                | 
-+------------------------------------------+    | 
-|                Common IV                 |->(XOR)
-+------------------------------------------+    | 
-                                                | 
-+------------------------------------------+    | 
-|                  Nonce                   |<---+ 
-+------------------------------------------+     
+     <- nonce length minus 6 -> <-  5 bytes ->
++---+--------------------------+--+--+--+--+--+
+| S |   ID of PIV generator    |  Partial IV  |----+ 
++---+--------------------------+--+--+--+--+--+    | 
+                                                   |
+ <------------ nonce length bytes ----------->     |               
++---------------------------------------------+    | 
+|                  Common IV                  |->(XOR)
++---------------------------------------------+    | 
+                                                   | 
+ <------------ nonce length bytes ----------->     |               
++---------------------------------------------+    | 
+|                    Nonce                    |<---+ 
++---------------------------------------------+     
 ~~~~~~~~~~~
 {: #fig-nonce title="AEAD Nonce Formation" artwork-align="center"}
 
