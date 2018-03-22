@@ -75,7 +75,14 @@ informative:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
   
-  MF10: title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security author: - ins: D. McGrew - ins: S. Fluhrer date: 2010
+  MF10:
+    title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security
+    author:
+      -
+        ins: D. McGrew
+      -
+        ins: S. Fluhrer
+    date: 2010
 
 --- abstract
 
