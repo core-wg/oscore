@@ -1080,8 +1080,8 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1 of {{RFC8075}
 
 ~~~~~~~~~~~
 [HTTP request -- Before client object security processing]
-
-  GET http://proxy.url/hc/?target_uri=coap://server.url/orders HTTP/1.1
+  GET http://proxy.url/hc/?target_uri=coap://server.url/orders 
+   HTTP/1.1
 ~~~~~~~~~~~
  
 ~~~~~~~~~~~
