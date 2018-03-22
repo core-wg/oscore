@@ -1033,7 +1033,7 @@ The HTTP OSCORE header field is only used in POST requests and 200 (OK) response
 
 Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field value is as follows.
 
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~ abnf
 base64url-char = ALPHA / DIGIT / "-" / "_"
 
 OSCORE = 2*base64url-char
