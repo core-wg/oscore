@@ -74,17 +74,10 @@ informative:
   I-D.ietf-core-oscore-groupcomm:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-6tisch-minimal-security:
+  
+  MF10: title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security author: - ins: D. McGrew - ins: S. Fluhrer date: 2010
 
--  MF10:
--    title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security
--    author:
--      -
--        ins: D. McGrew
--      -
--        ins: S. Fluhrer
--    date: 2010
--
- --- abstract
+--- abstract
 
 This document defines Object Security for Constrained RESTful Environments (OSCORE), a method for application-layer protection of the Constrained Application Protocol (CoAP), using CBOR Object Signing and Encryption (COSE). OSCORE provides end-to-end protection between endpoints communicating using CoAP or CoAP-mappable HTTP. OSCORE is designed for constrained nodes and networks supporting a range of proxy operations, including translation between different transport protocols. 
 
