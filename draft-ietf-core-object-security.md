@@ -720,7 +720,7 @@ The payload of the OSCORE message SHALL encode the ciphertext of the COSE object
 
 This section covers a list of OSCORE Header Compression examples for requests and responses. The examples assume the COSE\_Encrypt0 object is set (which means the CoAP message and cryptographic material is known). Note that the full CoAP unprotected message, as well as the full security context, is not reported in the examples, but only the input necessary to the compression mechanism, i.e. the COSE\_Encrypt0 object. The output is the compressed COSE object as defined in {{compression}}, divided into two parts, since the object is transported in two CoAP fields: OSCORE option and payload.
 
-### Examples: Requests 
+### Examples: Requests
 
 1\. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = 0x25, and Partial IV = 0x05
 
@@ -790,9 +790,9 @@ After compression (22  bytes):
   Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-### Example: Response (without Partial IV)
+### Example: Responses
 
-1\. Response not including an Partial IV, with ciphertext = 0xaea0155667924dff8a24e4cb35b9
+1\. Response with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and no Partial IV
 
 Before compression (18 bytes):
 
@@ -814,9 +814,7 @@ After compression (14 bytes):
   Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-### Example: Response (with Partial IV)
-
-1\. Response including an Partial IV (e.g. an Observe notification), with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
+2\. Response with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
 
 Before compression (21 bytes):
 
