@@ -226,7 +226,7 @@ The Sender Context contains the following parameters:
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm.
 
-* Sender Sequence Number. Non-negative integer used by the sender to protect requests and Observe notifications. Used as 'Partial IV' {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
+* Sender Sequence Number. Non-negative integer used by the sender to protect requests and some responses, e.g. Observe notifications. Used as 'Partial IV' {{RFC8152}} to generate unique nonces for the AEAD. Maximum value is determined by the AEAD Algorithm.
 
 The Recipient Context contains the following parameters:
 
@@ -790,7 +790,7 @@ Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-### Example: Response (without Observe)
+### Example: Response (without Partial IV)
 
 1\. Response not including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9
 
@@ -814,7 +814,7 @@ Option Value: (0 bytes)
 Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-### Example: Response (with Observe)
+### Example: Response (with Partial IV)
 
 1\. Response including an Observe option, with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and Partial IV = 0x07
 
