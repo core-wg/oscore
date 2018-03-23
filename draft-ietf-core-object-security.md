@@ -1196,7 +1196,7 @@ Note that the HTTP Status Code 200 in the next-to-last message is the mapping of
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~
-[CoAP response – Proxy to CoAP Client]
+[CoAP response -- Proxy to CoAP Client]
 
   2.04 Changed
   OSCORE: [empty]
