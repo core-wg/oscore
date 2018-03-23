@@ -1744,7 +1744,7 @@ CoAP is designed to work with intermediaries reading and/or changing CoAP messag
 
 Securing CoAP on transport layer protects the entire message between the endpoints in which case CoAP proxy operations are not possible. In order to enable proxy operations, security on transport layer needs to be terminated at the proxy in which case the CoAP message in its entirety is unprotected in the proxy. 
 
-Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}. The client and server are assumed to trust each other, but proxies and gateways are only trusted to perform its intended operations. Forwarding is specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. HTTP-CoAP translation is specified in {{RFC8075}}. Intermediaries translating between different transport layers are intended to perform just that.
+Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}. The client and server are assumed to be honest, but proxies and gateways are only trusted to perform its intended operations. Forwarding is specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. HTTP-CoAP translation is specified in {{RFC8075}}. Intermediaries translating between different transport layers are intended to perform just that.
 
 By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyze how OSCORE protects the protected message fields and the consequences of message fields intended for proxy operation being unprotected.
 
@@ -1775,19 +1775,19 @@ Fix a security context and an endpoint, called the encrypting endpoint. Endpoint
 
 Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV), and are unique for different (ID_PIV, PIV) pairs ({{nonce}}).
 
-For requests and responses with Partial IV (e.g. observe notifications):
+For requests and responses with Partial IV (e.g. Observe notifications):
 
 * ID_PIV = Sender ID of the encrypting endpoint
 * PIV = current Partial IV of the encrypting endpoint
 
 Since the encrypting endpoint steps the Partial IV for each use, the nonces used are all unique as long as the number of encrypted messages are kept within the required range ({{nonce-uniqueness}}).
 
-For responses without Partial IV (requires a single response):
+For responses without Partial IV (i.e. single response to a request):
 
 * ID_PIV = Sender ID of the endpoint generating the request
 * PIV = Partial IV of the request
 
-Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint genereated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}), PIV is unique for the Sender ID.
+Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV.
 
 The argumentation also holds for group communication as specified in {{RFC7390}} (see {{I-D.ietf-core-oscore-groupcomm}}).
 
