@@ -911,7 +911,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
-3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}} and (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}} and {{nonce-uniqueness}}.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
@@ -961,7 +961,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 3. Compute the AEAD nonce
   
-   * If Observe is used, compute the nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order). Then (in one atomic operation, see {{nonce-uniqueness}}) increment the Sender Sequence Number by one.
+   * If Observe is used, compute the nonce from the Sender ID, Common IV, and Partial IV (Sender Sequence Number in network byte order) as described in {{nonce}} and {{nonce-uniqueness}}.
 
    * If Observe is not used, either the nonce from the request is used or a new Partial IV is used (see bullet on 'Partial IV' in {{cose-object}}).
 
