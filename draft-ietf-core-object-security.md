@@ -1774,7 +1774,7 @@ In this section we show that (key, nonce) pairs are unique as long as the requir
 
 Fix a security context and an endpoint, called the encrypting endpoint. Endpoints may alternate between client and server roles, but each endpoint encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF from unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
 
-Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV), and are unique for different (ID_PIV, PIV) pairs ({{nonce}}).
+Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV). The nonce construction ({{nonce}}) with includes the size of the ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs.
 
 For requests and responses with Partial IV (e.g. Observe notifications):
 
