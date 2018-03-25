@@ -704,7 +704,6 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
-
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
 * The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
@@ -885,7 +884,7 @@ After boot, an endpoint MAY use a partly persistently stored security context, b
 
 To prevent reuse of Sender Sequence Numbers, an endpoint MAY perform the following procedure during normal operations:
 
-* Each time the Sender Sequence Number is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
+* Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
 
 ### Replay Window {#reboot-replay}
 
