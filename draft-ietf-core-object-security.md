@@ -919,7 +919,8 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
-6. Store the association Token - Security Context, in order to be able to find the Recipient Context from the Token in the response.
+6. Store the attribute-value pair (Token, {Security Context, PIV}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
+
 
 ## Verifying the Request {#ver-req}
 
@@ -998,6 +999,8 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
    * If decryption fails, then go to 11.
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
+   
+   * If decryption succeeds and Observe is not used, delete attribute-value pair (Token, {Security Context, PIV}).
 
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
