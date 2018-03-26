@@ -552,7 +552,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. If the partial IV is not present in a respsonse, it means that the nonce of the request is used. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -596,7 +596,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys make it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
-When Observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions see {{processing}}.
+If the Partial IV is not present in a response, the nonce from the request is used. When Observe is not used (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{#kn-uniqueness}} and {{#replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{#processing}}.
 
 ~~~~~~~~~~~
      <- nonce length minus 6 B -> <-- 5 bytes -->
