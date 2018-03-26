@@ -1489,9 +1489,9 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 ## Master Secret Used Multiple Times {#master-salt-transport}
 
-In cases where the Master Secret needs to be used to derive multiple security contexts, e.g. due to recommissioning or where the security context is not persistently stored, a stochastically unique Master Salt prevents the reuse of AEAD nonce and key. The Master Salt may be transported between client and server in the kid context parameter (see {{context-hint}}) of the request.
+In cases where the Master Secret needs to be used to derive multiple security contexts, e.g. due to recommissioning or where the security context is not persistently stored, a (stochastically) unique Master Salt prevents the reuse of AEAD nonce and key. 
 
-In this section we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt which is transported in kid context.
+In this section we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt which is transported in kid context parameter (see {{context-hint}}) of the request.
 
 1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with kid context set to the Master Salt.
 
