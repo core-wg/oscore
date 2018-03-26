@@ -1756,6 +1756,13 @@ Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e
 
 By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyze how OSCORE protects the protected message fields and the consequences of message fields intended for proxy operation being unprotected.
 
+## The OSCORE Master Secret
+
+OSCORE uses HKDF {{RFC5869}} and the established input parameters to derive the security context. The required properties of the security context parameters are discussed in {{req-params}}, in this section we focus on the Master Secret. HKDF denotes in this specification the composition of the expand and extract functions as defined in {{RFC5869}} and the Master Secret is used as Input Key Material (IKM).
+ 
+Informally, HKDF takes as source an IKM containing some good amount of randomness but not necessarily distributed uniformly (or for which an attacker has some partial knowledge) and derive from it one or more cryptographically strong secret keys {{RFC5869}}.
+
+Therefore the main requirements for the OSCORE Master Secret is that it is secret and has a good amount of randomness. Different key establishment schemes need to ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
 
 ## Protected Message Fields 
 
