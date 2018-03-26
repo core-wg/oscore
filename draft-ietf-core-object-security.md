@@ -553,7 +553,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. If the partial IV is not present in a respsonse, it means that the nonce of the request is used. (A non-Observe example where the Partial IV is included in a response is provided in {{reboot-replay}}.)
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -597,7 +597,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys make it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
-When Observe is not used, the request and the response may use the same nonce. In this way, the Partial IV does not have to be sent in responses, which reduces the size. For processing instructions see {{processing}}.
+If the Partial IV is not present in a response, the nonce from the request is used. When Observe is not used (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{#kn-uniqueness}} and {{#replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{#processing}}.
 
 ~~~~~~~~~~~
      <- nonce length minus 6 B -> <-- 5 bytes -->
@@ -867,7 +867,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Responses without partial IV (single responses) are protected against replay as they are bound to the request. 
+Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request. The Partial IV in a non-Observe response is not used for replay protection.
 
 In the case of Observe, a client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. 
 
