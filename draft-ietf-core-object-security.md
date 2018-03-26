@@ -962,8 +962,6 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 3. Compute the AEAD nonce
   
-  3. Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
-
    * If Observe is used, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
 
    * If Observe is not used, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV and Partial IV as described in {{nonce}} and increment the Sender Sequence Number by one.
