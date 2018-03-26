@@ -62,6 +62,7 @@ informative:
   RFC3986:
   RFC5116:
   RFC5869:
+  RFC6690:
   RFC7228:
   RFC7515:
   RFC7967:
@@ -1010,7 +1011,9 @@ An error condition occurring while processing a response in an observation does 
 
 # Web Linking
 
-The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC8288}} to a resource. This attribute is a hint indicating that the destination of that link is to be accessed using OSCORE. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCORE. 
+The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC8288}} to a resource, for example using a link-format document {{RFC6690}} if the resource is accessible over CoAP.
+
+The "osc" attribute is a hint indicating that the destination of that link is only accessible using OSCORE, and unprotected access to it is not supported. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCORE. 
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
 
