@@ -1822,25 +1822,29 @@ The argumentation also holds for group communication as specified in {{RFC7390}}
 
 This section lists and discusses issues with unprotected CoAP message fields.
 
+### CoAP Code
+
+The CoAP Code of an OSCORE message is POST for requests and 2.04 (Change) for responses, except for CoAP Observe, in which case it is FETCH for requests and 2.05 (Content) for responses. Since the use of Observe is indicated with the Outer Observe option, no additional information is revealed by having a special codes for Observe. The change of code to something else is a denial of service attack which will cause an error in the OSCORE processing. An interchange ex between the codes listed here also results in error if Observe is used with the wrong codes or FETCH/2.05 without Observe. Other cases of Observe are discussed in {{sec-coap-options}}.
+
 ### CoAP Header Fields {#sec-coap-headers}
 
-* Version. The CoAP version will be in cleartext. A change of this parameter is potentially a denial of service attack. Currently there is only one CoAP version defined. Future versions of CoAP need to analyse attacks to OSCORE protected messages due to an adversary changing the CoAP version.
+* Version. The CoAP version {{RFC7252}} is not expected to be sensitive to disclose. Currently there is only one CoAP version defined. A change of this parameter is potentially a denial of service attack. Future versions of CoAP need to analyse attacks to OSCORE protected messages due to an adversary changing the CoAP version.
 
-* Token/Token Length. The Token field is a client-local identifier for differentiating between concurrent requests. Change of Token is a denial of service attack, since the client may not be able to identify the request or verify integrity of the response, which depends on the request.
+* Token/Token Length. The Token field is a client-local identifier for differentiating between concurrent requests {{RFC7252}}. An eavesdropper reading the token can match requests to responses which can be used in traffic analysis. CoAP proxies are allowed to change Token and Token Length between UDP hops. However, inconsequential changes of Token and Token Length or during a UDP hop is a denial of service attack, since it may prevent the client to identify to which request the response belongs or to find the correct information to verify integrity of the response.
 
-* Type/Message ID. These fields reveal information about the UDP transport binding. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP, and does not impact the request/response message. A change of these fields is a denial of service attack similar to changing UDP header fields.
+* Type/Message ID. The Type/Message ID fields {{RFC7252}} reveal information about the UDP transport binding, e.g. an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP, and does not impact the request/response message. A change of these fields in a UDP hop is a denial of service attack similar to changing UDP header fields.                                                                                                                                                                                          
 
-* Length. This field reveal information about the TCP transport binding.  These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial of service attack similar to changing TCP header fields.
+* Length. This field contain the length of the message {{RFC8323}} which may be used for traffic analysis. These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial of service attack similar to changing TCP header fields.
 
 ### CoAP Options  {#sec-coap-options}
 
-* Max-Age. The Outer Max-Age is used to avoid unnecessary caching of OSCORE error responses. Changing this value is a potential denial of service attack.
+* Max-Age. The Outer Max-Age is set to zero to avoid unnecessary caching of OSCORE error responses. No additional information is carried with this option. Changing this value is a potential denial of service attack.
 
 * Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information which needs to be considered. 
 
 * Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages. Changing this option may lead to notifications not being forwarded.
 
-* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments up to the MAX_UNFRAGMENTED_SIZE, at which the message will be dropped.
+* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicate a large message being sent and the message size can be detected and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments up to the MAX_UNFRAGMENTED_SIZE, at which the message will be dropped.
  
 * No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Changing this option is a potential denial of service attack.
 
