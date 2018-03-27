@@ -418,7 +418,7 @@ Block-wise {{RFC7959}} is an optional feature. An implementation MAY support {{R
 
 ##### Inner Block Options {#inner-block-options}
 
-The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as normal Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to normal {{inner-options}} before processing Block-wise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as normal Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message before processing Block-wise as defined in {{RFC7959}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -985,7 +985,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a non-Observe response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a non-Observe 2.XX response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
