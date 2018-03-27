@@ -1027,13 +1027,13 @@ A value MUST NOT be given for the "osc" attribute; any present value MUST be ign
 
 CoAP is designed for proxy operations (see Section 5.7 of {{RFC7252}}). Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. 
 
-OSCORE is designed to work with legacy CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
+OSCORE is designed to work with legacy CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies, OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
 Proxy processing of the (Outer) Block options is as defined in {{RFC7959}}.
 
-Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
+Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies may look at the Partial IV value instead of the Outer Observe option.
 
 # HTTP Operations {#http-op}
 
