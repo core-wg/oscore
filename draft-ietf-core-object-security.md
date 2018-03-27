@@ -1003,7 +1003,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
    
-   * If decryption succeeds and Observe is not used, delete attribute-value pair (Token, {Security Context, PIV}).
+   * If decryption succeeds and Observe is not used, delete the attribute-value pair (Token, {Security Context, PIV}).
 
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
