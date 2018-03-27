@@ -217,7 +217,7 @@ The Common Context contains the following parameters:
 
 * Key Derivation Function. The HMAC based HKDF {{RFC5869}} used to derive Sender Key, Recipient Key, and Common IV.
 
-* Master Secret. Variable length, uniformly random byte string containing the key used to derive traffic keys and IVs.
+* Master Secret. Variable length, random byte string (see {{master-secret}}) containing the keying material used to derive traffic keys and IVs.
 
 * Master Salt. Variable length byte string containing the salt used to derive traffic keys and IVs.
 
@@ -271,7 +271,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. Other examples of deploying OSCORE are given in {{deployment-examples}}.
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. Other considerations of security context establishment are given in {{sec-considerations}} and examples of deploying OSCORE in {{deployment-examples}}.
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -1232,7 +1232,18 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 ## Security Context Establishment
 
-The use of COSE to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common keying material in client and server, which may be obtained, e.g., by using the ACE framework {{I-D.ietf-ace-oauth-authz}}. An OSCORE profile of ACE is described in {{I-D.ietf-ace-oscore-profile}}. The key establishement procedure need to ensure same key is not installed twice, even in error situations.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender/Recipient ID. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. 
+
+The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} even in error situations.
+
+## Master Secret {#master-secret}
+
+OSCORE uses HKDF {{RFC5869}} and the established input parameters to derive the security context. The required properties of the security context parameters are discussed in {{req-params}}, in this section we focus on the Master Secret. HKDF denotes in this specification the composition of the expand and extract functions as defined in {{RFC5869}} and the Master Secret is used as Input Key Material (IKM).
+ 
+Informally, HKDF takes as source an IKM containing some good amount of randomness but not necessarily distributed uniformly (or for which an attacker has some partial knowledge) and derive from it one or more cryptographically strong secret keys {{RFC5869}}.
+
+Therefore the main requirement for the OSCORE Master Secret, in addition to being secret, is that it is has a good amount of randomness. Different key establishment schemes need to ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
+
 
 ## Replay Protection {#replay-protection2}
 
@@ -1242,7 +1253,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must be uniformly random.
+In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have good randomness {{master-secret}}).
 
 ## Message Segmentation
 
@@ -1477,11 +1488,7 @@ The server verifies that the Partial IV has not been received before. The client
 
 # Deployment examples {#deployment-examples}
 
-OSCORE may be deployed in a variety of settings, a few examples are given in this section.
-
-## Client Aliveness
-
-A verified OSCORE request enables the server to verify the identity of the entity who generated the message. However, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may use the Echo option in the response to a request from the client {{I-D.ietf-core-echo-request-tag}}.
+Two examples complying with the requirements on the security context parameters ({{req-params}}) are given in this section.
 
 ## Master Secret Used Once
 
@@ -1756,19 +1763,11 @@ Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e
 
 By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyze how OSCORE protects the protected message fields and the consequences of message fields intended for proxy operation being unprotected.
 
-## The OSCORE Master Secret
-
-OSCORE uses HKDF {{RFC5869}} and the established input parameters to derive the security context. The required properties of the security context parameters are discussed in {{req-params}}, in this section we focus on the Master Secret. HKDF denotes in this specification the composition of the expand and extract functions as defined in {{RFC5869}} and the Master Secret is used as Input Key Material (IKM).
- 
-Informally, HKDF takes as source an IKM containing some good amount of randomness but not necessarily distributed uniformly (or for which an attacker has some partial knowledge) and derive from it one or more cryptographically strong secret keys {{RFC5869}}.
-
-Therefore the main requirements for the OSCORE Master Secret is that it is secret and has a good amount of randomness. Different key establishment schemes need to ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
-
 ## Protected Message Fields 
 
 Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object using an AEAD algorithm. 
 
-OSCORE depends on a pre-established strong Master Secret which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
+OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
 
 * Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
@@ -1778,7 +1777,7 @@ OSCORE depends on a pre-established strong Master Secret which can be used to de
 
 * Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
 
-In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the  AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
+In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
 
 OSCORE is susceptible to a variety of traffic analysis attacks based on observing the length and timing of encrypted packets. OSCORE does not provide any specific defenses against this form of attack but the application may use a padding mechanism to prevent an attacker from directly determine the length of the padding. However, information about padding may still be revealed by side-channel attacks observing differences in timing.
 
