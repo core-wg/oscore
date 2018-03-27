@@ -583,7 +583,7 @@ Some examples of relevant uses of kid context are the following:
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid    | kidctx | bstr       |                | Identifies the  |
+|   kid    |  TBD1  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
