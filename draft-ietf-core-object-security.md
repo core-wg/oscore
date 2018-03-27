@@ -674,7 +674,7 @@ where:
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
-The oscore_version and algorithms parameters are established out-of-band and are thus never transported in OSCORE, but the external_aad make sure they are the same on both sides.
+The oscore_version and algorithms parameters are established out-of-band and are thus never transported in OSCORE, but the external_aad make sure they are the same in both endpoints.
 
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid need not be integrity protected in the requests.
 
