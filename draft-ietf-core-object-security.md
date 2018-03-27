@@ -985,7 +985,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a non-Observe 2.XX response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a successful non-Observe response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
