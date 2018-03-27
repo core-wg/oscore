@@ -1229,7 +1229,7 @@ Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mappin
 
 An overview of the security properties is given in {{overview-sec-properties}}.
 
-## End-to-end protection
+## End-to-end Protection
 
 In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
@@ -1497,7 +1497,7 @@ The COSE header of the request contains an identifier (ca), indicating the secur
 
 The server verifies that the Partial IV has not been received before. The client verifies that the responses are bound to the request and that the Partial IVs are greater than any Partial IV previously received in a response bound to the request.
 
-# Deployment examples {#deployment-examples}
+# Deployment Examples {#deployment-examples}
 
 Two examples complying with the requirements on the security context parameters ({{req-params}}) are given in this section.
 
