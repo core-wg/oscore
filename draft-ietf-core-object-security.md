@@ -922,7 +922,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
-6. Store the attribute-value pair (Token, {Security Context, PIV}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
+6. Store the attribute-value pair (Token, \{Security Context, PIV\}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
 
 
 ## Verifying the Request {#ver-req}
@@ -1076,7 +1076,7 @@ The additional rules for HTTP messages with the OSCORE header field are:
 * The CoAP OSCORE option is set as follows:
 
   * empty if the value of the HTTP OSCORE header field is a single zero byte (0x00) represented by AA, otherwise
-  * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.	
+  * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.
 * The CoAP Content-Format option is omitted.
 
 ## HTTP Endpoints
