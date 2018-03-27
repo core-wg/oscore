@@ -870,7 +870,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request and that only a single response is accepted. Note that the Partial IV in a non-Observe response is not used for replay protection.
+Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV in a non-Observe response is not used for replay protection.
 
 In the case of Observe, a client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number.
 
@@ -1003,7 +1003,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
    
-   * If decryption succeeds and Observe is not used, delete attribute-value pair (Token, {Security Context, PIV}).
+   * If decryption succeeds and Observe is not used, delete the attribute-value pair (Token, {Security Context, PIV}).
 
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
