@@ -991,11 +991,11 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 6. Compute the AEAD nonce
 
-      1. If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
-      
-      2. If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
-      
-      3. If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+    * If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
+    
+    * If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
+    
+    * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
 7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
