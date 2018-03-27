@@ -463,7 +463,10 @@ See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-In order for an OSCORE-unaware proxy to support forwarding of Observe messages {{RFC7641}}, there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
+An Observe intermediary MUST forward the OSCORE option unchanged. In order for an OSCORE-unaware proxy to support forwarding of Observe messages {{RFC7641}}, there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. With OSCORE, Observe intermediaries are forwarding messages without being able to re-send cached notifications to other clients.
+
+In contrast to {{RFC7641}}, when using OSCORE it is allowed for a client to register multiple times to the same resource, since the target resource is encrypted and not visible in the OSCORE message. 
+The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
 To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. The client MAY ignore the Observe option value.
 
