@@ -1720,7 +1720,7 @@ The following COSE and cryptographic parameters are derived:
 From the previous parameter, the following is derived:
 
 * OSCORE option value: 0x (0 bytes)
-* ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
+* ciphertext: 0xe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
 
 From there:
 
