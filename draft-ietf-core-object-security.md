@@ -435,7 +435,7 @@ Proxy-Uri, when present, is split by OSCORE into class U options and class E opt
 
 The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to Section 6.4 of {{RFC7252}}. 
 
-Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}). 
+Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}). Uri-Host being an Outer option SHOULD NOT contain privacy sensitive information.
 
 The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host, and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
 
@@ -1224,11 +1224,15 @@ Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mappin
 
 # Security Considerations {#sec-considerations}
 
+An overview of the security properties is given in {{overview-sec-properties}}.
+
 ## End-to-end protection
 
 In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. The CoAP messaging layer, including header fields such as Type and Message ID, as well as CoAP message fields Token and Token Length may be changed by a proxy and thus cannot be protected end-to-end. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
+(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is recommended, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
+
+The consequences of unprotected message fields is analysed in {{unprot-fields}}. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
 
 ## Security Context Establishment
 
@@ -1267,7 +1271,7 @@ The Inner Block options enable the sender to split large messages into OSCORE-pr
 
 Privacy threats executed through intermediary nodes are considerably reduced by means of OSCORE. End-to-end integrity protection and encryption of the message payload and all options that are not used for proxy operations, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
-The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information. In particular Uri-Host SHOULD NOT contain privacy sensitive information. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not both CoAP-mappable and class E. 
+The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information, see {{unprot-fields}}. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not both CoAP-mappable and class E. The HTTP message fields which are visible to on-path entity are only used for the purpose of transporting the OSCORE message, whereas the application layer message is encoded in CoAP and encrypted.
 
 Unprotected error messages reveal information about the security state in the communication between the endpoints. Unprotected signalling messages reveal information about the reliable transport used on a leg of the path. Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
@@ -1755,7 +1759,7 @@ From there:
 
 * Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
 
-# Overview of Security Properties
+# Overview of Security Properties {#overview-sec-properties}
 
 ## Supporting Proxy Operations
 
@@ -1811,7 +1815,7 @@ The argumentation also holds for group communication as specified in {{RFC7390}}
 
 
 
-## Unprotected Message Fields
+## Unprotected Message Fields {#unprot-fields}
 
 This section lists and discusses issues with unprotected CoAP message fields.
 
@@ -1829,7 +1833,7 @@ This section lists and discusses issues with unprotected CoAP message fields.
 
 * Max-Age. The Outer Max-Age is used to avoid unnecessary caching of OSCORE error responses. Changing this value is a potential denial of service attack.
 
-* Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy.
+* Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information which needs to be considered. 
 
 * Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages. Changing this option may lead to notifications not being forwarded.
 
