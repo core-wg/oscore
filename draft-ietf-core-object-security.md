@@ -342,7 +342,7 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 
 ## CoAP Options {#coap-options}
 
-A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. Certain options required special processing as is described in {{special-options}}.
+A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. Certain options require special processing as is described in {{special-options}}.
 
 ~~~~~~~~~~~
   +-----+-----------------+---+---+
@@ -418,7 +418,7 @@ Block-wise {{RFC7959}} is an optional feature. An implementation MAY support {{R
 
 ##### Inner Block Options {#inner-block-options}
 
-The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as normal Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message according to normal {{inner-options}} before processing Block-wise as defined in {{RFC7959}}.
+The sending CoAP endpoint MAY fragment a CoAP message as defined in {{RFC7959}} before the message is processed by OSCORE. In this case the Block options SHALL be processed by OSCORE as normal Inner options ({{inner-options}}). The receiving CoAP endpoint SHALL process the OSCORE message before processing Block-wise as defined in {{RFC7959}}.
 
 ##### Outer Block Options {#outer-block-options}
 
@@ -583,7 +583,7 @@ Some examples of relevant uses of kid context are the following:
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid    | kidctx | bstr       |                | Identifies the  |
+|   kid    |  TBD1  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
@@ -674,9 +674,9 @@ where:
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
-The oscore_version and algorithms parameters are established out-of-band and are thus never transported in OSCORE, but the external_aad make sure they are the same on both sides.
+The oscore_version and algorithms parameters are established out-of-band and are thus never transported in OSCORE, but the external_aad allows to verify that they are the same in both endpoints.
 
-NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid need not be integrity protected in the requests.
+NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, need not be integrity protected in the requests.
 
 
 # OSCORE Header Compression {#compression}
@@ -870,7 +870,7 @@ For requests, and responses with Observe, OSCORE also provides relative freshnes
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request and that only a single response is accepted. Note that the Partial IV in a non-Observe response is not used for replay protection.
+Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV in a non-Observe response is not used for replay protection.
 
 In the case of Observe, a client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number.
 
@@ -922,7 +922,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
-6. Store the attribute-value pair (Token, {Security Context, PIV}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
+6. Store the attribute-value pair (Token, \{Security Context, PIV\}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
 
 
 ## Verifying the Request {#ver-req}
@@ -969,7 +969,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
   
    * If Observe is used, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
 
-   * If Observe is not used, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV and Partial IV as described in {{nonce}} and increment the Sender Sequence Number by one.
+   * If Observe is not used, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
@@ -985,17 +985,17 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a non-Observe response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a successful non-Observe response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
 6. Compute the AEAD nonce
 
-      1. If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
-      
-      2. If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
-      
-      3. If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+    * If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
+    
+    * If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
+    
+    * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
 7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
@@ -1003,7 +1003,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
    * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
    
-   * If decryption succeeds and Observe is not used, delete attribute-value pair (Token, {Security Context, PIV}).
+   * If decryption succeeds and Observe is not used, delete the attribute-value pair (Token, {Security Context, PIV}).
 
 8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
 
@@ -1027,13 +1027,13 @@ A value MUST NOT be given for the "osc" attribute; any present value MUST be ign
 
 CoAP is designed for proxy operations (see Section 5.7 of {{RFC7252}}). Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. 
 
-OSCORE is designed to work with legacy CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
+OSCORE is designed to work with legacy CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies, OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
 
 Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
 
 Proxy processing of the (Outer) Block options is as defined in {{RFC7959}}.
 
-Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies MAY look at the Partial IV value instead of the Outer Observe option.
+Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies may look at the Partial IV value instead of the Outer Observe option.
 
 # HTTP Operations {#http-op}
 
@@ -1076,7 +1076,7 @@ The additional rules for HTTP messages with the OSCORE header field are:
 * The CoAP OSCORE option is set as follows:
 
   * empty if the value of the HTTP OSCORE header field is a single zero byte (0x00) represented by AA, otherwise
-  * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.	
+  * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.
 * The CoAP Content-Format option is omitted.
 
 ## HTTP Endpoints
@@ -1720,7 +1720,7 @@ The following COSE and cryptographic parameters are derived:
 From the previous parameter, the following is derived:
 
 * OSCORE option value: 0x (0 bytes)
-* ciphertext: e4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
+* ciphertext: 0xe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
 
 From there:
 
@@ -1770,7 +1770,7 @@ CoAP is designed to work with intermediaries reading and/or changing CoAP messag
 
 Securing CoAP on transport layer protects the entire message between the endpoints in which case CoAP proxy operations are not possible. In order to enable proxy operations, security on transport layer needs to be terminated at the proxy in which case the CoAP message in its entirety is unprotected in the proxy. 
 
-Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}. The client and server are assumed to be honest, but proxies and gateways are only trusted to perform its intended operations. Forwarding is specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. HTTP-CoAP translation is specified in {{RFC8075}}. Intermediaries translating between different transport layers are intended to perform just that.
+Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}. The client and server are assumed to be honest, but proxies and gateways are only trusted to perform their intended operations. Forwarding is specified in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. HTTP-CoAP translation is specified in {{RFC8075}}. Intermediaries translating between different transport layers are intended to perform just that.
 
 By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyze how OSCORE protects the protected message fields and the consequences of message fields intended for proxy operation being unprotected.
 
@@ -1778,7 +1778,7 @@ By working at the CoAP layer, OSCORE enables different CoAP message fields to be
 
 Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object using an AEAD algorithm. 
 
-OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
+OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE provides the following guarantees: 
 
 * Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
