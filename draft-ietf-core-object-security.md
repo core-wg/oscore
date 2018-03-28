@@ -1396,12 +1396,11 @@ These media types are used to indicate that the content is an OSCORE message.
 IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 0-255 range is requested.
 
 ~~~~~~~~~~~
-+---------------------------------+----------+-------+--------------+
-| Media Type                      | Encoding | ID    | Reference    |
-+---------------------------------+----------+-------+--------------+
-| application/oscore              |          | TBD3  | [This        |
-|                                 |          |       | Document]    |
-+---------------------------------+----------+-------+--------------+
++----------------------+----------+----------+-------------------+
+| Media Type           | Encoding |   ID     |     Reference     |
++----------------------+----------+----------+-------------------+
+| application/oscore   |          |   TBD3   | [[this document]] |
++----------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
