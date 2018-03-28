@@ -1017,11 +1017,22 @@ An error condition occurring while processing a response in an observation does 
 
 # Web Linking
 
-The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC8288}} to a resource, for example using a link-format document {{RFC6690}} if the resource is accessible over CoAP.
+The use of OSCORE MAY be indicated by a target attribute "osc" in a web link {{RFC8288}} to a resource, e.g. using a link-format document {{RFC6690}} if the resource is accessible over CoAP.
 
 The "osc" attribute is a hint indicating that the destination of that link is only accessible using OSCORE, and unprotected access to it is not supported. Note that this is simply a hint, it does not include any security context material or any other information required to run OSCORE. 
 
 A value MUST NOT be given for the "osc" attribute; any present value MUST be ignored by parsers. The "osc" attribute MUST NOT appear more than once in a given link-value; occurrences after the first MUST be ignored by parsers.
+
+The example in {{fig-web-link}} shows a use of the "osc" attribute: the client does resource discovery on a server, and gets back a list of resources, one of which includes the "osc" attribute indicating that the resource is protected with OSCORE. The link-format notation (see Section 5. of {{RFC6690}}) is used.
+
+~~~~~~~~~~~                
+REQ: GET /.well-known/core
+
+RES: 2.05 Content
+   </sensors/temp>;osc,
+   </sensors/light>;if="sensor"
+~~~~~~~~~~~
+{: #fig-web-link title="The web link" artwork-align="center"}
 
 # CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
