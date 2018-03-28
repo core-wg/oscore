@@ -1778,7 +1778,7 @@ By working at the CoAP layer, OSCORE enables different CoAP message fields to be
 
 Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object using an AEAD algorithm. 
 
-OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE provides the following guarantees: 
+OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
 
 * Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
