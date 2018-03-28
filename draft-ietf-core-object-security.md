@@ -1407,12 +1407,11 @@ These media types are used to indicate that the content is an OSCORE message.
 IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 0-255 range is requested.
 
 ~~~~~~~~~~~
-+---------------------------------+----------+-------+--------------+
-| Media Type                      | Encoding | ID    | Reference    |
-+---------------------------------+----------+-------+--------------+
-| application/oscore              |          | TBD3  | [This        |
-|                                 |          |       | Document]    |
-+---------------------------------+----------+-------+--------------+
++----------------------+----------+----------+-------------------+
+| Media Type           | Encoding |   ID     |     Reference     |
++----------------------+----------+----------+-------------------+
+| application/oscore   |          |   TBD3   | [[this document]] |
++----------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
@@ -1529,9 +1528,9 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 ## Master Secret Used Multiple Times {#master-salt-transport}
 
-One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed by the client. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must be prevented from accidental repetition in different security context derivations, e.g. due to a deterministic procedure at startup such as derivation of pseudorandom master salt from a static seed, or a deterministic procedure with inputs that can be replayed. Some reliable source of randomness is typically needed for this.
+One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must be prevented from accidental repetition in different security context derivations, e.g. due derivation of pseudorandom master salt from a static seed, or a deterministic procedure with inputs that can be replayed. Techniques for persistant storage of security state may be used also in this case, in addition to or as a complement to true random number generation.
 
-Assuming the Master Salts are indeed unique with high probability, we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid context parameter (see {{context-hint}}) of the request.
+Assuming the Master Salts are indeed unique or stochastically unique, we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid context parameter (see {{context-hint}}) of the request.
 
 1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with kid context set to the Master Salt.
 
