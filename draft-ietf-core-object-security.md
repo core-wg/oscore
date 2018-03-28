@@ -160,11 +160,11 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 The OSCORE option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
 
 ~~~~~~~~~~~
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| No. | C | U | N | R | Name            | Format | Length | Default |
-+-----+---+---+---+---+-----------------+--------+--------+---------+
-| TBD | x |   |   |   | OSCORE          |  (*)   | 0-255  | (none)  |
-+-----+---+---+---+---+-----------------+--------+--------+---------+
++------+---+---+---+---+-----------------+--------+--------+---------+
+| No.  | C | U | N | R | Name            | Format | Length | Default |
++------+---+---+---+---+-----------------+--------+--------+---------+
+| TBD1 | x |   |   |   | OSCORE          |  (*)   | 0-255  | (none)  |
++------+---+---+---+---+-----------------+--------+--------+---------+
     C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable   
     (*) See below.
 ~~~~~~~~~~~
@@ -346,31 +346,31 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. Certain options require special processing as is described in {{special-options}}.
 
 ~~~~~~~~~~~
-  +-----+-----------------+---+---+
-  | No. | Name            | E | U |
-  +-----+-----------------+---+---+
-  |   1 | If-Match        | x |   |
-  |   3 | Uri-Host        |   | x |
-  |   4 | ETag            | x |   |
-  |   5 | If-None-Match   | x |   |
-  |   6 | Observe         |   | x |
-  |   7 | Uri-Port        |   | x |
-  |   8 | Location-Path   | x |   |
-  | TBD | OSCORE          |   | x |
-  |  11 | Uri-Path        | x |   |
-  |  12 | Content-Format  | x |   |
-  |  14 | Max-Age         | x | x |
-  |  15 | Uri-Query       | x |   |
-  |  17 | Accept          | x |   |
-  |  20 | Location-Query  | x |   |
-  |  23 | Block2          | x | x |
-  |  27 | Block1          | x | x |
-  |  28 | Size2           | x | x |
-  |  35 | Proxy-Uri       |   | x |
-  |  39 | Proxy-Scheme    |   | x |
-  |  60 | Size1           | x | x |
-  | 258 | No-Response     | x | x |
-  +-----+-----------------+---+---+
+  +------+-----------------+---+---+
+  | No.  | Name            | E | U |
+  +------+-----------------+---+---+
+  |   1  | If-Match        | x |   |
+  |   3  | Uri-Host        |   | x |
+  |   4  | ETag            | x |   |
+  |   5  | If-None-Match   | x |   |
+  |   6  | Observe         |   | x |
+  |   7  | Uri-Port        |   | x |
+  |   8  | Location-Path   | x |   |
+  | TBD1 | OSCORE          |   | x |
+  |  11  | Uri-Path        | x |   |
+  |  12  | Content-Format  | x |   |
+  |  14  | Max-Age         | x | x |
+  |  15  | Uri-Query       | x |   |
+  |  17  | Accept          | x |   |
+  |  20  | Location-Query  | x |   |
+  |  23  | Block2          | x | x |
+  |  27  | Block1          | x | x |
+  |  28  | Size2           | x | x |
+  |  35  | Proxy-Uri       |   | x |
+  |  39  | Proxy-Scheme    |   | x |
+  |  60  | Size1           | x | x |
+  | 258  | No-Response     | x | x |
+  +------+-----------------+---+---+
 
 E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
@@ -583,7 +583,7 @@ Some examples of relevant uses of kid context are the following:
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid    |  TBD1  | bstr       |                | Identifies the  |
+|   kid    |  TBD2  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
@@ -1286,7 +1286,7 @@ The length of message fields can reveal information about the message. Applicati
 
 Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
 
-Note to IANA: Please note all occurrences of "TBD" in this specification should be assigned the same number.
+Note to IANA: Please note all occurrences of "TBDx" in this specification should be assigned the same number.
 
 
 ## COSE Header Parameters Registry
@@ -1294,7 +1294,7 @@ Note to IANA: Please note all occurrences of "TBD" in this specification should 
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
 * Name: kid context
-* Label: TBD1 (Integer value between 1 and 255)
+* Label: TBD2 (Integer value between 1 and 255)
 * Value Type: bstr
 * Value Registry: 
 * Description: kid context
@@ -1308,7 +1308,7 @@ The OSCORE option is added to the CoAP Option Numbers registry:
 +--------+-----------------+-------------------+
 | Number | Name            | Reference         |
 +--------+-----------------+-------------------+
-|  TBD   | OSCORE          | [[this document]] |
+|  TBD1  | OSCORE          | [[this document]] |
 +--------+-----------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1321,7 +1321,7 @@ The OSCORE option is added to the CoAP Signaling Option Numbers registry:
 +------------+--------+---------------------+-------------------+
 | Applies to | Number | Name                | Reference         |
 +------------+--------+---------------------+-------------------+
-| 7.xx (any) |  TBD   | OSCORE              | [[this document]] |
+| 7.xx (any) |  TBD1  | OSCORE              | [[this document]] |
 +------------+--------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1393,7 +1393,17 @@ These media types are used to indicate that the content is an OSCORE message.
 
 ## CoAP Content-Formats Registry
 
-TODO
+IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 0-255 range is requested.
+
+~~~~~~~~~~~
++---------------------------------+----------+-------+--------------+
+| Media Type                      | Encoding | ID    | Reference    |
++---------------------------------+----------+-------+--------------+
+| application/oscore              |          | TBD3  | [This        |
+|                                 |          |       | Document]    |
++---------------------------------+----------+-------+--------------+
+~~~~~~~~~~~
+{: artwork-align="center"}
 
 --- back
 
