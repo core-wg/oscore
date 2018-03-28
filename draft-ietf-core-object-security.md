@@ -569,7 +569,7 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The kid context parameter is used to provide such additional input. The kid context and kid are used to determine the security context, or to establish the necessary input parameters to derive the security context (see {{context-derivation}}). The application defines how this is done.
 
-The kid context is implicitly integrity protected, as manipulation that leads to the wrong key (or no key) being retrieved which results in an error, as described in {{ver-req}}.
+The kid context is implicitly integrity protected, as a manipulation that leads to the wrong key (or no key) being retrieved results in an error, as described in {{ver-req}}.
 
 A summary of the COSE header parameter kid context defined above can be found in {{tab-1}}.
 
@@ -1891,7 +1891,7 @@ A `type` can be one of:
 # Acknowledgments
 {: numbered="no"}
 
-The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Esko Dijk, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Peter van der Stok, Dave Thaler, Marco Tiloca, and Mališa Vucinic.
+The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Esko Dijk, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Jim Schaad, Peter van der Stok, Dave Thaler, Marco Tiloca, William Vignat and Mališa Vucinic.
 
 Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
