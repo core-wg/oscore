@@ -1231,7 +1231,7 @@ An overview of the security properties is given in {{overview-sec-properties}}.
 
 ## End-to-end Protection
 
-In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
+In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify any information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
 (D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is recommended, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
 
@@ -1241,7 +1241,8 @@ The consequences of unprotected message fields is analysed in {{unprot-fields}}.
 
 The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender/Recipient ID. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. 
 
-The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} even in error situations.
+The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} even in error situations or in case of recommissioning. One particular importance is random number seeding, in particular for generating the Master Salt in case the Master Secret is reused. The same Master Salt must not be generated generated twice, even if the device is reset to factory settings or recommissioned under special conditions.
+
 
 ## Master Secret {#master-secret}
 
