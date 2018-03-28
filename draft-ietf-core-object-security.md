@@ -1812,7 +1812,7 @@ For responses without Partial IV (i.e. single response to a request):
 * ID_PIV = Sender ID of the endpoint generating the request
 * PIV = Partial IV of the request
 
-Since the request has been verified using the Recipient Context, ID_PIV is the Sender ID of another endpoint and is thus different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV.
+Since the Sender IDs are unique, ID_PIV is different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV.
 
 The argumentation also holds for group communication as specified in {{RFC7390}} (see {{I-D.ietf-core-oscore-groupcomm}}).
 
