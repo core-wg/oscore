@@ -931,7 +931,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 1. Process Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
-2. Discard the message Code and all non-special Inner option message fields (marked with 'x' in column E of {{fig-option-protection}}) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
+2. Discard the message Code and all non-special Inner option message fields (marked in {{fig-option-protection}} with 'x' in column E only) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
 3. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If:
 
