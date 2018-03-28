@@ -1820,7 +1820,7 @@ The argumentation also holds for group communication as specified in {{RFC7390}}
 
 ## Unprotected Message Fields {#unprot-fields}
 
-This section lists and discusses issues with unprotected CoAP message fields.
+This section lists and discusses issues with unprotected message fields.
 
 ### CoAP Code
 
@@ -1849,6 +1849,12 @@ The CoAP Code of an OSCORE message is POST for requests and 2.04 (Change) for re
 * No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial of service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
 
 * OSCORE. The OSCORE option contains information about the compressed COSE header. A change of this field may result in not being able to verify the OSCORE message.
+
+### HTTP Message Fields
+
+In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial of service attacks.
+It is recommended to additionally use TLS for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
+
 
 # CDDL Summary {#cddl-sum}
 
