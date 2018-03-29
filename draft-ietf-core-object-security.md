@@ -1345,8 +1345,7 @@ The HTTP OSCORE header field is added to the Message Headers registry:
 
 ## Media Type Registrations {#oscore-media-type}
 
-This section registers the 'application/oscore' media type in the "Media Types" registry.  
-These media types are used to indicate that the content is an OSCORE message.
+This section registers the 'application/oscore' media type in the "Media Types" registry. These media types are used to indicate that the content is an OSCORE message.
 
       Type name: application
 
