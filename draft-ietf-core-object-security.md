@@ -389,6 +389,8 @@ The sending endpoint SHALL write the Inner option message fields present in the 
 
 The processing of Inner option message fields by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
+Note that the Content-Format is only Inner. A Content-Format for the OSCORE payload is defined for completness ({{content-format}}) but it SHALL NOT be used in the OSCORE message.
+
 ### Outer Options {#outer-options}
 
 Outer option message fields (Class U or I) are used to support proxy operations. 
@@ -1087,7 +1089,7 @@ The additional rules for HTTP messages with the OSCORE header field are:
 
   * empty if the value of the HTTP OSCORE header field is a single zero byte (0x00) represented by AA, otherwise
   * the value of the HTTP OSCORE header field decoded from base64url (Section 5 of {{RFC4648}}) without padding. Implementation notes for this encoding are given in Appendix C of {{RFC7515}}.
-* The CoAP Content-Format option is omitted.
+* The CoAP Content-Format option is omitted, the content format for OSCORE ({{content-format}}) MUST NOT be used.
 
 ## HTTP Endpoints
 
@@ -1397,9 +1399,9 @@ These media types are used to indicate that the content is an OSCORE message.
 
       Provisional registration?  No
 
-## CoAP Content-Formats Registry
+## CoAP Content-Formats Registry {#content-format}
 
-IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 0-255 range is requested.
+IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 10000-64999 range is requested.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
