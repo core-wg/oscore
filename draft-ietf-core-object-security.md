@@ -1251,8 +1251,7 @@ The consequences of unprotected message fields is analysed in {{unprot-fields}}.
 
 ## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender/Recipient ID. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use, e.g. in case of recommissioning, and also in error situations. One important consideration is random number generation, in particular the generation of the Master Salt in case the Master Secret is reused. The same Master Salt must not be generated generated twice, even if the device is reset or recommissioned.
-
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret unique Sender/Recipient ID. The necessary input parameters may be pre-established or obtained using a key establishment protocol such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}, and/or a key exchange protocol potentially augmented with negotiation of Sender/Recipient ID. The key establishment procedure must ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use and also in error situations. One important consideration is forward secrecy; the use of a suitable key exchange protocol is recommended whenever possible. Another important consideration is random number generation, in particular the generation of the Master Salt in case Master Secret and Sender/Recipient ID are reused; the same Master Salt must never be used twice, even if the device is reset or recommissioned.
 
 ## Master Secret {#master-secret}
 
@@ -1260,8 +1259,7 @@ OSCORE uses HKDF {{RFC5869}} and the established input parameters to derive the 
  
 Informally, HKDF takes as source an IKM containing some good amount of randomness but not necessarily distributed uniformly (or for which an attacker has some partial knowledge) and derive from it one or more cryptographically strong secret keys {{RFC5869}}.
 
-Therefore the main requirement for the OSCORE Master Secret, in addition to being secret, is that it is has a good amount of randomness. Different key establishment schemes need to ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
-
+Therefore the main requirement for the OSCORE Master Secret, in addition to being secret, is that it is has a good amount of randomness. The selected key establishment schemes must ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
 
 ## Replay Protection {#replay-protection2}
 
