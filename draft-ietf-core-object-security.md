@@ -469,9 +469,7 @@ An Observe intermediary MUST forward the OSCORE option unchanged. In order for a
 
 In order to support multiple concurrent Observe registrations in the same endpoint, Observe intermediaries are allowed to deviate from {{RFC7641}} and register multiple times to the same (root) resource, since the actual target resource is encrypted and not visible in the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
-To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. The client MAY ignore the Observe option value.
-
-If the verification fails, the client SHALL stop processing the response.
+To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}. The client MAY ignore the Observe option value.
 
 The Observe option in the CoAP request may be legitimately removed by a proxy or ignored by the server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
 
@@ -479,7 +477,7 @@ Clients can re-register observations to ensure that the observation is still act
 
 #### No-Response {#no-resp}
 
-No-Response is defined in {{RFC7967}}. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with the same value.
+No-Response {{RFC7967}} is an optional feature. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with the same value.
 
 The Inner No-Response option is used to communicate to the server the client's disinterest in certain classes of responses to a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. 
 
