@@ -273,7 +273,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
 
-All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. Other considerations of security context establishment are given in {{sec-considerations}} and examples of deploying OSCORE in {{deployment-examples}}.
+All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. Considerations of security context establishment are given in {{sec-context-establish}} and examples of deploying OSCORE in {{deployment-examples}}.
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
@@ -1249,11 +1249,9 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 The consequences of unprotected message fields is analysed in {{unprot-fields}}. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
 
-## Security Context Establishment
+## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender/Recipient ID. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. 
-
-The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} even in error situations or in case of recommissioning. One particular importance is random number seeding, in particular for generating the Master Salt in case the Master Secret is reused. The same Master Salt must not be generated generated twice, even if the device is reset to factory settings or recommissioned under special conditions.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender/Recipient ID. The OSCORE profile of the ACE framework may be used to establish the necessary input parameters {{I-D.ietf-ace-oscore-profile}}, or a key exchange protocol for providing forward secrecy. The key establishment procedure need to ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use, e.g. in case of recommissioning, and also in error situations. One important consideration is random number generation, in particular the generation of the Master Salt in case the Master Secret is reused. The same Master Salt must not be generated generated twice, even if the device is reset or recommissioned.
 
 
 ## Master Secret {#master-secret}
