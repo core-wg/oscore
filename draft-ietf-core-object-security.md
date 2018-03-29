@@ -389,8 +389,6 @@ The sending endpoint SHALL write the Inner option message fields present in the 
 
 The processing of Inner option message fields by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
-Note that the Content-Format is only Inner. A Content-Format for the OSCORE payload is defined for completness ({{content-format}}) but it SHALL NOT be used in the OSCORE message.
-
 ### Outer Options {#outer-options}
 
 Outer option message fields (Class U or I) are used to support proxy operations. 
@@ -1401,7 +1399,8 @@ These media types are used to indicate that the content is an OSCORE message.
 
 ## CoAP Content-Formats Registry {#content-format}
 
-IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 10000-64999 range is requested.
+IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 10000-64999 range is requested.  This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
+
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
