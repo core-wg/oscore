@@ -597,7 +597,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
 3. concatenating the size of the ID_PIV (a single byte S) with the padded ID_PIV and the padded PIV,
 4. and then XORing with the Common IV.
  
-Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys make it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
+Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys makes it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
 If the Partial IV is not present in a response, the nonce from the request is used. When Observe is not used (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{kn-uniqueness}} and {{replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
 
