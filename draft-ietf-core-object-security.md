@@ -1297,7 +1297,7 @@ The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 * Label: TBD2 (Integer value between 1 and 255)
 * Value Type: bstr
 * Value Registry: 
-* Description: kid context
+* Description: Identifies the kid context
 * Reference: {{context-hint}} of this document
 
 ## CoAP Option Numbers Registry 
