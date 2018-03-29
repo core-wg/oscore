@@ -1840,7 +1840,7 @@ This section lists and discusses issues with unprotected message fields.
 
 ### CoAP Code
 
-The CoAP Code of an OSCORE message is POST for requests and 2.04 (Change) for responses, except for CoAP Observe, in which case it is FETCH for requests and 2.05 (Content) for responses. Since the use of Observe is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe. The change of code to something else is a denial of service attack which may cause an error in the OSCORE processing. An interchange between the codes listed here also results in error if Observe is used with the wrong codes or FETCH/2.05 without Observe. Other cases of Observe are discussed in {{sec-coap-options}}.
+The CoAP Code of an OSCORE message is POST for requests, except for CoAP Observe in which case it is FETCH, and 2.04 for responses. Since the use of Observe is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. Other cases of Observe are discussed in {{sec-coap-options}}.
 
 ### CoAP Header Fields {#sec-coap-headers}
 
