@@ -1294,11 +1294,13 @@ Note to IANA: Please note all occurrences of "TBDx" in this specification should
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
 * Name: kid context
-* Label: TBD2 (Integer value between 1 and 255)
+* Label: TBD2
 * Value Type: bstr
 * Value Registry: 
 * Description: Identifies the kid context
 * Reference: {{context-hint}} of this document
+
+Note to IANA: Label assignment in (Integer value between 1 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
 
 ## CoAP Option Numbers Registry 
 
@@ -1393,8 +1395,9 @@ These media types are used to indicate that the content is an OSCORE message.
 
 ## CoAP Content-Formats Registry {#content-format}
 
-IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 10000-64999 range is requested.  This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
+Note to IANA: ID assignment in the 10000-64999 range is requested. (RFC Editor: Delete this note after IANA assignment)
 
+This section registers the media type 'application/oscore' media type in the the "CoAP Content-Format" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
