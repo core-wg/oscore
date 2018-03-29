@@ -1053,7 +1053,7 @@ The CoAP request/response model may be mapped to HTTP and vice versa as describe
 
 The HTTP OSCORE Header Field (see {{iana-http}}) is used for carrying the content of the CoAP OSCORE option when transporting OSCORE messages over HTTP hops. 
 
-The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses. When used, the HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}) indicating that the HTTP body of this message contains the OSCORE payload (see {{oscore-payl}}}. The HTTP OSCORE header field may be listed in a Vary response header field (see Section 7.1.4 of {{RFC7231}}) to indicate that it is used by an origin server in generating content. No additional semantics is provided by other message fields.
+The HTTP OSCORE header field is only used in POST requests and 200 (OK) responses. When used, the HTTP header field Content-Type is set to 'application/oscore' (see {{oscore-media-type}}) indicating that the HTTP body of this message contains the OSCORE payload (see {{oscore-payl}}}. No additional semantics is provided by other message fields.
 
 Using the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}, including the following core ABNF syntax rules defined by that specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP OSCORE header field value is as follows.
 
@@ -1063,7 +1063,7 @@ base64url-char = ALPHA / DIGIT / "-" / "_"
 OSCORE = 2*base64url-char
 ~~~~~~~~~~~~~~
 
-The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. The HTTP OSCORE header field is not useful in trailers (see Section 4.1 of {{RFC7230}}).
+The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. The HTTP OSCORE header field is not appropriate to list in a Vary response header field (see Section 7.1.4 of {{RFC7231}}) since a cached response would in general not be useful for other clients. The HTTP OSCORE header field is not useful in trailers (see Section 4.1 of {{RFC7230}}).
 
 Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. A CoAP-to-HTTP proxy receiving a request for redirect may copy the HTTP OSCORE header field to the new request, although the condition for this being successful is that the server to which the OSCORE message is redirected needs to be a clone of the server for which the OSCORE message was intended (same target resource, same OSCORE security context etc.). If an HTTP/OSCORE client receives a redirect it should instead generate a new OSCORE request for the server it was redirected to. 
 
