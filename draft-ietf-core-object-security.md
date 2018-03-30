@@ -118,7 +118,7 @@ This document defines the Object Security for Constrained RESTful Environments (
 {: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
 
 
-OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE does not depend on underlying layers, and can be used with non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may also be used in different ways with HTTP. OSCORE messages may be transported in HTTP in the same way as they are transported in CoAP, and OSCORE may also be used to protect CoAP-mappable HTTP messages, as described below.
+OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE does not depend on underlying layers, and can be used with non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may also be used in different ways with HTTP. OSCORE messages may be transported in HTTP, and OSCORE may also be used to protect CoAP-mappable HTTP messages, as described below.
 
 OSCORE is designed to protect as much information as possible while still allowing CoAP proxy operations ({{coap-coap-proxy}}). It works with legacy CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{http-op}}. OSCORE may be used together with TLS or DTLS over one or more hops in the end-to-end path, e.g. transported with HTTPS in one hop and with plain CoAP in another hop. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
@@ -845,7 +845,7 @@ This section covers a list of OSCORE Header Compression examples for requests an
       Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-# Sequence Numbers, Replay, Message Binding, and Freshness {#sequence-numbers}
+# Message Binding, Sequence Numbers, Freshness and Replay Protection {#sequence-numbers}
 
 ## Message Binding
 
@@ -853,7 +853,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 ## Sequence Numbers {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. It is important that implementations keep track of Sender Sequence Numbers which have been used. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
+An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
 The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and SHALL be less than 2^40. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. If necessary, the endpoint SHOULD acquire a new security context before this happens. The latter is out of scope of this document.
 
@@ -1247,7 +1247,7 @@ The consequences of unprotected message fields are analyzed in {{unprot-fields}}
 
 ## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with negotiation of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. The key establishment procedure must ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use and also in error situations. It is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for the deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. This procedure must ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use and also in error situations. It is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for the deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
 
 ## Master Secret {#master-secret}
 
