@@ -47,7 +47,6 @@ normative:
   RFC7230:
   RFC7231:
   RFC7252:
-  RFC7390:
   RFC7641:
   RFC7959:
   RFC8075:
@@ -65,6 +64,7 @@ informative:
   RFC5869:
   RFC6690:
   RFC7228:
+  RFC7390:
   RFC7515:
   RFC7967:
   I-D.ietf-ace-oauth-authz:
