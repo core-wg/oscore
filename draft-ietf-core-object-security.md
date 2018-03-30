@@ -469,9 +469,9 @@ An Observe intermediary MUST forward the OSCORE option unchanged. In order for a
 
 In order to support multiple concurrent Observe registrations in the same endpoint, Observe intermediaries are allowed to deviate from {{RFC7641}} and register multiple times to the same (root) resource, since the actual target resource is encrypted and not visible in the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
-To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the successfully received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}. The client MAY ignore the Observe option value.
-
 The Observe option in the CoAP request may be legitimately removed by a proxy or ignored by the server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
+
+It the server accepts the Observe registration, a Partial IV must be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}. The client MAY ignore the Observe option value.
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE observation is refreshed, not only the ETags, but also the partial IV (and thus the payload and OSCORE option) change. The server uses the new request's Partial IV as the 'request_piv' of new responses.
 
@@ -555,7 +555,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe notifications ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -599,7 +599,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys makes it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
-If the Partial IV is not present in a response, the nonce from the request is used. When Observe is not used (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{kn-uniqueness}} and {{replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
+If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{kn-uniqueness}} and {{replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
 
 ~~~~~~~~~~~
      <- nonce length minus 6 B -> <-- 5 bytes -->
@@ -861,17 +861,17 @@ The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerati
 
 For requests, OSCORE provides only the guarantee that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
 
-Assuming an honest server, the message binding guarantees that a response is not older than its request. For responses without Observe, this gives absolute freshness. For responses with Observe, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation. Note that the message binding does not guarantee that misbehaving server created the response before receiving the request, i.e. it does not verify server aliveness.
+Assuming an honest server, the message binding guarantees that a response is not older than its request. For responses that are not notifications (i.e. when there is a single response to a request), this gives absolute freshness. For notifications, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation. Note that the message binding does not guarantee that misbehaving server created the response before receiving the request, i.e. it does not verify server aliveness.
 
-For requests, and responses with Observe, OSCORE also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of requests or responses.
+For requests and notifications, OSCORE also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of requests or responses.
 
 ## Replay Protection {#replay-protection}
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Non-Observe responses with or without Partial IV are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV in a non-Observe response is not used for replay protection.
+Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV in is not used for replay protection in this case.
 
-In the case of Observe, a client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number.
+A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number.
 
 If messages are processed concurrently, the Partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
 
@@ -966,9 +966,9 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 3. Compute the AEAD nonce
   
-   * If Observe is used, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
+   * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
 
-   * If Observe is not used, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
+   * For responses that are not Observe notifications, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
@@ -984,33 +984,27 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. If the client receives a notification for which no Observe request was sent, then go to 11. If the OSCORE client receives a successful non-Observe response to an Observe request it has previously received a notification to, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. If the Obseve option is present in the response, but the request was not a Observe registration, then go to 11. If a Partial IV is required (i.e. an Observe option is included or the Notification number for the observation has already been initiated), but not present in the response, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
 6. Compute the AEAD nonce
 
-    * If the Observe option and the Partial IV are not present in the response, the nonce from the request is used.
-    
-    * If the Observe option is present in the response, and the Partial IV is not present in the response, then go to 11.
-    
+    * If the Partial IV are not present in the response, the nonce from the request is used.
+        
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
+7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 11.
 
-   * If decryption fails, then go to 11.
+8. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
 
-   * If decryption succeeds and Observe is used, update the corresponding Notification Number, as described in {{sequence-numbers}}.
+9. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
+
+10. Add decrypted code, options and payload to the decrypted request. The OSCORE option is removed.
    
-   * If decryption succeeds and Observe is not used, delete the attribute-value pair (Token, {Security Context, PIV}).
+11. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
-
-9. Add decrypted code, options and payload to the decrypted request. The OSCORE option is removed.
-   
-10. The decrypted CoAP response is processed according to {{RFC7252}}.
-
-11. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+12. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
 An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
 
@@ -1300,11 +1294,13 @@ Note to IANA: Please note all occurrences of "TBDx" in this specification should
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
 * Name: kid context
-* Label: TBD2 (Integer value between 1 and 255)
+* Label: TBD2
 * Value Type: bstr
 * Value Registry: 
-* Description: kid context
+* Description: Identifies the kid context
 * Reference: {{context-hint}} of this document
+
+Note to IANA: Label assignment in (Integer value between 1 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
 
 ## CoAP Option Numbers Registry 
 
@@ -1349,8 +1345,7 @@ The HTTP OSCORE header field is added to the Message Headers registry:
 
 ## Media Type Registrations {#oscore-media-type}
 
-This section registers the 'application/oscore' media type in the "Media Types" registry.  
-These media types are used to indicate that the content is an OSCORE message.
+This section registers the 'application/oscore' media type in the "Media Types" registry. These media types are used to indicate that the content is an OSCORE message.
 
       Type name: application
 
@@ -1399,8 +1394,9 @@ These media types are used to indicate that the content is an OSCORE message.
 
 ## CoAP Content-Formats Registry {#content-format}
 
-IANA is requested to add the following entry to the "CoAP Content-Format" registry. ID assignment in the 10000-64999 range is requested.  This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
+Note to IANA: ID assignment in the 10000-64999 range is requested. (RFC Editor: Delete this note after IANA assignment)
 
+This section registers the media type 'application/oscore' media type in the the "CoAP Content-Format" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
