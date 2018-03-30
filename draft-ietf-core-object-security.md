@@ -391,7 +391,7 @@ The processing of Inner option message fields by the receiving endpoint is speci
 
 ### Outer Options {#outer-options}
 
-Outer option message fields (Class U or I) are used to support proxy operations. 
+Outer option message fields (Class U or I) are used to support proxy operations, see {{supp-proxy-op}}. 
 
 The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including the OSCORE option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of Outer option message field. 
 
@@ -869,7 +869,7 @@ For requests and notifications, OSCORE also provides relative freshness in the s
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV in is not used for replay protection in this case.
+Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
 A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of {{ver-res}}. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number.
 
@@ -1781,7 +1781,7 @@ From there:
 
 # Overview of Security Properties {#overview-sec-properties}
 
-## Supporting Proxy Operations
+## Supporting Proxy Operations {#supp-proxy-op}
 
 CoAP is designed to work with intermediaries reading and/or changing CoAP message fields and performing supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
 
