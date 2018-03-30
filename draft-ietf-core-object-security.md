@@ -853,7 +853,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 ## Sequence Numbers {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. It is important that implementations keeps track of Sender Sequence Numbers which have been used. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
+An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. It is important that implementations keep track of Sender Sequence Numbers which have been used. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
 The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and SHALL be less than 2^40. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. If necessary, the endpoint SHOULD acquire a new security context before this happens. The latter is out of scope of this document.
 
@@ -984,7 +984,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
 
-4. If the Obseve option is present in the response, but the request was not a Observe registration, then go to 11. If a Partial IV is required (i.e. an Observe option is included or the Notification number for the observation has already been initiated), but not present in the response, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. If the Observe option is present in the response, but the request was not an Observe registration, then go to 11. If a Partial IV is required (i.e. an Observe option is included or the Notification number for the observation has already been initiated), but not present in the response, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 5. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
@@ -1243,7 +1243,7 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 (D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is recommended, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
 
-The consequences of unprotected message fields is analysed in {{unprot-fields}}. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
+The consequences of unprotected message fields are analyzed in {{unprot-fields}}. Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. It may still be favorable to send an unprotected error message, e.g. to prevent extensive retransmissions, so unprotected error messages are allowed as specified. Similar to error messages, signaling messages are not always possible to protect as they may be intended for an intermediary. Applications using unprotected error and signaling messages need to consider the threat that these messages may be spoofed.
 
 ## Security Context Establishment {#sec-context-establish}
 
@@ -1255,7 +1255,7 @@ OSCORE uses HKDF {{RFC5869}} and the established input parameters to derive the 
  
 Informally, HKDF takes as source an IKM containing some good amount of randomness but not necessarily distributed uniformly (or for which an attacker has some partial knowledge) and derive from it one or more cryptographically strong secret keys {{RFC5869}}.
 
-Therefore the main requirement for the OSCORE Master Secret, in addition to being secret, is that it is has a good amount of randomness. The selected key establishment schemes must ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
+Therefore, the main requirement for the OSCORE Master Secret, in addition to being secret, is that it is has a good amount of randomness. The selected key establishment schemes must ensure that the necessary properties for the Master Secret are fulfilled. For pre-shared key deployments and key transport solutions such as {{I-D.ietf-ace-oscore-profile}}, the Master Secret can be generated offline using a good random number generator.
 
 ## Replay Protection {#replay-protection2}
 
@@ -1263,7 +1263,7 @@ Most AEAD algorithms require a unique nonce for each message, for which the send
 
 ## Client Aliveness
 
-A verified OSCORE request enables the server to verify the identity of the entity who generated the message. However, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may use the Echo option in the response to a request from the client (see f{{I-D.ietf-core-echo-request-tag}}).
+A verified OSCORE request enables the server to verify the identity of the entity who generated the message. However, it does not verify that the client is currently involved in the communication, since the message may be a delayed delivery of a previously generated request which now reaches the server. To verify the aliveness of the client the server may use the Echo option in the response to a request from the client (see {{I-D.ietf-core-echo-request-tag}}).
 
 ## Cryptographic Considerations
 
@@ -1400,7 +1400,7 @@ This section registers the 'application/oscore' media type in the "Media Types" 
 
 Note to IANA: ID assignment in the 10000-64999 range is requested. (RFC Editor: Delete this note after IANA assignment)
 
-This section registers the media type 'application/oscore' media type in the the "CoAP Content-Format" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
+This section registers the media type 'application/oscore' media type in the "CoAP Content-Format" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
@@ -1524,7 +1524,7 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 ## Master Secret Used Multiple Times {#master-salt-transport}
 
-One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistant storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
+One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistent storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
 
 Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid context parameter (see {{context-hint}}) of the request.
 
@@ -1822,7 +1822,7 @@ For requests and responses with Partial IV (e.g. Observe notifications):
 * ID_PIV = Sender ID of the encrypting endpoint
 * PIV = current Partial IV of the encrypting endpoint
 
-Since the encrypting endpoint steps the Partial IV for each use, the nonces used are all unique as long as the number of encrypted messages are kept within the required range ({{nonce-uniqueness}}).
+Since the encrypting endpoint steps the Partial IV for each use, the nonces used are all unique as long as the number of encrypted messages is kept within the required range ({{nonce-uniqueness}}).
 
 For responses without Partial IV (i.e. single response to a request):
 
@@ -1845,7 +1845,7 @@ The CoAP Code of an OSCORE message is POST or FETCH for requests and with corres
 
 ### CoAP Header Fields {#sec-coap-headers}
 
-* Version. The CoAP version {{RFC7252}} is not expected to be sensitive to disclose. Currently there is only one CoAP version defined. A change of this parameter is potentially a denial of service attack. Future versions of CoAP need to analyse attacks to OSCORE protected messages due to an adversary changing the CoAP version.
+* Version. The CoAP version {{RFC7252}} is not expected to be sensitive to disclose. Currently there is only one CoAP version defined. A change of this parameter is potentially a denial of service attack. Future versions of CoAP need to analyze attacks to OSCORE protected messages due to an adversary changing the CoAP version.
 
 * Token/Token Length. The Token field is a client-local identifier for differentiating between concurrent requests {{RFC7252}}. An eavesdropper reading the token can match requests to responses which can be used in traffic analysis. CoAP proxies are allowed to change Token and Token Length between UDP hops. However, modifications of Token and Token Length during a UDP hop may become a denial of service attack, since it may prevent the client to identify to which request the response belongs or to find the correct information to verify integrity of the response.
 
@@ -1863,7 +1863,7 @@ The CoAP Code of an OSCORE message is POST or FETCH for requests and with corres
 
 Removing this option in the response may lead to notifications not being forwarded or cause a denial of service. The Outer option value indicates a relative order of notifications as read and written by the proxy and a change of that may affect proxy operations and potentially lead to denial of service. Since OSCORE provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. 
 
-* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicate a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), at which the messages will be dropped, is intended as one measure to mitigate this kind of attack.
+* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), at which the messages will be dropped, is intended as one measure to mitigate this kind of attack.
  
 * No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial of service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
 
