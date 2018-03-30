@@ -1093,6 +1093,8 @@ The receiving HTTP endpoint maps the HTTP message to a CoAP message using {{RFC8
 
 ## Example: HTTP Client and CoAP Server
 
+This section is giving an example of how a request and a response between an HTTP client and a CoAP server could look like. The example is not a test vector but intended as an illustration of how the message fields are translated in the different steps.
+
 Mapping and notation here is based on "Simple Form" (Section 5.4.1 of {{RFC8075}}).
 
 ~~~~~~~~~~~
@@ -1161,6 +1163,8 @@ Mapping and notation here is based on "Simple Form" (Section 5.4.1 of {{RFC8075}
 Note that the HTTP Status Code 200 in the next-to-last message is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200 in the last message is the mapping of the CoAP Code 2.05 (Content), which was encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
 ## Example: CoAP Client and HTTP Server
+
+This section is giving an example of how a request and a response between a CoAP client and an HTTP server could look like.  The example is not a test vector but intended as an illustration of how the message fields are translated in the different steps
 
 ~~~~~~~~~~~
 [CoAP request -- Before client object security processing]
