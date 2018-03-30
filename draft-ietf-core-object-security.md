@@ -518,7 +518,7 @@ The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and i
 
 The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the sending endpoint writes an Outer Code to the OSCORE message. The Outer Code SHALL be set to 0.02 (POST) or 0.05 (FETCH) for requests. For non-Observe requests the client SHALL set the Outer Code to 0.02 (POST). For responses, the sending endpoint SHALL respond with Outer Code 2.04 (Changed) to 0.02 (POST) requests, and with Outer Code 2.05 (Content) to 0.05 (FETCH) requests. Using FETCH with Observe allows OSCORE to be compliant with the Observe processing in OSCORE-unaware intermediaries. The choice of POST and FETCH {{RFC8132}} allows all OSCORE messages to have payload.
 
-The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object  ({{plaintext}}) into the decrypted CoAP message.
+The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object plaintext ({{plaintext}}) into the decrypted CoAP message.
 
 The other currently defined CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
@@ -1271,7 +1271,7 @@ A verified OSCORE request enables the server to verify the identity of the entit
 
 The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
 
-In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have good randomness {{master-secret}}).
+In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have a good amount of randomness (see {{master-secret}})).
 
 ## Message Segmentation
 
