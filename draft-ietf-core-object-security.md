@@ -1057,7 +1057,7 @@ base64url-char = ALPHA / DIGIT / "-" / "_"
 OSCORE = 2*base64url-char
 ~~~~~~~~~~~~~~
 
-The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. The HTTP OSCORE header field is not appropriate to list in a Vary response header field (see Section 7.1.4 of {{RFC7231}}) since a cached response would in general not be useful for other clients. The HTTP OSCORE header field is not useful in trailers (see Section 4.1 of {{RFC7230}}).
+The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. OSCORE messages are generally not useful when served from cache (i.e., they will generally be marked Cache-Control: no-cache) and so interaction with Vary isn't relevant (Section 7.1.4 of {{RFC7231}}). The HTTP OSCORE header field is not useful in trailers (see Section 4.1 of {{RFC7230}}).
 
 Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. A CoAP-to-HTTP proxy receiving a request for redirect may copy the HTTP OSCORE header field to the new request, although the condition for this being successful is that the server to which the OSCORE message is redirected needs to be a clone of the server for which the OSCORE message was intended (same target resource, same OSCORE security context etc.). If an HTTP/OSCORE client receives a redirect it should instead generate a new OSCORE request for the server it was redirected to. 
 
