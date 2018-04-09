@@ -956,21 +956,27 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 ## Protecting the Response {#prot-res}
 
-If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
+If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (step 9 in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (steps 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
 2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
-3. Compute the AEAD nonce
-  
-   * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
-
-   * For responses that are not Observe notifications, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
+3. Compute the AEAD nonce: either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
+
+### Supporting Observe
+
+If Observe is implemented, replace step 3 {{prot-res}} with:
+
+3. Compute the AEAD nonce
+
+  * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
+  
+  * For responses that are not Observe notifications, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
 
 ## Verifying the Response {#ver-res}
 
@@ -980,29 +986,43 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 2. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 11.
+3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 10.
 
-4. If the Observe option is present in the response, but the request was not an Observe registration, then go to 11. If a Partial IV is required (i.e. an Observe option is included or the Notification number for the observation has already been initiated), but not present in the response, then go to 11. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+4. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
-5. Compose the Additional Authenticated Data, as described in {{AAD}}.
-
-6. Compute the AEAD nonce
+5. Compute the AEAD nonce
 
     * If the Partial IV are not present in the response, the nonce from the request is used.
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 11.
+6. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 10.
 
-8. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+7. Delete the attribute-value pair (Token, {Security Context, PIV}).
 
-9. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+8. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
    
-10. The decrypted CoAP response is processed according to {{RFC7252}}.
+9. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-11. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+10. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
-An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
+### Supporting Observe
+
+If Observe is implemented:
+
+Insert the following steps between step 3 and 4 of {{ver-res}}:
+
+a.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 11.
+
+b.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 11.
+
+c.  For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+
+Replace step 7 of {{ver-res}} with:
+
+7. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+
+An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 6 by re-registering the observation immediately.
 
 # Web Linking
 
