@@ -1057,9 +1057,19 @@ base64url-char = ALPHA / DIGIT / "-" / "_"
 OSCORE = 2*base64url-char
 ~~~~~~~~~~~~~~
 
-The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. OSCORE messages are generally not useful when served from cache (i.e., they will generally be marked Cache-Control: no-cache) and so interaction with Vary isn't relevant (Section 7.1.4 of {{RFC7231}}). Since the HTTP OSCORE header field is critical for message processing, moving it from headers to trailers renders the message unusable in case trailers are ignored (see Section 4.1 of {{RFC7230}}).
+The HTTP OSCORE header field is not appropriate to list in the Connection header field (see Section 6.1 of {{RFC7230}}) since it is not hop-by-hop. OSCORE messages are generally not useful when served from cache (i.e., they will generally be marked Cache-Control: no-cache) and so interaction with Vary is not relevant (Section 7.1.4 of {{RFC7231}}). Since the HTTP OSCORE header field is critical for message processing, moving it from headers to trailers renders the message unusable in case trailers are ignored (see Section 4.1 of {{RFC7230}}).
 
-Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. A CoAP-to-HTTP proxy receiving a request for redirect may copy the HTTP OSCORE header field to the new request, although the condition for this being successful is that the target of the redirect has to have the necessary OSCORE security context. If an HTTP/OSCORE client receives a redirect, it should instead generate a new OSCORE request for the server it was redirected to. 
+Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. 
+
+Since redirects are not defined in the mappings between HTTP and CoAP {{RFC8075}}{{RFC7252}}, a number of conditions need to be fullfilled for redirects to work. For CoAP client to HTTP server, such conditions include:
+
+* the CoAP-to-HTTP proxy follows the redirect, instead of the CoAP client as in the HTTP case
+* the CoAP-to-HTTP proxy copies the HTTP OSCORE header field and body to the new request
+* the target of the redirect has the necessary OSCORE security context required to decrypt and verify the message
+
+Since OSCORE requires HTTP body to be preserved across redirects, the HTTP server is recommended to reply with 307 or 308 instead of 301 or 302.
+
+For the case of HTTP client to CoAP server, although is not defined for CoAP servers {{RFC7252}}, an HTTP client receiving a redirect should generate a new OSCORE request for the server it was redirected to. 
 
 ## CoAP-to-HTTP Mapping {#coap2http}
 
