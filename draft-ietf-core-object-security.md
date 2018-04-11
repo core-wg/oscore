@@ -465,7 +465,7 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-An Observe intermediary MUST forward the OSCORE option unchanged. In order for an OSCORE-unaware proxy to support forwarding of Observe messages {{RFC7641}}, there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. With OSCORE, Observe intermediaries are forwarding messages without being able to re-send cached notifications to other clients.
+An Observe intermediary MUST copy the OSCORE option in the next hop request unchanged. In order for an OSCORE-unaware proxy to support Observe {{RFC7641}}, there SHALL be an Outer Observe option, i.e., present in the options part of the OSCORE message. With OSCORE, Observe intermediaries are not expected to re-send cached notifications to other clients, since a specific security context is needed for verifying the message.
 
 In order to support multiple concurrent Observe registrations in the same endpoint, Observe intermediaries are allowed to deviate from {{RFC7641}} and register multiple times to the same (root) resource, since the actual target resource is encrypted and not visible in the OSCORE message. The processing of the CoAP Code for Observe messages is described in {{coap-header}}.
 
