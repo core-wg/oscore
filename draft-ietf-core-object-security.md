@@ -905,7 +905,7 @@ To prevent accepting replay of previously received notification responses, the c
 
 # Processing {#processing}
 
-This section describes the OSCORE message processing.
+This section describes the OSCORE message processing, and the necessary modified processing in case Observe or Block-wise are implemented.
 
 ## Protecting the Request {#prot-req}
 
