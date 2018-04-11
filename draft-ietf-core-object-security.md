@@ -930,11 +930,11 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
-2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If:
+2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
-   * either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
+   * If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
-   * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
+   * If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
 
 3. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
 
@@ -954,7 +954,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 ### Processing Block-wise
 
-If Block-wise is implemented and used on the Outer Block options, then insert the following step before step 1 of {{ver-req}}:
+If Block-wise is implemented and present in the request then insert the following step before step 1 of {{ver-req}}:
 
 A.  Process Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
@@ -986,29 +986,33 @@ A. Compute the AEAD nonce
 
 A client receiving a response containing the OSCORE option SHALL perform the following steps:
 
-1. Process Outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
+1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 10.
 
-3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 10.
+3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
-4. Compose the Additional Authenticated Data, as described in {{AAD}}.
-
-5. Compute the AEAD nonce
+4. Compute the AEAD nonce
 
     * If the Partial IV are not present in the response, the nonce from the request is used.
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-6. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 10.
+5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 10.
 
-7. Delete the attribute-value pair (Token, {Security Context, PIV}).
+6. Delete the attribute-value pair (Token, {Security Context, PIV}).
 
-8. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
    
-9. The decrypted CoAP response is processed according to {{RFC7252}}.
+8. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-10. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+9. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+
+### Processing Block-wise
+
+If Block-wise is implemented and present in the request then insert the following step before step 1 of {{ver-res}}:
+
+A. Process Outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
 
 ### Processing Observe
 
