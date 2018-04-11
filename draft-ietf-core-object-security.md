@@ -995,7 +995,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 10.
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
 
 3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
@@ -1005,7 +1005,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 10.
+5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 9.
 
 6. Delete the attribute-value pair (Token, {Security Context, PIV}).
 
@@ -1025,19 +1025,19 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is implemented:
 
-Insert the following steps between step 3 and 4 of {{ver-res}}:
+Insert the following steps between step 2 and 3 of {{ver-res}}:
 
-A.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 11.
+A.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 9.
 
-B.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 11.
+B.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 9.
 
 C.  For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
-Replace step 7 of {{ver-res}} with:
+Replace step 6 of {{ver-res}} with:
 
 D. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
 
-An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 6 by re-registering the observation immediately.
+An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 5 by re-registering the observation immediately.
 
 # Web Linking
 
