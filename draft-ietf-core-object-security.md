@@ -465,7 +465,8 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-An intermediary that supports Observe MUST forward the OSCORE option unchanged. In order for an OSCORE-unaware proxy to support forwarding of Observe messages {{RFC7641}}, Observe MUST be an Outer option. Although intermediaries are allowed to re-send notifications to other clients, when using OSCORE this does not happen, since requests from different clients will have different cache keys.
+
+An intermediary that supports Observe MUST copy the OSCORE option in the next hop request unchanged. In order for an OSCORE-unaware proxy to support Observe {{RFC7641}}, Observe MUST be an Outer option. Although intermediaries are allowed to re-send notifications to other clients, when using OSCORE this does not happen, since requests from different clients will have different cache keys.
 
 Note that, as defined in Section 3.1 of {{RFC7641}}, the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE. This means that several clients registering to the same protected resource via an intermediary, when using OSCORE, will be effectively registering to different target resources. The intermediary may then register to the protected resource (different target resources) once per each client.
 
@@ -485,7 +486,7 @@ The Inner No-Response option is used to communicate to the server the client's d
 
 The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. The Outer No-Response option is processed according to {{outer-options}}. 
 
-Note the effect in step 8 of {{ver-res}} when applied to No-Response. Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
+Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
 
 #### OSCORE
 
@@ -873,7 +874,7 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
-A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. Observe reordering MUST be linked to OSCORE's ordering of notifications. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
+A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. Observe reordering MUST be linked to OSCORE's ordering of notifications. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
 
 If messages are processed concurrently, the Partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
 
@@ -909,7 +910,7 @@ To prevent accepting replay of previously received notification responses, the c
 
 # Processing {#processing}
 
-This section describes the OSCORE message processing.
+This section describes the OSCORE message processing, and the necessary modified processing in case Observe or Block-wise are implemented.
 
 ## Protecting the Request {#prot-req}
 
@@ -932,85 +933,116 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 A server receiving a request containing the OSCORE option SHALL perform the following steps:
 
-1. Process Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
-2. Discard the message Code and all non-special Inner option message fields (marked in {{fig-option-protection}} with 'x' in column E only) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
+2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
-3. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. If:
-
-   * either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
+   * If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
-   * the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
+   * If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
 
-4. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
+3. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
 
-5. Compose the Additional Authenticated Data, as described in {{AAD}}.
+4. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
-6. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
+5. Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
 
-7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
+6. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
    * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Decryption failed" string.
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-8. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
+7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
 
-9. Add decrypted code, options and payload to the decrypted request. The OSCORE option is removed.
+8. The decrypted CoAP request is processed according to {{RFC7252}}.
 
-10. The decrypted CoAP request is processed according to {{RFC7252}}.
+### Processing Block-wise
+
+If Block-wise is implemented then insert the following step before step 1 of {{ver-req}}:
+
+A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 ## Protecting the Response {#prot-res}
 
-If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (point 10. in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (point 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
+If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (step 9 in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (steps 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
 1. Retrieve the Sender Context in the Security Context used to verify the request.
 
 2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
-3. Compute the AEAD nonce
-  
-   * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
+3. Compute the AEAD nonce as described in {{nonce}}:
 
-   * For responses that are not Observe notifications, either use the nonce from the request, or compute a new nonce from the Sender ID, Common IV, and a new Partial IV as described in {{nonce}}, and increment the Sender Sequence Number by one.
-
+    * Either use the nonce from the request, or 
+    * Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+ 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
+
+### Processing Observe
+
+If Observe is implemented, replace step 3 in {{prot-res}} with:
+
+A. Compute the AEAD nonce as described in {{nonce}}.
+
+  * For responses that are not Observe notifications:
+    
+      * Either use the nonce from the request, or 
+      * Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+
+  *  For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+
 
 ## Verifying the Response {#ver-res}
 
 A client receiving a response containing the OSCORE option SHALL perform the following steps:
 
-1. Process Outer Block options according to {{RFC7959}}, until all blocks of the OSCORE message have been received (see {{block-options}}).
+1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Discard the message Code and all non-special Class E options from the message. For example, ETag Outer option is discarded, Max-Age Outer option is not discarded.
+2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
 
-3. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 12.
+3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
-4. If the Observe option is present in the response, but the request was not an Observe registration, then go to 12. If a Partial IV is required (i.e. an Observe option is included or the Notification number for the observation has already been initiated), but not present in the response, then go to 12. For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
-
-5. Compose the Additional Authenticated Data, as described in {{AAD}}.
-
-6. Compute the AEAD nonce
+4. Compute the AEAD nonce
 
     * If the Partial IV are not present in the response, the nonce from the request is used.
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-7. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 12.
+5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 9.
 
-8. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+6. Delete the attribute-value pair (Token, {Security Context, PIV}).
 
-9. For each decrypted option, check if the option is also present as an Outer option: if it is, discard the Outer. For example: the message contains a Max-Age Inner and a Max-Age Outer option. The Outer Max-Age is discarded.
-
-10. Add decrypted code, options and payload to the decrypted request. The OSCORE option is removed.
+7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
    
-11. The decrypted CoAP response is processed according to {{RFC7252}}.
+8. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-12. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+9. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
-An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 7 by re-registering the observation immediately.
+### Processing Block-wise
+
+If Block-wise is implemented then insert the following step before step 1 of {{ver-res}}:
+
+A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+
+### Processing Observe
+
+If Observe is implemented:
+
+Insert the following steps between step 2 and 3 of {{ver-res}}:
+
+A.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 9.
+
+B.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 9.
+
+C.  For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+
+Replace step 6 of {{ver-res}} with:
+
+D. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+
+An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 5 by re-registering the observation immediately.
 
 # Web Linking
 
