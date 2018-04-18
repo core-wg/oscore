@@ -963,7 +963,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 8. The decrypted CoAP request is processed according to {{RFC7252}}.
 
-### Processing Block-wise
+### Supporting Block-wise
 
 If Block-wise is implemented then insert the following step before step 1 of {{ver-req}}:
 
@@ -986,7 +986,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
-### Processing Observe
+### Supporting Observe
 
 If Observe is implemented, replace step 3 in {{prot-res}} with:
 
@@ -1026,13 +1026,13 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 9. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
-### Processing Block-wise
+### Supporting Block-wise
 
 If Block-wise is implemented then insert the following step before step 1 of {{ver-res}}:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
-### Processing Observe
+### Supporting Observe
 
 If Observe is implemented:
 
