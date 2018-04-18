@@ -873,8 +873,7 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
-A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. Observe reordering MUST be linked to OSCORE's ordering of notifications. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. The client MUST NOT process notifications which have a Partial IV
-less than or equal to the Notification Number.
+A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. Observe reordering MUST be linked to OSCORE's ordering of notifications. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
 
 If messages are processed concurrently, the Partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
 
@@ -882,21 +881,21 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 To prevent reuse of an AEAD nonce with the same key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
 
-After boot, an endpoint can either reject to use pre-existing security contexts, or use a partly persistently stored security context, or use a full persistently stored security context.
+After boot, an endpoint can either reject to use pre-existing security contexts, or use a persistently stored complete or partial security context.
 
 If the endpoint rejects to use pre-existing security contexts, it MUST establish a new security context with each endpoint it communicates with. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
 
-If the endpoint uses a partly persistently stored security context, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. Some ways to achieve this are described in the following sections.
+If the endpoint uses a persistently stored partial security context, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. Some ways to achieve this are described in the following sections.
 
 ### Sequence Number
 
-To prevent reuse of Sender Sequence Numbers, an endpoint MAY perform the following procedure during normal operations:
+To prevent reuse of Sender Sequence Numbers, an endpoint may perform the following procedure during normal operations:
 
 * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
 
 ### Replay Window {#reboot-replay}
 
-To prevent accepting replay of previously received requests, the server MAY perform the following procedure after boot:
+To prevent accepting replay of previously received requests, the server may perform the following procedure after boot:
 
 * For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Partial IV when generating the AEAD nonce and MUST include the Partial IV in the response.
 
@@ -904,7 +903,7 @@ If the server using the Echo option can verify a second request as fresh, then t
 
 ### Replay Protection of Observe Notifications
 
-To prevent accepting replay of previously received notification responses, the client MAY perform the following procedure after boot:
+To prevent accepting replay of previously received notification responses, the client may perform the following procedure after boot:
 
 * The client rejects notifications bound to the earlier registration, removes all Notification Numbers and re-registers using Observe.
 
