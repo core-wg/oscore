@@ -965,9 +965,28 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 ### Supporting Block-wise
 
-If Block-wise is implemented then insert the following step before step 1 of {{ver-req}}:
+If Block-wise is implemented, insert the following step before step 1 of {{ver-req}}:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+
+### Supporting Observe
+
+If Observe is implemented:
+
+Replace step 1 in {{ver-req}} with:
+
+A.  Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, except for Observe, present in the received message. For example, an If-Match Outer option is discarded, Uri-Host Outer option is not discarded, Observe is not discarded.
+
+Insert the following steps between step 6 and 7 of {{ver-req}}:
+
+B.  If Observe was present in the received message (in step 1):
+
+  * If the value of Observe in the Outer message is 0:
+
+    * If Observe is present and has value 0 in the decrypted options, add the Observe option with value 0 to the set of decrypted options;
+    * Otherwise, discard the Outer (and Inner if present) Observe option.
+
+  * If the value of Observe in the Outer message is not 0, discard decrypted Observe option if present.
 
 ## Protecting the Response {#prot-res}
 
@@ -1028,7 +1047,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 ### Supporting Block-wise
 
-If Block-wise is implemented then insert the following step before step 1 of {{ver-res}}:
+If Block-wise is implemented, insert the following step before step 1 of {{ver-res}}:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
