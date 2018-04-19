@@ -465,7 +465,7 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-The Observe option is both Inner and Outer. In case of registrations or re-registrations, the CoAP client using Observe with OSCORE MUST set both Inner and Outer Observe with the same value (0). In all ather cases, the CoAP endpoint using Observe with OSCORE MUST set Outer Observe.
+The Observe option is both Inner and Outer. In case of registrations or re-registrations, the CoAP client using Observe with OSCORE MUST set both Inner and Outer Observe with the same value (0). In all other cases, the CoAP endpoint using Observe with OSCORE MUST set Outer Observe.
 
 In order for an OSCORE-unaware proxy to support Observe {{RFC7641}}, Observe has to be an Outer option: if Observe was only sent encrypted end-to-end, since intermediaries do not generally expect several responses to a request, notifications would not reach the endpoint.
 Moreover, intermediaries are allowed to cancel observations at any time; forbidding this behavior would result once again in notifications being dropped.
@@ -983,8 +983,8 @@ B.  If Observe was present in the received message (in step 1):
 
   * If the value of Observe in the Outer message is 0:
 
-    * If Observe is present and has value 0 in the decrypted options, add the Observe option with value 0 to the set of decrypted options;
-    * Otherwise, discard the Outer (and Inner if present) Observe option.
+    * If Observe is present and has value 0 in the decrypted options, discard it;
+    * Otherwise, discard both the Outer and Inner (if present) Observe options.
 
   * If the value of Observe in the Outer message is not 0, discard decrypted Observe option if present.
 
@@ -1055,17 +1055,25 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is implemented:
 
+Replace step 1 of {{ver-res}} with:
+
+A. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, except for Observe, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option, Observe is not discarded.
+
 Insert the following steps between step 2 and 3 of {{ver-res}}:
 
-A.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 9.
+B.  If the Observe option is present in the response, but the request was not an Observe registration, then go to 9.
 
-B.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 9.
+C.  If an Observe option is included or the Notification number for the observation has already been initiated, but the Partial IV is not present in the response, then go to 9.
 
-C.  For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
+D.  For Observe notifications, verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-protection}}.
 
 Replace step 6 of {{ver-res}} with:
 
-D. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+E. If the response is a notification, initiate or update the corresponding Notification Number, as described in {{sequence-numbers}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+
+Replace step 7 of {{ver-res}} with:
+
+F. Add decrypted Code, options and payload to the decrypted request, except for decrypted Observe if present. The OSCORE option is removed.
 
 An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure in step 5 by re-registering the observation immediately.
 
