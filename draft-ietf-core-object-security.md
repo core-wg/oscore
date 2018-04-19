@@ -878,7 +878,13 @@ For requests and notifications, OSCORE also provides relative freshness in the s
 
 In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero, to inform any intermediary that the response is not to be cached. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
-Responses that are not notifications (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
+Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
+
+### Supporting Observe
+
+Additionally to the previous section, the following applies when Observe is supported.
+
+Observe allows re-registration of observations (see 3.3.1 of {{RFC7641}}). A server receiving an Observe registration identical to a previously stored one (including Partial IV and Token) SHALL treat it as valid and reply with the last notification sent.
 
 A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. Observe reordering MUST be linked to OSCORE's ordering of notifications. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
 
@@ -983,10 +989,16 @@ B.  If Observe was present in the received message (in step 1):
 
   * If the value of Observe in the Outer message is 0:
 
-    * If Observe is present and has value 0 in the decrypted options, discard it;
+    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe;
     * Otherwise, discard both the Outer and Inner (if present) Observe options.
 
   * If the value of Observe in the Outer message is not 0, discard decrypted Observe option if present.
+
+Insert the following steps between step 6 and 7 of {{ver-req}}:
+
+C. If the message is an Observe registration, store it in memory for later comparison with re-registrations (see {{replay-protection}}).
+
+D. If the message is an Observe cancellation, delete from memory the previously stored registration related to that observation (see {{replay-protection}}).
 
 ## Protecting the Response {#prot-res}
 
@@ -1007,7 +1019,9 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 ### Supporting Observe
 
-If Observe is implemented, replace step 3 in {{prot-res}} with:
+If Observe is implemented:
+
+Replace step 3 in {{prot-res}} with:
 
 A. Compute the AEAD nonce as described in {{nonce}}.
 
@@ -1018,6 +1032,9 @@ A. Compute the AEAD nonce as described in {{nonce}}.
 
   *  For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
 
+Add the following step after step 5:
+
+B. If the message is an Observe notification, store it in memory for use with re-registrations (see {{replay-protection}}), and delete from memory any older one previously stored.
 
 ## Verifying the Response {#ver-res}
 
