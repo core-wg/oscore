@@ -564,7 +564,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading zeroes SHALL be removed when encoding the Partial IV, except in the case of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe notifications ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading bytes of value zero SHALL be removed when encoding the Partial IV, except in the case of Partial IV of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe notifications ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
