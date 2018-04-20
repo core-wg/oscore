@@ -465,14 +465,11 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1).
 
-The Observe option is both Inner and Outer. In case of registrations or re-registrations, the CoAP client using Observe with OSCORE MUST set both Inner and Outer Observe with the same value (0). In all other cases, the CoAP endpoint using Observe with OSCORE MUST set Outer Observe.
-
-In order for an OSCORE-unaware proxy to support Observe {{RFC7641}}, Observe has to be an Outer option: if Observe was only sent encrypted end-to-end, since intermediaries do not generally expect several responses to a request, notifications would not reach the endpoint.
-Moreover, intermediaries are allowed to cancel observations at any time; forbidding this behavior would result once again in notifications being dropped.
-
-The Observe option for registrations and re-registrations is also Inner, allowing the server to verify that the observation was requested by the client, and to avoid overhead (processing and transmission of notifications) on the server, since such notifications would never reach the client.
+To support proxy operations, OSCORE MUST set Outer Observe. If Observe was only sent encrypted end-to-end, an OSCORE-unaware proxy would not expect several responses to a request and notifications would not reach the endpoint. Moreover, intermediaries are allowed to cancel observations at any time; forbidding this behavior would also result in notifications being dropped.
 
 An intermediary that supports Observe MUST copy the OSCORE option in the next hop request unchanged. It is worth noting that although intermediaries are allowed to re-send notifications to other clients, when using OSCORE this does not happen, since requests from different clients will have different cache keys.
+
+In case of registrations or re-registrations, the CoAP client using Observe with OSCORE MUST set both Inner and Outer Observe to the same value (0). This allows the server to verify that the observation was requested by the client, thereby avoiding unnecessary overhead (processing and transmission of notifications) on the server, since such notifications would not benefit the client.
 
 Note that, as defined in Section 3.1 of {{RFC7641}}, the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE. This means that several clients registering to the same protected resource via an intermediary, when using OSCORE, will be effectively registering to different target resources. The intermediary may then register to the protected resource (different target resources) once per each client.
 
