@@ -465,8 +465,6 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. 
 
-An Observe option in the CoAP request may be ignored by a server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
-
 ##### Partial IV Processing
 
 It the server accepts an Observe registration, a Partial IV must be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}. The client MAY ignore the Observe option value.
@@ -475,7 +473,7 @@ Clients can re-register observations to ensure that the observation is still act
 
 ##### Observe in Intermediaries {#observe-option-processing}
 
-The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1). To support proxy operations, OSCORE MUST set Outer Observe. If Observe was only sent encrypted end-to-end, an OSCORE-unaware proxy would not expect several responses to a non-Observe request and notifications would not reach the client. Moreover, intermediaries are allowed to cancel observations and inform the server; forbidding this may result in processing and transmission of notifications which does not reach the client.
+The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1). To support proxy operations, the CoAP client using Observe with OSCORE MUST set Outer Observe. If Observe was only sent encrypted end-to-end, an OSCORE-unaware proxy would not expect several responses to a non-Observe request and notifications would not reach the client. Moreover, intermediaries are allowed to cancel observations and inform the server; forbidding this may result in processing and transmission of notifications which does not reach the client.
 
 In case of registrations or re-registrations, the CoAP client using Observe with OSCORE MUST set both Inner and Outer Observe to the same value (0). This allows the server to verify that the observation was requested by the client, thereby avoiding unnecessary processing and transmission of notifications, since such notifications would not benefit the client.
 
@@ -484,6 +482,8 @@ Note that, as defined in Section 3.1 of {{RFC7641}}, the target resource for Obs
 An intermediary that supports Observe MUST copy the OSCORE option in the next hop request unchanged. Although intermediaries are allowed to re-send notifications to other clients, when using OSCORE this does not happen, since requests from different clients will have different cache keys.
 
 The Outer Observe option in the CoAP request may be legitimately removed by a proxy. 
+
+An Observe option in the CoAP request may be ignored by a server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
 
 The default value of the Outer Code is specified in {{coap-header}}. In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
 
@@ -894,7 +894,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 #### Observe in Intermediaries {#observe-replay-processing}
 
-In order to support intermediaries making re-registration of observations (see 3.3.1 of {{RFC7641}}), a server receiving an Observe registration identical to a previously stored one (including Partial IV and Token) SHALL treat it as valid and respond with the last notification sent.
+In order to support intermediaries making re-registration of observations (see 3.3.1 of {{RFC7641}}), a server receiving an Observe registration with Token, Kid and Partial IV identical to a previously stored registration, and which decrypts without error SHALL not treat it as a replay and SHALL respond with a notification. The notification may be a cached copy of the latest sent notification (with the same Token, Kid and Partial IV) or it may be a newly generated notification with a fresh Partial IV.
 
 
 ## Losing Part of the Context State {#context-state}
@@ -990,22 +990,21 @@ Replace step 1 in {{ver-req}} with:
 
 A.  Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, except for Observe, present in the received message. For example, an If-Match Outer option is discarded, Uri-Host Outer option is not discarded, Observe is not discarded.
 
+Replace step 3 in {{ver-req}} with:
+
+B. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}. If the Token, Kid and Partial IV are identical to a previously stored Observe registration, this is a re-registration attempt and processing is continued as described in {{observe-replay-processing}}.
+
 Insert the following steps between step 6 and 7 of {{ver-req}}:
 
-B.  If Observe was present in the received message (in step 1):
+C.  If Observe was present in the received message (in step 1):
 
   * If the value of Observe in the Outer message is 0:
 
-    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe;
-    * Otherwise, discard both the Outer and Inner (if present) Observe options.
+    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe. If this is a re-registration, proceed as described in {{observe-replay-processing}};
+    * Otherwise, discard both the Outer and Inner (if present) Observe options. 
 
-  * If the value of Observe in the Outer message is not 0, discard decrypted Observe option if present.
+  * If the value of Observe in the Outer message is not 0, discard the decrypted Observe option if present.
 
-Insert the following steps between step 6 and 7 of {{ver-req}}:
-
-C. If the message is an Observe registration, store it in memory for later comparison with re-registrations (see {{replay-protection}}).
-
-D. If the message is an Observe cancellation, delete from memory the previously stored registration related to that observation (see {{replay-protection}}).
 
 ## Protecting the Response {#prot-res}
 
@@ -1039,9 +1038,6 @@ A. Compute the AEAD nonce as described in {{nonce}}.
 
   *  For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
 
-Add the following step after step 5:
-
-B. If the message is an Observe notification, store it in memory for use with re-registrations (see {{replay-protection}}), and delete from memory any older one previously stored.
 
 ## Verifying the Response {#ver-res}
 
@@ -1980,9 +1976,9 @@ It is recommended to additionally use TLS {{RFC5246}} for HTTP hops, which enabl
 
 # Observe Without Intermediaries
 
-OSCORE is designed to support proxy operations, but may also be used in applications without intermediaries. In settings where intermediaries are not present, or where intermediaries allow multiple responses to one request, Observe processing may be simplified as is specified in this section.
+OSCORE is designed to support proxy operations, but may also be used in applications without intermediaries. In settings where intermediaries are not present, or where intermediaries allow multiple responses to one request, Observe processing may be simplified as is specified in this section. The processing specified in this section is in part incompatible with Observe processing specified elsewhere in this document and applications must ensure that  compatible Observe processing is being used all nodes.
 
-OSCORE MUST set Inner Observe. Any value of the Outer Observe is ignored.
+According to the Observe processing of this appendix the CoAP endpoint using Observe with OSCORE MUST set Inner Observe. Any value of the Outer Observe is ignored.
 
 The processing specified in {{observe-option-processing}} and {{observe-replay-processing}} is omitted.
 
