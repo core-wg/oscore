@@ -463,15 +463,17 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 #### Observe {#observe}
 
-Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. 
+Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. This section specifies Observe processing associated to the Partial IV {{observe-partial-iv}} and Observe processing in the presence of RFC 7641 compliant intermediaries {{observe-option-processing}}.
 
-##### Partial IV Processing
+In contrast to e.g. block-wise, the use of Inner and Outer Observe option are not independent. Outer Observe is required to support Observe operations in intermediaries, but the additional use of Inner Observe is needed to protect Observe registrations end-to-end (see {{observe-option-processing}}). {{observe-without-intermed}} specifies an alternative Observe processing in the absence of intermediaries.
 
-It the server accepts an Observe registration, a Partial IV must be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}. The client MAY ignore the Observe option value.
+##### Partial IV Processing {#observe-partial-iv}
+
+It the server accepts an Observe registration, a Partial IV must be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration (see {{replay-protection}}). The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. Further details of replay protection of notifications are specified in {{replay-protection}}.
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, not only the ETags, but also the partial IV (and thus the payload and OSCORE option) change. The server uses the new request's Partial IV as the 'request_piv' of new responses.
 
-##### Observe in Intermediaries {#observe-option-processing}
+##### Observe In Intermediaries {#observe-option-processing}
 
 The Observe option as used here targets the requirements on forwarding of {{I-D.hartke-core-e2e-security-reqs}} (Section 2.2.1). To support proxy operations, the CoAP client using Observe with OSCORE MUST set Outer Observe. If Observe was only sent encrypted end-to-end, an OSCORE-unaware proxy would not expect several responses to a non-Observe request and notifications would not reach the client. Moreover, intermediaries are allowed to cancel observations and inform the server; forbidding this may result in processing and transmission of notifications which does not reach the client.
 
@@ -886,11 +888,11 @@ Additionally to the previous section, the following applies when Observe is supp
 
 #### Partial IV Processing
 
-A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. The ordering of notifications after OSCORE processing MUST be aligned with the Partial IV. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
+A client receiving a notification SHALL compare the Partial IV of a received notification with the Notification Number associated to that Observe registration. The ordering of notifications after OSCORE processing MUST be aligned with the Partial IV. The client MAY do so by copying the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing. The client MAY ignore an Outer Observe option value. If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The client MUST stop processing notifications with a Partial IV which has been previously received. An application MAY require the client to discard notifications which have Partial IV less than the Notification Number.
 
 If messages are processed concurrently, the Partial IV needs to be validated a second time after decryption and before updating the replay protection data. The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
 
-#### Observe in Intermediaries {#observe-replay-processing}
+#### Observe In Intermediaries {#observe-replay-processing}
 
 In order to support intermediaries making re-registration of observations (see 3.3.1 of {{RFC7641}}), a server receiving an Observe registration with Token, Kid and Partial IV identical to a previously stored registration, and which decrypts without error SHALL not treat it as a replay and SHALL respond with a notification. The notification may be a cached copy of the latest sent notification (with the same Token, Kid and Partial IV) or it may be a newly generated notification with a fresh Partial IV.
 
@@ -1973,7 +1975,7 @@ In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-
 It is recommended to additionally use TLS {{RFC5246}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
 
 
-# Observe Without Intermediaries
+# Observe Without Intermediaries {#observe-without-intermed}
 
 OSCORE is designed to support proxy operations, but may also be used in applications without intermediaries. In settings where intermediaries are not present, or where intermediaries allow multiple responses to one request, Observe processing may be simplified as is specified in this section. The processing specified in this section is in part incompatible with Observe processing specified elsewhere in this document and applications must ensure that  compatible Observe processing is being used all nodes.
 
