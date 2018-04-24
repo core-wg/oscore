@@ -481,11 +481,9 @@ Note that, as defined in Section 3.1 of {{RFC7641}}, the target resource for Obs
 
 An intermediary that supports Observe MUST copy the OSCORE option in the next hop request unchanged. Although intermediaries are allowed to re-send notifications to other clients, when using OSCORE this does not happen, since requests from different clients will have different cache keys.
 
-The Outer Observe option in the CoAP request may be legitimately removed by a proxy. 
+The Outer Observe option in the CoAP request may be legitimately removed by a proxy or ignored by a server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
 
-An Observe option in the CoAP request may be ignored by a server. In these cases, the server processes the request as a non-Observe request and produce a non-Observe response. If the OSCORE client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the OSCORE client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
-
-The default value of the Outer Code is specified in {{coap-header}}. In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
+In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code SHALL be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
 
 
 #### No-Response {#no-resp}
@@ -992,7 +990,7 @@ A.  Discard Code and all options marked in {{fig-option-protection}} with 'x' in
 
 Replace step 3 in {{ver-req}} with:
 
-B. Verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}. If the Token, Kid and Partial IV are identical to a previously stored Observe registration, this is a re-registration attempt and processing is continued as described in {{observe-replay-processing}}.
+B. If Observe is present in the received message, and has value 0, check if the Token, Kid and Partial IV are identical to a previously received Observe registration. In this case, replay verification is postponed until step C. Otherwise verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
 
 Insert the following steps between step 6 and 7 of {{ver-req}}:
 
@@ -1000,8 +998,9 @@ C.  If Observe was present in the received message (in step 1):
 
   * If the value of Observe in the Outer message is 0:
 
-    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe. If this is a re-registration, proceed as described in {{observe-replay-processing}};
-    * Otherwise, discard both the Outer and Inner (if present) Observe options. 
+    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe. If the Token, Kid and Partial IV are identical to a previously received Observe registration, respond with a notification as described in {{observe-replay-processing}};
+    
+    * Otherwise, discard both the Outer and Inner (if present) Observe options and verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}. 
 
   * If the value of Observe in the Outer message is not 0, discard the decrypted Observe option if present.
 
