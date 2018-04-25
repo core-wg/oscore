@@ -463,9 +463,9 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 #### Observe {#observe}
 
-Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}. This section specifies Observe processing associated to the Partial IV {{observe-partial-iv}} and Observe processing in the presence of RFC 7641 compliant intermediaries {{observe-option-processing}}.
+Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}, in which case the Observe related processing specified in this section, {{sequence-numbers}} and {{processing}} can be omitted. This section specifies Observe processing associated to the Partial IV ({{observe-partial-iv}}) and Observe processing in the presence of RFC 7641 compliant intermediaries ({{observe-option-processing}}).  
 
-In contrast to e.g. block-wise, the use of Inner and Outer Observe option are not independent. Outer Observe is required to support Observe operations in intermediaries, but the additional use of Inner Observe is needed to protect Observe registrations end-to-end (see {{observe-option-processing}}). {{observe-without-intermed}} specifies an alternative Observe processing in the absence of intermediaries.
+In contrast to e.g. block-wise, the use of Inner and Outer Observe option are not independent. Outer Observe is required to support Observe operations in intermediaries, but the additional use of Inner Observe is needed to protect Observe registrations end-to-end (see {{observe-option-processing}}). {{observe-without-intermed}} specifies a simplified Observe processing which is applicable in the absence of intermediaries. 
 
 ##### Partial IV Processing {#observe-partial-iv}
 
@@ -1977,9 +1977,9 @@ It is recommended to additionally use TLS {{RFC5246}} for HTTP hops, which enabl
 
 # Observe Without Intermediaries {#observe-without-intermed}
 
-OSCORE is designed to support proxy operations, but may also be used in applications without intermediaries. In settings where intermediaries are not present, or where intermediaries allow multiple responses to one request, Observe processing may be simplified as is specified in this section. The processing specified in this section is in part incompatible with Observe processing specified elsewhere in this document and applications must ensure that  compatible Observe processing is being used all nodes.
+OSCORE is designed to support proxy operations, but may also be used in applications without intermediaries. In settings where there are no intermediaries performing Observe operations, the Observe processing may be simplified as is specified in this section. The processing specified in this section is incompatible with Observe processing specified elsewhere in this document. Applications must ensure that all nodes of a given deployment use the same Observe processing.
 
-According to the Observe processing of this appendix the CoAP endpoint using Observe with OSCORE MUST set Inner Observe. Any value of the Outer Observe is ignored.
+According to the Observe processing of this appendix the CoAP endpoint using Observe with OSCORE MUST set Inner Observe. Any value of the Outer Observe MAY be ignored by the endpoints. The processing specified elsewhere in this document applies, with the modifications described in the remainder of this appendix.
 
 The processing specified in {{observe-option-processing}} and {{observe-replay-processing}} is omitted.
 
