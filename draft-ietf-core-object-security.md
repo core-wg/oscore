@@ -1152,7 +1152,7 @@ Since redirects are not defined in the mappings between HTTP and CoAP {{RFC8075}
 
 Since OSCORE requires HTTP body to be preserved across redirects, the HTTP server is recommended to reply with 307 or 308 instead of 301 or 302.
 
-For the case of HTTP client to CoAP server, although is not defined for CoAP servers {{RFC7252}}, an HTTP client receiving a redirect should generate a new OSCORE request for the server it was redirected to. 
+For the case of HTTP client to CoAP server, although redirect is not defined for CoAP servers {{RFC7252}}, an HTTP client receiving a redirect should generate a new OSCORE request for the server it was redirected to. 
 
 ## CoAP-to-HTTP Mapping {#coap2http}
 
