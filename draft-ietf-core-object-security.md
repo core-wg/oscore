@@ -277,7 +277,7 @@ All input parameters need to be known to and agreed on by both endpoints, but th
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
-The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in COSE. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps {{RFC5869}}:
+The derivation of keys and IV follows {{RFC8152}}. The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in {{RFC8152}}. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps {{RFC5869}}:
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
@@ -1876,7 +1876,7 @@ From there:
 
 ## Supporting Proxy Operations {#supp-proxy-op}
 
-CoAP is designed to work with intermediaries reading and/or changing CoAP message fields and performing supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
+CoAP is designed to work with intermediaries reading and/or changing CoAP message fields to perform supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
 
 Securing CoAP on transport layer protects the entire message between the endpoints in which case CoAP proxy operations are not possible. In order to enable proxy operations, security on transport layer needs to be terminated at the proxy in which case the CoAP message in its entirety is unprotected in the proxy. 
 
@@ -1886,9 +1886,9 @@ By working at the CoAP layer, OSCORE enables different CoAP message fields to be
 
 ## Protected Message Fields {#prot-message-fields}
 
-Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object using an AEAD algorithm. 
+Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object and encrypted using an AEAD algorithm. 
 
-OSCORE depends on a pre-established random Master Secret ({{master-secret}}) which can be used to derive keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
+OSCORE depends on a pre-established random Master Secret ({{master-secret}}) used to derive encryption keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
 
 * Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
@@ -1896,7 +1896,7 @@ OSCORE depends on a pre-established random Master Secret ({{master-secret}}) whi
 
 * Request-response binding: An attacker should not be able to make a client match a response to the wrong request.
 
-* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
+* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. (This property is explicitly disabled by certain Observe requests, see {{unprot-fields}}.)
 
 In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
 
@@ -1932,9 +1932,9 @@ The argumentation also holds for group communication as specified in {{RFC7390}}
 
 This section lists and discusses issues with unprotected message fields.
 
-### CoAP Code
+### CoAP Code {#sec-coap-code}
 
-The CoAP Code of an OSCORE message is POST or FETCH for requests and with corresponding response codes. Since the use of Observe is indicated with the Outer Observe option, no additional information is revealed by having a special codes for Observe messages. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. Other aspects of Observe are discussed in {{sec-coap-options}}.
+The CoAP Code of an OSCORE message is by default POST or FETCH for requests and with corresponding response codes. Since the use of Observe in intermediaries is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe messages. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. 
 
 ### CoAP Header Fields {#sec-coap-headers}
 
@@ -1952,11 +1952,9 @@ The CoAP Code of an OSCORE message is POST or FETCH for requests and with corres
 
 * Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{proxy-uri}}. 
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages.  Removing this option in the request turns the notification request into a normal request, which is allowed for a proxy and server and understood by the client but changes the performed operation from a request for notifications to a plain request, but the client cannot tell what party removed the option.
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages.  Removing this option in the request turns the notification request into a normal request, which is allowed for a proxy and server and understood by the client but changes the performed operation from a request for notifications to a plain request, but the client cannot tell what party removed the option. Removing this option in the response may lead to notifications not being forwarded or cause a denial of service. The Outer option value indicates a relative order of notifications as read and written by the proxy and a change of that may affect proxy operations and potentially lead to denial of service. Since OSCORE provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. By design, Observe allows a proxy to replay a registration request and trigger a notification being sent from the server. However, new registration requests are verified for replay and that they originated from the client.
 
-Removing this option in the response may lead to notifications not being forwarded or cause a denial of service. The Outer option value indicates a relative order of notifications as read and written by the proxy and a change of that may affect proxy operations and potentially lead to denial of service. Since OSCORE provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. 
-
-* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), at which the messages will be dropped, is intended as one measure to mitigate this kind of attack.
+* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
  
 * No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial of service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
 
