@@ -875,7 +875,7 @@ The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerati
 
 For requests, OSCORE provides only the guarantee that the request is not older than the security context. For applications having stronger demands on request freshness (e.g., control of actuators), OSCORE needs to be augmented with mechanisms providing freshness, for example as specified in {{I-D.ietf-core-echo-request-tag}}.
 
-Assuming an honest server, the message binding guarantees that a response is not older than its request. For responses that are not notifications (i.e. when there is a single response to a request), this gives absolute freshness. For notifications, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation. Note that the message binding does not guarantee that misbehaving server created the response before receiving the request, i.e. it does not verify server aliveness.
+Assuming an honest server (see {{overview-sec-properties}}), the message binding guarantees that a response is not older than its request. For responses that are not notifications (i.e. when there is a single response to a request), this gives absolute freshness. For notifications, the absolute freshness gets weaker with time, and it is RECOMMENDED that the client regularly re-register the observation. Note that the message binding does not guarantee that misbehaving server created the response before receiving the request, i.e. it does not verify server aliveness.
 
 For requests and notifications, OSCORE also provides relative freshness in the sense that the received Partial IV allows a recipient to determine the relative order of requests or responses.
 
@@ -897,7 +897,7 @@ If messages are processed concurrently, the Partial IV needs to be validated a s
 
 #### Re-registration Processing {#observe-replay-processing}
 
-In order to allow intermediaries to re-register their interest in a resource (see 3.3.1 of {{RFC7641}}), a server receiving an Observe registration with Token, Kid and Partial IV identical to a previously received registration, and which decrypts without error SHALL not treat it as a replay and SHALL respond with a notification. The notification may be a cached copy of the latest sent notification (with the same Token, Kid and Partial IV) or it may be a newly generated notification with a fresh Partial IV.
+In order to allow intermediaries to re-register their interest in a resource (see 3.3.1 of {{RFC7641}}), a server receiving an Observe registration with Token, kid and Partial IV identical to a previously received registration, and which decrypts without error SHALL not treat it as a replay and SHALL respond with a notification. The notification may be a cached copy of the latest sent notification (with the same Token, kid and Partial IV) or it may be a newly generated notification with a fresh Partial IV.
 
 
 ## Losing Part of the Context State {#context-state}
@@ -995,7 +995,7 @@ A.  Discard Code and all options marked in {{fig-option-protection}} with 'x' in
 
 Replace step 3 in {{ver-req}} with:
 
-B. If Observe is present in the received message, and has value 0, check if the Token, Kid and Partial IV are identical to a previously received Observe registration. In this case, replay verification is postponed until step C. Otherwise verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
+B. If Observe is present in the received message, and has value 0, check if the Token, kid and Partial IV are identical to a previously received Observe registration. In this case, replay verification is postponed until step C. Otherwise verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}.
 
 Insert the following steps between step 6 and 7 of {{ver-req}}:
 
@@ -1003,7 +1003,7 @@ C.  If Observe was present in the received message (in step 1):
 
   * If the value of Observe in the Outer message is 0:
 
-    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe. If the Token, Kid and Partial IV are identical to a previously received Observe registration, respond with a notification as described in {{observe-replay-processing}};
+    * If Observe is present and has value 0 in the decrypted options, discard the Outer Observe. If the Token, kid and Partial IV are identical to a previously received Observe registration, respond with a notification as described in {{observe-replay-processing}};
     
     * Otherwise, discard both the Outer and Inner (if present) Observe options and verify the 'Partial IV' parameter using the Replay Window, as described in {{replay-protection}}. 
 
