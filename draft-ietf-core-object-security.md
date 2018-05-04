@@ -277,7 +277,7 @@ All input parameters need to be known to and agreed on by both endpoints, but th
 
 ### Derivation of Sender Key, Recipient Key, and Common IV 
 
-The derivation of keys and IV follows {{RFC8152}}. The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in {{RFC8152}}. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps {{RFC5869}}:
+The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined in {{RFC8152}}. HKDF SHA-256 is mandatory to implement. The security context parameters Sender Key, Recipient Key, and Common IV SHALL be derived from the input parameters using the HKDF, which consists of the composition of the HKDF-Extract and HKDF-Expand steps {{RFC5869}}:
 
 ~~~~~~~~~~~
    output parameter = HKDF(salt, IKM, info, L) 
