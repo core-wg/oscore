@@ -1660,22 +1660,22 @@ Inputs:
 
 From the previous parameters,
 
-* info (for Sender Key): 0x84400A634b657910 (8 bytes)
-* info (for Recipient Key): 0x8441010A634b657910 (9 bytes)
+* info (for Sender Key): 0x84400a634b657910 (8 bytes)
+* info (for Recipient Key): 0x8441010a634b657910 (9 bytes)
 * info (for Common IV): 0x84400a6249560d (7 bytes)
 
 Outputs:
 
 * Sender Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
 * Recipient Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
-* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
+* Common IV: 0x9091b60715f92b3de49a011911 (13 bytes)
 
 ### Server
 
 Inputs:
 
 * Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
-* Master Salt: 0x9e7ca92223786340 (64 bytes)
+* Master Salt: 0x9e7ca92223786340 (8 bytes)
 * Sender ID: 0x01 (1 byte)
 * Recipient ID: 0x (0 byte)
 
@@ -1689,7 +1689,7 @@ Outputs:
 
 * Sender Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
 * Recipient Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
-* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
+* Common IV: 0x9091b60715f92b3de49a011911 (13 bytes)
 
 ## Test Vector 2: Key Derivation without Master Salt {#key-der-tv}
 
@@ -1713,7 +1713,7 @@ Outputs:
 
 * Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
 * Recipient Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
-* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Common IV: 0x64e3ff1cdc31cb040c048396f3 (13 bytes)
 
 ### Server
 
@@ -1733,60 +1733,23 @@ Outputs:
 
 * Sender Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
 * Recipient Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
-* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Common IV: 0x64e3ff1cdc31cb040c048396f3 (13 bytes)
 
 ## Test Vector 3: OSCORE Request, Client {#tv3}
 
 This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv-ms}}. The unprotected request only contains the Uri-Path option.
 
-Unprotected CoAP request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
+Unprotected CoAP request: 0x44015d1f00003974396c6f63616c686f737483747631 (22 bytes)
 
 Common Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Common IV: 0x9091b60715f92b3de49a011911 (13 bytes)
 
 Sender Context:
 
-* Sender ID: 0x00 (1 byte)
-* Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
-* Sender Sequence Number: 20
-
-The following COSE and cryptographic parameters are derived:
-
-* Partial IV: 0x14 (1 byte)
-* kid: 0x00 (1 byte)
-* external_aad: 0x8501810a4100411440 (9 bytes)
-* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
-* plaintext: 0x01b3747631 (5 bytes)
-* encryption key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
-* nonce: 0xd0a1949aa253278f34c528d2d8 (13 bytes)
-
-From the previous parameter, the following is derived:
-
-* OSCORE option value: 0x091400 (3 bytes)
-* ciphertext: 0x55b3710d47c611cd3924838a44 (13 bytes)
-
-From there:
-
-* Protected CoAP request (OSCORE message): 0x44026dd30000acc5396c6f63616c686f7374d305091400ff55b3710d47c611cd3924838a44 (37 bytes)
-
-## Test Vector 4: OSCORE Request, Client
-
-This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path option.
-
-Unprotected CoAP request: 0x440149c60000f2a7396c6f63616c686f737483747631 (22 bytes)
-
-Common Context:
-
-* AEAD Algorithm: 10 (AES-CCM-16-64-128)
-* Key Derivation Function: HKDF SHA-256
-* Common IV: 0x01727733ab49ead385b18f7d91 (13 bytes)
-
-Sender Context:
-
-* Sender ID: 0x (0 bytes)
+* Sender ID: 0x (0 byte)
 * Sender Key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
 * Sender Sequence Number: 20
 
@@ -1798,87 +1761,124 @@ The following COSE and cryptographic parameters are derived:
 * AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 * plaintext: 0x01b3747631 (5 bytes)
 * encryption key: 0x7230aab3b549d94c9224aacc744e93ab (16 bytes)
-* nonce: 0x01727733ab49ead385b18f7d85 (13 bytes)
+* nonce: 0x9091b60715f92b3de49a011905 (13 bytes)
 
 From the previous parameter, the following is derived:
 
 * OSCORE option value: 0x0914 (2 bytes)
-* ciphertext: 0x6be9214aad448260ff1be1f594 (13 bytes)
+* ciphertext: 0x1103eba88aee253823fe52f14b (13 bytes)
 
 From there:
 
-* Protected CoAP request (OSCORE message): 0x44023bfc000066ef396c6f63616c686f7374d2050914ff6be9214aad448260ff1be1f594 (36 bytes)
+* Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f63616c686f7374d2050914ff1103eba88aee253823fe52f14b (36 bytes)
+
+## Test Vector 4: OSCORE Request, Client
+
+This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path option.
+
+Unprotected CoAP request: 0x440171c30000b932396c6f63616c686f737483747631 (22 bytes)
+
+Common Context:
+
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
+* Key Derivation Function: HKDF SHA-256
+* Common IV: 0x64e3ff1cdc31cb040c048396f3 (13 bytes)
+
+Sender Context:
+
+* Sender ID: 0x00 (1 bytes)
+* Sender Key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
+* Sender Sequence Number: 20
+
+The following COSE and cryptographic parameters are derived:
+
+* Partial IV: 0x14 (1 byte)
+* kid: 0x00 (1 byte)
+* external_aad: 0x8501810a4100411440 (9 bytes)
+* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* plaintext: 0x01b3747631 (5 bytes)
+* encryption key: 0xf8f3b887436285ed5a66f6026ac2cdc1 (16 bytes)
+* nonce: 0x65e3ff1cdc31cb040c048396e7 (13 bytes)
+
+From the previous parameter, the following is derived:
+
+* OSCORE option value: 0x091400 (3 bytes)
+* ciphertext: 0xf529dfd94c8c26b8fe1628a839 (13 bytes)
+
+From there:
+
+* Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f63616c686f7374d305091400fff529dfd94c8c26b8fe1628a839 (37 bytes)
 
 ## Test Vector 5: OSCORE Response, Server
 
 This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV. Note that some parameters are derived from the request.
 
-Unprotected CoAP response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
+Unprotected CoAP response: 0x644539f80000b421ff48656c6c6f20576f726c6421 (21 bytes)
 
 Common Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Common IV: 0x9091b60715f92b3de49a011911 (13 bytes)
 
 Sender Context:
 
 * Sender ID: 0x01 (1 byte)
-* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
+* Sender Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
 * Sender Sequence Number: 0
 
 The following COSE and cryptographic parameters are derived:
 
-* external_aad: 0x8501810a4100411440 (9 bytes)
-* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* external_aad: 0x8501810a40411440 (8 bytes)
+* AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 * plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
-* encryption key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
-* nonce: 0xd0a1949aa253278f34c528d2d8 (13 bytes)
+* encryption key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
+* nonce: 0x9091b60715f92b3de49a011905 (13 bytes)
 
 From the previous parameter, the following is derived:
 
 * OSCORE option value: 0x (0 bytes)
-* ciphertext: 0xe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (22 bytes)
+* ciphertext: 0x4e4f25d4179124f8f35a7c84b7bd989d0f063c5667fd (22 bytes)
 
 From there:
 
-* Protected CoAP response (OSCORE message): 0x64446dd30000acc5d008ffe4e8c28c41c8f31ca56eec24f6c71d94eacbcdffdc6d (33 bytes)
+* Protected CoAP response (OSCORE message): 0x644439f80000b421d008ff4e4f25d4179124f8f35a7c84b7bd989d0f063c5667fd (33 bytes)
 
 ##  Test Vector 6: OSCORE Response with Partial IV, Server
 
 This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV. Note that some parameters are derived from the request.
 
-Unprotected CoAP response: 0x644549c60000f2a7ff48656c6c6f20576f726c6421 (21 bytes)
+Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
 Common Context:
 
 * AEAD Algorithm: 10 (AES-CCM-16-64-128)
 * Key Derivation Function: HKDF SHA-256
-* Common IV: 0xd1a1949aa253278f34c528d2cc (13 bytes)
+* Common IV: 0x9091b60715f92b3de49a011911 (13 bytes)
 
 Sender Context:
 
 * Sender ID: 0x01 (1 byte)
-* Sender Key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
+* Sender Key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
 * Sender Sequence Number: 0 
 
 The following COSE and cryptographic parameters are derived:
 
 * Partial IV: 0x00 (1 byte)
-* external_aad: 0x8501810a4100411440 (9 bytes)
-* AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+* external_aad: 0x8501810a40411440 (8 bytes)
+* AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 * plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
-* encryption key: 0xd904cb101f7341c3f4c56c300fa69941 (16 bytes)
-* nonce: 0xd0a1949aa253278e34c528d2cc (13 bytes)
+* encryption key: 0xe534a26a64aa3982e988e31f1e401e65 (16 bytes)
+* nonce: 0x9091b60715f92b3de49a011905 (13 bytes)
 
 From the previous parameter, the following is derived:
 
 * OSCORE option value: 0x0100 (2 bytes)
-* ciphertext: 0xa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (22 bytes)
+* ciphertext: 0xf27bab77519d76e016c03a4c4e6b1dd5f371d3e690ae (22 bytes)
 
 From there:
 
-* Protected CoAP response (OSCORE message): 0x64442b130000b29ed2080100ffa7e3ca27f221f453c0ba68c350bf652ea096b328a1bf (35 bytes)
+* Protected CoAP response (OSCORE message): 0x64445d1f00003974d2080100fff27bab77519d76e016c03a4c4e6b1dd5f371d3e690ae (35 bytes)
 
 # Overview of Security Properties {#overview-sec-properties}
 
