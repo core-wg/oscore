@@ -1813,7 +1813,7 @@ From there:
 
 This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv3}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV. Note that some parameters are derived from the request.
 
-Unprotected CoAP response: 0x644539f80000b421ff48656c6c6f20576f726c6421 (21 bytes)
+Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
 Common Context:
 
@@ -1842,7 +1842,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP response (OSCORE message): 0x644439f80000b421d008ff4e4f25d4179124f8f35a7c84b7bd989d0f063c5667fd (33 bytes)
+* Protected CoAP response (OSCORE message): 0x64445d1f00003974d008ff4e4f25d4179124f8f35a7c84b7bd989d0f063c5667fd (33 bytes)
 
 ##  Test Vector 6: OSCORE Response with Partial IV, Server
 
