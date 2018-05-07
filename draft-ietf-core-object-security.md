@@ -465,25 +465,32 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}, in which case the Observe related processing can be omitted. 
 
-OSCORE supports a reduced set of {{RFC7641}} operations performed in intermediary nodes. The use of Observe targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through any intermediate node, as illustrated in Figure 8 of {{RFC7641}}). 
+OSCORE supports a reduced set of {{RFC7641}} operations performed in intermediary nodes as specified in this section. The use of Observe targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through any intermediate node, as illustrated in Figure 8 of {{RFC7641}}). 
 
-Inner Observe is used in all OSCORE protected Observe messages to be able to securely communicate the message intent between the endpoints. Outer Observe is used to support a selected set of intermediate node operations that are useful while maintaining end-to-end security. Intermediary nodes MUST copy the OSCORE option in the next hop request unchanged.
+Inner Observe is used by default to protect the value of the Observe option between the endpoints. Outer Observe is additionally used to support a selected set of intermediate node operations that are useful while maintaining end-to-end security. Intermediary nodes MUST copy the OSCORE option in the next hop request unchanged.
 
 In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
 
-The client MUST set both Inner and Outer Observe to the same value in the request. In order to support the case of an intermediary node changing a registration request (Observe 0) to a non-Observe request, the server MUST only consider the received message a registration request if both Inner and Outer Observe are set to 0. 
+##### Registration, re-registration and cancellation
+
+The client MUST set both Inner and Outer Observe to the same value in the request. In order to support the case of an intermediary node ignoring a registration request (Observe 0) and instead processing a non-Observe request (Section 2 of {{RFC7641}}), the server MUST only consider the received message a registration request if both Inner and Outer Observe are set to 0. 
+
+Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, not only the ETags, but also the Partial IV (and thus the payload and OSCORE option) change. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
+
+Since intermediaries are not assumed to have a security context with the server, cancellation or re-registration of an observation initiated by an intermediary node is not supported.
+
+  * Cancellation of observation by an intermediary using the Reset message as response to a notification can still be applied.  
+  * An intermediary node may forward a re-registration message, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server which, depending on action, may result in a termination of the observation in proxy or client. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. A server MAY respond to a replayed registration request with a cached notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
 
 Note that OSCORE is compliant with the requirement that a client must not register more than once for the same target resource (see Section 3.1 of {{RFC7641}}) since the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE.
 
-Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, not only the ETags, but also the Partial IV (and thus the payload and OSCORE option) change. The server uses the new request's Partial IV as the 'request_piv' of new responses. 
+##### Notifications
 
-Observe re-registration originating in an intermediary is not supported. If a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server which, depending on action, may result in a temination of the observation in proxy or client. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. A server MAY respond to a replayed registration request with a cached notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request.
+If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-protection}}.
+The Inner Observe in a response MUST either have the value of Observe in the original CoAP message or be empty. The former is used to allow the server to set the Observe values to be received by the client. In the latter case the overhead of the Observe value is saved and instead the least significant bytes of the Partial IV is used as Observe value, see {{replay-notifications}}. The Outer Observe in the response may be needed for intermediary nodes to support multiple responses to one request. The client MAY ignore the Outer Observe value.
 
-Inner Observe MUST either have the value of Observe in the original CoAP message or be empty. Outer Observe may be needed for intermediary nodes to support multiple responses to one request. The client MAY ignore the Outer Observe value.
-
-If the client receives a response to an Observe request without an Outer Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Outer Observe value, it stops processing the message, as specified in {{ver-res}}.
+If the client receives a response to an Observe request without an Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Observe value, then it stops processing the message but keeps the observation alive, as specified in {{ver-res}}.
 
 
 #### No-Response {#no-resp}
@@ -880,15 +887,15 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
-###  Replay Protection of Notifications
+###  Replay Protection of Notifications {#replay-notifications}
 
-The following applies when Observe is supported.
+The following applies additionally when Observe is supported.
 
 The Notification Number is initialized to the Partial IV of the first successfully received notification response to the registration request.  A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
 If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The operation of validating the Partial IV and updating the replay protection data MUST be atomic. If the Inner Observe option is empty, then the client SHALL copy the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing.
 
-If the Partial IV is less than or equal to the Notification Number, then the client SHALL stop processing the response.
+If the Partial IV is less than or equal to the Notification Number, then the client SHALL stop processing the response but not cancel the observation.
 
 
 ## Losing Part of the Context State {#context-state}
@@ -919,7 +926,7 @@ If the server using the Echo option can verify a second request as fresh, then t
 
 To prevent accepting replay of previously received notifications, the client may perform the following procedure after boot:
 
-* The client rejects notifications bound to the earlier registration, removes all Notification Numbers and re-registers using Observe.
+* The client forgets about earlier registrations, removes all Notification Numbers and re-registers using Observe.
 
 # Processing {#processing}
 
@@ -980,13 +987,13 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is implemented:
 
-Insert the following before step 1 in {{ver-req}}:
+Insert the following step before step 1 in {{ver-req}}:
 
-A. Note if the Outer Observe option is not present. 
+A. Check if the Outer Observe option is present and has value zero.
 
 Insert the following step between step 6 and 7 of {{ver-req}}:
 
-B. If Inner Observe is zero and Outer Observe option was not present then remove the Observe option. 
+B. If Inner Observe is present and has value zero, and Outer option is either not present or has not value 0, then remove the Observe option. 
 
 
 ## Protecting the Response {#prot-res}
@@ -1058,11 +1065,6 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is implemented:
 
-In step 5:
-
-A client MUST NOT react to failure in step 5 by re-registering the observation immediately. An error condition occurring while processing a response in an observation does not cancel the observation.
-
-
 Replace step 6 of {{ver-res}} with:
 
 A. If Inner Observe is present then:
@@ -1071,10 +1073,13 @@ A. If Inner Observe is present then:
  
 *  If the Partial IV was not present in the response, then go to 9.
      
-*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number, and follow the processing described in {{replay-protection}}. 
+*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number, and follow the processing described in {{replay-notifications}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
 
-Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+Replace step 9 of {{ver-res}} with:
 
+B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+
+Note that the attribute-value attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or "forgotten".
 
 
 # Web Linking
