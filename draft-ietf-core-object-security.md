@@ -950,7 +950,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 A server receiving a request containing the OSCORE option SHALL perform the following steps:
 
-1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
+1. Discard Code and all options which may have a class E value (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
 2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
