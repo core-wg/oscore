@@ -1922,7 +1922,7 @@ This section lists and discusses issues with unprotected message fields.
 
 ### CoAP Code {#sec-coap-code}
 
-The CoAP Code of an OSCORE message is by default POST or FETCH for requests and with corresponding response codes. Since the use of Observe in intermediaries is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe messages. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. 
+The CoAP Code of an OSCORE message is POST or FETCH for requests and with corresponding response codes. Since the use of Observe in intermediaries is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe messages. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. 
 
 ### CoAP Header Fields {#sec-coap-headers}
 
