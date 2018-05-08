@@ -477,10 +477,9 @@ The client MUST set both Inner and Outer Observe to the same value in the reques
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, not only the ETags, but also the Partial IV (and thus the payload and OSCORE option) change. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
 
-Since intermediaries are not assumed to have a security context with the server, cancellation or re-registration of an observation initiated by an intermediary node is not supported.
+Since intermediaries are not assumed to have a security context with the server, cancellation of an observation originating in an intermediary node is not supported. Cancellation of observation by an intermediary using the Reset message as response to a notification is specified in Section 3.6 of {{RFC7641}}. 
 
-  * Cancellation of observation by an intermediary using the Reset message as response to a notification can still be applied.  
-  * An intermediary node may forward a re-registration message, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server which, depending on action, may result in a termination of the observation in proxy or client. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. A server MAY respond to a replayed registration request with a cached notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
+Furthermore re-registration originating in an intermediary node is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
 
 Note that OSCORE is compliant with the requirement that a client must not register more than once for the same target resource (see Section 3.1 of {{RFC7641}}) since the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE.
 
@@ -490,7 +489,7 @@ If the server accepts an Observe registration, a Partial IV MUST be included in 
 
 The Inner Observe in a response MUST either have the value of Observe in the original CoAP message or be empty. The former is used to allow the server to set the Observe values to be received by the client. In the latter case the overhead of the Observe value is saved and instead the least significant bytes of the Partial IV is used as Observe value, see {{replay-notifications}}. The Outer Observe in the response may be needed for intermediary nodes to support multiple responses to one request. The client MAY ignore the Outer Observe value.
 
-If the client receives a response to an Observe request without an Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Observe value, then it stops processing the message but keeps the observation alive, as specified in {{ver-res}}.
+If the client receives a response to an Observe request without an Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Observe value, then it stops processing the message, as specified in {{ver-res}}.
 
 
 #### No-Response {#no-resp}
@@ -1075,7 +1074,7 @@ A. If Inner Observe is present then:
 
 Replace step 9 of {{ver-res}} with:
 
-B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response in an observation does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
 Note that the attribute-value attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or "forgotten".
 
