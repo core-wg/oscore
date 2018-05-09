@@ -935,7 +935,7 @@ To prevent accepting replay of previously received notifications, the client may
 
 # Processing {#processing}
 
-This section describes the OSCORE message processing, and the necessary modified processing in case Observe or Block-wise are implemented.
+This section describes the OSCORE message processing. Additional processing for Observe or Block-wise are described in subsections.
 
 ## Protecting the Request {#prot-req}
 
@@ -984,13 +984,13 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 ### Supporting Block-wise
 
-If Block-wise is implemented, insert the following step before step 1 of {{ver-req}}:
+If Block-wise is supported, insert the following step before step 1 of {{ver-req}}:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 ### Supporting Observe {#observe-ver-req}
 
-If Observe is implemented:
+If Observe is supported:
 
 Insert the following step before step 1 in {{ver-req}}:
 
@@ -1020,7 +1020,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 ### Supporting Observe {#observe-prot-res}
 
-If Observe is implemented:
+If Observe is supported:
 
 Replace step 3 in {{prot-res}} with:
 
@@ -1062,13 +1062,13 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 ### Supporting Block-wise
 
-If Block-wise is implemented, insert the following step before step 1 of {{ver-res}}:
+If Block-wise is supported, insert the following step before step 1 of {{ver-res}}:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 ### Supporting Observe {#observe-ver-res}
 
-If Observe is implemented:
+If Observe is supported:
 
 Replace step 6 of {{ver-res}} with:
 
