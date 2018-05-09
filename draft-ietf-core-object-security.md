@@ -479,8 +479,6 @@ The client SHALL set both Inner and Outer Observe to the same value in the reque
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, the Partial IV changes and so does the payload and the OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
 
-Note that OSCORE is compliant with the requirement that a client must not register more than once for the same target resource (see Section 3.1 of {{RFC7641}}) since the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE, and the FETCH payload which contains the ciphertext.
-
 Intermediaries are not assumed to have a security context with the server, so the server cannot verify operations originated by the intermediary. This has motivated the following limitations and work-arounds.
 
    * An intermediary polling an endpoint and transforming responses to Observe notifications (see figure 7 of RFC7641) is not supported.
