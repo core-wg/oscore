@@ -479,12 +479,12 @@ The client SHALL set both Inner and Outer Observe to the same value in the reque
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, the Partial IV changes and so does the payload and the OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
 
-Intermediaries are not assumed to have a security context with the server, so the server cannot verify operations originated by the intermediary. This has motivated the following limitations and work-arounds.
+Intermediaries are not assumed to have a security context for an endpoint. This has motivated the following limitations and work-arounds:
 
-   * An intermediary polling an endpoint and transforming responses to Observe notifications (see figure 7 of RFC7641) is not supported.
-
-   * An intermediary cancelling an observation by originating an Observe with value 1 is not supported. An intermediary node may forward a cancellation message originating in the client. An intermediary may cancel an observation using the Reset message as response to a notification as specified in Section 3.6 of {{RFC7641}}. 
-
+   * An intermediary node originating polling of an endpoint and transforming responses to Observe notifications (see figure 7 of {{RFC7641}}) is not supported. The proxy does not have the security context to request a representation that is protected such that the client would be able to verify it.
+   
+   * An intermediary node cancelling an observation without the OSCORE option, e.g. by originating an Observe with value 1, or using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) is out of scope for this document. How the server processes such a message is dependent on application and may also depend on other things such as if there is hop-by-hop security between the intermediary node and the server.
+   
    * An intermediary re-registrating by originating an Observe with value 0 is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
 
 
