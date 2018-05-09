@@ -473,23 +473,29 @@ In order to support Observe processing in OSCORE-unaware intermediaries, for mes
 
 ##### Registration, re-registration and cancellation {#observe-registration}
 
-The client MUST set both Inner and Outer Observe to the same value in the request. In order to support the case of an intermediary node ignoring a registration request (Observe 0) and instead processing a non-Observe request (Section 2 of {{RFC7641}}), the server MUST only consider the received message a registration request if both Inner and Outer Observe are set to 0. 
+The client MUST set both Inner and Outer Observe to the same value in the request. The presence and value of the Inner Observe decides if this is processed as a registration request, a cancellation request or a normal request, with one exception: In order to support the case of an intermediary node ignoring a registration request (Observe with value 0) and instead processing a non-Observe request (Section 2 of {{RFC7641}}), the server MUST only consider the received message a registration request if both Inner and Outer Observe are set to 0. 
 
-Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, not only the ETags, but also the Partial IV (and thus the payload and OSCORE option) change. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
+Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, the Partial IV changes and so does the payload and the OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
 
-Since intermediaries are not assumed to have a security context with the server, cancellation of an observation originating in an intermediary node is not supported. Cancellation of observation by an intermediary using the Reset message as response to a notification is specified in Section 3.6 of {{RFC7641}}. 
+Note that OSCORE is compliant with the requirement that a client must not register more than once for the same target resource (see Section 3.1 of {{RFC7641}}) since the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE, and the FETCH payload which contains the ciphertext.
 
-Furthermore re-registration originating in an intermediary node is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
+Intermediaries are not assumed to have a security context with the server, so the server cannot verify operations originated by the intermediary. This has motivated the following limitations and work-arounds.
 
-Note that OSCORE is compliant with the requirement that a client must not register more than once for the same target resource (see Section 3.1 of {{RFC7641}}) since the target resource for Observe registration is identified by all options in the request that are part of the Cache-Key, including OSCORE.
+   * An intermediary polling an endpoint and transforming responses to Observe notifications (see figure 7 of RFC7641) is not supported.
+
+   * An intermediary cancelling an observation by originating an Observe with value 1 is not supported. An intermediary node may forward a cancellation message originating in the client. An intermediary may cancel an observation using the Reset message as response to a notification as specified in Section 3.6 of {{RFC7641}}. 
+
+   * An intermediary re-registrating by originating an Observe with value 0 is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
+
+
 
 ##### Notifications
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-The Inner Observe in a response MUST either have the value of Observe in the original CoAP message or be empty. The former is used to allow the server to set the Observe values to be received by the client. In the latter case the overhead of the Observe value is saved and instead the least significant bytes of the Partial IV is used as Observe value, see {{replay-notifications}}. The Outer Observe in the response may be needed for intermediary nodes to support multiple responses to one request. The client MAY ignore the Outer Observe value.
+The Inner Observe in a response MUST either have the value of Observe in the original CoAP message or be empty. The former is used to allow the server to set the Observe values to be received by the client. In the latter case the overhead of the Observe value is saved and instead the least significant bytes of the Partial IV is used as Observe value, see {{replay-notifications}}. The Outer Observe in the response may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client MAY ignore the Outer Observe value.
 
-If the client receives a response to an Observe request without an Observe value, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Observe value, then it stops processing the message, as specified in {{ver-res}}.
+If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
 
 #### No-Response {#no-resp}
@@ -1884,7 +1890,7 @@ OSCORE depends on a pre-established random Master Secret ({{master-secret}}) use
 
 * Request-response binding: An attacker should not be able to make a client match a response to the wrong request.
 
-* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. (This property is explicitly disabled by certain Observe requests, see {{unprot-fields}}.)
+* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
 
 In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
 
