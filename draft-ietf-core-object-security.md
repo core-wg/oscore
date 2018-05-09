@@ -473,7 +473,9 @@ In order to support Observe processing in OSCORE-unaware intermediaries, for mes
 
 ##### Registration, re-registration and cancellation {#observe-registration}
 
-The client MUST set both Inner and Outer Observe to the same value in the request. The presence and value of the Inner Observe decides if this is processed as a registration request, a cancellation request or a normal request, with one exception: In order to support the case of an intermediary node ignoring a registration request (Observe with value 0) and instead processing a non-Observe request (Section 2 of {{RFC7641}}), the server MUST only consider the received message a registration request if both Inner and Outer Observe are set to 0. 
+The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe is 1, then the server SHALL process the message as a cancellation. If the Inner Observe is 0, then the processing depends on the Outer Observe.
+
+The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
 Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, the Partial IV changes and so does the payload and the OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new responses. 
 
