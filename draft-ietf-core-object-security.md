@@ -471,7 +471,7 @@ Inner Observe is used by default to protect the value of the Observe option betw
 
 In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
 
-##### Registration, re-registration and cancellation {#observe-registration}
+##### Registration, Re-registration and Cancellation {#observe-registration}
 
 The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe is 1, then the server SHALL process the message as a cancellation. If the Inner Observe is 0, then the processing depends on the Outer Observe.
 
