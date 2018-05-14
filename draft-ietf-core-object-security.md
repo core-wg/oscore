@@ -1106,15 +1106,27 @@ RES: 2.05 Content
 
 # CoAP-to-CoAP Forwarding Proxy {#coap-coap-proxy}
 
-CoAP is designed for proxy operations (see Section 5.7 of {{RFC7252}}). Security requirements for forwarding are presented in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. 
+CoAP is designed for proxy operations (see Section 5.7 of {{RFC7252}}). 
 
-OSCORE is designed to work with OSCORE-unaware CoAP proxies. Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of legacy proxies, OSCORE defines special Max-Age processing, see {{max-age}}. An OSCORE-aware proxy SHOULD NOT cache a response to a request with an OSCORE option
+OSCORE is designed to work with OSCORE-unaware CoAP proxies. Security requirements for forwarding are listed in Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}. Proxy processing of the (Outer) Proxy-Uri option works as defined in {{RFC7252}}. Proxy processing of the (Outer) Block options works as defined in {{RFC7959}}.
 
-Proxy processing of the (Outer) Proxy-Uri option is as defined in {{RFC7252}}.
+However, not all CoAP proxy operations are useful: 
 
-Proxy processing of the (Outer) Block options is as defined in {{RFC7959}}.
+* Since a CoAP response is only applicable to the original CoAP request, caching is in general not useful. In support of existing proxies, OSCORE uses the outer Max-Age option, see {{max-age}}.
 
-Proxy processing of the (Outer) Observe option is as defined in {{RFC7641}}. OSCORE-aware proxies may look at the Partial IV value instead of the Outer Observe option.
+* Proxy processing of the (Outer) Observe option as defined in {{RFC7641}} is specified in {{observe}}. 
+
+Optionally, a CoAP proxy may be aware of OSCORE and act accordingly:
+
+* If the OSCORE option is present in a request, bypass all caching for that request
+* Avoid caching responses to requests with an OSCORE option.
+
+An OSCORE-aware CoAP proxy may align the Observe processing (see {{observe}}):
+
+* Never initiate an Observe registration, only forward registration requests made by a client.
+* Optionally, verify order of notifications using Partial IV rather than the Observe option.
+
+
 
 # HTTP Operations {#http-op}
 
