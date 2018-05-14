@@ -409,7 +409,7 @@ Some options require special processing as specified in this section.
 
 An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in {{inner-options}}.
 
-An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses, which are described in {{replay-protection}}, {{ver-req}} and {{ver-res}}. Such message field is then processed according to {{outer-options}}.
+An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses, which are described in {{replay-protection}}, {{ver-req}} and {{ver-res}}. Such message field is then processed according to {{outer-options}}.
 
 Successful OSCORE responses do not need to include an Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
@@ -485,7 +485,7 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
    
    * An intermediary node cancelling an observation without the OSCORE option, e.g. by originating an Observe with value 1, or using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) is out of scope for this document. How the server processes such a message is dependent on application and may also depend on other things such as if there is hop-by-hop security between the intermediary node and the server.
    
-   * An intermediary re-registrating by originating an Observe with value 0 is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
+   * An intermediary re-registrating by originating an Observe with value 0 is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE-aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
 
 
 
@@ -500,13 +500,10 @@ If the client receives a response to an Observe request without an Inner Observe
 
 #### No-Response {#no-resp}
 
-No-Response {{RFC7967}} is an optional feature. Clients using No-Response MUST set both an Inner (Class E) and an Outer (Class U) No-Response option, with the same value.
+No-Response {{RFC7967}} is an optional feature used by the client to communicate its disinterest in certain classes of responses to a particular request. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7967}}. 
 
-The Inner No-Response option is used to communicate to the server the client's disinterest in certain classes of responses to a particular request. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. 
+If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD not be present. The server SHALL ignore the Outer option. The client MAY set the Outer to 26 ('suppress all known codes') if the Inner is set to 26. The client MUST be prepared to receive and discard 5.04 (Gateway Timeout) from intermediaries potentially resulting from destination time out due to no response.
 
-The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. The Outer No-Response option is processed according to {{outer-options}}. 
-
-Applications should consider that a proxy may remove the Outer No-Response option from the request. Applications using No-Response can specify policies to deal with cases where servers receive an Inner No-Response option only, which may be the result of the request having traversed a No-Response unaware proxy, and update the processing in {{ver-res}} accordingly. This avoids unnecessary error responses to clients and bandwidth reductions to servers, due to No-Response unaware proxies. 
 
 #### OSCORE
 
