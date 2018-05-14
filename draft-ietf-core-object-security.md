@@ -287,7 +287,7 @@ where:
 
 * salt is the Master Salt as defined above
 * IKM is the Master Secret as defined above
-* info is a CBOR array consisting of:
+* info is a serialization of a CBOR array consisting of:
 
 ~~~~~~~~~~~ CDDL
    info = [
@@ -397,7 +397,7 @@ The sending endpoint SHALL include the Outer option message field present in the
 
 The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
 
-A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. Proxies MUST NOT change the order of option's occurrences, for options repeatable and of class I.
+A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. Specifications that introduce repeatable Class I options MUST specify that proxies MUST NOT change the order of the instances of such an option in the CoAP message.
 
 Note: There are currently no Class I option message fields defined.
 
@@ -1042,7 +1042,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 4. Compute the AEAD nonce
 
-    * If the Partial IV are not present in the response, the nonce from the request is used.
+    * If the Partial IV is not present in the response, the nonce from the request is used.
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
@@ -1536,17 +1536,17 @@ Client  Proxy  Server
   |       |<------+            Code: 2.04 (Changed)
   |       |  2.04 |           Token: 0x7b
   |       |       |          OSCORE: -
-  |       |       |         Payload: {Code:2.05, "OFF"}
+  |       |       |         Payload: {Code:2.05, "0"}
   |       |       |
   |<------+       |            Code: 2.04 (Changed)
   |  2.04 |       |           Token: 0x8c
   |       |       |          OSCORE: -
-  |       |       |         Payload: {Code:2.05, "OFF"}
+  |       |       |         Payload: {Code:2.05, "0"}
   |       |       |
 ~~~~~~~~~~~
 {: #fig-alarm title="Secure Access to Sensor. Square brackets [ ... ] indicate content of compressed COSE object. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Changed) are visible in the header of the OSCORE message. The option Uri-Path ("alarm_status") and payload ("OFF") are encrypted.
+The request/response Codes are encrypted by OSCORE and only dummy Codes (POST/Changed) are visible in the header of the OSCORE message. The option Uri-Path ("alarm_status") and payload ("0") are encrypted.
 
 The COSE header of the request contains an identifier (5f), indicating which security context was used to protect the message and a Partial IV (42). 
 
