@@ -465,27 +465,28 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}, in which case the Observe related processing can be omitted. 
 
-OSCORE supports a reduced set of {{RFC7641}} operations performed in intermediary nodes as specified in this section. The use of Observe targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through any intermediate node, as illustrated in Figure 8 of {{RFC7641}}). 
+OSCORE supports a subset of {{RFC7641}} operations performed in intermediary nodes as specified in this section. The use of Observe targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through any intermediate node, as illustrated in Figure 8 of {{RFC7641}}). 
 
 Inner Observe is used by default to protect the value of the Observe option between the endpoints. Outer Observe is additionally used to support a selected set of intermediate node operations that are useful while maintaining end-to-end security. Intermediary nodes MUST copy the OSCORE option in the next hop request unchanged.
 
 In order to support Observe processing in OSCORE-unaware intermediaries, for messages with the Observe option the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
 
-##### Registration, Re-registration and Cancellation {#observe-registration}
+##### Registrations and Cancellations {#observe-registration}
 
 The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe is 1, then the server SHALL process the message as a cancellation. If the Inner Observe is 0, then the processing depends on the Outer Observe.
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-Clients can re-register observations to ensure that the observation is still active and establish freshness again ({{RFC7641}} Section 3.3.1). When an OSCORE protected observation is refreshed, the Partial IV changes and so does the payload and the OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
+If a client issues a new GET request with the same Token (see Section 3.3.1 of {{RFC7641}}), then the Partial IV is changed, and so are the payload and OSCORE option. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
 
-Intermediaries are not assumed to have a security context for an endpoint. This has motivated the following limitations and work-arounds:
+Intermediaries are not assumed to have a security context for an endpoint. This has the following limitations and consequences:
 
-   * An intermediary node originating polling of an endpoint and transforming responses to Observe notifications (see figure 7 of {{RFC7641}}) is not supported. The proxy does not have the security context to request a representation that is protected such that the client would be able to verify it.
+   * An intermediary node transforming a normal response into an Observe notification (see figure 7 of {{RFC7641}}) is not supported. The intermediary does not have the security context to request a representation that the client would be able to verify as coming from the server.
    
-   * An intermediary node cancelling an observation without the OSCORE option, e.g. by originating an Observe with value 1, or using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) is out of scope for this document. How the server processes such a message is dependent on application and may also depend on other things such as if there is hop-by-hop security between the intermediary node and the server.
+   * An intermediary node initiating a registration (Observe with value 0) is not supported. The intermediary does not have the security context to generate the registration request that the server would be able to verify as coming from the client. If a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
    
-   * An intermediary re-registrating by originating an Observe with value 0 is not supported. An intermediary node may forward a re-registration message originating in the client, but if a proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in a cancellation of the registration, a server MAY respond to a replayed registration request with a cached notification. An OSCORE-aware intermediary SHALL NOT initiate re-registrations of observations. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request. 
+   * An intermediary node initiating a deregistering -- e.g. by initiating GET Observe with value 1, or by using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) -- may or may not be supported dependent on application, but is out of scope since it does not involve the OSCORE option. The server processing may e.g. depend on if there is hop-by-hop security between the intermediary node and the server.
+
 
 
 
@@ -493,7 +494,7 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-The Inner Observe in a notification MUST be empty. The three least significant bytes of the Partial IV is used as Observe value, see {{replay-notifications}}. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client SHALL ignore the Outer Observe value.
+The server SHALL set Inner Observe without value. The client SHALL use the three least significant bytes of the Partial IV as the Observe value, see {{replay-notifications}}. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client SHALL ignore the Outer Observe value.
 
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
@@ -922,11 +923,11 @@ To prevent accepting replay of previously received requests, the server may perf
 
 If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
-### Re-registration of Observations
+### Replay of Notifications
 
 To prevent accepting replay of previously received notifications, the client may perform the following procedure after boot:
 
-* The client forgets about earlier registrations, removes all Notification Numbers and re-registers using Observe.
+* The client forgets about earlier registrations, removes all Notification Numbers and registers using Observe.
 
 # Processing {#processing}
 
@@ -1113,15 +1114,15 @@ However, not all CoAP proxy operations are useful:
 
 * Proxy processing of the (Outer) Observe option as defined in {{RFC7641}} is specified in {{observe}}. 
 
-Optionally, a CoAP proxy may be aware of OSCORE and act accordingly:
+Optionally, a CoAP proxy MAY detect OSCORE and act accordingly. An OSCORE-aware CoAP proxy:
 
-* If the OSCORE option is present in a request, bypass all caching for that request
-* Avoid caching responses to requests with an OSCORE option.
+* SHALL bypass caching for the request if the OSCORE option is present
+* SHOULD avoid caching responses to requests with an OSCORE option
 
-An OSCORE-aware CoAP proxy may align the Observe processing (see {{observe}}):
+In the case of Observe (see {{observe}}) the OSCORE-aware CoAP proxy:
 
-* Never initiate an Observe registration, only forward registration requests made by a client.
-* Optionally, verify order of notifications using Partial IV rather than the Observe option.
+* SHALL NOT initiate an Observe registration
+* MAY verify the order of notifications using Partial IV rather than the Observe option
 
 
 
