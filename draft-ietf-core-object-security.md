@@ -494,7 +494,7 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-The server SHALL set Inner Observe without value. The client SHALL use the three least significant bytes of the Partial IV as the Observe value, see {{replay-notifications}}. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client SHALL ignore the Outer Observe value.
+The server SHALL set Inner Observe without value. The client uses the three least significant bytes of the Partial IV as the Observe value, see {{replay-notifications}}. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client SHALL ignore the Outer Observe value.
 
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
@@ -894,9 +894,9 @@ Responses (with or without Partial IV) are protected against replay as they are 
 
 The following applies additionally when Observe is supported.
 
-The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request.  A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
+The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
-If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The operation of validating the Partial IV and updating the replay protection data MUST be atomic. If the Inner Observe option is empty, then the client SHALL copy the least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing.
+If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The operation of validating the Partial IV and updating the replay protection data MUST be atomic. The client SHALL copy the three least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing.
 
 If the Partial IV is less than or equal to the Notification Number, then the client SHALL stop processing the notification but not cancel the observation.
 
