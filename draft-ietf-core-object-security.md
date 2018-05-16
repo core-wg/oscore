@@ -990,11 +990,11 @@ If Observe is supported:
 
 Insert the following step before step 1 in {{ver-req}}:
 
-A. Check if the Outer Observe option is present and has value zero.
+A. Check if the Outer Observe option is present and has value zero, and if so store this information.
 
 Insert the following step between step 6 and 7 of {{ver-req}}:
 
-B. If Inner Observe is present and has value zero, and Outer option is either not present or has not value 0, then remove the Observe option. 
+B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option. 
 
 
 ## Protecting the Response {#prot-res}
