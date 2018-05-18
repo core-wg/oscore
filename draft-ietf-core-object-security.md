@@ -490,13 +490,15 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
    
    * An intermediary node initiating a deregistering -- e.g. by initiating GET Observe with value 1, or by using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) -- may or may not be supported dependent on application, but is out of scope since it does not involve the OSCORE option. The server processing may e.g. depend on if there is hop-by-hop security between the intermediary node and the server.
 
-##### Notifications
+##### Notifications {#notifications}
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-For notifications, the Inner Observe MUST be empty (see section 3.2 of {{RFC7252}}). The client recognizes and discards old notifications by comparing their Partial IVs to the Notification Number, and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
+For notifications, the Inner Observe MUST be empty (see section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
    
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
+
+A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. In order to support existing Observe implementations the OSCORE client implementation MAY set the Observe value to the three least significant bytes of the Partial IV.
 
 
 #### No-Response {#no-resp}
@@ -896,9 +898,12 @@ The operation of validating the Partial IV and updating the replay protection da
 
 The following applies additionally when Observe is supported.
 
-The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
+The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. 
 
-A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival.  If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of Section 8.4).  The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number. 
+If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV.  
+
+Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
+
 
 ## Losing Part of the Context State {#context-state}
 
@@ -1073,11 +1078,13 @@ A. If Inner Observe is present then:
  
 *  If the Partial IV was not present in the response, then go to 9.
      
-*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number, and follow the processing described in {{replay-notifications}}. Otherwise, delete the attribute-value pair (Token, {Security Context, PIV}).
+*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notfications}} . 
+
+B. If Inner Observe is not present, then delete the attribute-value pair (Token, {Security Context, PIV}).
 
 Replace step 9 of {{ver-res}} with:
 
-B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+C. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
 Note that the attribute-value attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or "forgotten".
 
