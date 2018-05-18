@@ -292,6 +292,7 @@ where:
 ~~~~~~~~~~~ CDDL
    info = [
        id : bstr,
+       kid_context : bstr,
        alg_aead : int / tstr,
        type : tstr,
        L : uint
@@ -300,6 +301,8 @@ where:
 where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
+
+   * kid_context is an optional additional identifier of the security material, see {{context-hint}}.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
@@ -318,7 +321,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. To assign identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}) or a protocol that allows the parties to negotiate locally unique identifiers can be used. The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
 To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. If an endpoint has the same Recipient ID with different Recipient Contexts, i.e. the Recipient Contexts are derived from different keying material, then the endpoint may need to try multiple times before finding the right security context associated to the Recipient ID.
-The Client MAY provide a 'kid context' parameter ({{context-hint}}) to help the Server find the right context.
+The Client MAY provide a 'kid_context' parameter ({{context-hint}}) to help the Server find the right context.
 
 While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
@@ -578,7 +581,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
+   * Optionally, a 'kid_context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -586,22 +589,22 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The kid context parameter is used to provide such additional input. The kid context and kid are used to determine the security context, or to establish the necessary input parameters to derive the security context (see {{context-derivation}}). The application defines how this is done.
+For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The kid_context parameter is used to provide such additional input. The kid_context and kid are used to determine the security context, or to establish the necessary input parameters to derive the security context (see {{context-derivation}}). The application defines how this is done.
 
-The kid context is implicitly integrity protected, as a manipulation that leads to the wrong key (or no key) being retrieved results in an error, as described in {{ver-req}}.
+The kid_context is implicitly integrity protected, as a manipulation that leads to the wrong key (or no key) being retrieved results in an error, as described in {{ver-req}}.
 
-A summary of the COSE header parameter kid context defined above can be found in {{tab-1}}.
+A summary of the COSE header parameter kid_context defined above can be found in {{tab-1}}.
 
-Some examples of relevant uses of kid context are the following:
+Some examples of relevant uses of kid_context are the following:
 
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid context. The kid context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{master-salt-transport}}, or {{I-D.ietf-6tisch-minimal-security}}).
-* In case of a group communication scenario {{I-D.ietf-core-oscore-groupcomm}}, if the server belongs to multiple groups, then a group identifier can be used as kid context to enable the server to find the right security context.
+* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid_context. The kid_context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{master-salt-transport}}, or {{I-D.ietf-6tisch-minimal-security}}).
+* In case of a group communication scenario {{I-D.ietf-core-oscore-groupcomm}}, if the server belongs to multiple groups, then a group identifier can be used as kid_context to enable the server to find the right security context.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid    |  TBD2  | bstr       |                | Identifies the  |
+|   kid_   |  TBD2  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
@@ -705,7 +708,7 @@ The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE option and 
 
 ## Encoding of the OSCORE Option Value {#obj-sec-value}
 
-The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
+The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid_context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <--------- n bytes ------------->
@@ -715,7 +718,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 
  <- 1 byte -> <------ s bytes ----->                    
 +------------+----------------------+------------------+
-| s (if any) | kid context (if any) | kid (if any) ... |
+| s (if any) | kid_context (if any) | kid (if any) ... |
 +------------+----------------------+------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="The OSCORE Option Value" artwork-align="center"}
@@ -723,20 +726,20 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 * The first byte of flag bits encodes the following set of flags and the length of the Partial IV parameter:
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
+    - The fifth least significant bit is the kid_context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
+* The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
 
-* The following s bytes encode the kid context, if the kid context flag is set (h = 1).
+* The following s bytes encode the kid_context, if the kid_context flag is set (h = 1).
 
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1).
 
 Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
-The length of the OSCORE option thus depends on the presence and length of Partial IV, kid context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
+The length of the OSCORE option thus depends on the presence and length of Partial IV, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
 
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
@@ -796,7 +799,7 @@ This section covers a list of OSCORE Header Compression examples for requests an
 ~~~~~~~~~~~
 
 {: req}
-3. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
+3. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid_context = 0x44616c656b
 
 ~~~~~~~~~~~
     Before compression (30 bytes):
@@ -1392,9 +1395,9 @@ Note to IANA: Please note all occurrences of "TBDx" in this specification should
 
 ## COSE Header Parameters Registry
 
-The 'kid context' parameter is added to the "COSE Header Parameters Registry":
+The 'kid_context' parameter is added to the "COSE Header Parameters Registry":
 
-* Name: kid context
+* Name: kid_context
 * Label: TBD2
 * Value Type: bstr
 * Value Registry: 
@@ -1623,17 +1626,17 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistent storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
 
-Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid context parameter (see {{context-hint}}) of the request.
+Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid_context parameter (see {{context-hint}}) of the request.
 
-1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with kid context set to the Master Salt.
+1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with kid_context set to the Master Salt.
 
-2. The server, receiving an OSCORE request with a non-empty kid context derives the new security context using the received kid context as Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
+2. The server, receiving an OSCORE request with a non-empty kid_context derives the new security context using the received kid_context as Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
 
-3. The client, receiving a response with an Echo option to a request which used a new security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the kid context.
+3. The client, receiving a response with an Echo option to a request which used a new security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the kid_context.
 
-4. The server, receiving a request with a kid context and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error, then the new security context is established, and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
+4. The server, receiving a request with a kid_context and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error, then the new security context is established, and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
 
-If the server receives a request without kid context from a client with which no security context is established, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Security context not found". This could be the result of the server having lost its security context or that a new security context has not been successfully established, which may be a trigger for the client to run this procedure.
+If the server receives a request without kid_context from a client with which no security context is established, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Security context not found". This could be the result of the server having lost its security context or that a new security context has not been successfully established, which may be a trigger for the client to run this procedure.
 
 
 
