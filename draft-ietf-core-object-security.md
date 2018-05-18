@@ -890,16 +890,15 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
+The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
+
 ###  Replay Protection of Notifications {#replay-notifications}
 
 The following applies additionally when Observe is supported.
 
 The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
-If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number, then the client SHALL update the corresponding Notification Number with the received Partial IV. The operation of validating the Partial IV and updating the replay protection data MUST be atomic. The client SHALL copy the three least significant bytes of the Partial IV into the Observe option, before passing it to CoAP processing.
-
-If the Partial IV is less than or equal to the Notification Number, then the client SHALL stop processing the notification but not cancel the observation.
-
+A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival.  If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of Section 8.4.  The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number. 
 
 ## Losing Part of the Context State {#context-state}
 
