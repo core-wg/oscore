@@ -490,15 +490,12 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
    
    * An intermediary node initiating a deregistering -- e.g. by initiating GET Observe with value 1, or by using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) -- may or may not be supported dependent on application, but is out of scope since it does not involve the OSCORE option. The server processing may e.g. depend on if there is hop-by-hop security between the intermediary node and the server.
 
-
-
-
 ##### Notifications
 
-If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To secure the order of notifications, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
+If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protects against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-The server SHALL set Inner Observe without value. The client uses the three least significant bytes of the Partial IV as the Observe value, see {{replay-notifications}}. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries. The client SHALL ignore the Outer Observe value.
-
+The server SHALL set Inner Observe without value. The client recognizes and discards old notifications by comparing their Partial IVs to the Notification Number, and SHALL ignore the outer Observe value. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
+   
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
 
