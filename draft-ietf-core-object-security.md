@@ -537,7 +537,7 @@ Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are
 
 The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping on or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the sending endpoint writes an Outer Code to the OSCORE message. With one exeception (see {{observe}}) the Outer Code SHALL by default be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses. The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object plaintext ({{plaintext}}) into the decrypted CoAP message.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the sending endpoint writes an Outer Code to the OSCORE message. With one exeception (see {{observe}}) the Outer Code SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses. The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object plaintext ({{plaintext}}) into the decrypted CoAP message.
 
 The other currently defined CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
