@@ -473,7 +473,7 @@ In order to support Observe processing in OSCORE-unaware intermediaries, for mes
 
 ##### Registrations and Cancellations {#observe-registration}
 
-The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe is 1, then the server SHALL process the message as a cancellation. If the Inner Observe is 0, then the processing depends on the Outer Observe.
+The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe value is 1, then the server SHALL process the message as a cancellation. If the Inner Observe value is 0, then the processing depends on the Outer Observe.
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
