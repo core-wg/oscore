@@ -898,7 +898,7 @@ The following applies additionally when Observe is supported.
 
 The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV of a verified notification with the Notification Number associated to that Observe registration. In contrast to {{RFC7641}}, the received Partial IV MUST always be compared with the Notification Number, which thus MUST NOT be forgotten after 128 seconds.
 
-A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival.  If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of Section 8.4.  The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number. 
+A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival.  If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV (see step 7 of Section 8.4).  The client MUST stop processing notifications with a Partial IV which has been previously received. The client MAY process only notifications which have greater Partial IV than the Notification Number. 
 
 ## Losing Part of the Context State {#context-state}
 
