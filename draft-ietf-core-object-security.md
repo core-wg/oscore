@@ -953,7 +953,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 A server receiving a request containing the OSCORE option SHALL perform the following steps:
 
-1. Discard Code and all options which may have a class E value (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
+1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
 2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
@@ -1033,7 +1033,7 @@ A. Compute the AEAD nonce as described in {{nonce}}.
 
 A client receiving a response containing the OSCORE option SHALL perform the following steps:
 
-1. Discard Code and all options marked in {{fig-option-protection}} with 'x' in column E, present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
+1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
 2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
 
