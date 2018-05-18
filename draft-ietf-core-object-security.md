@@ -292,7 +292,6 @@ where:
 ~~~~~~~~~~~ CDDL
    info = [
        id : bstr,
-       kid_context : bstr,
        alg_aead : int / tstr,
        type : tstr,
        L : uint
@@ -301,8 +300,6 @@ where:
 where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
-
-   * kid_context is an optional additional identifier of the security material, see {{context-hint}}.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
