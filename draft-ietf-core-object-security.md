@@ -895,11 +895,9 @@ The operation of validating the Partial IV and updating the replay protection da
 
 The following applies additionally when Observe is supported.
 
-The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. 
+The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
 
 If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV.  
-
-Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
 
 
 ## Losing Part of the Context State {#context-state}
@@ -1067,9 +1065,13 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is supported:
 
+Insert a step between step 2 and step 3:
+
+A. If the request was a registration and the response has a Partial IV, verify for replay as specified in {{replay-notifications}}.
+
 Replace step 6 of {{ver-res}} with:
 
-A. If Inner Observe is present then:
+B. If Inner Observe is present then:
 
 *  If the request was not an Observe registration, then go to 9.
  
@@ -1077,11 +1079,11 @@ A. If Inner Observe is present then:
      
 *  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notfications}} . 
 
-B. If Inner Observe is not present, then delete the attribute-value pair (Token, {Security Context, PIV}).
+C. If Inner Observe is not present, then delete the attribute-value pair (Token, {Security Context, PIV}).
 
 Replace step 9 of {{ver-res}} with:
 
-C. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+D. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
 Note that the attribute-value attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or "forgotten".
 
