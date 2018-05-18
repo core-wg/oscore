@@ -1077,7 +1077,7 @@ B. If Inner Observe is present then:
  
 *  If the Partial IV was not present in the response, then go to 9.
      
-*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notfications}} . 
+*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
 
 C. If Inner Observe is not present, then delete the attribute-value pair (Token, {Security Context, PIV}).
 
