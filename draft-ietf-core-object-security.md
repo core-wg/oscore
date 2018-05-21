@@ -1013,7 +1013,7 @@ B. If Inner Observe and Outer Observe are both present and equal to zero, then a
 
    * If this is not a registration request then remove the Observe option
 
-C. If Inner Observe is equal to one, then and only then is this a cancellation and the attribute-value pair for that Token and Security Context is deleted.
+C. If Inner Observe is equal to one, then and only then is this a cancellation and the attribute-value pair stored in step B for that Token and Security Context is deleted.
 
 Note that the attribute-value pair stored in step B MUST be deleted whenever the Observation is cancelled or “forgotten”.
 
