@@ -211,7 +211,7 @@ Retrieve context with |<----------------------+
 Verify request with   |                       |
  Recipient Context    |                       |
 ~~~~~~~~~~~
-{: #fig-context title="Retrieval and Use of the Security Context" artwork-align="center"}
+{: #fig-context title="Retrieval and use of the Security Context" artwork-align="center"}
 
 The Common Context contains the following parameters:
 
@@ -489,7 +489,7 @@ The presence and value of the Inner Observe determines if a request is processed
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
+If a client issues a new registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), then a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
 
 Intermediaries are not assumed to have a security context for an endpoint. This has the following limitations and consequences:
 
@@ -514,7 +514,7 @@ A client MUST consider the notification with the highest Partial IV as the fresh
 
 No-Response {{RFC7967}} is an optional feature used by the client to communicate its disinterest in certain classes of responses to a particular request. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7967}}. 
 
-If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD NOT be present. The server SHALL ignore the Outer No-Response option. The client MAY set the Outer No-Response value to 26 ('suppress all known codes') if the Inner value is set to 26. The client MUST be prepared to receive and discard 5.04 Gateway Timeout error messages from intermediaries potentially resulting from destination time out due to no response.
+If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD not be present. The server SHALL ignore the Outer option. The client MAY set the Outer to 26 ('suppress all known codes') if the Inner is set to 26. The client MUST be prepared to receive and discard 5.04 (Gateway Timeout) from intermediaries potentially resulting from destination time out due to no response.
 
 
 #### OSCORE
@@ -548,7 +548,7 @@ Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are
 
 The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping on or manipulating the Code (e.g., changing from GET to DELETE). 
 
-The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the sending endpoint writes an Outer Code to the OSCORE message. With one exception (see {{observe}}) the Outer Code SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses. The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object plaintext ({{plaintext}}) into the decrypted CoAP message.
+The sending endpoint SHALL write the Code of the original CoAP message into the plaintext of the COSE object (see {{plaintext}}). After that, the sending endpoint writes an Outer Code to the OSCORE message. With one exeception (see {{observe}}) the Outer Code SHALL be set to 0.02 (POST) for requests and to 2.04 (Changed) for responses. The receiving endpoint SHALL discard the Outer Code in the OSCORE message and write the Code of the COSE object plaintext ({{plaintext}}) into the decrypted CoAP message.
 
 The other currently defined CoAP Header fields are Unprotected (Class U). The sending endpoint SHALL write all other header fields of the original message into the header of the OSCORE message. The receiving endpoint SHALL write the header fields from the received OSCORE message into the header of the decrypted CoAP message.
 
@@ -615,7 +615,7 @@ Some examples of relevant uses of kid_context are the following:
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
-{: #tab-1 title="Additional Common Header Parameter for the COSE Object" artwork-align="center"}
+{: #tab-1 title="Additional common header parameter for the COSE object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
@@ -1166,7 +1166,7 @@ The HTTP OSCORE header field is not appropriate to list in the Connection header
 
 Intermediaries are in general not allowed to insert, delete, or modify the OSCORE header. Changes to the HTTP OSCORE header field will in general violate the integrity of the OSCORE message resulting in an error. For the same reason the HTTP OSCORE header field is in general not preserved across redirects. 
 
-Since redirects are not defined in the mappings between HTTP and CoAP {{RFC8075}}{{RFC7252}}, a number of conditions need to be fulfilled for redirects to work. For CoAP client to HTTP server, such conditions include:
+Since redirects are not defined in the mappings between HTTP and CoAP {{RFC8075}}{{RFC7252}}, a number of conditions need to be fullfilled for redirects to work. For CoAP client to HTTP server, such conditions include:
 
 * the CoAP-to-HTTP proxy follows the redirect, instead of the CoAP client as in the HTTP case
 * the CoAP-to-HTTP proxy copies the HTTP OSCORE header field and body to the new request
@@ -1362,7 +1362,7 @@ The consequences of unprotected message fields are analyzed in {{unprot-fields}}
 
 ## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. This procedure must ensure that the requirements of the security context parameters are complied with {{req-params}} for the intended use and also in error situations. It is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for the deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. Such a procedure must ensure that the requirements of the security context parameters for the intended use are complied with (see {{req-params}}) and also in error situations. It is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
 
 ## Master Secret {#master-secret}
 
@@ -2018,7 +2018,7 @@ The CoAP Code of an OSCORE message is POST or FETCH for requests and with corres
 
 * Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{proxy-uri}}. 
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, whereas the Inner Observe allows the receiving endpoint to verify the intent of the sending endpoint.  Removing the Outer option of a registration request turns it into a normal request, which is legitimate Observe behavior for proxies and servers but the client cannot tell what party removed the option. Removing the Outer option of a cancellation request is ignored by the server. Removing the Outer option in the response may lead to notifications not being forwarded or cause a denial of service. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. A replay of a registration request may cancel a registration or trigger the server to resend a cached notification (see {{observe-registration}}), but an intermediary device should not be able to craft a new registration request.
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, whereas the Inner Observe allows the receiving endpoint to verify the intent of the sending endpoint.  Removing the Outer option of a registration request turns it into a normal request, which is legitimate Observe behavior for proxys and servers but the client cannot tell what party removed the option. Removing the Outer option of a cancellation request is ignored by the server. Removing the Outer option in the response may lead to notifications not being forwarded or cause a denial of service. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. A replay of a registration request may cancel a registration or trigger the server to resend a cached notification (see {{observe-registration}}), but an intermediary device should not be able to craft a new registration request.
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
  
