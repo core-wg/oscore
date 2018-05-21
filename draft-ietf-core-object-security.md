@@ -211,7 +211,7 @@ Retrieve context with |<----------------------+
 Verify request with   |                       |
  Recipient Context    |                       |
 ~~~~~~~~~~~
-{: #fig-context title="Retrieval and use of the Security Context" artwork-align="center"}
+{: #fig-context title="Retrieval and Use of the Security Context" artwork-align="center"}
 
 The Common Context contains the following parameters:
 
@@ -615,7 +615,7 @@ Some examples of relevant uses of kid_context are the following:
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
-{: #tab-1 title="Additional common header parameter for the COSE object" artwork-align="center"}
+{: #tab-1 title="Additional Common Header Parameter for the COSE Object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
