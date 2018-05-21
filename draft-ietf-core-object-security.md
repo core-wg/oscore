@@ -225,6 +225,8 @@ The Common Context contains the following parameters:
 
 * Common IV. Byte string derived from Master Secret and Master Salt. Length is determined by the AEAD Algorithm.
 
+* ID Context. Variable length byte string providing additional information to identify the security context.
+
 The Sender Context contains the following parameters:
 
 * Sender ID. Byte string used to identify the Sender Context and to assure unique AEAD nonces. Maximum length is determined by the AEAD Algorithm.
@@ -256,6 +258,10 @@ The parameters in the security context are derived from a small set of input par
 * Recipient ID 
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
+
+* ID Context
+
+   - Default is nil
 
 * AEAD Algorithm
 
@@ -292,6 +298,7 @@ where:
 ~~~~~~~~~~~ CDDL
    info = [
        id : bstr,
+       id_context : bstr / nil,
        alg_aead : int / tstr,
        type : tstr,
        L : uint
@@ -300,6 +307,8 @@ where:
 where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
+ 
+   * id_context is an optional additional identifier of the security context which typically has the value of kid_context, see {{req-params}}. 
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
@@ -315,12 +324,15 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters {#req-params}
 
-As collisions may lead to the loss of both confidentiality and integrity, Sender ID SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. To assign identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}) or a protocol that allows the parties to negotiate locally unique identifiers can be used. The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
+As collisions may lead to the loss of both confidentiality and integrity, the 2-tuple \{Sender ID, id_context\} SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. To assign identifiers different methods can be used: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. 
+
+The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
 To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. If an endpoint has the same Recipient ID with different Recipient Contexts, i.e. the Recipient Contexts are derived from different keying material, then the endpoint may need to try multiple times before finding the right security context associated to the Recipient ID.
-The Client MAY provide a 'kid_context' parameter ({{context-hint}}) to help the Server find the right context.
 
-While the triple (Master Secret, Master Salt, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
+The id_context is an optional identifier used in the key derivation. If a kid_context parameter is used in the message (see {{context-hint}}) then the id_context MUST be set to the kid_context.
+
+While the quartet (Master Secret, Master Salt, Sender ID, id_context) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
 # Protected Message Fields {#protected-fields} 
 
@@ -585,16 +597,15 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary or favorable for the sender to provide an additional identifier of the security material to use, in order for the receiver to retrieve or establish the correct key. The kid_context parameter is used to provide such additional input. The kid_context and kid are used to determine the security context, or to establish the necessary input parameters to derive the security context (see {{context-derivation}}). The application defines how this is done.
-
-The kid_context is implicitly integrity protected, as a manipulation that leads to the wrong key (or no key) being retrieved results in an error, as described in {{ver-req}}.
+For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}} or favorable for the Client to provide an send an additional identifier used for determining the security context. The kid_context parameter is used to provide such additional input. The kid_context and kid are used to  establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
 
 A summary of the COSE header parameter kid_context defined above can be found in {{tab-1}}.
 
 Some examples of relevant uses of kid_context are the following:
 
-* If the client has an identifier in some other namespace which can be used by the server to retrieve or establish the security context, then that identifier can be used as kid_context. The kid_context may be used as Master Salt ({{context-definition}}) for additional entropy of the security contexts (see for example {{master-salt-transport}}, or {{I-D.ietf-6tisch-minimal-security}}).
-* In case of a group communication scenario {{I-D.ietf-core-oscore-groupcomm}}, if the server belongs to multiple groups, then a group identifier can be used as kid_context to enable the server to find the right security context.
+* If the client has a unique identifier in some namespace, then that identifier can be used as kid_context. 
+
+* In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as kid_context to enable different security contexts for a server belonging to multiple groups.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
