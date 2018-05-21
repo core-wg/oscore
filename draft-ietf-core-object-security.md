@@ -489,7 +489,7 @@ The presence and value of the Inner Observe determines if a request is processed
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-If a client issues a new registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), then a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
+Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications. 
 
 Intermediaries are not assumed to have a security context for an endpoint. This has the following limitations and consequences:
 
