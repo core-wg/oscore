@@ -706,6 +706,7 @@ The oscore_version and algorithms parameters are established out-of-band and are
 
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, need not be integrity protected in the requests.
 
+The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{8152}}.
 
 # OSCORE Header Compression {#compression}
 
