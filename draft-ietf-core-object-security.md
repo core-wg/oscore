@@ -514,7 +514,7 @@ A client MUST consider the notification with the highest Partial IV as the fresh
 
 No-Response {{RFC7967}} is an optional feature used by the client to communicate its disinterest in certain classes of responses to a particular request. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7967}}. 
 
-If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD NOT be present. The server SHALL ignore the Outer option. The client MAY set the Outer value to 26 ('suppress all known codes') if the Inner value is set to 26. The client MUST be prepared to receive and discard 5.04 (Gateway Timeout) from intermediaries potentially resulting from destination time out due to no response.
+If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD NOT be present. The server SHALL ignore the Outer option. The client MAY set the Outer value to 26 ('suppress all known codes') if the Inner value is set to 26. The client MUST be prepared to receive and discard 5.04 Gateway Timeout error messages from intermediaries potentially resulting from destination time out due to no response.
 
 
 #### OSCORE
