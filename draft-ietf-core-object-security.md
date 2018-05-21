@@ -1007,7 +1007,16 @@ A. Check if the Outer Observe option is present and has value zero, and if so st
 
 Insert the following step between step 6 and 7 of {{ver-req}}:
 
-B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option. 
+B. If Inner Observe and Outer Observe are both present and equal to zero, then and only then is this a registration request.
+
+   * If this is a registration request, then in order to find the Sender Context and the request_piv for protecting  notifications, the attribute-value pair (Token, {Security Context, PIV}) is stored, overwriting PIV if a value already existed for that Token and Security Context.
+
+   * If this is not a registration request then remove the Observe option
+
+If If Inner Observe is equal to one, then and only then is this a cancellation and the attribute-value pair for that Token and Security Context is deleted.
+
+Note that the attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or “forgotten”.
+
 
 
 ## Protecting the Response {#prot-res}
@@ -1031,16 +1040,14 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported:
 
-Replace step 3 in {{prot-res}} with:
+In step 3 of Section 8.3, compute the AEAD nonce as described in Section 5.2:
 
-A. Compute the AEAD nonce as described in {{nonce}}.
+   * For responses that are not Observe notifications, process the step as described in step 3.
 
-  * For responses that are not Observe notifications:
-    
-      * Either use the nonce from the request, or 
-      * Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+   * For Observe notifications, use the attribute-value pair stored in step B of {{observe-ver-req}} to encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. 
 
-  *  For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+Note that the attribute-value pair stored in step B of {{observe-ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”.
+
 
 
 ## Verifying the Response {#ver-res}
@@ -1061,7 +1068,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
       
 5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 9.
 
-6. Delete the attribute-value pair (Token, {Security Context, PIV}).
+6. Delete the attribute-value pair stored in step 6 of {{prot-req}}.
 
 7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
    
@@ -1093,13 +1100,13 @@ B. If Inner Observe is present then:
      
 *  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
 
-C. If Inner Observe is not present, then delete the attribute-value pair (Token, {Security Context, PIV}).
+C. If Inner Observe is not present, then delete the attribute-value pair stored in step 6 of {{prot-req}}.
 
 Replace step 9 of {{ver-res}} with:
 
 D. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
-Note that the attribute-value attribute-value pair (Token, {Security Context, PIV}) MUST be deleted whenever the Observation is cancelled or "forgotten".
+Note that the attribute-value pair stored in step 6 of {{prot-req}} MUST be deleted whenever the Observation is cancelled or "forgotten".
 
 
 # Web Linking
