@@ -884,6 +884,8 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
+### Maximum Sequence Number {#max-seq}
+
 The maximum Sender Sequence Number is algorithm dependent (see {{sec-considerations}}), and SHALL be less than 2^40. If the Sender Sequence Number exceeds the maximum, the endpoint MUST NOT process any more messages with the given Sender Context. If necessary, the endpoint SHOULD acquire a new security context before this happens. The latter is out of scope of this document.
 
 ## Freshness
@@ -1908,7 +1910,7 @@ By working at the CoAP layer, OSCORE enables different CoAP message fields to be
 
 Protected message fields are included in the Plaintext ({{plaintext}}) and the Additional Authenticated Data ({{AAD}}) of the COSE_Encrypt0 object and encrypted using an AEAD algorithm. 
 
-OSCORE depends on a pre-established random Master Secret ({{master-secret}}) used to derive encryption keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{nonce-uniqueness}}, OSCORE should provide the following guarantees: 
+OSCORE depends on a pre-established random Master Secret ({{master-secret}}) used to derive encryption keys, and a construction for making (key, nonce) pairs unique ({{kn-uniqueness}}). Assuming this is true, and the keys are used for no more data than indicated in {{max-seq}}, OSCORE should provide the following guarantees: 
 
 * Confidentiality: An attacker should not be able to determine the plaintext contents of a given OSCORE message or determine that different plaintexts are related ({{plaintext}}). 
 
@@ -1924,27 +1926,25 @@ OSCORE is susceptible to a variety of traffic analysis attacks based on observin
 
 ##  Uniqueness of (key, nonce) {#kn-uniqueness}
 
-In this section we show that (key, nonce) pairs are unique as long as the requirements {{req-params}} and {{nonce-uniqueness}} are followed.
+In this section we show that (key, nonce) pairs are unique as long as the requirements {{req-params}} and {{max-seq}} are followed.
 
-Fix a security context and an endpoint, called the encrypting endpoint. Endpoints may alternate between client and server roles, but each endpoint encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF from unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
+Fix a Common Context and an endpoint, called the encrypting endpoint. An endpoints may alternate between client and server roles, but each endpoint always encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF using unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
 
-Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV). The nonce construction ({{nonce}}) with the size of the ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs.
+Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV). The nonce construction ({{nonce}}) with the size of the ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs. There are two cases:
 
-For requests and responses with Partial IV (e.g. Observe notifications):
+A. For requests, and responses with Partial IV (e.g. Observe notifications):
 
 * ID_PIV = Sender ID of the encrypting endpoint
 * PIV = current Partial IV of the encrypting endpoint
 
-Since the encrypting endpoint steps the Partial IV for each use, the nonces used are all unique as long as the number of encrypted messages is kept within the required range ({{nonce-uniqueness}}).
+Since the encrypting endpoint steps the Partial IV for each use, the nonces used in case A are all unique as long as the number of encrypted messages is kept within the required range ({{max-seq}}).
 
-For responses without Partial IV (i.e. single response to a request):
+B. For responses without Partial IV (subset of cases with single response to a request):
 
 * ID_PIV = Sender ID of the endpoint generating the request
 * PIV = Partial IV of the request
 
-Since the Sender IDs are unique, ID_PIV is different from the Sender ID of the encrypting endpoint. Therefore, the nonce is different compared to nonces where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV.
-
-The argumentation also holds for group communication as specified in {{RFC7390}} (see {{I-D.ietf-core-oscore-groupcomm}}).
+Since the Sender IDs are unique, ID_PIV is different from the Sender ID of the encrypting endpoint. Therefore, the nonces in case B are different compared to nonces in case A, where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV, which makes all nonces in case B distinct.
 
 
 
