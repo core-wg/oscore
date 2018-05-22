@@ -591,13 +591,15 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
    
    * Optionally, a 'kid_context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
+   * Optionally, a 'Master Salt' parameter as defined in {{master-salt}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
+
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}} or favorable for the Client to provide an send an additional identifier used for determining the security context. The kid_context parameter is used to provide such additional input. The kid_context and kid are used to  establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
+For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}}) or favorable for the client to provide an send an additional identifier used for determining the security context. The kid_context parameter is used to provide such additional input. The kid_context and kid are used to  establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
 
 A summary of the COSE header parameter kid_context defined above can be found in {{tab-1}}.
 
@@ -615,7 +617,25 @@ Some examples of relevant uses of kid_context are the following:
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
-{: #tab-1 title="Additional Common Header Parameter for the COSE object" artwork-align="center"}
+{: #tab-1 title="Common Header Parameter kid_context for the COSE object" artwork-align="center"}
+
+## Master Salt {#master-salt}
+
+For certain use cases, e.g. deployments where the same Master Secret is used multiple times, it is necessary (see {{req-params}}) or favorable for the client to provide a Master Salt for deriving a fresh security context. The Master Salt parameter is used by the client to transport the Master Salt of the OSCORE security context. The server MUST protect against replay of Master Salt.
+
+A summary of the COSE header parameter Master Salt defined above can be found in {{tab-2}}.
+
+An example of using the Master Salt parameter is provided in {{master-salt-transport}}.
+ 
+~~~~~~~~~~
++----------+--------+------------+----------------+-----------------+
+|   name   |  label | value type | value registry | description     |
++----------+--------+------------+----------------+-----------------+
+|  Master  |  TBD4  | bstr       |                | Contains the    |
+|   Salt   |        |            |                | Master Salt     |
++----------+--------+------------+----------------+-----------------+
+~~~~~~~~~~
+{: #tab-2 title="Common Header Parameter Master Salt for the COSE object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
@@ -708,6 +728,9 @@ NOTE: The format of the external_aad is for simplicity the same for requests and
 
 The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{RFC8152}}.
 
+
+
+
 # OSCORE Header Compression {#compression}
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} combines very small message sizes with extensibility. The CBOR Object Signing and Encryption (COSE) {{RFC8152}} uses CBOR to create compact encoding of signed and encrypted data. COSE is however constructed to support a large number of different stateless use cases, and is not fully optimized for use as a stateful security protocol, leading to a larger than necessary message expansion. In this section, we define a stateless header compression mechanism, simply removing redundant information from the COSE objects, which significantly reduces the per-packet overhead. The result of applying this mechanism to a COSE object is called the "compressed COSE object".
@@ -740,12 +763,12 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid_context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
-    - The sixth least significant bit is the Master Salt flag, m: it is set to 1 if the compressed COSE object contains a Master Salt (see {{context-definition}}).
+    - The sixth least significant bit is the Master Salt flag, m: it is set to 1 if the compressed COSE object contains a Master Salt (see {{master-salt}}).
     - The seventh and eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the Master Salt ({{context-definition}}) t, if the kid_context flag is set (m = 1).
+* The following 1 byte encode the length of the Master Salt ({{master-salt}}) t, if the Master Salt flag is set (m = 1).
 
 * The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
 
@@ -1659,9 +1682,9 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistent storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
 
-Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in the Master Salt parameter in the OSCORE option (see {{obj-sec-value}}) of the request.
+Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-definition}}) except for the Master Salt, which is transported in the Master Salt parameter in the OSCORE option (see {{master-salt}}) of the request.
 
-1. In order to establish a security context with a server for the first time, or replace an old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with the Master Salt in the OSCORE option (see {{obj-sec-value}}).
+1. In order to establish a security context with a server for the first time, or replace an old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with the Master Salt in the OSCORE option (see {{master-salt}}).
 
 2. The server, receiving a request with the Master Salt parameter set derives a new security context using this Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
 
