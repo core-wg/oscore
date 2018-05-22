@@ -993,8 +993,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
-6. Store the attribute-value pair (Token, \{Security Context, PIV\}) in order to be able to find the Recipient Context and the request_piv from the Token in the response.
-
+6. Store the attribute-value pair (Token, \{Security Context, Partial IV\}) in order to be able to find the Recipient Context and the request_piv from the Token to verify the response.
 
 ## Verifying the Request {#ver-req}
 
@@ -1020,9 +1019,11 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+7. Store the attribute-value pair (Token, \{Security Context, Partial IV\}) in order to be able to find the Security Context and the request_piv from the Token to protect the response.
 
-8. The decrypted CoAP request is processed according to {{RFC7252}}.
+8. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+
+9. The decrypted CoAP request is processed according to {{RFC7252}}.
 
 ### Supporting Block-wise
 
@@ -1038,27 +1039,21 @@ Insert the following step before step 1 in {{ver-req}}:
 
 A. Check if the Outer Observe option is present and has value zero, and if so store this information.
 
-Insert the following step between step 6 and 7 of {{ver-req}}:
+Insert the following step between step 7 and 8 of {{ver-req}}:
 
-B. If Inner Observe and Outer Observe are both present and equal to zero, then and only then is this a registration request.
+B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
 
-   * If this is a registration request, then in order to find the Sender Context and the request_piv for protecting  notifications, the attribute-value pair (Token, {Security Context, PIV}) is stored, overwriting PIV if a value already existed for that Token and Security Context.
+C. If Inner Observe has value one, then and only then this is a cancellation. If so, store this information. 
 
-   * If this is not a registration request then remove the Observe option
-
-C. If Inner Observe is equal to one, then and only then is this a cancellation and the attribute-value pair stored in step B for that Token and Security Context is deleted.
-
-Note that the attribute-value pair stored in step B MUST be deleted whenever the Observation is cancelled or “forgotten”.
-
-
+Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, but after the reponse has been processed (see step 6 in {{observe-prot-res}}).
 
 ## Protecting the Response {#prot-res}
 
 If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (step 9 in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (steps 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
-1. Retrieve the Sender Context in the Security Context used to verify the request.
+1. Retrieve the Sender Context in the Security Context associated with the Token (see step 7 of {{ver-req}}).
 
-2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}. The attribute-value pair stored in step 7 of {{ver-req}} is used to retrieve the request\_piv and request\_kid.
 
 3. Compute the AEAD nonce as described in {{nonce}}:
 
@@ -1069,6 +1064,8 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
 
+6. Delete the attribute-value pair stored in step 7 of {{prot-req}}.
+
 ### Supporting Observe {#observe-prot-res}
 
 If Observe is supported:
@@ -1076,12 +1073,13 @@ If Observe is supported:
 In step 3 of Section 8.3, compute the AEAD nonce as described in Section 5.2:
 
    * For responses that are not Observe notifications, process the step as described in step 3.
+   * For Observe notifications, use the attribute-value pair stored in step 7 of {{ver-req}} to encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. 
 
-   * For Observe notifications, use the attribute-value pair stored in step B of {{observe-ver-req}} to encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. 
+Replace step 6 of {{prot-res}} with:
 
-Note that the attribute-value pair stored in step B of {{observe-ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”.
+6. If the response is not an Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
 
-
+Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, and will be stored for as long as the Observation is active.
 
 ## Verifying the Response {#ver-res}
 
@@ -1089,7 +1087,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Retrieve the Recipient Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
+2. Retrieve the Recipient Context associated with the Token (see step 6 of {{prot-req}}). Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
 
 3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
@@ -1139,7 +1137,7 @@ Replace step 9 of {{ver-res}} with:
 
 D. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
-Note that the attribute-value pair stored in step 6 of {{prot-req}} MUST be deleted whenever the Observation is cancelled or "forgotten".
+Note that the attribute-value pair stored in step 6 of {{prot-req}} MUST be deleted whenever the Observation is cancelled or "forgotten", and will be stored for as long as the Observation is active.
 
 
 # Web Linking
