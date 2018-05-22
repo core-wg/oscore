@@ -752,7 +752,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 | t (if any) |          Master Salt (if any) ...
 +------------+-----------------------------------------
 
- <- 1 byte -> <--------------- s bytes --------------->                    
+ <- 1 byte -> <----- s bytes ------>                    
 +------------+----------------------+------------------+
 | s (if any) | kid_context (if any) | kid (if any) ... |
 +------------+----------------------+------------------+
@@ -770,9 +770,9 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 
 * The following 1 byte encode the length of the Master Salt ({{master-salt}}) t, if the Master Salt flag is set (m = 1).
 
-* The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
-
 * The following t bytes encode the Master Salt, if the Master Salt flag is set (m = 1).
+
+* The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
 
 * The following s bytes encode the kid_context, if the kid_context flag is set (h = 1).
 
