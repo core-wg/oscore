@@ -716,15 +716,20 @@ The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE option and 
 
 ## Encoding of the OSCORE Option Value {#obj-sec-value}
 
-The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid_context parameter (length and value), and the kid parameter as follows:
+The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the Master Salt parameter, the kid_context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
- 0 1 2 3 4 5 6 7 <--------- n bytes ------------->
-+-+-+-+-+-+-+-+-+---------------------------------
-|0 0 0|h|k|  n  |      Partial IV (if any) ...    
-+-+-+-+-+-+-+-+-+---------------------------------
+ 0 1 2 3 4 5 6 7 <------------- n bytes -------------->
++-+-+-+-+-+-+-+-+--------------------------------------
+|0 0|m|h|k|  n  |       Partial IV (if any) ...    
++-+-+-+-+-+-+-+-+--------------------------------------
 
- <- 1 byte -> <------ s bytes ----->                    
+ <- 1 byte -> <--------------- t bytes --------------->                    
++------------+-----------------------------------------
+| t (if any) |          Master Salt (if any) ...
++------------+-----------------------------------------
+
+ <- 1 byte -> <--------------- s bytes --------------->                    
 +------------+----------------------+------------------+
 | s (if any) | kid_context (if any) | kid (if any) ... |
 +------------+----------------------+------------------+
@@ -735,11 +740,16 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid_context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
-    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
+    - The sixth least significant bit is the Master Salt flag, m: it is set to 1 if the compressed COSE object contains a Master Salt (see {{context-definition}}).
+    - The seventh and eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
+* The following 1 byte encode the length of the Master Salt ({{context-definition}}) t, if the kid_context flag is set (m = 1).
+
 * The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
+
+* The following t bytes encode the Master Salt, if the Master Salt flag is set (m = 1).
 
 * The following s bytes encode the kid_context, if the kid_context flag is set (h = 1).
 
@@ -747,7 +757,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 
 Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
-The length of the OSCORE option thus depends on the presence and length of Partial IV, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
+The length of the OSCORE option thus depends on the presence and length of Partial IV, Master Salt, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
 
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
@@ -1649,17 +1659,19 @@ For settings where the Master Secret is only used during deployment, the uniquen
 
 One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistent storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
 
-Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in kid_context parameter (see {{context-hint}}) of the request.
+Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-derivation}}) except for the Master Salt, which is transported in the Master Salt parameter in the OSCORE option (see {{obj-sec-value}}) of the request.
 
-1. In order to establish a security context with a server for the first time, or a new security context replacing an  old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with kid_context set to the Master Salt.
+1. In order to establish a security context with a server for the first time, or replace an old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with the Master Salt in the OSCORE option (see {{obj-sec-value}}).
 
-2. The server, receiving an OSCORE request with a non-empty kid_context derives the new security context using the received kid_context as Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
+2. The server, receiving a request with the Master Salt parameter set derives a new security context using this Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
 
-3. The client, receiving a response with an Echo option to a request which used a new security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the kid_context.
+3. The client, receiving a response with an Echo option to an outstanding request for establishing a first, or replacing a security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the OSCORE option.
 
-4. The server, receiving a request with a kid_context and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error, then the new security context is established, and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
+4. The server, receiving a request with the Master Salt parameter set and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error, then the new security context is established, and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
 
-If the server receives a request without kid_context from a client with which no security context is established, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Security context not found". This could be the result of the server having lost its security context or that a new security context has not been successfully established, which may be a trigger for the client to run this procedure.
+If the server receives a request without the Master Salt parameter set from a client with which there is pre-established input parameters but no Master Salt, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Master Salt not found". This is an indication of the server having lost the Master Salt or that the procedure for establishing a new Master Salt has not been successfully completed, which is a trigger for the client to run this procedure.
+
+Note that the message received by the server in step 2 may be a replay of an old request for establishing a first, or replacing an old security context. In this case the client does not have an outstanding request and the procedure is terminated by the client in step 3.
 
 # Test Vectors
 
