@@ -324,7 +324,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters {#req-params}
 
-As collisions may lead to the loss of both confidentiality and integrity, the pair (Sender ID, id_context) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. Different methods can be used to assign identifiers: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. 
+As collisions may lead to the loss of both confidentiality and integrity, the pair (Sender ID, ID Context) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. Different methods can be used to assign identifiers: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. 
 
 The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
