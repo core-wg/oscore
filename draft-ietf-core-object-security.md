@@ -491,13 +491,13 @@ The client SHALL set both Inner and Outer Observe to the same value in the reque
 
 Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications (see {{AAD}}). 
 
-Intermediaries are not assumed to have a security context for an endpoint. This has the following limitations and consequences:
-
-   * An intermediary node transforming a normal response into an Observe notification (see figure 7 of {{RFC7641}}) is not supported. The intermediary does not have the security context to request a representation that the client would be able to verify as coming from the server.
+Intermediaries are not assumed to have the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
+ 
+   * An intermediary node is not able to transform a normal response into an OSCORE protected Observe notification (see figure 7 of {{RFC7641}}) which verify as coming from the server.
+  
+   * An intermediary node is not able to initiate an OSCORE protected Observe registration (Observe with value 0)  which verify as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If a OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request.
    
-   * An intermediary node initiating a registration (Observe with value 0) is not supported. The intermediary does not have the security context to generate the registration request that the server would be able to verify as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If a OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request.
-   
-   * An intermediary node initiating a cancellation -- e.g. by initiating GET Observe with value 1, or by using the Reset message as response to a notification (as specified in Section 3.6 of {{RFC7641}}) -- may or may not be supported dependent on application, but is out of scope since it does not involve the OSCORE option. The server processing may e.g. depend on if there is hop-by-hop security between the intermediary node and the server.
+   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1)  which verify as coming from the client. An application may decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1, or to respond with Reset to a notification (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
 
 ##### Notifications {#notifications}
 
