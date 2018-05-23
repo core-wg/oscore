@@ -1085,7 +1085,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Retrieve the Recipient Context associated with the Token (see step 6 of {{prot-req}}). Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
+2. Retrieve the Recipient Context in the Security Context associated with the Token (see step 6 of {{prot-req}}). Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
 
 3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
