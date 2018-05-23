@@ -936,7 +936,7 @@ In order to protect from replay of requests, the server's Recipient Context incl
 
 Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
-The operation of validating the Partial IV and updating the replay protection data MUST be atomic.
+The operation of validating the Partial IV and updating the replay protection MUST be atomic.
 
 ###  Replay Protection of Notifications {#replay-notifications}
 
@@ -1021,7 +1021,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 7. Store the attribute-value pair (Token, \{Security Context, Partial IV\}) in order to be able to find the Security Context and the request_piv from the Token to protect the response.
 
-8. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+8. Add decrypted Code, options, and payload to the decrypted request. The OSCORE option is removed.
 
 9. The decrypted CoAP request is processed according to {{RFC7252}}.
 
