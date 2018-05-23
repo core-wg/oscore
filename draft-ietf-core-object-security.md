@@ -2009,24 +2009,21 @@ B. For responses without Partial IV (subset of cases with single response to a r
 Since the Sender IDs are unique, ID_PIV is different from the Sender ID of the encrypting endpoint. Therefore, the nonces in case B are different compared to nonces in case A, where the encrypting endpoint generated the Partial IV. Since the Partial IV of the request is verified for replay ({{replay-protection}}) associated to this Recipient Context, PIV is unique for this ID_PIV, which makes all nonces in case B distinct.
 
 
-
 ## Unprotected Message Fields {#unprot-fields}
 
 This section lists and discusses issues with unprotected message fields.
 
-### CoAP Code {#sec-coap-code}
-
-The CoAP Code of an OSCORE message is POST or FETCH for requests and with corresponding response codes. Since the use of Observe in intermediaries is indicated with the Outer Observe option, no additional information is revealed by having a special code for Observe messages. A change of code does not affect the method of the end-to-end message but may be a denial service attack caused by error in the OSCORE processing. 
-
 ### CoAP Header Fields {#sec-coap-headers}
 
-* Version. The CoAP version {{RFC7252}} is not expected to be sensitive to disclose. Currently there is only one CoAP version defined. A change of this parameter is potentially a denial of service attack. Future versions of CoAP need to analyze attacks to OSCORE protected messages due to an adversary changing the CoAP version.
+* Version. The CoAP version {{RFC7252}} is not expected to be sensitive to disclose. Currently there is only one CoAP version defined. A change of this parameter is potentially a denial-of-service attack. Future versions of CoAP need to analyze attacks to OSCORE protected messages due to an adversary changing the CoAP version.
 
-* Token/Token Length. The Token field is a client-local identifier for differentiating between concurrent requests {{RFC7252}}. An eavesdropper reading the token can match requests to responses which can be used in traffic analysis. CoAP proxies are allowed to change Token and Token Length between UDP hops. However, modifications of Token and Token Length during a UDP hop may become a denial of service attack, since it may prevent the client to identify to which request the response belongs or to find the correct information to verify integrity of the response.
+* Token/Token Length. The Token field is a client-local identifier for differentiating between concurrent requests {{RFC7252}}. An eavesdropper reading the token can match requests to responses which can be used in traffic analysis. In particular this is true for notifications, where multiple responses are matched with one request. CoAP proxies are allowed to change Token and Token Length between UDP hops. However, modifications of Token and Token Length during a UDP hop may become a denial-of-service attack, since it may prevent the client to identify to which request the response belongs or to find the correct information to verify integrity of the response. 
 
-* Type/Message ID. The Type/Message ID fields {{RFC7252}} reveal information about the UDP transport binding, e.g. an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP, and does not impact the request/response message. A change of these fields in a UDP hop is a denial of service attack similar to changing UDP header fields.
+* Code. The CoAP Code of an OSCORE message is POST or FETCH for requests and with corresponding response codes. The use of FETCH reveals that the message has an Observe option, but this is also indicated with the Outer Observe option, and by analysing the traffic and noting multiple responses to one request. A change of Code does not affect the method of the end-to-end message but may be a denial-of-service attack caused by error in the OSCORE processing. 
 
-* Length. This field contain the length of the message {{RFC8323}} which may be used for traffic analysis. These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial of service attack similar to changing TCP header fields.
+* Type/Message ID. The Type/Message ID fields {{RFC7252}} reveal information about the UDP transport binding, e.g. an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP, and does not impact the request/response message. A change of these fields in a UDP hop is a denial-of-service attack. By sending an ACK, an attacker can make the endpoint believe that the other endpoint received the previous message. By sending a RST, an attacker may be able to cancel an observation, make one endpoint believe the other endpoint is alive, or make one endpoint endpoint believe that the other endpoint is missing some context. By changing a NON to a CON, the attacker can cause the receiving endpoint to respond to messages for which no response was requested.
+
+* Length. This field contain the length of the message {{RFC8323}} which may be used for traffic analysis. These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial-of-service attack similar to changing TCP header fields.
 
 ### CoAP Options  {#sec-coap-options}
 
@@ -2034,17 +2031,25 @@ The CoAP Code of an OSCORE message is POST or FETCH for requests and with corres
 
 * Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{proxy-uri}}. 
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, whereas the Inner Observe allows the receiving endpoint to verify the intent of the sending endpoint.  Removing the Outer option of a registration request turns it into a normal request, which is legitimate Observe behavior for proxies and servers but the client cannot tell what party removed the option. Removing the Outer option of a cancellation request is ignored by the server. Removing the Outer option in the response may lead to notifications not being forwarded or cause a denial of service. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. A replay of a registration request may cancel a registration or trigger the server to resend a cached notification (see {{observe-registration}}), but an intermediary device should not be able to craft a new registration request.
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, whereas the Inner Observe allows the receiving endpoint to verify the intent of the sending endpoint.  Removing the Outer option of a registration request turns it into a normal request, which is legitimate Observe behavior for proxies and servers but the client cannot tell what party removed the option. An attacker putting back the Outer Observe 0 removed by the proxy will cause notifications unwanted by the intermediary. Removing the Outer option of a cancellation request is ignored by the server. Removing the Outer option in the response may lead to notifications not being forwarded or cause a denial-of-service. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. A replay of a registration request may cancel a registration or trigger the server to resend a cached notification (see {{observe-registration}}), but an intermediary device should not be able to craft a new registration request.
 
-* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial of service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
+* Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
  
-* No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial of service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
+* No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial-of-service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
 
 * OSCORE. The OSCORE option contains information about the compressed COSE header. A change of this field may result in not being able to verify the OSCORE message.
 
+### CoAP Error Messages
+
+Injecting/modifying error
+
+### CoAP over TCP Signaling
+
+Injecting/modifying signaling
+
 ### HTTP Message Fields
 
-In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial of service attacks.
+In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial-of-service attacks.
 It is recommended to additionally use TLS {{RFC5246}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
 
 
