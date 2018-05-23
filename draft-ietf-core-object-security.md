@@ -1027,19 +1027,13 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 ### Supporting Block-wise
 
-If Block-wise is supported, insert the following step before step 1 of {{ver-req}}:
+If Block-wise is supported, insert the following step before any other:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 ### Supporting Observe {#observe-ver-req}
 
-If Observe is supported:
-
-Insert the following step before step 1 in {{ver-req}}:
-
-A. Check if the Outer Observe option is present and has value zero, and if so store this information.
-
-Insert the following step between step 7 and 8 of {{ver-req}}:
+If Observe is supported, insert the following step between step 7 and 8 of {{ver-req}}:
 
 B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
 
@@ -1068,10 +1062,12 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported:
 
-In step 3 of {{prot-res}}, compute the AEAD nonce as described in {{nonce}}:
+Replace step 3 in {{prot-res}} with:
 
-   * For responses that are not Observe notifications, process the step as described in step 3.
-   * For Observe notifications, use the attribute-value pair stored in step 7 of {{ver-req}} to encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. 
+A. Compute the AEAD nonce as described in {{nonce}}:
+
+   * For responses that are not Observe notifications, follow step 3 of {{prot-res}}.
+   * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
 
 Replace step 6 of {{prot-res}} with:
 
