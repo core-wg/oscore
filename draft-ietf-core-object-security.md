@@ -503,7 +503,7 @@ Intermediaries are not assumed to have a security context for an endpoint. This 
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-For notifications, the Inner Observe MUST be empty (see section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
+For notifications, the Inner Observe value MUST be empty (see section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
    
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
