@@ -1043,9 +1043,9 @@ Insert the following step between step 7 and 8 of {{ver-req}}:
 
 B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
 
-C. If Inner Observe has value one, then and only then this is a cancellation. If so, store this information. 
+C. If Inner Observe has value one, then this is a cancellation, and if so store this information. 
 
-Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, but after the reponse has been processed (see step 6 in {{observe-prot-res}}).
+Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, but after the reponse has been processed (see step A in {{observe-prot-res}}).
 
 ## Protecting the Response {#prot-res}
 
@@ -1070,14 +1070,14 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported:
 
-In step 3 of Section 8.3, compute the AEAD nonce as described in Section 5.2:
+In step 3 of {{prot-res}}, compute the AEAD nonce as described in {{nonce}}:
 
    * For responses that are not Observe notifications, process the step as described in step 3.
    * For Observe notifications, use the attribute-value pair stored in step 7 of {{ver-req}} to encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. 
 
 Replace step 6 of {{prot-res}} with:
 
-6. If the response is not an Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
+A. If the response is not an Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
 
 Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, and will be stored for as long as the Observation is active.
 
