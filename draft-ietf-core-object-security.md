@@ -979,6 +979,8 @@ To prevent accepting replay of previously received notifications, the client may
 
 This section describes the OSCORE message processing. Additional processing for Observe or Block-wise are described in subsections.
 
+Note that, analogously to {{RFC7252}} where the couple (Token, endpoint) is used to match a response with a request, both endpoints MUST save the association (Token, \{Security Context, Partial IV of the request\}), in order to be able to find the Security Context and compute the AAD to protect or verify the response. For Observe processing, such an association is stored in the endpoint for at least as long as the Observation is active for that endpoint.
+
 ## Protecting the Request {#prot-req}
 
 Given a CoAP request, the client SHALL perform the following steps to create an OSCORE request:
@@ -992,8 +994,6 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}.
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
-
-6. Store the attribute-value pair (Token, \{Security Context, Partial IV\}) in order to be able to find the Recipient Context and the request_piv from the Token to verify the response.
 
 ## Verifying the Request {#ver-req}
 
@@ -1019,11 +1019,9 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
-7. Store the attribute-value pair (Token, \{Security Context, Partial IV\}) in order to be able to find the Security Context and the request_piv from the Token to protect the response.
+7. Add decrypted Code, options, and payload to the decrypted request. The OSCORE option is removed.
 
-8. Add decrypted Code, options, and payload to the decrypted request. The OSCORE option is removed.
-
-9. The decrypted CoAP request is processed according to {{RFC7252}}.
+8. The decrypted CoAP request is processed according to {{RFC7252}}.
 
 ### Supporting Block-wise
 
@@ -1033,19 +1031,17 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 ### Supporting Observe {#observe-ver-req}
 
-If Observe is supported, insert the following step between step 7 and 8 of {{ver-req}}:
+If Observe is supported, insert the following step between step 6 and 7 of {{ver-req}}:
 
 B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
 
-Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, but after the reponse has been processed (see step A in {{observe-prot-res}}).
-
 ## Protecting the Response {#prot-res}
 
-If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (step 9 in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (steps 3, 4, and 7 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
+If a CoAP response is generated in response to an OSCORE request, the server SHALL perform the following steps to create an OSCORE response. Note that CoAP error responses derived from CoAP processing (step 8 in {{ver-req}}) are protected, as well as successful CoAP responses, while the OSCORE errors (steps 2, 3, and 6 in {{ver-req}}) do not follow the processing below, but are sent as simple CoAP responses, without OSCORE processing.
 
-1. Retrieve the Sender Context in the Security Context associated with the Token (see step 7 of {{ver-req}}).
+1. Retrieve the Sender Context in the Security Context associated with the Token.
 
-2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}. The attribute-value pair stored in step 7 of {{ver-req}} is used to retrieve the request\_piv and request\_kid.
+2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
 
 3. Compute the AEAD nonce as described in {{nonce}}:
 
@@ -1055,8 +1051,6 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 4. Encrypt the COSE object using the Sender Key. Compress the COSE Object as specified in {{compression}}. If the AEAD nonce was constructed from a new Partial IV, this Partial IV MUST be included in the message. If the AEAD nonce from the request was used, the Partial IV MUST NOT be included in the message.
 
 5. Format the OSCORE message according to {{protected-fields}}. The OSCORE option is added (see {{outer-options}}).
-
-6. Delete the attribute-value pair stored in step 7 of {{prot-req}}.
 
 ### Supporting Observe {#observe-prot-res}
 
@@ -1069,19 +1063,13 @@ A. Compute the AEAD nonce as described in {{nonce}}:
    * For responses that are not Observe notifications, follow step 3 of {{prot-res}}.
    * For Observe notifications, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
 
-Replace step 6 of {{prot-res}} with:
-
-A. If the response is not a successful Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
-
-Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, and will be stored for as long as the Observation is active.
-
 ## Verifying the Response {#ver-res}
 
 A client receiving a response containing the OSCORE option SHALL perform the following steps:
 
 1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, ETag Outer option is discarded, as well as Max-Age Outer option.
 
-2. Retrieve the Recipient Context in the Security Context associated with the Token (see step 6 of {{prot-req}}). Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 9.
+2. Retrieve the Recipient Context in the Security Context associated with the Token. Decompress the COSE Object ({{compression}}). If either the decompression or the COSE message fails to decode, then go to 8.
 
 3. Compose the Additional Authenticated Data, as described in {{AAD}}.
 
@@ -1091,19 +1079,17 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
         
     * If the Partial IV is present in the response, compute the nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE Object.
       
-5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 9.
+5. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 8.
 
-6. Delete the attribute-value pair stored in step 6 of {{prot-req}}.
-
-7. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
+6. Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.
    
-8. The decrypted CoAP response is processed according to {{RFC7252}}.
+7. The decrypted CoAP response is processed according to {{RFC7252}}.
 
-9. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
+8. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response.
 
 ### Supporting Block-wise
 
-If Block-wise is supported, insert the following step before step 1 of {{ver-res}}:
+If Block-wise is supported, insert the following step before any other:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
@@ -1111,28 +1097,23 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is supported:
 
-Insert a step between step 2 and step 3:
+Insert the following step between step 2 and step 3:
 
 A. If the request was a registration and the response has a Partial IV, verify for replay as specified in {{replay-notifications}}.
 
-Replace step 6 of {{ver-res}} with:
+Insert the following step between step 5 and step 6:
 
 B. If Inner Observe is present then:
 
-*  If the request was not an Observe registration, then go to 9.
+*  If the request was not an Observe registration, then go to 8.
  
-*  If the Partial IV was not present in the response, then go to 9.
+*  If the Partial IV was not present in the response, then go to 8.
      
-*  If the request was an Observe registration and the Partial IV was present in the response, then verify the received 'Partial IV' parameter against the corresponding Notification Number as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
+*  If the request was an Observe registration and the Partial IV was present in the response, then initialize or update the Notification Number with the 'Partial IV' parameter, if the Partial IV was greater than the Notification Number, as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
 
-C. If Inner Observe is not present, then delete the attribute-value pair stored in step 6 of {{prot-req}}.
-
-Replace step 9 of {{ver-res}} with:
+Replace step 8 of {{ver-res}} with:
 
 D. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
-
-Note that the attribute-value pair stored in step 6 of {{prot-req}} MUST be deleted whenever the Observation is cancelled or "forgotten", and will be stored for as long as the Observation is active.
-
 
 # Web Linking
 
