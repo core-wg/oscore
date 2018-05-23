@@ -1043,8 +1043,6 @@ Insert the following step between step 7 and 8 of {{ver-req}}:
 
 B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
 
-C. If Inner Observe has value one, then this is a cancellation, and if so store this information. 
-
 Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, but after the reponse has been processed (see step A in {{observe-prot-res}}).
 
 ## Protecting the Response {#prot-res}
@@ -1077,7 +1075,7 @@ In step 3 of {{prot-res}}, compute the AEAD nonce as described in {{nonce}}:
 
 Replace step 6 of {{prot-res}} with:
 
-A. If the response is not an Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
+A. If the response is not a successful Observe notification, delete the attribute-value pair stored in step 7 of {{ver-req}}.
 
 Note that the attribute-value pair stored in step 7 of {{ver-req}} MUST be deleted whenever the Observation is cancelled or “forgotten”, and will be stored for as long as the Observation is active.
 
