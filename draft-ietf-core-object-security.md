@@ -324,7 +324,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters {#req-params}
 
-As collisions may lead to the loss of both confidentiality and integrity, the pair (Sender ID, ID Context) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. Different methods can be used to assign identifiers: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. 
+As collisions may lead to the loss of both confidentiality and integrity, the pair (ID Context, Sender ID) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. Different methods can be used to assign identifiers: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. 
 
 The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
@@ -332,7 +332,7 @@ To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be
 
 The Client MAY provide a 'kid_context' parameter (see {{context-hint}}) to help the Server find the right context. If a kid_context parameter is used in the message then the id_context MUST be set to the kid_context (see {{context-derivation}}).
 
-While the quartet (Master Secret, Master Salt, Sender ID, id_context) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
+While the quartet (Master Secret, Master Salt, ID Context, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
 # Protected Message Fields {#protected-fields} 
 
