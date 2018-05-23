@@ -2039,14 +2039,6 @@ This section lists and discusses issues with unprotected message fields.
 
 * OSCORE. The OSCORE option contains information about the compressed COSE header. A change of this field may result in not being able to verify the OSCORE message.
 
-### CoAP Error Messages
-
-Injecting/modifying error
-
-### CoAP over TCP Signaling
-
-Injecting/modifying signaling
-
 ### HTTP Message Fields
 
 In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial-of-service attacks.
