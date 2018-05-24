@@ -609,7 +609,7 @@ Some examples of relevant uses of kid_context are the following:
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid_   |  TBD2  | bstr       |                | Identifies the  |
+|   kid    |  TBD2  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
@@ -622,16 +622,6 @@ For certain use cases, e.g. deployments where the same Master Secret is used mul
 A summary of the COSE header parameter Master Salt defined above can be found in {{tab-2}}.
 
 An example of using the Master Salt parameter is provided in {{master-salt-transport}}.
- 
-~~~~~~~~~~
-+----------+--------+------------+----------------+-----------------+
-|   name   |  label | value type | value registry | description     |
-+----------+--------+------------+----------------+-----------------+
-|  Master  |  TBD4  | bstr       |                | Contains the    |
-|   Salt   |        |            |                | Master Salt     |
-+----------+--------+------------+----------------+-----------------+
-~~~~~~~~~~
-{: #tab-2 title="Common Header Parameter Master Salt for the COSE object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
