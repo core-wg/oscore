@@ -619,8 +619,6 @@ Some examples of relevant uses of kid_context are the following:
 
 For certain use cases, e.g. deployments where the same Master Secret is used multiple times, it is necessary (see {{req-params}}) or favorable for the client to provide a Master Salt for deriving a fresh security context. The Master Salt parameter is used by the client to transport the Master Salt of the OSCORE security context. The server MUST protect against replay of Master Salt.
 
-A summary of the COSE header parameter Master Salt defined above can be found in {{tab-2}}.
-
 An example of using the Master Salt parameter is provided in {{master-salt-transport}}.
 
 ## Nonce {#nonce}
