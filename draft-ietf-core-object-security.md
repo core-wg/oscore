@@ -304,7 +304,7 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
  
-   * id_context is set to the value of the header parameter kid_context. If kid_context is not present, the value is nil.
+   * id_context is the value of the header parameter kid context. If kid context is not present, the value is nil.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
