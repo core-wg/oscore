@@ -1080,16 +1080,16 @@ A. If the request was a registration and the response has a Partial IV, verify f
 
 Insert the following step between step 5 and step 6:
 
-B. If the request was a registration and the client has previously received successful notifications to the registration (active observation):
+B. If the request was a registration:
 
-  * If the Partial IV is not present in the response, then go to 8.
+  * If the client has previously received a successful notification to the registration (active observation) or if Inner Observe is present:
+  
+    - If the Partial IV is not present in the response, then go to 8.
 
 C. If Inner Observe is present then:
 
   * If the request was not an Observe registration, then go to 8.
- 
-  * If the Partial IV is not present in the response, then go to 8.
-     
+   
   * If the request was an Observe registration and the Partial IV is present in the response, then initialize or update the Notification Number with the 'Partial IV' parameter, if the Partial IV was greater than the Notification Number, as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
 
 Replace step 8 of {{ver-res}} with:
