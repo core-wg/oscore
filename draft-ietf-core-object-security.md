@@ -259,10 +259,6 @@ The parameters in the security context are derived from a small set of input par
 
 The following input parameters MAY be pre-established. In case any of these parameters is not pre-established, the default value indicated below is used:
 
-* ID Context
-
-   - Default is nil
-
 * AEAD Algorithm
 
    - Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
@@ -308,7 +304,7 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
  
-   * id_context is an optional additional identifier of the security context which typically has the value of kid_context, see {{req-params}}. 
+   * id_context is set to the value of the header parameter kid_context. If kid_context is not present, the value is nil.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
