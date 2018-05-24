@@ -483,7 +483,7 @@ The presence and value of the Inner Observe determines if a request is processed
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request_piv' of new notifications (see {{AAD}}). 
+Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications. The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
 
 Intermediaries are not assumed to have the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
@@ -700,7 +700,7 @@ where:
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
-- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
+- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}), with one exception: in case of protection or verification of Observe cancellations, contains the value of the 'Partial IV' in the COSE object of the registration request (see {{observe-registration}}).
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
