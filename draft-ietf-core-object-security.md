@@ -1054,9 +1054,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 ### Supporting Observe {#observe-prot-res}
 
-If Observe is supported:
-
-Replace step 3 in {{prot-res}} with:
+If Observe is supported, replace step 3 in {{prot-res}} with:
 
 A. Compute the AEAD nonce as described in {{nonce}}:
 
