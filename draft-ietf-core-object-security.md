@@ -1033,7 +1033,7 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is supported, insert the following step between step 6 and 7 of {{ver-req}}:
 
-B. If Inner Observe is present and has value zero, and Outer option is either not present or does not have value 0, then remove the Observe option.
+B. If Inner Observe is present and has value zero, and Outer Observeoption was either not present or did not have value 0, then remove the Inner Observe option.
 
 ## Protecting the Response {#prot-res}
 
