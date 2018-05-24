@@ -304,7 +304,7 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
  
-   * id_context is the value of the header parameter kid context. If kid context is not present, the value is nil.
+   * id_context is the value of the header parameter 'kid_context'. If 'kid_context' is not present, the value is nil.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
@@ -324,9 +324,7 @@ As collisions may lead to the loss of both confidentiality and integrity, the pa
 
 The Sender IDs can be very short. The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
-To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. If an endpoint has the same Recipient ID with different Recipient Contexts, i.e. the Recipient Contexts are derived from different keying material, then the endpoint may need to try multiple times before finding the right security context associated to the Recipient ID.
-
-The Client MAY provide a 'kid_context' parameter (see {{context-hint}}) to help the Server find the right context. If a kid_context parameter is used in the message then the id_context MUST be set to the kid_context (see {{context-derivation}}).
+To simplify retrieval of the right Recipient Context, the Recipient ID SHOULD be unique in the sets of all Recipient Contexts used by an endpoint. If an endpoint has the same Recipient ID with different Recipient Contexts, i.e. the Recipient Contexts are derived from different keying material, then the endpoint may need to try multiple times before finding the right security context associated to the Recipient ID. The Client MAY provide a 'kid context' parameter (see {{context-hint}}) to help the Server find the right context.
 
 While the quartet (Master Secret, Master Salt, ID Context, Sender ID) MUST be unique, the same Master Salt MAY be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts.
 
