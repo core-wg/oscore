@@ -609,7 +609,7 @@ Some examples of relevant uses of kid_context are the following:
 +----------+--------+------------+----------------+-----------------+
 |   name   |  label | value type | value registry | description     |
 +----------+--------+------------+----------------+-----------------+
-|   kid_   |  TBD2  | bstr       |                | Identifies the  |
+|   kid    |  TBD2  | bstr       |                | Identifies the  |
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
@@ -622,16 +622,6 @@ For certain use cases, e.g. deployments where the same Master Secret is used mul
 A summary of the COSE header parameter Master Salt defined above can be found in {{tab-2}}.
 
 An example of using the Master Salt parameter is provided in {{master-salt-transport}}.
- 
-~~~~~~~~~~
-+----------+--------+------------+----------------+-----------------+
-|   name   |  label | value type | value registry | description     |
-+----------+--------+------------+----------------+-----------------+
-|  Master  |  TBD4  | bstr       |                | Contains the    |
-|   Salt   |        |            |                | Master Salt     |
-+----------+--------+------------+----------------+-----------------+
-~~~~~~~~~~
-{: #tab-2 title="Common Header Parameter Master Salt for the COSE object" artwork-align="center"}
 
 ## Nonce {#nonce}
 
@@ -735,18 +725,13 @@ The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE option and 
 
 ## Encoding of the OSCORE Option Value {#obj-sec-value}
 
-The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the Master Salt parameter, the kid_context parameter (length and value), and the kid parameter as follows:
+The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid_context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <------------- n bytes -------------->
 +-+-+-+-+-+-+-+-+--------------------------------------
 |0 0|m|h|k|  n  |       Partial IV (if any) ...    
 +-+-+-+-+-+-+-+-+--------------------------------------
-
- <- 1 byte -> <--------------- t bytes --------------->                    
-+------------+-----------------------------------------
-| t (if any) |          Master Salt (if any) ...
-+------------+-----------------------------------------
 
  <- 1 byte -> <----- s bytes ------>                    
 +------------+----------------------+------------------+
@@ -759,14 +744,9 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid_context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
-    - The sixth least significant bit is the Master Salt flag, m: it is set to 1 if the compressed COSE object contains a Master Salt (see {{master-salt}}).
-    - The seventh and eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
+    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
-
-* The following 1 byte encode the length of the Master Salt ({{master-salt}}) t, if the Master Salt flag is set (m = 1).
-
-* The following t bytes encode the Master Salt, if the Master Salt flag is set (m = 1).
 
 * The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
 
@@ -776,7 +756,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 
 Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
-The length of the OSCORE option thus depends on the presence and length of Partial IV, Master Salt, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
+The length of the OSCORE option thus depends on the presence and length of Partial IV, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
 
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
