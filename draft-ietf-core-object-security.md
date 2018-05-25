@@ -959,7 +959,7 @@ Given a CoAP request, the client SHALL perform the following steps to create an 
 
 1. Retrieve the Sender Context associated with the target resource.
 
-2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the plaintext, as described in Sections {{plaintext}}{: format="counter"} and {{AAD}}{: format="counter"}.
 
 3. Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV as described in {{nonce}}.
 
