@@ -630,7 +630,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys makes it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
-If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{kn-uniqueness}} and {{replay-protection}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
+If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see Sections {{kn-uniqueness}}{: format="counter"} and {{replay-protection}}{: format="counter"}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
 
 ~~~~~~~~~~~
      <- nonce length minus 6 B -> <-- 5 bytes -->
@@ -1013,7 +1013,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 1. Retrieve the Sender Context in the Security Context associated with the Token.
 
-2. Compose the Additional Authenticated Data and the plaintext, as described in {{AAD}} and {{plaintext}}.
+2. Compose the Additional Authenticated Data and the plaintext, as described in Sections {{plaintext}}{: format="counter"} and {{AAD}}{: format="counter"}.
 
 3. Compute the AEAD nonce as described in {{nonce}}:
 
@@ -1959,7 +1959,7 @@ OSCORE is susceptible to a variety of traffic analysis attacks based on observin
 
 ##  Uniqueness of (key, nonce) {#kn-uniqueness}
 
-In this section we show that (key, nonce) pairs are unique as long as the requirements {{req-params}} and {{max-seq}} are followed.
+In this section we show that (key, nonce) pairs are unique as long as the requirements in Sections {{req-params}}{: format="counter"} and {{max-seq}}{: format="counter"} are followed.
 
 Fix a Common Context and an endpoint, called the encrypting endpoint. An endpoints may alternate between client and server roles, but each endpoint always encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF using unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
 
