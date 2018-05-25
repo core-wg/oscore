@@ -726,7 +726,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <------------- n bytes -------------->
 +-+-+-+-+-+-+-+-+--------------------------------------
-|0 0|m|h|k|  n  |       Partial IV (if any) ...    
+|0 0|0|h|k|  n  |       Partial IV (if any) ...    
 +-+-+-+-+-+-+-+-+--------------------------------------
 
  <- 1 byte -> <----- s bytes ------>                    
