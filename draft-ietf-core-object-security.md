@@ -158,7 +158,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 
 # The OSCORE Option {#option}
 
-The OSCORE option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see {{cose-object}} and {{compression}}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
+The OSCORE option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see Sections {{cose-object}}{: format="counter"} and {{compression}}{: format="counter"}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
 
 ~~~~~~~~~~~
 +------+---+---+---+---+-----------------+--------+--------+---------+
@@ -330,7 +330,7 @@ While the quartet (Master Secret, Master Salt, ID Context, Sender ID) MUST be un
 
 # Protected Message Fields {#protected-fields} 
 
-OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see {{coap-coap-proxy}} and {{http-op}}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
+OSCORE transforms a CoAP message (which may have been generated from an HTTP message) into an OSCORE message, and vice versa. OSCORE protects as much of the original message as possible while still allowing certain proxy operations (see Sections {{coap-coap-proxy}}{: format="counter"} and {{http-op}}{: format="counter"}). This section defines how OSCORE protects the message fields and transfers them end-to-end between client and server (in any direction).  
 
 The remainder of this section and later sections focus on the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in {{http-op}}.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.
 
@@ -393,7 +393,7 @@ the other endpoint.
 
 The sending endpoint SHALL write the Inner option message fields present in the original CoAP message into the plaintext of the COSE object ({{plaintext}}), and then remove the Inner option message fields from the OSCORE message. 
 
-The processing of Inner option message fields by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
+The processing of Inner option message fields by the receiving endpoint is specified in Sections {{ver-req}}{: format="counter"} and {{ver-res}}{: format="counter"}.
 
 ### Outer Options {#outer-options}
 
@@ -401,7 +401,7 @@ Outer option message fields (Class U or I) are used to support proxy operations,
 
 The sending endpoint SHALL include the Outer option message field present in the original message in the options part of the OSCORE message. All Outer option message fields, including the OSCORE option, SHALL be encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of Outer option message field. 
 
-The processing of Outer options by the receiving endpoint is specified in {{ver-req}} and {{ver-res}}.
+The processing of Outer options by the receiving endpoint is specified in Sections {{ver-req}}{: format="counter"} and {{ver-res}}{: format="counter"}.
 
 A procedure for integrity-protection-only of Class I option message fields is specified in {{AAD}}. Specifications that introduce repeatable Class I options MUST specify that proxies MUST NOT change the order of the instances of such an option in the CoAP message.
 
