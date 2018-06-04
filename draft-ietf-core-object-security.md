@@ -489,9 +489,9 @@ The presence and value of the Inner Observe determines if a request is processed
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-Every time a client issues a registration request, even if the same Token is used (see Section 3.3.1 of {{RFC7641}}), a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications. The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
+Every time a client issues a registration request, a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications. The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
 
-Intermediaries are not assumed to have the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
+Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
    * An intermediary node is not able to transform a normal response into an OSCORE protected Observe notification (see figure 7 of {{RFC7641}}) which verify as coming from the server.
   
@@ -503,7 +503,7 @@ Intermediaries are not assumed to have the OSCORE security context used by the e
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-For notifications, the Inner Observe value MUST be empty (see Section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to support multiple responses to one request, but may be omitted in applications without intermediaries.
+For notifications, the Inner Observe value MUST be empty (see Section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to allow multiple responses to one request, but may be omitted in applications without intermediaries.
    
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
