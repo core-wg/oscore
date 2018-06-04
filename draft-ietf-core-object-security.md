@@ -171,7 +171,7 @@ The OSCORE option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) ind
 ~~~~~~~~~~~
 {: #fig-option title="The OSCORE Option" artwork-align="center"}
 
-The OSCORE option includes the OSCORE flag bits ({{compression}}), the Sender Sequence Number and the Sender ID when present ({{context}}). The detailed format and length is specified in {{compression}}. If the OSCORE flag bits are all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an OSCORE option SHALL treat it as malformed and reject it.
+The OSCORE option includes the OSCORE flag bits ({{compression}}), the Sender Sequence Number, the Sender ID and the ID Context when present ({{context}}). The detailed format and length is specified in {{compression}}. If the OSCORE flag bits are all zero (0x00) the Option value SHALL be empty (Option Length = 0). An endpoint receiving a CoAP message without payload, that also contains an OSCORE option SHALL treat it as malformed and reject it.
 
 A successful response to a request with the OSCORE option SHALL contain the OSCORE option. Whether error responses contain the OSCORE option depends on the error type (see {{processing}}).
 
