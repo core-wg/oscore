@@ -585,8 +585,6 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
    
    * Optionally, a 'kid_context' parameter as defined in {{context-hint}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
 
-   * Optionally, a 'Master Salt' parameter as defined in {{master-salt}}. This parameter MAY be present in requests and SHALL NOT be present in responses.
-
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
@@ -613,11 +611,6 @@ Some examples of relevant uses of kid_context are the following:
 ~~~~~~~~~~
 {: #tab-1 title="Common Header Parameter kid_context for the COSE object" artwork-align="center"}
 
-## Master Salt {#master-salt}
-
-For certain use cases, e.g. deployments where the same Master Secret is used multiple times, it is necessary (see {{req-params}}) or favorable for the client to provide a Master Salt for deriving a fresh security context. The Master Salt parameter is used by the client to transport the Master Salt of the OSCORE security context. The server MUST protect against replay of Master Salt.
-
-An example of using the Master Salt parameter is provided in {{master-salt-transport}}.
 
 ## Nonce {#nonce}
 
