@@ -267,6 +267,10 @@ The following input parameters MAY be pre-established. In case any of these para
 
    - Default is the empty string
 
+* ID Context
+
+   - Default is nil
+
 * Key Derivation Function (KDF)
 
    - Default is HKDF SHA-256
@@ -304,7 +308,7 @@ where:
 
    * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
  
-   * id_context is the value of the header parameter 'kid_context'. If 'kid_context' is not present, the value is nil.
+   * id_context is the ID Context, or nil if ID Context has no value.
    
    * alg_aead is the AEAD Algorithm, encoded as defined in {{RFC8152}}. 
 
