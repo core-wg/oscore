@@ -699,7 +699,7 @@ where:
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
-- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}), with one exception: in case of protection or verification of Observe cancellations, contains the value of the 'Partial IV' in the COSE object of the registration request (see {{observe-registration}}).
+- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}), with one exception: in case of protection or verification of Observe cancellations, the request_piv contains the value of the 'Partial IV' in the COSE object of the corresponding registration (see {{observe-registration}}).
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
