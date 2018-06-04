@@ -950,7 +950,7 @@ To prevent accepting replay of previously received notifications, the client may
 
 This section describes the OSCORE message processing. Additional processing for Observe or Block-wise are described in subsections.
 
-Note that, analogously to {{RFC7252}} where the Token and source/destination pair are used to match a response with a request, both endpoints MUST keep the association (Token, \{Security Context, Partial IV of the request\}), in order to be able to find the Security Context and compute the AAD to protect or verify the response. The association is forgotten after it has been used to sucessfully protect or verify the response.  For Observe processing, the association kept as long as the Observation is active.
+Note that, analogously to {{RFC7252}} where the Token and source/destination pair are used to match a response with a request, both endpoints MUST keep the association (Token, \{Security Context, Partial IV of the request\}), in order to be able to find the Security Context and compute the AAD to protect or verify the response. The association may be forgotten after it has been used to sucessfully protect or verify the response, with the execption for Observe processing, where the association needs to be kept as long as the Observation is active.
 
 ## Protecting the Request {#prot-req}
 
