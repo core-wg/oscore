@@ -223,7 +223,7 @@ The Common Context contains the following parameters:
 
 * Master Salt. Variable length byte string containing the salt used to derive traffic keys and IVs.
 
-* ID Context. Variable length byte string providing additional information to identify the security context.
+* ID Context. Variable length byte string providing additional information to identify the Common Context and to assure unique AEAD keys.
 
 * Common IV. Byte string derived from Master Secret, Master Salt, and ID Context. Length is determined by the AEAD Algorithm.
 
