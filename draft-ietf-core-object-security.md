@@ -154,7 +154,7 @@ The term "hop" is used to denote a particular leg in the end-to-end path. The co
 
 The term "stop processing" is used throughout the document to denote that the message is not passed up to the CoAP Request/Response layer (see {{fig-stack}}).
 
-The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, and Common IV are defined in {{context-definition}}.
+The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, ID Context, and Common IV are defined in {{context-definition}}.
 
 # The OSCORE Option {#option}
 
