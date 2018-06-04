@@ -1613,25 +1613,25 @@ Two examples complying with the requirements on the security context parameters 
 
 ## Master Secret Used Once
 
-For settings where the Master Secret is only used during deployment, the uniqueness of the AEAD nonce may be assured by persistent storage of the security context as described in this specification (see {{context-state}}). For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime.
+An application may derive a security context once and use it for the lifetime of a device. For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. This specification describes techniques for persistent storage of the security context and synchronization of sequence numbers (see {{context-state}}) to ensure that security is maintained with the existing security context.
 
-## Master Secret Used Multiple Times {#master-salt-transport}
+## Master Secret Used Multiple Times 
 
-One Master Secret can be used to derive multiple security contexts if unique Master Salts can be guaranteed. This may be useful e.g. in case of recommissioning with reused Master Secret. In order to prevent reuse of AEAD nonce and key, which would compromise the security, the Master Salt must never be used twice, even if the device is reset, recommissioned or in error cases. Examples of failures include derivation of pseudorandom master salt from a static seed, or a deterministic seeding procedure with inputs that are repeated or can be replayed. Techniques for persistent storage of security state may be used also in this case, to ensure uniqueness of Master Salt.
+{{sec-context-establish}} recommends the use of a key establishment protocol providing forward secrecy of the Master Secret. 
 
-Assuming the Master Salts are indeed unique (or stochastically unique) we give an example of a procedure which may be implemented in client and server to establish the OSCORE security context based on pre-established input parameters (see {{context-definition}}) except for the Master Salt, which is transported in the Master Salt parameter in the OSCORE option (see {{master-salt}}) of the request.
+An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-1. In order to establish a security context with a server for the first time, or replace an old security context, the client generates a (pseudo-)random uniformly distributed 64-bit Master Salt and derives the security context as specified in {{context-derivation}}. The client protects a request with the new Sender Context and sends the message with the Master Salt in the OSCORE option (see {{master-salt}}).
+This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose: in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
 
-2. The server, receiving a request with the Master Salt parameter set derives a new security context using this Master Salt. The server processes the request as specified in this document using the new Recipient Context. If the processing of the request completes without error, the server responds with an Echo option as specified in {{I-D.ietf-core-echo-request-tag}}. The response is protected with the new Sender Context.
+* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastical uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid_context, kid) = (ID Context, Sender ID) in the OSCORE option.
 
-3. The client, receiving a response with an Echo option to an outstanding request for establishing a first, or replacing a security context, verifies the response using the new Recipient Context, and if valid repeats the request with the Echo option (see {{I-D.ietf-core-echo-request-tag}}) using the new Sender Context. Subsequent message exchanges (unless superseded) are processed using the new security context without including the Master Salt in the OSCORE option.
+* The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid_context, derives the security context using ID Context = kid_context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid_context, kid) are verified with this security context.
 
-4. The server, receiving a request with the Master Salt parameter set and a valid Echo option (see {{I-D.ietf-core-echo-request-tag}}), repeats the processing described in step 2. If it completes without error, then the new security context is established, and the request is valid. If the server already had an old security context with this client that is now replaced by the new security context.
 
-If the server receives a request without the Master Salt parameter set from a client with which there is pre-established input parameters but no Master Salt, then the server responds with a 4.01 Unauthorized error message with diagnostic payload containing the string "Master Salt not found". This is an indication of the server having lost the Master Salt or that the procedure for establishing a new Master Salt has not been successfully completed, which is a trigger for the client to run this procedure.
+As an alternative procedure to reduce the subsequent overhead in requests due to kid_context, the verification of a message with a new ID Context may trigger the server to generate a new kid to replace the Client Sender ID in future requests. A client may e.g. indicate support for such a procedure by requesting a special well-known URI and receive the new kid in the response, which together with the input parameters and the ID context is used to derive the new security context which may be identified only by its kid. The details are out of scope for this specification.
 
-Note that the message received by the server in step 2 may be a replay of an old request for establishing a first, or replacing an old security context. In this case the client does not have an outstanding request and the procedure is terminated by the client in step 3.
+The procedures may be complemented with the use of the Echo option for verifying the aliveness of the client requesting a new security context.
+
 
 # Test Vectors
 
