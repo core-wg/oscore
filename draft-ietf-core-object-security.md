@@ -471,7 +471,7 @@ OSCORE supports a subset of {{RFC7641}} operations performed in intermediary nod
 
 Inner Observe is always used to protect the value of the Observe option between the endpoints. Outer Observe is additionally used to support a selected set of intermediate node operations that are useful while maintaining end-to-end security.
 
-In order to support Observe processing in OSCORE-unaware intermediaries, for messages with Outer Observe the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses. 
+Since POST with Observe is not defined, in order to support Observe processing in OSCORE-unaware intermediaries for messages with Outer Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
 ##### Registrations and Cancellations {#observe-registration}
 
@@ -479,7 +479,7 @@ The presence and value of the Inner Observe determines if a request is processed
 
 The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
 
-Every time a client issues a registration request, a new Partial IV MUST be used, and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications. The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
+Every time a client issues a registration request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications (see {{AAD}}). The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
 
 The server MUST NOT remove an active observation if it receives a request with the same Token.
 
