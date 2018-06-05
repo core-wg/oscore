@@ -587,7 +587,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid_context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses. If kid_context is present in the request, then the server SHALL use a security context with that ID Context when verifying the request.
+   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request.
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
