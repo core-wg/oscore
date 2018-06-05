@@ -728,7 +728,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 
  <- 1 byte -> <----- s bytes ------>                    
 +------------+----------------------+------------------+
-| s (if any) | kid_context (if any) | kid (if any) ... |
+| s (if any) | kid context (if any) | kid (if any) ... |
 +------------+----------------------+------------------+
 ~~~~~~~~~~~
 {: #fig-option-value title="The OSCORE Option Value" artwork-align="center"}
@@ -736,20 +736,20 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 * The first byte of flag bits encodes the following set of flags and the length of the Partial IV parameter:
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the kid_context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
+    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the kid_context ({{context-hint}}) s, if the kid_context flag is set (h = 1).
+* The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
 
-* The following s bytes encode the kid_context, if the kid_context flag is set (h = 1).
+* The following s bytes encode the kid_context, if the kid context flag is set (h = 1).
 
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1).
 
 Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
-The length of the OSCORE option thus depends on the presence and length of Partial IV, kid_context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
+The length of the OSCORE option thus depends on the presence and length of Partial IV, kid context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
 
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
