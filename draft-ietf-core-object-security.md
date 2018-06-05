@@ -2003,8 +2003,6 @@ This section lists and discusses issues with unprotected message fields.
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
  
-* No-Response. The Outer No-Response option is used to support proxy functionality, specifically to avoid error transmissions from proxies to clients, and to avoid bandwidth reduction to servers by proxies applying congestion control when not receiving responses. Modifying or introducing this option is a potential denial-of-service attack against the proxy operations, but since the option has an Inner value its use can be securely agreed between the endpoints. The presence of this option is not expected to reveal any sensitive information about the message exchange. 
-
 * OSCORE. The OSCORE option contains information about the compressed COSE header. A change of this field may result in not being able to verify the OSCORE message.
 
 ### HTTP Message Fields
