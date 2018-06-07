@@ -223,13 +223,13 @@ The Common Context contains the following parameters:
 
 * Master Salt. Optional variable length byte string containing the salt used to derive traffic keys and IVs.
 
-* ID Context. Optional variable length byte string providing additional information to identify the Common Context and to assure unique AEAD keys.
+* ID Context. Optional variable length byte string providing additional information to identify the Common Context and to derive traffic keys and IVs.
 
 * Common IV. Byte string derived from Master Secret, Master Salt, and ID Context. Length is determined by the AEAD Algorithm.
 
 The Sender Context contains the following parameters:
 
-* Sender ID. Byte string used to identify the Sender Context and to assure unique AEAD keys and nonces. Maximum length is determined by the AEAD Algorithm.
+* Sender ID. Byte string used to identify the Sender Context, to derive traffic keys and IVs, and to assure unique nonces. Maximum length is determined by the AEAD Algorithm.
 
 * Sender Key. Byte string containing the symmetric key to protect messages to send. Derived from Common Context and Sender ID. Length is determined by the AEAD Algorithm.
 
@@ -237,13 +237,13 @@ The Sender Context contains the following parameters:
 
 The Recipient Context contains the following parameters:
 
-* Recipient ID. Byte string used to identify the Recipient Context and to assure unique AEAD keys and nonces. Maximum length is determined by the AEAD Algorithm.
+* Recipient ID. Byte string used to identify the Recipient Context, to derive traffic keys and IVs, and to assure unique nonces. Maximum length is determined by the AEAD Algorithm.
 
 * Recipient Key. Byte string containing the symmetric key to verify messages received. Derived from Common Context and Recipient ID. Length is determined by the AEAD Algorithm.
 
 * Replay Window (Server only). The replay window to verify requests received.
 
-All parameters except Sender Sequence Number and Replay Window are immutable once the security context is established. An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them from the Master Key and Master Salt when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
+All parameters except Sender Sequence Number and Replay Window are immutable once the security context is established. An endpoint may free up memory by not storing the Common IV, Sender Key, and Recipient Key, deriving them when needed. Alternatively, an endpoint may free up memory by not storing the Master Secret and Master Salt after the other parameters have been derived.
 
 Endpoints MAY operate as both client and server and use the same security context for those roles. Independent of being client or server, the endpoint protects messages to send using its Sender Context, and verifies messages received using its Recipient Context. The endpoints MUST NOT change the Sender/Recipient ID when changing roles. In other words, changing the roles does not change the set of keys to be used.
 
