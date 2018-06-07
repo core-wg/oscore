@@ -481,7 +481,7 @@ The client SHALL set both Inner and Outer Observe to the same value in the reque
 
 Every time a client issues a registration request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications (see {{AAD}}). The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
 
-The server MUST NOT remove an active observation if it receives a request with the same Token.
+The server MUST NOT remove an active observation just because it receives a request with the same Token.
 
 Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
