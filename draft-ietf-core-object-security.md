@@ -590,15 +590,15 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}}) or favorable for the client to provide an additional identifier used for distinguishing the security contexts. The kid_context parameter is used to provide such input by transporting the ID Context (see {{context-definition}}). The kid_context and kid are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
+For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}}) or favorable for the client to provide an additional identifier used for distinguishing the security contexts. The kid context parameter is used to provide such input by transporting the ID Context (see {{context-definition}}). The kid context and kid are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
 
-A summary of the COSE header parameter kid_context defined above can be found in {{tab-1}}.
+A summary of the COSE header parameter kid context defined above can be found in {{tab-1}}.
 
-Some examples of relevant uses of kid_context are the following:
+Some examples of relevant uses of kid context are the following:
 
-* If the client has a unique identifier in some namespace, then that identifier can be used as kid_context. 
+* If the client has a unique identifier in some namespace, then that identifier can be used as kid context. 
 
-* In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as kid_context to enable different security contexts for a server belonging to multiple groups.
+* In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as kid context to enable different security contexts for a server belonging to multiple groups.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
