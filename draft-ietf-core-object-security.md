@@ -994,11 +994,6 @@ If Block-wise is supported, insert the following step before any other:
 
 A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
-### Supporting Observe {#observe-ver-req}
-
-If Observe is supported, insert the following step between step 6 and 7 of {{ver-req}}:
-
-B. If Inner Observe is present and has value zero, and Outer Observe option was either not present or did not have value 0, then remove the Inner Observe option.
 
 ## Protecting the Response {#prot-res}
 
@@ -1073,7 +1068,10 @@ C. If Inner Observe is present then:
 
   * If the request was not an Observe registration, then go to 8.
    
-  * If the request was an Observe registration and the Partial IV is present in the response, then initialize or update the Notification Number with the 'Partial IV' parameter, if the Partial IV was greater than the Notification Number, as described in {{replay-notifications}}, and follow the processing specified in {{notifications}} . 
+  * If the request was an Observe registration and the Partial IV is present in the response then follow the processing described in {{notifications}} and {{replay-notifications}}: 
+
+  - initialize the Notification Number (if first successfully received notification), or
+  - overwrite the Notification Number (if the received Partial IV was greater than the Notification Number).
 
 Replace step 8 of {{ver-res}} with:
 
@@ -1604,7 +1602,7 @@ Client  Proxy  Server
 ~~~~~~~~~~~
 {: #fig-blood-sugar title="Secure Subscribe to Sensor. Square brackets [ ... ] indicate content of compressed COSE object header. Curly brackets { ... \} indicate encrypted data." artwork-align="center"}
 
-The dummy Codes (FETCH/Content) are visible in the header of the OSCORE message to allow intermediary processing of Observe. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
+The dummy Codes (FETCH/Content) are used to allow forwarding of Observe messages. The options Content-Format (0) and the payload ("220" and "180"), are encrypted.
 
 The COSE header of the request contains an identifier (ca), indicating the security context used to protect the message and a Partial IV (15). The COSE headers of the responses contains Partial IVs (32 and 36).
 
@@ -1998,7 +1996,7 @@ This section lists and discusses issues with unprotected message fields.
 
 * Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. Proxy-Uri/Proxy-Scheme/Uri-Host/Uri-Port cannot be integrity protected since they are allowed to be changed by a forward proxy. Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{proxy-uri}}. 
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, whereas the Inner Observe allows the receiving endpoint to verify the intent of the sending endpoint.  Removing the Outer option of a registration request turns it into a normal request, which is legitimate Observe behavior for proxies and servers but the client cannot tell what party removed the option. An attacker putting back the Outer Observe 0 removed by the proxy will cause notifications unwanted by the intermediary. Removing the Outer option of a cancellation request is ignored by the server. Removing the Outer option in the response may lead to notifications not being forwarded or cause a denial-of-service. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. A replay of a registration request may cancel a registration or trigger the server to resend a cached notification (see {{observe-registration}}), but an intermediary device should not be able to craft a new registration request.
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. 
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
 
