@@ -467,29 +467,30 @@ Because of encryption of Uri-Path and Uri-Query, messages to the same server may
 
 Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7641}}, in which case the Observe related processing can be omitted. 
 
-OSCORE supports a subset of {{RFC7641}} operations performed in intermediary nodes as specified in this section. The use of Observe targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through any intermediate node, as illustrated in Figure 8 of {{RFC7641}}). 
+The support for Observe {{RFC7641}} with OSCORE targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through intermediary nodes, as illustrated in Figure 8 of {{RFC7641}}). 
 
-Inner Observe is always used to protect the value of the Observe option between the endpoints. Outer Observe is additionally used to support a selected set of intermediate node operations that are useful while maintaining end-to-end security.
+Inner Observe is used to protect the value of the Observe option between the endpoints. Outer Observe is additionally used when needed to support forwarding by intermediary nodes.
 
 Since POST with Observe is not defined, in order to support Observe processing in OSCORE-unaware intermediaries for messages with Outer Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
 ##### Registrations and Cancellations {#observe-registration}
 
-The presence and value of the Inner Observe determines if a request is processed as a registration request, a cancellation request, or a normal request without Observe, with one exception as described below. If the Inner Observe option is not present, then the server SHALL process the message as a request without Observe. If the Inner Observe value is 1 (cancellation), then the server SHALL process the message as a cancellation. If the Inner Observe value is 0 (registration), then the processing depends on the Outer Observe.
+The Inner Observe in the request SHALL contain the value set by the client; 0 (registration) or 1 (cancellation).
+The Outer Observe in a request may be needed for intermediary nodes to allow multiple responses to one request, but may be omitted in applications without intermediaries. If Outer Observe is used, the client SHALL set the value of the Outer Observe to the same value as the Inner Observe.
 
-The client SHALL set both Inner and Outer Observe to the same value in the request.  In order to support the case of an intermediary node changing a registration request to a request without Observe (see Section 2 of [RFC7641]) in case Inner Observe has value 0, the server SHALL only consider the received message a registration request if also the Outer Observe are set to 0, otherwise it SHALL process the message as a request without Observe.
-
-Every time a client issues a registration request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of new notifications (see {{AAD}}). The Partial IV of the registration is used as 'request\_piv' of all associated notifications, as well as 'request\_piv' of associated cancellations (see {{AAD}}).
+Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}). The Partial IV of the registration is also used as 'request\_piv' of associated cancellations (see {{AAD}}).
 
 The server MUST NOT remove an active observation just because it receives a request with the same Token.
 
 Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
+   * An intermediary node removing the Outer Observe 0 does not change the registration request to a request without Observe (see Section 2 of {{RFC7641}}). Instead other means for cancellation may be used as described in Section 3.6 of {{RFC7641}}.
+ 
    * An intermediary node is not able to transform a normal response into an OSCORE protected Observe notification (see figure 7 of {{RFC7641}}) which verify as coming from the server.
   
    * An intermediary node is not able to initiate an OSCORE protected Observe registration (Observe with value 0)  which verify as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If a OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request.
    
-   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1)  which verify as coming from the client. An application may decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1, or to respond with Reset to a notification (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
+   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1)  which verify as coming from the client. An application may decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1 (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
 
 
 ##### Notifications {#notifications}
