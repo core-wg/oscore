@@ -440,7 +440,7 @@ During OSCORE processing, Proxy-Uri is split into:
 * Uri-Path = "resource"
 * Uri-Query = "q=1"
 
-Uri-Path and Uri-QuIery follow the processing defined in {{inner-options}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCORE message, which has value:
+Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and are thus encrypted and transported in the COSE object. The remaining options are composed into the Proxy-Uri included in the options part of the OSCORE message, which has value:
 
 * Proxy-Uri = "coap://example.com"
 
