@@ -1648,7 +1648,6 @@ As an alternative procedure to reduce the subsequent overhead in requests due to
 
 The procedures may be complemented with the use of the Echo option for verifying the aliveness of the client requesting a new security context.
 
-
 # Test Vectors
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE. Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
@@ -1793,7 +1792,7 @@ Outputs:
 
 ## Test Vector 4: OSCORE Request, Client {#tv4}
 
-This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv-ms}}. The unprotected request only contains the Uri-Path option.
+This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv-ms}}. The unprotected request only contains the Uri-Path and Uri-Host options.
 
 Unprotected CoAP request: 0x44015d1f00003974396c6f63616c686f737483747631 (22 bytes)
 
@@ -1828,9 +1827,9 @@ From there:
 
 * Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f63616c686f7374d2050914ff612f1092f1776f1c1668b3825e (36 bytes)
 
-## Test Vector 5: OSCORE Request, Client
+## Test Vector 5: OSCORE Request, Client {#tv5}
 
-This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path option.
+This section contains a test vector for an OSCORE protected CoAP GET request using the security context derived in {{key-der-tv}}. The unprotected request only contains the Uri-Path and Uri-Host options.
 
 Unprotected CoAP request: 0x440171c30000b932396c6f63616c686f737483747631 (22 bytes)
 
@@ -1865,7 +1864,46 @@ From there:
 
 * Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f63616c686f7374d305091400ff4ed339a5a379b0b8bc731fffb0 (37 bytes)
 
-## Test Vector 6: OSCORE Response, Server
+## Test Vector 6: OSCORE Request, Client {#tv6}
+
+This section contains a test vector for an OSCORE protected CoAP GET request carrying the ID Context in the message, using the security context derived in {{key-der-kc}}. The unprotected request only contains the Uri-Path and Uri-Host options.
+
+Unprotected CoAP request: 0x44012f8eef9bbf7a396c6f63616c686f737483747631 (22 bytes)
+
+Common Context:
+
+* AEAD Algorithm: 10 (AES-CCM-16-64-128)
+* Key Derivation Function: HKDF SHA-256
+* Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+* ID Context: 0x37cbf3210017a2d3 (8 bytes)
+
+Sender Context:
+
+* Sender ID: 0x (0 bytes)
+* Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+* Sender Sequence Number: 20
+
+The following COSE and cryptographic parameters are derived:
+
+* Partial IV: 0x14 (1 byte)
+* kid: 0x (0 byte)
+* kid_context: 0x37cbf3210017a2d3 (8 bytes)
+* external_aad: 0x8501810a40411440 (8 bytes)
+* AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+* plaintext: 0x01b3747631 (5 bytes)
+* encryption key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+* nonce: 0x2ca58fb85ff1b81c0b7181b84a (13 bytes)
+
+From the previous parameter, the following is derived:
+
+* OSCORE option value: 0x19140837cbf3210017a2d3 (11 bytes)
+* ciphertext: 0x72cd7273fd331ac45cffbe55c3 (13 bytes)
+
+From there:
+
+* Protected CoAP request (OSCORE message): 0x44022f8eef9bbf7a396c6f63616c686f7374db0519140837cbf3210017a2d3ff4ed339a5a379b0b8bc731fffb0 (45 bytes)
+
+## Test Vector 7: OSCORE Response, Server {#tv7}
 
 This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV. Note that some parameters are derived from the request.
 
@@ -1900,7 +1938,7 @@ From there:
 
 * Protected CoAP response (OSCORE message): 0x64445d1f00003974d008ffdbaad1e9a7e7b2a813d3c31524378303cdafae119106 (33 bytes)
 
-##  Test Vector 7: OSCORE Response with Partial IV, Server
+##  Test Vector 8: OSCORE Response with Partial IV, Server {#tv8}
 
 This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV. Note that some parameters are derived from the request.
 
