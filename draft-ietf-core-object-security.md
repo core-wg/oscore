@@ -1825,7 +1825,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f63616c686f7374d2050914ff612f1092f1776f1c1668b3825e (36 bytes)
+* Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f63616c686f7374620914ff612f1092f1776f1c1668b3825e (35 bytes)
 
 ## Test Vector 5: OSCORE Request, Client {#tv5}
 
@@ -1862,7 +1862,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f63616c686f7374d305091400ff4ed339a5a379b0b8bc731fffb0 (37 bytes)
+* Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f63616c686f737463091400ff4ed339a5a379b0b8bc731fffb0 (36 bytes)
 
 ## Test Vector 6: OSCORE Request, Client {#tv6}
 
@@ -1901,7 +1901,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP request (OSCORE message): 0x44022f8eef9bbf7a396c6f63616c686f7374db0519140837cbf3210017a2d3ff4ed339a5a379b0b8bc731fffb0 (45 bytes)
+* Protected CoAP request (OSCORE message): 0x44022f8eef9bbf7a396c6f63616c686f73746b19140837cbf3210017a2d3ff4ed339a5a379b0b8bc731fffb0 (44 bytes)
 
 ## Test Vector 7: OSCORE Response, Server {#tv7}
 
@@ -1936,7 +1936,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP response (OSCORE message): 0x64445d1f00003974d008ffdbaad1e9a7e7b2a813d3c31524378303cdafae119106 (33 bytes)
+* Protected CoAP response (OSCORE message): 0x64445d1f0000397490ffdbaad1e9a7e7b2a813d3c31524378303cdafae119106 (32 bytes)
 
 ##  Test Vector 8: OSCORE Response with Partial IV, Server {#tv8}
 
@@ -1972,7 +1972,7 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP response (OSCORE message): 0x64445d1f00003974d2080100ff4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (35 bytes)
+* Protected CoAP response (OSCORE message): 0x64445d1f00003974920100ff4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (34 bytes)
 
 # Overview of Security Properties {#overview-sec-properties}
 
