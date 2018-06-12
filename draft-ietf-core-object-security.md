@@ -314,7 +314,7 @@ where:
 
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV.
 
-Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. OSCORE sets the salt's default value to empty byte string, which for implementation purposes is equivalent to not providing it and consequently setting it to a string of zeroes (see section 2.2 of {{RFC5869}}).
+Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. OSCORE sets the salt's default value to empty byte string, which for implementation purposes is equivalent to not providing it and consequently setting it to a string of zeroes (see Section 2.2 of {{RFC5869}}).
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
