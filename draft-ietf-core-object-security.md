@@ -622,7 +622,7 @@ Some examples of relevant uses of kid context are the following:
 | context  |        |            |                | kid context     |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
-{: #tab-1 title="Common Header Parameter kid_context for the COSE object" artwork-align="center"}
+{: #tab-1 title="Common Header Parameter kid context for the COSE object" artwork-align="center"}
 
 
 ## Nonce {#nonce}
@@ -727,7 +727,7 @@ The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE option and 
 
 ## Encoding of the OSCORE Option Value {#obj-sec-value}
 
-The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid_context parameter (length and value), and the kid parameter as follows:
+The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <------------- n bytes -------------->
@@ -745,14 +745,14 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 * The first byte of flag bits encodes the following set of flags and the length of the Partial IV parameter:
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid_context (see {{context-hint}}).
+    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
 * The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
 
-* The following s bytes encode the kid_context, if the kid context flag is set (h = 1).
+* The following s bytes encode the kid context, if the kid context flag is set (h = 1).
 
 * The remaining bytes encode the value of the kid, if the kid is present (k = 1).
 
@@ -818,7 +818,7 @@ This section covers a list of OSCORE Header Compression examples for requests an
 ~~~~~~~~~~~
 
 {: req}
-3. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid_context = 0x44616c656b
+3. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
 
 ~~~~~~~~~~~
     Before compression (30 bytes):
@@ -1404,9 +1404,9 @@ Note to IANA: Please note all occurrences of "TBDx" in this specification should
 
 ## COSE Header Parameters Registry
 
-The 'kid_context' parameter is added to the "COSE Header Parameters Registry":
+The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 
-* Name: kid_context
+* Name: kid context
 * Label: TBD2
 * Value Type: bstr
 * Value Registry: 
@@ -1639,12 +1639,12 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose: in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
 
-* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastical uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid_context, kid) = (ID Context, Sender ID) in the OSCORE option.
+* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastical uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
 
-* The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid_context, derives the security context using ID Context = kid_context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid_context, kid) are verified with this security context.
+* The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid context, kid) are verified with this security context.
 
 
-As an alternative procedure to reduce the subsequent overhead in requests due to kid_context, the verification of a message with a new ID Context may trigger the server to generate a new kid to replace the Client Sender ID in future requests. A client may e.g. indicate support for such a procedure by requesting a special well-known URI and receive the new kid in the response, which together with the input parameters and the ID context is used to derive the new security context which may be identified only by its kid. The details are out of scope for this specification.
+As an alternative procedure to reduce the subsequent overhead in requests due to kid context, the verification of a message with a new ID Context may trigger the server to generate a new kid to replace the Client Sender ID in future requests. A client may e.g. indicate support for such a procedure by requesting a special well-known URI and receive the new kid in the response, which together with the input parameters and the ID context is used to derive the new security context which may be identified only by its kid. The details are out of scope for this specification.
 
 The procedures may be complemented with the use of the Echo option for verifying the aliveness of the client requesting a new security context.
 
@@ -1887,7 +1887,7 @@ The following COSE and cryptographic parameters are derived:
 
 * Partial IV: 0x14 (1 byte)
 * kid: 0x (0 byte)
-* kid_context: 0x37cbf3210017a2d3 (8 bytes)
+* kid context: 0x37cbf3210017a2d3 (8 bytes)
 * external_aad: 0x8501810a40411440 (8 bytes)
 * AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 * plaintext: 0x01b3747631 (5 bytes)
