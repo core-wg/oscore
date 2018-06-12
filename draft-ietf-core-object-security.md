@@ -483,7 +483,7 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 The support for Observe {{RFC7641}} with OSCORE targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through intermediary nodes, as illustrated in Figure 8 of {{RFC7641}}). 
 
-Inner Observe is used to protect the value of the Observe option between the endpoints. Outer Observe may additionally be used to support forwarding by intermediary nodes, but may be omitted in applications without intermediaries. 
+Inner Observe SHALL be used to protect the value of the Observe option between the endpoints. Outer Observe MAY additionally be used to support forwarding by intermediary nodes, but MAY be omitted in applications without intermediaries. 
 
 Since POST with Observe is not defined, in order to support Observe processing in OSCORE-unaware intermediaries for messages with Outer Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
