@@ -1743,9 +1743,9 @@ Outputs:
 * Recipient Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 * Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
 
-## Test Vector 3: Key Derivation with kid_context {#key-der-kc}
+## Test Vector 3: Key Derivation with ID Context {#key-der-kc}
 
-In this test vector, a Master Salt of 8 bytes and a kid_context of 8 bytes are used. The default values are used for AEAD Algorithm and KDF.
+In this test vector, a Master Salt of 8 bytes and a ID Context of 8 bytes are used. The default values are used for AEAD Algorithm and KDF.
 
 ### Client
 
@@ -1755,7 +1755,7 @@ Inputs:
 * Master Salt: 0x9e7ca92223786340 (8 bytes)
 * Sender ID: 0x (0 byte)
 * Recipient ID: 0x01 (1 byte)
-* kid_context: 0x37cbf3210017a2d3 (8 bytes)
+* ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
 From the previous parameters,
 
@@ -1777,7 +1777,7 @@ Inputs:
 * Master Salt: 0x9e7ca92223786340 (8 bytes)
 * Sender ID: 0x01 (1 byte)
 * Recipient ID: 0x (0 byte)
-* kid_context: 0x37cbf3210017a2d3 (8 bytes)
+* ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
 From the previous parameters,
 
