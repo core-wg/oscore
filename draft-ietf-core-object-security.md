@@ -261,15 +261,19 @@ The following input parameters MAY be pre-established. In case any of these para
 
 * AEAD Algorithm
 
-   - Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
+  - Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
+
+* Master Salt
+
+  - Default is the empty byte string
 
 * Key Derivation Function (KDF)
 
-   - Default is HKDF SHA-256
+  - Default is HKDF SHA-256
 
 * Replay Window Type and Size
 
-   - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
+  - Default is DTLS-type replay protection with a window size of 32 {{RFC6347}}
 
 All input parameters need to be known to and agreed on by both endpoints, but the replay window may be different in the two endpoints. The way the input parameters are pre-established, is application specific. Considerations of security context establishment are given in {{sec-context-establish}} and examples of deploying OSCORE in {{deployment-examples}}.
 
@@ -283,7 +287,7 @@ The KDF MUST be one of the HMAC based HKDF {{RFC5869}} algorithms defined for CO
 
 where:
 
-* salt is the Master Salt as defined above (if provided)
+* salt is the Master Salt as defined above
 * IKM is the Master Secret as defined above
 * info is a serialization of a CBOR array consisting of:
 
@@ -298,7 +302,7 @@ where:
 ~~~~~~~~~~~
 where:
 
-   * id is the Sender ID or Recipient ID when deriving keys and the empty string when deriving the Common IV. The encoding is described in {{cose-object}}.
+   * id is the Sender ID or Recipient ID when deriving keys and the empty byte string when deriving the Common IV. The encoding is described in {{cose-object}}.
  
    * id_context is the ID Context, or nil if ID Context is not provided.
    
@@ -309,6 +313,8 @@ where:
    * L is the size of the key/IV for the AEAD algorithm used, in bytes.
 
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV.
+
+Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. OSCORE sets the salt's default value to empty byte string, which for implementation purposes is equivalent to not providing it and consequently setting it to a string of zeroes (see section 2.2 of {{RFC5869}}).
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
