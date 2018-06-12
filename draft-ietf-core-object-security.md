@@ -454,7 +454,7 @@ See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
 
 #### Uri-Host and Uri-Port {#uri-host}
 
-Uri-Host and Uri-Port are defined to be Class U options in order to support forward proxy processing (see {{proxy-uri}}). For a given OSCORE request, a change in Uri-Host, Uri-Port, or scheme in the Proxy-Uri MUST NOT lead to a different successful response. Uri-Host SHOULD NOT contain privacy sensitive information. Note that Uri-Host and Uri-Port may be omitted in the message when the default values are used (see Section 5.10.1 of {{RFC7252}}).
+Uri-Host and Uri-Port are defined to be Class U options in order to support forward proxy processing (see {{proxy-uri}}). For a given OSCORE request, a change in Uri-Host, Uri-Port, or scheme in the Proxy-Uri MUST NOT lead to a different result. Uri-Host SHOULD NOT contain privacy sensitive information. Note that Uri-Host and Uri-Port may be omitted in the message when the default values are used (see Section 5.10.1 of {{RFC7252}}).
 
 In deployments without forward proxies, Uri-Host and Uri-Port SHOULD be Class E and thus encrypted and integrity protected between the endpoints. In this case the Outer Uri-Host and Uri-Port SHALL be discarded by the server when verifying the request, complying with Step 1 of the {{ver-req}}. Uri-Host and Uri-Port MUST NOT be Class E in deployments supporting forward proxy operations. 
 
@@ -2049,7 +2049,7 @@ This section lists and discusses issues with unprotected message fields.
 
 * Proxy-Uri/Proxy-Scheme. These options are used in forward proxy deployments. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. The other parts of Proxy-Uri cannot be protected since they are allowed to be changed by a forward proxy. The server can verify what scheme is used in the last hop, but not what was requested by the client or what was used in previous hops. 
 
-* Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, but if the OSCORE request verifies, must not lead to a different successful OSCORE response (see {{uri-host}}). Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{uri-host}}.
+* Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, and the application needs to handle the consequences of that (see {{uri-host}}). Depending on content, the Uri-Host may either reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged in {{uri-host}}.
 
 * Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. 
 
