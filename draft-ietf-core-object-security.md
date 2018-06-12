@@ -477,14 +477,13 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 The support for Observe {{RFC7641}} with OSCORE targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through intermediary nodes, as illustrated in Figure 8 of {{RFC7641}}). 
 
-Inner Observe is used to protect the value of the Observe option between the endpoints. Outer Observe is additionally used when needed to support forwarding by intermediary nodes.
+Inner Observe is used to protect the value of the Observe option between the endpoints. Outer Observe may additionally be used to support forwarding by intermediary nodes, but may be omitted in applications without intermediaries. 
 
 Since POST with Observe is not defined, in order to support Observe processing in OSCORE-unaware intermediaries for messages with Outer Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
 ##### Registrations and Cancellations {#observe-registration}
 
-The Inner Observe in the request SHALL contain the value set by the client; 0 (registration) or 1 (cancellation).
-The Outer Observe in a request may be needed for intermediary nodes to allow multiple responses to one request, but may be omitted in applications without intermediaries. If Outer Observe is used, the client SHALL set the value of the Outer Observe to the same value as the Inner Observe.
+The Inner Observe in the request contains the Observe value of the original CoAP request; 0 (registration) or 1 (cancellation). If Outer Observe is used in a request, the client SHALL set the value of the Outer Observe to the same value as the Inner Observe.
 
 Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}). The Partial IV of the registration is also used as 'request\_piv' of associated cancellations (see {{AAD}}).
 
