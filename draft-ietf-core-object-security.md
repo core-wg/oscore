@@ -2009,7 +2009,7 @@ OSCORE is susceptible to a variety of traffic analysis attacks based on observin
 
 In this section we show that (key, nonce) pairs are unique as long as the requirements in Sections {{req-params}}{: format="counter"} and {{max-seq}}{: format="counter"} are followed.
 
-Fix a Common Context and an endpoint, called the encrypting endpoint. An endpoints may alternate between client and server roles, but each endpoint always encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF using unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
+Fix a Common Context and an endpoint, called the encrypting endpoint. An endpoint may alternate between client and server roles, but each endpoint always encrypts with the Sender Key of its Sender Context. Sender Keys are (stochastically) unique since they are derived with HKDF using unique Sender IDs, so messages encrypted by different endpoints use different keys. It remains to prove that the nonces used by the fixed endpoint are unique.
 
 Since the Common IV is fixed, the nonces are determined by a Partial IV (PIV) and the Sender ID of the endpoint generating that Partial IV (ID_PIV). The nonce construction ({{nonce}}) with the size of the ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs. There are two cases:
 
