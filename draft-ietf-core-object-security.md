@@ -821,6 +821,10 @@ This section covers a list of OSCORE Header Compression examples for requests an
 {: req}
 3. Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid = empty string, Partial IV = 0x05, and kid context = 0x44616c656b
 
+<!--
+NOTE (IANA registration) that the following example uses kid context = 8. This might need to be changed following IANA assignment.
+-->
+
 ~~~~~~~~~~~
     Before compression (30 bytes):
 
@@ -1652,6 +1656,10 @@ The procedures may be complemented with the use of the Echo option for verifying
 # Test Vectors
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE. Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
+
+<!--
+NOTE (IANA registration) that the following example uses option number = 9. This might need to be changed following IANA assignment.
+-->
 
 ## Test Vector 1: Key Derivation with Master Salt {#key-der-tv-ms}
 
