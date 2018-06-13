@@ -428,9 +428,10 @@ Proxy-Uri, when present, is split by OSCORE into class U options and class E opt
 
 The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to Section 6.4 of {{RFC7252}}. 
 
-Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}). 
+Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}).
 
-The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host, and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}).
+
+The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host, and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}). For a given OSCORE request, a change in Proxy-Uri MUST NOT lead to a different successful result, see {{uri-host}}.
 
 Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}). OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies (see {{coap2http}}). In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
 
@@ -454,7 +455,7 @@ See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
 
 #### Uri-Host and Uri-Port {#uri-host}
 
-Uri-Host and Uri-Port are defined to be Class U options in order to support forward proxy processing (see {{proxy-uri}}). For a given OSCORE request, a change in Uri-Host, Uri-Port, or scheme in the Proxy-Uri MUST NOT lead to a different result. Uri-Host SHOULD NOT contain privacy sensitive information. Note that Uri-Host and Uri-Port may be omitted in the message when the default values are used (see Section 5.10.1 of {{RFC7252}}).
+Uri-Host and Uri-Port are defined to be Class U options in order to support forward proxy processing (see {{proxy-uri}}). To protect against manipulation of an OSCORE request, a change in Uri-Host or Uri-Port MUST NOT lead to a different successful result; for example, if the same Uri-Host is used with the same security context such that the request verifies and leads to a different server action or response. Uri-Host SHOULD NOT contain privacy sensitive information. Note that Uri-Host and Uri-Port may be omitted in the message when the default values are used (see Section 5.10.1 of {{RFC7252}}).
 
 In deployments without forward proxies, Uri-Host and Uri-Port SHOULD be Class E and thus encrypted and integrity protected between the endpoints. In this case the Outer Uri-Host and Uri-Port SHALL be discarded by the server when verifying the request, complying with Step 1 of the {{ver-req}}. Uri-Host and Uri-Port MUST NOT be Class E in deployments supporting forward proxy operations. 
 
