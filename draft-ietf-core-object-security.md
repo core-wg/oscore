@@ -2007,7 +2007,7 @@ OSCORE depends on a pre-established random Master Secret ({{master-secret}}) use
 
 * Request-response binding: An attacker should not be able to make a client match a response to the wrong request.
 
-* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has already accepted. 
+* Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has previously received and accepted. 
 
 In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
 
