@@ -484,34 +484,36 @@ Observe {{RFC7641}} is an optional feature. An implementation MAY support {{RFC7
 
 The support for Observe {{RFC7641}} with OSCORE targets the requirements on forwarding of Section 2.2.1 of {{I-D.hartke-core-e2e-security-reqs}}, i.e. that observations go through intermediary nodes, as illustrated in Figure 8 of {{RFC7641}}). 
 
-Inner Observe SHALL be used to protect the value of the Observe option between the endpoints. Outer Observe MAY additionally be used to support forwarding by intermediary nodes, but MAY be omitted in applications without intermediaries. 
+Inner Observe SHALL be used to protect the value of the Observe option between the endpoints. Outer Observe SHALL be used to support forwarding by intermediary nodes. 
 
-Since POST with Observe is not defined, in order to support Observe processing in OSCORE-unaware intermediaries for messages with Outer Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
+The server SHALL include a new Partial IV in responses (with or without the Observe option) to Observe registrations.
+
+{{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server MUST NOT remove an active observation just because it receives a request with the same Token.
+
+Since POST with Observe is not defined, for messages with Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
 ##### Registrations and Cancellations {#observe-registration}
 
-The Inner Observe in the request contains the Observe value of the original CoAP request; 0 (registration) or 1 (cancellation). If Outer Observe is used in a request, the client SHALL set the value of the Outer Observe to the same value as the Inner Observe.
+The Inner and Outer Observe in the request MUST contain the Observe value of the original CoAP request; 0 (registration) or 1 (cancellation).
 
 Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}). The Partial IV of the registration is also used as 'request\_piv' of associated cancellations (see {{AAD}}).
-
-The server MUST NOT remove an active observation just because it receives a request with the same Token.
 
 Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
    * An intermediary node removing the Outer Observe 0 does not change the registration request to a request without Observe (see Section 2 of {{RFC7641}}). Instead other means for cancellation may be used as described in Section 3.6 of {{RFC7641}}.
  
-   * An intermediary node is not able to transform a normal response into an OSCORE protected Observe notification (see figure 7 of {{RFC7641}}) which verify as coming from the server.
+   * An intermediary node is not able to transform a normal response into an OSCORE protected Observe notification (see figure 7 of {{RFC7641}}) which verifies as coming from the server.
   
-   * An intermediary node is not able to initiate an OSCORE protected Observe registration (Observe with value 0)  which verify as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If a OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. The server SHALL NOT respond to a replayed registration request with a message encrypted using the Partial IV of the request.
+   * An intermediary node is not able to initiate an OSCORE protected Observe registration (Observe with value 0) which verifies as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If an OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. 
    
-   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1)  which verify as coming from the client. An application may decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1 (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
+   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1) which verifies as coming from the client. An application MAY decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1 (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
 
 
 ##### Notifications {#notifications}
 
 If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
-For notifications, the Inner Observe value MUST be empty (see Section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification may be needed for intermediary nodes to allow multiple responses to one request, but may be omitted in applications without intermediaries.
+For notifications, the Inner Observe value MUST be empty (see Section 3.2 of {{RFC7252}}). The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value. The Outer Observe in a notification is needed for intermediary nodes to allow multiple responses to one request.
    
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
@@ -593,7 +595,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading bytes of value zero SHALL be removed when encoding the Partial IV, except in the case of Partial IV of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. In case of Observe notifications ({{observe}}) the Partial IV SHALL be present in responses, and otherwise the Partial IV will not typically be present in responses. 
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading bytes of value zero SHALL be removed when encoding the Partial IV, except in the case of Partial IV of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. The Partial IV SHALL be present in responses to Observe registrations (see {{observe-registration}}), otherwise the Partial IV will not typically be present in responses. 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -984,7 +986,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 1. Discard Code and all options which may be class E (marked in {{fig-option-protection}} with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.
 
-2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
+2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter, additionally using the 'kid context', if present. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
    * If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
@@ -1034,7 +1036,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported, insert the following step between step 2 and 3 of {{prot-res}}:
 
-A. If the request is a notification, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
+A. If the request was a registration, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
 
 ## Verifying the Response {#ver-res}
 
