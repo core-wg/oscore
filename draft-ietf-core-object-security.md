@@ -359,11 +359,11 @@ A summary of how options are protected is shown in {{fig-option-protection}}. No
   | No.  | Name            | E | U |
   +------+-----------------+---+---+
   |   1  | If-Match        | x |   |
-  |   3  | Uri-Host        |   | x |
+  |   3  | Uri-Host        | x | x |
   |   4  | ETag            | x |   |
   |   5  | If-None-Match   | x |   |
   |   6  | Observe         | x | x |
-  |   7  | Uri-Port        |   | x |
+  |   7  | Uri-Port        | x | x |
   |   8  | Location-Path   | x |   |
   | TBD1 | OSCORE          |   | x |
   |  11  | Uri-Path        | x |   |
@@ -422,18 +422,21 @@ An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE er
 Successful OSCORE responses do not need to include an Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
 
 
+#### Uri-Host and Uri-Port {#uri-host}
+
+Uri-Host and Uri-Port are of Class E, if present. When Uri-Host or Uri-Port coincides with its default value (destination IP literal or destination port number) it is recommended to be omitted (Section 5.4.4 of {{RFC7252}}), in which case it is not protected by OSCORE. A change of scheme, destination IP or port during transport MUST NOT cause an OSCORE message to be verified with undesirable result. For example, if OSCORE security context is shared between different destinations, a malicously diverted request may cause other actions than intended.
+
+In order to support forward proxy operations with the Proxy-Uri option, Uri-Host and Uri-Port are additionally Class U (see {{proxy-uri}}). In this case Uri-Host SHOULD NOT contain privacy sensitive information. If present, the Outer Uri-Host and Uri-Port SHALL be discarded by the server when verifying the request.
+
 #### Proxy-Uri {#proxy-uri}
 
-Proxy-Uri, when present, is split by OSCORE into class U options and class E options, which are processed accordingly. When Proxy-Uri is used in the original CoAP message, Uri-* are not present {{RFC7252}}.
-
-The sending endpoint SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to Section 6.4 of {{RFC7252}}. 
+When Proxy-Uri is present, the client SHALL first decompose the Proxy-Uri value of the original CoAP message into the Proxy-Scheme, Uri-Host, Uri-Port, Uri-Path, and Uri-Query options (if present) according to Section 6.4 of {{RFC7252}}. 
 
 Uri-Path and Uri-Query are class E options and SHALL be protected and processed as Inner options ({{inner-options}}).
 
+The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host, and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}). 
 
-The Proxy-Uri option of the OSCORE message SHALL be set to the composition of Proxy-Scheme, Uri-Host, and Uri-Port options (if present) as specified in Section 6.5 of {{RFC7252}}, and processed as an Outer option of Class U ({{outer-options}}). For a given OSCORE request, a change in Proxy-Uri MUST NOT lead to a different successful result, see {{uri-host}}.
-
-Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}). OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies (see {{coap2http}}). In future documents specifying cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specify in which OSCORE class they belong.
+Note that replacing the Proxy-Uri value with the Proxy-Scheme and Uri-* options works by design for all CoAP URIs (see Section 6 of {{RFC7252}}). OSCORE-aware HTTP servers should not use the userinfo component of the HTTP URI (as defined in Section 3.2.1 of {{RFC3986}}), so that this type of replacement is possible in the presence of CoAP-to-HTTP proxies (see {{coap2http}}). In future specifications of cross-protocol proxying behavior using different URI structures, it is expected that the authors will create Uri-* options that allow decomposing the Proxy-Uri, and specifying the OSCORE processing.
 
 An example of how Proxy-Uri is processed is given here. Assume that the original CoAP message contains:
 
@@ -451,15 +454,7 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 * Proxy-Uri = "coap://example.com"
 
-See Sections 6.1 and 12.6 of {{RFC7252}} for more information.
-
-#### Uri-Host and Uri-Port {#uri-host}
-
-Uri-Host and Uri-Port are defined to be Class U options in order to support forward proxy processing (see {{proxy-uri}}). To protect against manipulation of an OSCORE request, a change in Uri-Host or Uri-Port MUST NOT lead to a different successful result. An application needs to be aware that these fields are sent unprotected, and, for example, make sure that if the Uri-Host is tampered with in an OSCORE request, this does not lead to a different server action or response on the server. Uri-Host SHOULD NOT contain privacy sensitive information. Note that Uri-Host and Uri-Port may be omitted in the message when the default values are used (see Section 5.10.1 of {{RFC7252}}).
-
-In deployments without forward proxies, Uri-Host and Uri-Port SHOULD be Class E and thus encrypted and integrity protected between the endpoints. In this case the Outer Uri-Host and Uri-Port SHALL be discarded by the server when verifying the request, complying with Step 1 of the {{ver-req}}. Uri-Host and Uri-Port MUST NOT be Class E in deployments supporting forward proxy operations. 
-
-Note that deployments using Class E Uri-Host and Uri-Port options are not interoperable with deployments using Class U Uri-Host and Uri-Port options.
+See Sections 6.1 and 12.6 of {{RFC7252}} for more details. Note that Uri-Host is also Inner in this example (see {{uri-host}}).
 
 #### The Block Options {#block-options}
 
