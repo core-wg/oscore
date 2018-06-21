@@ -424,9 +424,14 @@ Successful OSCORE responses do not need to include an Outer Max-Age option since
 
 #### Uri-Host and Uri-Port {#uri-host}
 
-Uri-Host and Uri-Port are of Class E, if present. When Uri-Host or Uri-Port coincides with its default value (destination IP literal or destination port number) it is recommended to be omitted (Section 5.4.4 of {{RFC7252}}), in which case it is not protected by OSCORE. A change of scheme, destination IP or port during transport MUST NOT cause an OSCORE message to be verified with undesirable result. For example, if OSCORE security context is shared between different destinations, a malicously diverted request may cause other actions than intended.
+It is expected that Uri-Host and Uri-Port typically are set by the client to its default values; destination IP literal and port number 5683, respectively (see Section 5.10.1 {{RFC7252}}), and that the options are elided from the message (Section 5.4.4 of {{RFC7252}}). 
+The server MUST be able to retrieve the relevant Recipient Context in the absence of Uri-Host and Uri-Port. Manipulation of destination IP/port or request scheme MUST NOT lead to an OSCORE message becoming verified by an unintended server or service. Different servers and services SHOULD have different security contexts.
 
-In order to support forward proxy operations with the Proxy-Uri option, Uri-Host and Uri-Port are additionally Class U (see {{proxy-uri}}). In this case Uri-Host SHOULD NOT contain privacy sensitive information. If present, the Outer Uri-Host and Uri-Port SHALL be discarded by the server when verifying the request.
+In order to support forward proxy operations using the Proxy-Scheme option, Uri-Host and Uri-Port need to be Class U. For the use of Proxy-Uri, see {{proxy-uri}}. The Outer Uri-Host SHOULD be an IP literal and SHOULD coincide with the default value in the message sent from the proxy to the server so it is elided from that message. If the Outer Uri-Host is not an IP literal then the Outer Uri-Host SHOULD NOT contain privacy sensitive information.
+Except in the forward proxy case, if not elided due to being the default value, Uri-Host and Uri-Port SHALL be Inner. In the forward proxy case Uri-Host and Uri-Port MAY be Inner, if the additional message overhead is acceptable. The server SHALL discard Outer Uri-Host / Uri-Port, if present, when verifying the request.
+
+The Outer Uri-Host / Uri-Port value may be different than Inner Uri-Host / Uri-Port value. The purpose of the Outer is to route the message right while revealing as little as possible about the message, whereas the purpose of the Inner is to identify the right server and/or service. Manipulation of Outer Uri-Host or Outer Uri-Port MUST NOT lead to an OSCORE message becoming verified by an unintended server or service
+
 
 #### Proxy-Uri {#proxy-uri}
 
@@ -454,7 +459,9 @@ Uri-Path and Uri-Query follow the processing defined in {{inner-options}}, and a
 
 * Proxy-Uri = "coap://example.com"
 
-See Sections 6.1 and 12.6 of {{RFC7252}} for more details. Note that Uri-Host is also Inner in this example (see {{uri-host}}).
+The presence of "example.com" is for illustrative reasons to indicate a non-default value, whereas the use of default values is strongly recommended (see {{uri-host}}). Note that there may also be an Inner Uri-Host in this example (see {{uri-host}}).
+
+See Sections 6.1 and 12.6 of {{RFC7252}} for more details. 
 
 #### The Block Options {#block-options}
 
