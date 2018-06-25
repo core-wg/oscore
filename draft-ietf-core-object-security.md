@@ -1071,30 +1071,20 @@ A.  If Block-wise is present in the request then process the Outer Block options
 
 If Observe is supported:
 
-Insert the following step between step 2 and step 3:
-
-A. If the request was a registration and the response has a Partial IV, verify for replay as specified in {{replay-notifications}}.
-
 Insert the following step between step 5 and step 6:
 
-B. If the request was a registration:
+A. If Inner Observe is present then:
 
-  * If the client has previously received a successful notification to the registration (active observation) or if Inner Observe is present:
-  
-    - If the Partial IV is not present in the response, then go to 8.
-
-C. If Inner Observe is present then:
-
-  * If the request was not an Observe registration, then go to 8.
+  * If the request was not an Observe registration or if the Partial IV is not present in the response, then go to 8.
    
-  * If the request was an Observe registration and the Partial IV is present in the response then follow the processing described in {{notifications}} and {{replay-notifications}}: 
+  * If the request was an Observe registration then follow the processing described in {{notifications}} and {{replay-notifications}}: 
 
   - initialize the Notification Number (if first successfully received notification), or
   - overwrite the Notification Number (if the received Partial IV was greater than the Notification Number).
 
 Replace step 8 of {{ver-res}} with:
 
-D. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
 # Web Linking
 
