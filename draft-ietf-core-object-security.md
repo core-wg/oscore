@@ -322,7 +322,7 @@ The Sender Sequence Number is initialized to 0.  The supported types of replay p
 
 ## Requirements on the Security Context Parameters {#req-params}
 
-To ensure unique Sender Keys, the quartet (Master Secret, Master Salt, ID Context, Sender ID) MUST be unique, i.e. the pair (ID Context, Sender ID) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt.  The same Master Salt MAY however be used with several Master Secrets and the same Master Secret MAY be used with several Master Salts. The requirement that Sender ID SHALL be unique in the set of all security contexts using the same Master Secret, Master Salt, and ID Context guarantees unique (key, nonce) pairs, which avoids nonce reuse.
+To ensure unique Sender Keys, the quartet (Master Secret, Master Salt, ID Context, Sender ID) MUST be unique, i.e. the pair (ID Context, Sender ID) SHALL be unique in the set of all security contexts using the same Master Secret and Master Salt. The requirement that Sender ID SHALL be unique in the set of all security contexts using the same Master Secret, Master Salt, and ID Context guarantees unique (key, nonce) pairs, which avoids nonce reuse.
 
 Different methods can be used to assign Sender IDs: a protocol that allows the parties to negotiate locally unique identifiers, a trusted third party (e.g., {{I-D.ietf-ace-oauth-authz}}), or the identifiers can be assigned out-of-band. The Sender IDs can be very short (note that the empty string is a legitimate value). The maximum length of Sender ID in bytes equals the length of AEAD nonce minus 6. For AES-CCM-16-64-128 the maximum length of Sender ID is 7 bytes. 
 
