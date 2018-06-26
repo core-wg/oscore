@@ -643,7 +643,7 @@ The AEAD nonce is constructed in the following way (see {{fig-nonce}}):
  
 Note that in this specification only algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint unique IDs and encryption keys makes it easy to verify that the nonces used with a specific key will be unique, see {{kn-uniqueness}}.
 
-If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see Sections {{kn-uniqueness}}{: format="counter"} and {{replay-protection}}{: format="counter"}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
+If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e. when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see {{replay-protection}} and {{kn-uniqueness}}. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see {{reboot-replay}}. For processing instructions see {{processing}}.
 
 ~~~~~~~~~~~
      <- nonce length minus 6 B -> <-- 5 bytes -->
