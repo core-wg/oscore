@@ -929,7 +929,7 @@ The operation of validating the Partial IV and updating the replay protection MU
 
 The following applies additionally when Observe is supported.
 
-The Notification Number is initialized to the Partial IV of the first successfully received notification to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
+The Notification Number is initialized to the Partial IV of the first successfully verified notification in response to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
 
 If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV.  
 
@@ -1082,7 +1082,7 @@ A. If Inner Observe is present then:
    
   * If the request was an Observe registration then follow the processing described in {{notifications}} and {{replay-notifications}}: 
 
-    - initialize the Notification Number (if first received notification, with previous verifications passed), or
+    - initialize the Notification Number (if first successfully verified notification), or
     
     - overwrite the Notification Number (if the received Partial IV was greater than the Notification Number).
 
