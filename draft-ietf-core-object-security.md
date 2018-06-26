@@ -1379,8 +1379,6 @@ The maximum sender sequence number is dependent on the AEAD algorithm. The maxim
 
 In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct keys, the nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have a good amount of randomness (see {{master-secret}}).
 
-Note that by construction of HKDF, using the default value for Master Salt produces the same result as the Master Salt set to a byte string of zeros of a certain length (see Section 2.2 of {{RFC5869}}), so those are considered the same value of the Master Salt.
-
 
 ## Message Segmentation
 
