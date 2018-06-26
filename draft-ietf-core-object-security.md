@@ -611,23 +611,21 @@ The encryption process is described in Section 5.3 of {{RFC8152}}.
 
 ## Kid Context {#context-hint}
 
-For certain use cases, e.g. deployments where the same kid is used with multiple contexts, it is necessary (see {{req-params}}) or favorable for the client to provide an additional identifier used for distinguishing the security contexts. The kid context parameter is used to provide such input by transporting the ID Context (see {{context-definition}}). The kid context and kid are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
+For certain use cases, e.g. deployments where the same Sender ID is used with multiple contexts, it is possible (and sometimes necessary, see {{req-params}}) for the client to use an ID Context to distinguish the security contexts (see {{context-definition}}). For example:
 
-A summary of the COSE header parameter kid context defined above can be found in {{tab-1}}.
+* If the client has a unique identifier in some namespace, then that identifier can be used as ID Context. 
 
-Some examples of relevant uses of kid context are the following:
+* In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as ID Context to enable different security contexts for a server belonging to multiple groups.
 
-* If the client has a unique identifier in some namespace, then that identifier can be used as kid context. 
-
-* In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as kid context to enable different security contexts for a server belonging to multiple groups.
+The Sender ID and Context ID are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context, see {{tab-1}}.
  
 ~~~~~~~~~~
-+----------+--------+------------+----------------+-----------------+
-|   name   |  label | value type | value registry | description     |
-+----------+--------+------------+----------------+-----------------+
-|   kid    |  TBD2  | bstr       |                | Identifies the  |
-| context  |        |            |                | kid context     |
-+----------+--------+------------+----------------+-----------------+
++----------+--------+------------+----------------+--------------------+
+|   name   |  label | value type | value registry |    description     |
++----------+--------+------------+----------------+--------------------+
+|   kid    |  TBD2  | bstr       |                | Additional context |
+| context  |        |            |                | for identification |
++----------+--------+------------+----------------+--------------------+
 ~~~~~~~~~~
 {: #tab-1 title="Common Header Parameter kid context for the COSE object" artwork-align="center"}
 
@@ -1412,7 +1410,7 @@ The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 * Label: TBD2
 * Value Type: bstr
 * Value Registry: 
-* Description: Identifies the kid context
+* Description: Additional context for identification
 * Reference: {{context-hint}} of this document
 
 Note to IANA: Label assignment in (Integer value between 1 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
