@@ -492,7 +492,7 @@ Inner Observe SHALL be used to protect the value of the Observe option between t
 
 The server SHALL include a new Partial IV in responses (with or without the Observe option) to Observe registrations.
 
-{{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server MUST NOT remove an active observation just because it receives a request with the same Token.
+{{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server SHOULD NOT remove an active observation just because it receives a request with the same Token.
 
 Since POST with Observe is not defined, for messages with Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
 
@@ -510,7 +510,7 @@ Intermediaries are not assumed to have access to the OSCORE security context use
   
    * An intermediary node is not able to initiate an OSCORE protected Observe registration (Observe with value 0) which verifies as coming from the client. An OSCORE-aware intermediary SHALL NOT initiate registrations of observations (see {{coap-coap-proxy}}). If an OSCORE-unaware proxy re-sends an old registration message from a client this will trigger the replay protection mechanism in the server. To prevent this from resulting in the OSCORE-unaware proxy to cancel of the registration, a server MAY respond to a replayed registration request with a replay of a cached notification. Alternatively, the server MAY send a new notification. 
    
-   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1) which verifies as coming from the client. An application MAY decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1 (see Section 3.6 of {{RFC7641}}), but that is out of scope for this specification. 
+   * An intermediary node is not able to initiate an OSCORE protected Observe cancellation (Observe with value 1) which verifies as coming from the client. An application MAY decide to allow intermediaries to cancel Observe registrations, e.g. to send Observe with value 1 (see Section 3.6 of {{RFC7641}}), but that can also be done with other methods, e.g. reusing the Token in a different request or sending a RST message. This is out of scope for this specification. 
 
 
 ##### Notifications {#notifications}
