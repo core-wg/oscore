@@ -159,11 +159,11 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 The OSCORE option (see {{fig-option}}, which extends Table 4 of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see Sections {{cose-object}}{: format="counter"} and {{compression}}{: format="counter"}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
 
 ~~~~~~~~~~~
-+------+---+---+---+---+-----------------+--------+--------+---------+
-| No.  | C | U | N | R | Name            | Format | Length | Default |
-+------+---+---+---+---+-----------------+--------+--------+---------+
-| TBD1 | x |   |   |   | OSCORE          |  (*)   | 0-255  | (none)  |
-+------+---+---+---+---+-----------------+--------+--------+---------+
++------+---+---+---+---+----------------+--------+--------+---------+
+| No.  | C | U | N | R | Name           | Format | Length | Default |
++------+---+---+---+---+----------------+--------+--------+---------+
+| TBD1 | x |   |   |   | OSCORE         |  (*)   | 0-255  | (none)  |
++------+---+---+---+---+----------------+--------+--------+---------+
     C = Critical,   U = Unsafe,   N = NoCacheKey,   R = Repeatable   
     (*) See below.
 ~~~~~~~~~~~
@@ -965,7 +965,7 @@ To prevent accepting replay of previously received notifications, the client may
 
 This section describes the OSCORE message processing. Additional processing for Observe or Block-wise are described in subsections.
 
-Note that, analogously to {{RFC7252}} where the Token and source/destination pair are used to match a response with a request, both endpoints MUST keep the association (Token, \{Security Context, Partial IV of the request\}), in order to be able to find the Security Context and compute the AAD to protect or verify the response. The association MAY be forgotten after it has been used to sucessfully protect or verify the response, with the exception of Observe processing, where the association MUST be kept as long as the Observation is active.
+Note that, analogously to {{RFC7252}} where the Token and source/destination pair are used to match a response with a request, both endpoints MUST keep the association (Token, \{Security Context, Partial IV of the request\}), in order to be able to find the Security Context and compute the AAD to protect or verify the response. The association MAY be forgotten after it has been used to successfully protect or verify the response, with the exception of Observe processing, where the association MUST be kept as long as the Observation is active.
 
 ## Protecting the Request {#prot-req}
 
@@ -1346,7 +1346,7 @@ In scenarios with intermediary nodes such as proxies or gateways, transport laye
 
 (D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is recommended, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
 
-Applications need to consider that certain message fields and messages types are not protected end-to-end and the conseqeunces of spoofing or manipulating that information. The consequences of unprotected message fields are analyzed in {{unprot-fields}}. 
+Applications need to consider that certain message fields and messages types are not protected end-to-end and may be spoofed or manipulated. The consequences of unprotected message fields are analyzed in {{unprot-fields}}. 
 
 ## Security Context Establishment {#sec-context-establish}
 
@@ -1638,7 +1638,7 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose: in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
 
-* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastical uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
+* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
 
 * The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid context, kid) are verified with this security context.
 
