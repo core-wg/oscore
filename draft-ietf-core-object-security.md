@@ -621,12 +621,12 @@ For certain use cases, e.g. deployments where the same Sender ID is used with mu
 The Sender ID and Context ID are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context, see {{tab-1}}.
  
 ~~~~~~~~~~
-+----------+--------+------------+----------------+--------------------+
-|   name   |  label | value type | value registry |    description     |
-+----------+--------+------------+----------------+--------------------+
-|   kid    |  TBD2  | bstr       |                | Additional context |
-| context  |        |            |                | for identification |
-+----------+--------+------------+----------------+--------------------+
++----------+--------+------------+----------------+-----------------+
+|   name   |  label | value type | value registry |   description   |
++----------+--------+------------+----------------+-----------------+
+|   kid    |  TBD2  | bstr       |                | Identifies the  |
+| context  |        |            |                | context for kid |
++----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
 {: #tab-1 title="Common Header Parameter kid context for the COSE object" artwork-align="center"}
 
@@ -1389,7 +1389,7 @@ Privacy threats executed through intermediary nodes are considerably reduced by 
 
 The unprotected options ({{fig-option-protection}}) may reveal privacy sensitive information, see {{unprot-fields}}. CoAP headers sent in plaintext allow, for example, matching of CON and ACK (CoAP Message Identifier), matching of request and responses (Token) and traffic analysis. OSCORE does not provide protection for HTTP header fields which are not both CoAP-mappable and class E. The HTTP message fields which are visible to on-path entity are only used for the purpose of transporting the OSCORE message, whereas the application layer message is encoded in CoAP and encrypted.
 
-COSE message fields, i.e. the OSCORE option, may reveal information about the communicating endpoints. E.g. 'kid context', which is intended to help the server find the right context, may reveal information about the client. Tracking 'kid' and 'kid context' to one server may be used for correlating requests from one client.
+COSE message fields, i.e. the OSCORE option, may reveal information about the communicating endpoints. E.g. 'kid' and 'kid context', which are intended to help the server find the right context, may reveal information about the client. Tracking 'kid' and 'kid context' to one server may be used for correlating requests from one client.
 
 Unprotected error messages reveal information about the security state in the communication between the endpoints. Unprotected signaling messages reveal information about the reliable transport used on a leg of the path. Using the mechanisms described in {{context-state}} may reveal when a device goes through a reboot. This can be mitigated by the device storing the precise state of sender sequence number and replay window on a clean shutdown.
 
@@ -1411,7 +1411,7 @@ The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 * Label: TBD2
 * Value Type: bstr
 * Value Registry: 
-* Description: Additional context for identification
+* Description: Identifies the context for kid
 * Reference: {{context-hint}} of this document
 
 Note to IANA: Label assignment in (Integer value between 1 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
