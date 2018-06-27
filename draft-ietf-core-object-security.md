@@ -386,7 +386,8 @@ U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
 
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing.
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. If a new CoAP option is of class U, the potential issues with
+the option being unprotected SHOULD be documented (see {{unprot-fields}}).
 
 ### Inner Options {#inner-options}
 
