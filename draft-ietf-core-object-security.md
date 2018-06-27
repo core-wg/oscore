@@ -64,7 +64,6 @@ informative:
   RFC5869:
   RFC6690:
   RFC7228:
-  RFC7390:
   RFC7515:
   RFC7967:
   I-D.ietf-ace-oauth-authz:
@@ -75,7 +74,6 @@ informative:
   I-D.ietf-ace-oscore-profile:
   I-D.ietf-core-oscore-groupcomm:
   I-D.ietf-core-echo-request-tag:
-  I-D.ietf-6tisch-minimal-security:
   
   MF00:
     title: Attacks on Encryption of Redundant Plaintext and Implications on Internet Security
