@@ -1077,11 +1077,17 @@ If Observe is supported:
 
 Insert the following step between step 5 and step 6:
 
-A. If Inner Observe is present then:
+A. If the request was a registration:
 
-  * If the request was not an Observe registration or if the Partial IV is not present in the response, then go to 8.
-   
-  * If the request was an Observe registration then follow the processing described in {{notifications}} and {{replay-notifications}}: 
+  * If the client has previously received a successful notification to the registration (active observation) or if Inner Observe is present:
+ 
+   - If the Partial IV is not present in the response, then go to 8.
+
+B. If Inner Observe is present then:
+
+  * If the request was not an Observe registration, then go to 8.
+
+  * If the request was an Observe registration and the Partial IV is present in the response then follow the processing described in {{notifications}} and {{replay-notifications}}: 
 
     - initialize the Notification Number (if first successfully verified notification), or
     
@@ -1089,7 +1095,7 @@ A. If Inner Observe is present then:
 
 Replace step 8 of {{ver-res}} with:
 
-B. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
+C. In case any of the previous erroneous conditions apply: the client SHALL stop processing the response. An error condition occurring while processing a response to an observation request does not cancel the observation. A client MUST NOT react to failure by re-registering the observation immediately. 
 
 # Web Linking
 
