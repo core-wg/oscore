@@ -1081,7 +1081,7 @@ A. If the request was a registration:
 
   * If the client has previously received a successful notification to the registration (active observation) or if Inner Observe is present:
  
-   - If the Partial IV is not present in the response, then go to 8.
+    - If the Partial IV is not present in the response, then go to 8.
 
 B. If Inner Observe is present then:
 
