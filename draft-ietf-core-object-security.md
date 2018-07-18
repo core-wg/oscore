@@ -489,7 +489,7 @@ The support for Observe {{RFC7641}} with OSCORE targets the requirements on forw
 
 Inner Observe SHALL be used to protect the value of the Observe option between the endpoints. Outer Observe SHALL be used to support forwarding by intermediary nodes. 
 
-The server SHALL include a new Partial IV in responses (with or without the Observe option) to Observe registrations.
+The server SHALL include a new Partial IV in responses (with or without the Observe option) to Observe registrations, except for the first response where Partial IV MAY be omitted.
 
 {{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server SHOULD NOT remove an active observation just because it receives a request with the same Token.
 
@@ -514,13 +514,13 @@ Intermediaries are not assumed to have access to the OSCORE security context use
 
 ##### Notifications {#notifications}
 
-If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error). To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in {{replay-notifications}}.
+If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error), except for the first one where Partial IV MAY be omitted. To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration, or 0 if no Partial IV was received yet. Further details of replay protection of notifications are specified in {{replay-notifications}}.
 
 For notifications, the Inner Observe value MUST be empty (see Section 3.2 of {{RFC7252}}). The Outer Observe in a notification is needed for intermediary nodes to allow multiple responses to one request, and may be set to the value of Observe in the original CoAP message. The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the outer Observe value.
 
 If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in {{ver-res}}. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in {{ver-res}}.
 
-A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. In order to support existing Observe implementations the OSCORE client implementation MAY set the Observe value to the three least significant bytes of the Partial IV.
+A client MUST consider the notification with the highest Partial IV as the freshest, regardless of the order of arrival. In order to support existing Observe implementations the OSCORE client implementation MAY set the Observe value to the three least significant bytes of the Partial IV or zero if no Partial IV was received.
 
 
 #### No-Response {#no-resp}
@@ -719,9 +719,6 @@ The oscore_version and algorithms parameters are established out-of-band and are
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, need not be integrity protected in all requests.
 
 The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{RFC8152}}.
-
-
-
 
 # OSCORE Header Compression {#compression}
 
@@ -930,7 +927,7 @@ The operation of validating the Partial IV and updating the replay protection MU
 
 The following applies additionally when Observe is supported.
 
-The Notification Number is initialized to the Partial IV of the first successfully verified notification in response to the registration request. A client receiving a notification SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
+The Notification Number is initialized to the Partial IV of the first successfully verified notification in response to the registration request, or to zero if the first successfully verified notification does not contain a Partial IV. A client MUST only accept at most one Observe notifications without Partial IV, and treat it as the oldest notification received. A client receiving a notification containing a Partial IV SHALL compare the Partial IV with the Notification Number associated to that Observe registration. The client MUST stop processing notifications with a Partial IV which has been previously received. Applications MAY decide that a client only processes notifications which have greater Partial IV than the Notification Number.
 
 If the verification of the response succeeds, and the received Partial IV was greater than the Notification Number then the client SHALL overwrite the corresponding Notification Number with the received Partial IV.  
 
@@ -1039,7 +1036,7 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported, insert the following step between step 2 and 3 of {{prot-res}}:
 
-A. If the request was a registration, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
+A. If the response is an observe notification, and if the nonce from the request was already used, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
 
 ## Verifying the Response {#ver-res}
 
@@ -1079,7 +1076,7 @@ Insert the following step between step 5 and step 6:
 
 A. If the request was an Observe registration, then:
 
-  * If the Partial IV is not present in the response, and either the client has previously received a successful notification to the registration (active observation) or Inner Observe is present, then go to 8.
+  * If the Partial IV is not present in the response, and Inner Observe is present, and the nonce from the request was already used once, then go to 8.
   
   * If the Partial IV is present in the response and Inner Observe is present, then follow the processing described in {{notifications}} and {{replay-notifications}}, then: 
 
@@ -2064,7 +2061,7 @@ A. For requests, and responses with Partial IV (e.g. Observe notifications):
 
 Since the encrypting endpoint steps the Partial IV for each use, the nonces used in case A are all unique as long as the number of encrypted messages is kept within the required range ({{max-seq}}).
 
-B. For responses without Partial IV (subset of cases with single response to a request):
+B. For responses without Partial IV (e.g. single response to a request):
 
 * ID_PIV = Sender ID of the endpoint generating the request
 * PIV = Partial IV of the request
@@ -2097,7 +2094,7 @@ This section lists and discusses issues with unprotected message fields.
 * Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, and the application needs to handle the consequences of that (see {{uri-host}}). 
 The Uri-Host may either be omitted, reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged.
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. Cancellations ({{observe-registration}}) are not bound to the corresponding registrations in the same way responses are bound to requests in OSCORE (see {{prot-message-fields}}), but that does not open up for attacks based on mismatched cancellations, since {{RFC7641}} specifies that for cancellations to be accepted, all options except for ETags MUST be the same (see Section 3.6 of {{RFC7641}}). For different target resources, the OSCORE option is different, and even if the Token is modified to match a different observation, such a cancellation would not be accepted.
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The absence of Partial IV, since only allowed for the first notification, does not prevent correct ordering of notifications. The size and distributions of notifications over time may reveal information about the content or nature of the notifications. Cancellations ({{observe-registration}}) are not bound to the corresponding registrations in the same way responses are bound to requests in OSCORE (see {{prot-message-fields}}), but that does not open up for attacks based on mismatched cancellations, since {{RFC7641}} specifies that for cancellations to be accepted, all options except for ETags MUST be the same (see Section 3.6 of {{RFC7641}}). For different target resources, the OSCORE option is different, and even if the Token is modified to match a different observation, such a cancellation would not be accepted.
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
 
