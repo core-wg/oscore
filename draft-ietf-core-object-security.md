@@ -1523,11 +1523,11 @@ This section registers the media type 'application/oscore' media type in the "Co
 
 ## OSCORE Octet Registry {#oscore-octet}
 
-It is requested that IANA create a new registry entitled "OSCORE Octet". The registry should be created with the Standards Action policy.
+It is requested that IANA create a new registry entitled "OSCORE Octet". The registry should be created with the Expert Review policy. Guidelines for the experts are provided in {{exp-instr}}.
 
 The columns of the registry are:
 
-* bit position: This indicates the position of the bit in the OSCORE Octet, starting at 0 for the least significant bit. The bit position must be an integer or a range of integers, in the range 0 to 7.
+* bit position: This indicates the position of the bit in the OSCORE Octet, starting at 0 for the least significant bit. The bit position must be an integer or a range of integers, in the range 0 to 63.
 
 * name: The name is present to make it easier to refer to and discuss the registration entry. The value is not used in the protocol. Names are to be unique in the table.
 
@@ -1535,7 +1535,7 @@ The columns of the registry are:
 
 * specification: This contains a pointer to the specification defining the entry.
 
-The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. 
+The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 7 is to be marked as 'Reserved'.
 
 ~~~~~~~~~~~
 +--------------+-------------+---------------------+-------------------+
@@ -1556,6 +1556,10 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 +--------------+-------------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: #table-flagbyte artwork-align="center"}
+
+## Expert Review Instructions {#exp-instr}
+
+todo
 
 --- back
 
