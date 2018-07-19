@@ -1037,10 +1037,12 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 If Observe is supported, insert the following step between step 2 and 3 of {{prot-res}}:
 
 A. If the response is an observe notification:
+
   * If the response is the first notification:
     - compute the AEAD nonce as described in {{nonce}}:
       * Either use the nonce from the request, or 
       * Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+      
       Then go to 4.
   * If the response is not the first notification:
     - encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
