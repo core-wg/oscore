@@ -1531,7 +1531,7 @@ It is requested that IANA create a new registry entitled "OSCORE Octet". The reg
 
 The columns of the registry are:
 
-* bit position: This indicates the position of the bit in the OSCORE Octet, starting at 0 for the least significant bit. The bit position must be an integer or a range of integers, in the range 0 to 63.
+* bit position: This indicates the position of the bit in the OSCORE Octet, starting at 0 for the most significant bit. The bit position must be an integer or a range of integers, in the range 0 to 63.
 
 * name: The name is present to make it easier to refer to and discuss the registration entry. The value is not used in the protocol. Names are to be unique in the table.
 
@@ -1539,21 +1539,21 @@ The columns of the registry are:
 
 * specification: This contains a pointer to the specification defining the entry.
 
-The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 7 is to be marked as 'Reserved'.
+The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'.
 
 ~~~~~~~~~~~
 +--------------+-------------+---------------------+-------------------+
 | Bit Position |     Name    |     Description     |   Specification   |
 +--------------+-------------+---------------------+-------------------+
-|     0-2      | Partial IV  | Encodes the Partial | [[this document]] |
+|     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
 |              | Length      | IV length; can have |                   |
 |              |             | value 0 to 5        |                   |
 +--------------+-------------+---------------------+-------------------+
-|       3      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
+|       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
 |              |             | present in the com- |                   |
 |              |             | pressed COSE object |                   |
 +--------------+-------------+---------------------+-------------------+
-|       4      | Kid Context | Set to 1 if kid     | [[this document]] |
+|       3      | Kid Context | Set to 1 if kid     | [[this document]] |
 |              | Flag        | context is present  |                   |
 |              |             | in the compressed   |                   |
 |              |             | COSE object         |                   |
