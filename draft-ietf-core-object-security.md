@@ -416,7 +416,7 @@ Some options require special processing as specified in this section.
 
 An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in {{inner-options}}.
 
-An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermedary caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option since the responses appear to the OSCORE-unaware intermediary as 2.04 Changed responses, which are non-cacheable (see {{coap-header}}).
+An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermediary caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option since the responses appear to the OSCORE-unaware intermediary as 2.04 Changed responses, which are non-cacheable (see {{coap-header}}).
 
 The Outer Max-Age message field is processed according to {{outer-options}}.
 
@@ -1036,7 +1036,14 @@ If a CoAP response is generated in response to an OSCORE request, the server SHA
 
 If Observe is supported, insert the following step between step 2 and 3 of {{prot-res}}:
 
-A. If the response is an observe notification, and if the nonce from the request was already used, encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
+A. If the response is an observe notification:
+  * If the response is the first notification:
+    - compute the AEAD nonce as described in {{nonce}}:
+      * Either use the nonce from the request, or 
+      * Encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV.
+      Then go to 4.
+  * If the response is not the first notification:
+    - encode the Partial IV (Sender Sequence Number in network byte order) and increment the Sender Sequence Number by one. Compute the AEAD nonce from the Sender ID, Common IV, and Partial IV, then go to 4.
 
 ## Verifying the Response {#ver-res}
 
