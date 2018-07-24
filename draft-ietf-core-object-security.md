@@ -1791,6 +1791,11 @@ Outputs:
 * Recipient Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 * Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x2ca58fb85ff1b81c0b7181b85e
+* recipient nonce: 0x2da58fb85ff1b81d0b7181b85e
+
 ### Server
 
 Inputs:
@@ -1812,6 +1817,11 @@ Outputs:
 * Sender Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 * Recipient Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 * Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x2da58fb85ff1b81d0b7181b85e
+* recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e
 
 ## Test Vector 4: OSCORE Request, Client {#tv4}
 
