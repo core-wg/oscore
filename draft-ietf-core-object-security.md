@@ -1680,6 +1680,11 @@ Outputs:
 * Recipient Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 * Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x4622d4dd6d944168eefb54987c
+* recipient nonce: 0x4722d4dd6d944169eefb54987c
+
 ### Server
 
 Inputs:
@@ -1700,6 +1705,11 @@ Outputs:
 * Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 * Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
 * Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x4722d4dd6d944169eefb54987c
+* recipient nonce: 0x4622d4dd6d944168eefb54987c
 
 ## Test Vector 2: Key Derivation without Master Salt {#key-der-tv}
 
