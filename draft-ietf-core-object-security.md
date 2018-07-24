@@ -499,7 +499,7 @@ Since POST with Observe is not defined, for messages with Observe, the Outer Cod
 
 The Inner and Outer Observe in the request MUST contain the Observe value of the original CoAP request; 0 (registration) or 1 (cancellation).
 
-Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}). The Partial IV of the registration is also used as 'request\_piv' of associated cancellations (see {{AAD}}).
+Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}).
 
 Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
@@ -710,7 +710,7 @@ where:
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
-- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}), with one exception: in case of protection or verification of Observe cancellations, the request_piv contains the value of the 'Partial IV' in the COSE object of the corresponding registration (see {{observe-registration}}).
+- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
@@ -2055,7 +2055,7 @@ This section lists and discusses issues with unprotected message fields.
 * Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, and the application needs to handle the consequences of that (see {{uri-host}}). 
 The Uri-Host may either be omitted, reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged.
 
-* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. 
+* Observe. The Outer Observe option is intended for an OSCORE-unaware proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The size and distributions of notifications over time may reveal information about the content or nature of the notifications. Cancellations ({{observe-registration}}) are not bound to the corresponding registrations in the same way responses are bound to requests in OSCORE (see {{prot-message-fields}}), but that does not open up for attacks based on mismatched cancellations, since {{RFC7641}} specifies that for cancellations to be accepted, all options except for ETags MUST be the same (see Section 3.6 of {{RFC7641}}). For different target resources, the OSCORE option is different, and even if the Token is modified to match a different observation, such a cancellation would not be accepted.
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
 
