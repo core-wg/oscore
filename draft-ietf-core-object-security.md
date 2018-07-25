@@ -746,11 +746,14 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 ~~~~~~~~~~~
 {: #fig-option-value title="The OSCORE Option Value" artwork-align="center"}
 
-* The first byte of flag bits encodes the following set of flags and the length of the Partial IV parameter:
+* The first byte, called OSCORE Octet, encodes the following set of flag bits and the length of the Partial IV parameter:
+
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
+
+The flag bits are registered in the OSCORE Octet registry specified in {{oscore-octet}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
@@ -763,7 +766,6 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
 The length of the OSCORE option thus depends on the presence and length of Partial IV, kid context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
-
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
@@ -1518,6 +1520,48 @@ This section registers the media type 'application/oscore' media type in the "Co
 +----------------------+----------+----------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
+
+## OSCORE Octet Registry {#oscore-octet}
+
+It is requested that IANA create a new registry entitled "OSCORE Octet". The registry should be created with the Expert Review policy. Guidelines for the experts are provided in {{exp-instr}}.
+
+The columns of the registry are:
+
+* bit position: This indicates the position of the bit in the OSCORE Octet, starting at 0 for the most significant bit. The bit position must be an integer or a range of integers, in the range 0 to 63.
+
+* name: The name is present to make it easier to refer to and discuss the registration entry. The value is not used in the protocol. Names are to be unique in the table.
+
+* description: This contains a brief description of the use of the bit.
+
+* specification: This contains a pointer to the specification defining the entry.
+
+The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'. This entry is going to be specified in a future document, and will be used to expand the OSCORE Octet in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
+
+~~~~~~~~~~~
++--------------+-------------+---------------------+-------------------+
+| Bit Position |     Name    |     Description     |   Specification   |
++--------------+-------------+---------------------+-------------------+
+|       0      | Reserved    |                     |                   |
++--------------+-------------+---------------------+-------------------+
+|       3      | Kid Context | Set to 1 if kid     | [[this document]] |
+|              | Flag        | context is present  |                   |
+|              |             | in the compressed   |                   |
+|              |             | COSE object         |                   |
++--------------+-------------+---------------------+-------------------+
+|       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
+|              |             | present in the com- |                   |
+|              |             | pressed COSE object |                   |
++--------------+-------------+---------------------+-------------------+
+|     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
+|              | Length      | IV length; can have |                   |
+|              |             | value 0 to 5        |                   |
++--------------+-------------+---------------------+-------------------+
+~~~~~~~~~~~
+{: #table-flagbyte artwork-align="center"}
+
+## Expert Review Instructions {#exp-instr}
+
+The expert reviewers for the registry defined in this document are expected to ensure that the usage solves a valid use case that could hardly be solved in a different way, that it is not going to duplicate one that is already registered, and that the registered point is likely to be used in deployments. They are furthermore expected to check the clarity of purpose and use of the requested code points. Experts should take into account the expected usage of entries when approving point assignment, and the length of the encoded value should be weighed against the number of code points left that encode to that size and the size of device it will be used on. Experts should block registration for entries 8-63 until these points are defined (i.e. until the mechanism for the OSCORE Octet expansion via bit 0 is specified).
 
 --- back
 
