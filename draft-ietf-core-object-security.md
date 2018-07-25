@@ -1541,18 +1541,20 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 +--------------+-------------+---------------------+-------------------+
 | Bit Position |     Name    |     Description     |   Specification   |
 +--------------+-------------+---------------------+-------------------+
-|     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
-|              | Length      | IV length; can have |                   |
-|              |             | value 0 to 5        |                   |
-+--------------+-------------+---------------------+-------------------+
-|       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
-|              |             | present in the com- |                   |
-|              |             | pressed COSE object |                   |
+|       0      | Reserved    |                     |                   |
 +--------------+-------------+---------------------+-------------------+
 |       3      | Kid Context | Set to 1 if kid     | [[this document]] |
 |              | Flag        | context is present  |                   |
 |              |             | in the compressed   |                   |
 |              |             | COSE object         |                   |
++--------------+-------------+---------------------+-------------------+
+|       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
+|              |             | present in the com- |                   |
+|              |             | pressed COSE object |                   |
++--------------+-------------+---------------------+-------------------+
+|     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
+|              | Length      | IV length; can have |                   |
+|              |             | value 0 to 5        |                   |
 +--------------+-------------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: #table-flagbyte artwork-align="center"}
