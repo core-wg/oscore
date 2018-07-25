@@ -1535,7 +1535,7 @@ The columns of the registry are:
 
 * specification: This contains a pointer to the specification defining the entry.
 
-The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'.
+The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'. This entry is going to be specified in a future document, and will be used to expand the OSCORE Octet in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
 
 ~~~~~~~~~~~
 +--------------+-------------+---------------------+-------------------+
@@ -1561,7 +1561,7 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 
 ## Expert Review Instructions {#exp-instr}
 
-The expert reviewers for the registry defined in this document are expected to ensure that the usage solves a valid use case that could hardly be solved in a different way, that it is not going to duplicate one that is already registered, and that the registered point is likely to be used in deployments. They are furthermore expected to check the clarity of purpose and use of the requested code points. Experts should take into account the expected usage of entries when approving point assignment, and the length of the encoded value should be weighed against the number of code points left that encode to that size and the size of device it will be used on.
+The expert reviewers for the registry defined in this document are expected to ensure that the usage solves a valid use case that could hardly be solved in a different way, that it is not going to duplicate one that is already registered, and that the registered point is likely to be used in deployments. They are furthermore expected to check the clarity of purpose and use of the requested code points. Experts should take into account the expected usage of entries when approving point assignment, and the length of the encoded value should be weighed against the number of code points left that encode to that size and the size of device it will be used on. Experts should block registration for entries 8-63 until these points are defined (i.e. until the mechanism for the OSCORE Octet expansion via bit 0 is specified).
 
 --- back
 
