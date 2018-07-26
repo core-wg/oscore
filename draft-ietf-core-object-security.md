@@ -901,7 +901,7 @@ In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap
 
 ## Sequence Numbers {#nonce-uniqueness}
 
-An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs. If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
+An AEAD nonce MUST NOT be used more than once per AEAD key. The uniqueness of (key, nonce) pairs is shown in {{kn-uniqueness}}, and in particular depends on a correct usage of Partial IVs (which encode the Sender Sequence Numbers, see {{cose-object}}). If messages are processed concurrently, the operation of reading and increasing the Sender Sequence Number MUST be atomic.
 
 ### Maximum Sequence Number {#max-seq}
 
