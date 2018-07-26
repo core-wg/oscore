@@ -1730,6 +1730,11 @@ Outputs:
 * Recipient Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 * Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x4622d4dd6d944168eefb54987c
+* recipient nonce: 0x4722d4dd6d944169eefb54987c
+
 ### Server
 
 Inputs:
@@ -1750,6 +1755,11 @@ Outputs:
 * Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 * Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
 * Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x4722d4dd6d944169eefb54987c
+* recipient nonce: 0x4622d4dd6d944168eefb54987c
 
 ## Test Vector 2: Key Derivation without Master Salt {#key-der-tv}
 
@@ -1775,6 +1785,11 @@ Outputs:
 * Recipient Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 * Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
 
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0xbf35ae297d2dace910c52e99f9
+* recipient nonce: 0xbf35ae297d2dace810c52e99f9
+
 ### Server
 
 Inputs:
@@ -1794,6 +1809,11 @@ Outputs:
 * Sender Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 * Recipient Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 * Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
+
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0xbf35ae297d2dace810c52e99f9
+* recipient nonce: 0xbf35ae297d2dace910c52e99f9
 
 ## Test Vector 3: Key Derivation with ID Context {#key-der-kc}
 
@@ -1821,6 +1841,11 @@ Outputs:
 * Recipient Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 * Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x2ca58fb85ff1b81c0b7181b85e
+* recipient nonce: 0x2da58fb85ff1b81d0b7181b85e
+
 ### Server
 
 Inputs:
@@ -1842,6 +1867,11 @@ Outputs:
 * Sender Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 * Recipient Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 * Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+
+From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
+
+* sender nonce: 0x2da58fb85ff1b81d0b7181b85e
+* recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e
 
 ## Test Vector 4: OSCORE Request, Client {#tv4}
 
