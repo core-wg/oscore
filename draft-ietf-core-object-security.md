@@ -300,7 +300,7 @@ where:
 ~~~~~~~~~~~
 where:
 
-   * id is the Sender ID or Recipient ID when deriving keys and the empty byte string when deriving the Common IV. The encoding is described in {{cose-object}}.
+   * id is the Sender ID or Recipient ID when deriving keys and the empty byte string when deriving the Common IV.
  
    * id_context is the ID Context, or nil if ID Context is not provided.
    
