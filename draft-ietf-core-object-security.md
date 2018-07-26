@@ -416,9 +416,9 @@ Some options require special processing as specified in this section.
 
 An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in {{inner-options}}.
 
-An Outer Max-Age message field is used to avoid unnecessary caching of OSCORE error responses at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to OSCORE error responses, which are described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}. Such a message field is then processed according to {{outer-options}}.
+An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermediary caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option since the responses appear to the OSCORE-unaware intermediary as 2.04 Changed responses, which are non-cacheable (see {{coap-header}}).
 
-Successful OSCORE responses do not need to include an Outer Max-Age option since the responses are non-cacheable by construction (see {{coap-header}}).
+The Outer Max-Age message field is processed according to {{outer-options}}.
 
 
 #### Uri-Host and Uri-Port {#uri-host}
@@ -499,7 +499,7 @@ Since POST with Observe is not defined, for messages with Observe, the Outer Cod
 
 The Inner and Outer Observe in the request MUST contain the Observe value of the original CoAP request; 0 (registration) or 1 (cancellation).
 
-Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}). The Partial IV of the registration is also used as 'request\_piv' of associated cancellations (see {{AAD}}).
+Every time a client issues a new Observe request, a new Partial IV MUST be used (see {{cose-object}}), and so the payload and OSCORE option are changed. The server uses the Partial IV of the new request as the 'request\_piv' of all associated notifications (see {{AAD}}).
 
 Intermediaries are not assumed to have access to the OSCORE security context used by the endpoints, and thus cannot make requests or transform responses with the OSCORE option which verify at the receiving endpoint as coming from the other endpoint. This has the following consequences and limitations for Observe operations.
  
@@ -710,7 +710,7 @@ where:
 
 - request_kid: contains the value of the 'kid' in the COSE object of the request (see {{cose-object}}).
 
-- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}), with one exception: in case of protection or verification of Observe cancellations, the request_piv contains the value of the 'Partial IV' in the COSE object of the corresponding registration (see {{observe-registration}}).
+- request_piv: contains the value of the 'Partial IV' in the COSE object of the request (see {{cose-object}}).
 
 - options: contains the Class I options (see {{outer-options}}) present in the original CoAP message encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of class I option.
 
@@ -2062,6 +2062,7 @@ This section lists and discusses issues with unprotected message fields.
 The Uri-Host may either be omitted, reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged.
 
 * Observe. The Outer Observe option is intended for a proxy to support forwarding of Observe messages, but is ignored by the endpoints since the Inner Observe determines the processing in the endpoints. Since the Partial IV provides absolute ordering of notifications it is not possible for an intermediary to spoof reordering (see {{observe}}). The absence of Partial IV, since only allowed for the first notification, does not prevent correct ordering of notifications. The size and distributions of notifications over time may reveal information about the content or nature of the notifications.
+Cancellations ({{observe-registration}}) are not bound to the corresponding registrations in the same way responses are bound to requests in OSCORE (see {{prot-message-fields}}), but that does not open up for attacks based on mismatched cancellations, since {{RFC7641}} specifies that for cancellations to be accepted, all options except for ETags MUST be the same (see Section 3.6 of {{RFC7641}}). For different target resources, the OSCORE option is different, and even if the Token is modified to match a different observation, such a cancellation would not be accepted.
 
 * Block1/Block2/Size1/Size2. The Outer Block options enables fragmentation of OSCORE messages in addition to segmentation performed by the Inner Block options. The presence of these options indicates a large message being sent and the message size can be estimated and used for traffic analysis. Manipulating these options is a potential denial-of-service attack, e.g. injection of alleged Block fragments. The specification of a maximum size of message, MAX_UNFRAGMENTED_SIZE ({{outer-block-options}}), above which messages will be dropped, is intended as one measure to mitigate this kind of attack.
 
