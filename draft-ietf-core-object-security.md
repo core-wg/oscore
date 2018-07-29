@@ -1516,7 +1516,7 @@ This section registers the 'application/oscore' media type in the "Media Types" 
 
 Note to IANA: ID assignment in the 10000-64999 range is requested. (RFC Editor: Delete this note after IANA assignment)
 
-This section registers the media type 'application/oscore' media type in the "CoAP Content-Format" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
+This section registers the media type 'application/oscore' media type in the "CoAP Content-Formats" registry. This Content-Format for the OSCORE payload is defined for potential future use cases and SHALL NOT be used in the OSCORE message. The OSCORE payload cannot be understood without the OSCORE option value and the security context.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
