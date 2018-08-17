@@ -1451,23 +1451,22 @@ Furthermore, the following existing entries in the CoAP Option Numbers registry 
 |   3    | Uri-Host         | [RFC7252] [[this document]] | 
 |   4    | ETag             | [RFC7252] [[this document]] |
 |   5    | If-None-Match    | [RFC7252] [[this document]] |
-|   6    | Observe          | [RFC7252] [[this document]] |
+|   6    | Observe          | [RFC7641] [[this document]] |
 |   7    | Uri-Port         | [RFC7252] [[this document]] |
 |   8    | Location-Path    | [RFC7252] [[this document]] |
-| TBD1   | OSCORE           | [RFC7252] [[this document]] |
 |  11    | Uri-Path         | [RFC7252] [[this document]] |
 |  12    | Content-Format   | [RFC7252] [[this document]] |
 |  14    | Max-Age          | [RFC7252] [[this document]] |
 |  15    | Uri-Query        | [RFC7252] [[this document]] |
 |  17    | Accept           | [RFC7252] [[this document]] |
 |  20    | Location-Query   | [RFC7252] [[this document]] |
-|  23    | Block2           | [RFC7252] [[this document]] |
-|  27    | Block1           | [RFC7252] [[this document]] |
-|  28    | Size2            | [RFC7252] [[this document]] |
+|  23    | Block2           | [RFC7959] [[this document]] |
+|  27    | Block1           | [RFC7959] [[this document]] |
+|  28    | Size2            | [RFC7959] [[this document]] |
 |  35    | Proxy-Uri        | [RFC7252] [[this document]] |
 |  39    | Proxy-Scheme     | [RFC7252] [[this document]] |
 |  60    | Size1            | [RFC7252] [[this document]] |
-| 258    | No-Response      | [RFC7252] [[this document]] |
+| 258    | No-Response      | [RFC7967] [[this document]] |
 +--------+------------------+-----------------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
