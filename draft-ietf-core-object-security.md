@@ -1743,9 +1743,8 @@ This appendix includes the test vectors for different examples of CoAP messages 
 
 Note that in {{tv4}} and all following test vectors the Token and the Message ID of the OSCORE-protected CoAP messages are set to the same value of the unprotected CoAP message, to help the reader with comparisons.
 
-<!--
-NOTE (IANA registration) that the following example uses option number = 9. This might need to be changed following IANA assignment.
--->
+\[NOTE: the following examples use option number = 9 (TBD1 assigned by IANA). If that differs, the RFC editor is asked to update the test vectors with data provided by the authors. Please remove this paragraph before publication.\]
+
 
 ## Test Vector 1: Key Derivation with Master Salt {#key-der-tv-ms}
 
