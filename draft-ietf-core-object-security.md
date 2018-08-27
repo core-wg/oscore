@@ -160,7 +160,7 @@ The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Re
 
 # The OSCORE Option {#option}
 
-The OSCORE option defined in this section (see {{fig-option}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see Sections {{cose-object}}{: format="counter"} and {{compression}}{: format="counter"}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
+The OSCORE option defined in this section (see {{fig-option}}, which extends Table 4: Options of {{RFC7252}}) indicates that the CoAP message is an OSCORE message and that it contains a compressed COSE object (see Sections {{cose-object}}{: format="counter"} and {{compression}}{: format="counter"}). The OSCORE option is critical, safe to forward, part of the cache key, and not repeatable.
 
 ~~~~~~~~~~~
 +------+---+---+---+---+----------------+--------+--------+---------+
@@ -948,7 +948,7 @@ If the endpoint uses a persistently stored partial security context, it MUST NOT
 
 To prevent reuse of Sender Sequence Numbers, an endpoint may perform the following procedure during normal operations:
 
-* Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store/overwrite the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
+* Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
 
 ### Replay Window {#reboot-replay}
 
@@ -956,7 +956,7 @@ To prevent accepting replay of previously received requests, the server may perf
 
 * For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Sender Sequence Number (initiated as in {{seq-numb}}) when generating the AEAD nonce and MUST include it as Partial IV in the response.
 
-If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as a lower (disallowed) limit of Sender Sequence Numbers of the replay window.
+If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window of Sender Sequence Numbers.
 
 ### Replay of Notifications
 
