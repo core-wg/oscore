@@ -1990,7 +1990,7 @@ From there:
 
 ## Test Vector 6: OSCORE Request, Client {#tv6}
 
-This section contains a test vector for an OSCORE protected CoAP GET request carrying the ID Context in the message, using the security context derived in {{key-der-kc}}. The unprotected request only contains the Uri-Path and Uri-Host options.
+This section contains a test vector for an OSCORE protected CoAP GET request for an application that sets the ID Context and requires it to be sent in the request, so kid context is present in the protected message. This test vector uses the security context derived in {{key-der-kc}}. The unprotected request only contains the Uri-Path and Uri-Host options.
 
 Unprotected CoAP request: 0x44012f8eef9bbf7a396c6f63616c686f737483747631 (22 bytes)
 
