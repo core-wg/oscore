@@ -1741,6 +1741,8 @@ The procedures may be complemented with the use of the Echo option for verifying
 
 This appendix includes the test vectors for different examples of CoAP messages using OSCORE. Given a set of inputs, OSCORE defines how to set up the Security Context in both the client and the server.
 
+Note that in {{tv4}} and all following test vectors the Token and the Message ID of the OSCORE-protected CoAP messages are set to the same value of the unprotected CoAP message, to help the reader with comparisons.
+
 <!--
 NOTE (IANA registration) that the following example uses option number = 9. This might need to be changed following IANA assignment.
 -->
