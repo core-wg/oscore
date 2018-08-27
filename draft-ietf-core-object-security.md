@@ -2025,7 +2025,8 @@ From the previous parameter, the following is derived:
 
 From there:
 
-* Protected CoAP request (OSCORE message): 0x44022f8eef9bbf7a396c6f63616c686f73746b19140837cbf3210017a2d3ff4ed339a5a379b0b8bc731fffb0 (44 bytes)
+* Protected CoAP request (OSCORE message): 0x44022f8eef9bbf7a396c6f63616c686f73746b19140837cbf3210017a2d3ff
+72cd7273fd331ac45cffbe55c3 (44 bytes)
 
 ## Test Vector 7: OSCORE Response, Server {#tv7}
 
