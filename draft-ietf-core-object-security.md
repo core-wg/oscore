@@ -98,7 +98,7 @@ This document defines Object Security for Constrained RESTful Environments (OSCO
 
 The Constrained Application Protocol (CoAP) {{RFC7252}} is a web transfer protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS {{RFC6347}} for security. CoAP-to-CoAP, HTTP-to-CoAP, and CoAP-to-HTTP proxies require DTLS or TLS {{RFC5246}} to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of, the message payload and metadata in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
-This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports Observe {{RFC7641}}, Block-wise {{RFC7959}}, PATCH and FETCH {{RFC8132}}, and No-Response {{RFC7967}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
+This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports the Observe {{RFC7641}}, Block-wise {{RFC7959}}, and No-Response {{RFC7967}} options, as well as the PATCH and FETCH methods {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
 ~~~~~~~~~~~
 +-----------------------------------+
@@ -192,11 +192,11 @@ The endpoints protect messages to send using the Sender Context and verify messa
 An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}. 
 
 ~~~~~~~~~~~
-              .-------------.           .-------------.
-              |  Common,    |           |  Common,    |
-              |  Sender,    |           |  Recipient, |
-              |  Recipient  |           |  Sender     |
-              '-------------'           '-------------'
+          .---------------------.    .---------------------.
+          |  Common Context,    |    |  Common Context,    |
+          |  Sender Context,    |    |  Recipient Context, |
+          |  Recipient Context  |    |  Sender Context     |
+          '---------------------'    '---------------------'
                    Client                   Server
                       |                       |
 Retrieve context for  | OSCORE request:       |
@@ -493,7 +493,7 @@ The support for Observe {{RFC7641}} with OSCORE targets the requirements on forw
 
 Inner Observe SHALL be used to protect the value of the Observe option between the endpoints. Outer Observe SHALL be used to support forwarding by intermediary nodes. 
 
-The server SHALL include a new Partial IV in responses (with or without the Observe option) to Observe registrations, except for the first response where Partial IV MAY be omitted.
+The server SHALL include a new Partial IV (see {{cose-object}}) in responses (with or without the Observe option) to Observe registrations, except for the first response where Partial IV MAY be omitted.
 
 {{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server SHOULD NOT remove an active observation just because it receives a request with the same Token.
 
