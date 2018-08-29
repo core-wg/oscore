@@ -1494,11 +1494,11 @@ The OSCORE option is added to the CoAP Signaling Option Numbers registry:
 The HTTP OSCORE header field is added to the Message Headers registry:
 
 ~~~~~~~~~~~
-+----------------------+----------+----------+-------------------+
-| Header Field Name    | Protocol | Status   | Reference         |
-+----------------------+----------+----------+-------------------+
-| OSCORE               | http     | standard | [[this document]] |
-+----------------------+----------+----------+-------------------+
++-------------------+----------+----------+---------------------------------+
+| Header Field Name | Protocol | Status   | Reference                       |
++-------------------+----------+----------+---------------------------------+
+| OSCORE            | http     | standard | [[this document]], Section 11.1 |
++-------------------+----------+----------+---------------------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
