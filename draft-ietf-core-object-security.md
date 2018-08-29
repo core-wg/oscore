@@ -1483,7 +1483,7 @@ The OSCORE option is added to the CoAP Signaling Option Numbers registry:
 +------------+--------+---------------------+-------------------+
 | Applies to | Number | Name                | Reference         |
 +------------+--------+---------------------+-------------------+
-| 7.xx (any) |  TBD1  | OSCORE              | [[this document]] |
+| 7.xx (all) |  TBD1  | OSCORE              | [[this document]] |
 +------------+--------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
