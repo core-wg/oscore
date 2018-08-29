@@ -1441,7 +1441,7 @@ The OSCORE option is added to the CoAP Option Numbers registry:
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
-Note to IANA: Label assignment in (Integer value between 0 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
+Note to IANA: Label assignment in (Integer value between 0 and 255) is requested. We also request Expert review if possible, to make sure a correct number for the option is selected (RFC Editor: Delete this note after IANA assignment)
 
 Furthermore, the following existing entries in the CoAP Option Numbers registry are updated with a reference to the document specifying OSCORE processing of that option:
 
