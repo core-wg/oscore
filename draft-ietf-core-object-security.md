@@ -1570,7 +1570,7 @@ This section registers the media type 'application/oscore' media type in the "Co
 
 ## OSCORE Octet Registry {#oscore-octet}
 
-It is requested that IANA create a new registry entitled "OSCORE Octet". The registry should be created with the Expert Review policy. Guidelines for the experts are provided in {{exp-instr}}.
+This document defines a sub-registry for the bits used in OSCORE Octet within the "CoRE Parameters" registry. The name of the sub-registry is "OSCORE Octet". The registry should be created with the Expert Review policy. Guidelines for the experts are provided in {{exp-instr}}.
 
 The columns of the registry are:
 
