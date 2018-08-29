@@ -1590,6 +1590,8 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 +--------------+-------------+---------------------+-------------------+
 |       0      | Reserved    |                     |                   |
 +--------------+-------------+---------------------+-------------------+
+|     1-2      | Unassigned  |                     |                   |
++--------------+-------------+---------------------+-------------------+
 |       3      | Kid Context | Set to 1 if kid     | [[this document]] |
 |              | Flag        | context is present  |                   |
 |              |             | in the compressed   |                   |
@@ -1602,6 +1604,8 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 |     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
 |              | Length      | IV length; can have |                   |
 |              |             | value 0 to 5        |                   |
++--------------+-------------+---------------------+-------------------+
+|    8-63      | Unassigned  |                     |                   |
 +--------------+-------------+---------------------+-------------------+
 ~~~~~~~~~~~
 {: #table-flagbyte artwork-align="center"}
