@@ -1488,6 +1488,7 @@ The OSCORE option is added to the CoAP Signaling Option Numbers registry:
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
+Note to IANA: The value in the "Number" field is the same value that's being assigned to the new Option Number. Please make sure TBD1 is not the same as any value in Numbers for any existing entry in the CoAP Signaling Option Numbers registry (at the time of writing this, that means make sure TBD1 is not 2 or 4)(RFC Editor: Delete this note after IANA assignment)
 
 ## Header Field Registrations {#iana-http}
 
