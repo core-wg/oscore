@@ -1780,8 +1780,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0x4622d4dd6d944168eefb54987c
-* recipient nonce: 0x4722d4dd6d944169eefb54987c
+* sender nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
+* recipient nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
 
 ### Server
 
@@ -1806,8 +1806,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0x4722d4dd6d944169eefb54987c
-* recipient nonce: 0x4622d4dd6d944168eefb54987c
+* sender nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
+* recipient nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
 ## Test Vector 2: Key Derivation without Master Salt {#key-der-tv}
 
@@ -1835,8 +1835,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0xbf35ae297d2dace910c52e99f9
-* recipient nonce: 0xbf35ae297d2dace810c52e99f9
+* sender nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
+* recipient nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
 
 ### Server
 
@@ -1860,8 +1860,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0xbf35ae297d2dace810c52e99f9
-* recipient nonce: 0xbf35ae297d2dace910c52e99f9
+* sender nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
+* recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
 ## Test Vector 3: Key Derivation with ID Context {#key-der-kc}
 
@@ -1891,8 +1891,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0x2ca58fb85ff1b81c0b7181b85e
-* recipient nonce: 0x2da58fb85ff1b81d0b7181b85e
+* sender nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+* recipient nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
 
 ### Server
 
@@ -1918,8 +1918,8 @@ Outputs:
 
 From the previous parameters and a Partial IV equal to 0 (both for sender and recipient):
 
-* sender nonce: 0x2da58fb85ff1b81d0b7181b85e
-* recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e
+* sender nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
+* recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
 ## Test Vector 4: OSCORE Request, Client {#tv4}
 
