@@ -192,10 +192,12 @@ The endpoints protect messages to send using the Sender Context and verify messa
 An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}. 
 
 ~~~~~~~~~~~
-          .---------------------.    .---------------------.
-          |  Common Context,    |    |  Common Context,    |
-          |  Sender Context,    |    |  Recipient Context, |
-          |  Recipient Context  |    |  Sender Context     |
+          .------------------------------------------------.
+          |                 Common Context                 |
+          +---------------------.----.---------------------+        
+          |  Sender Context     |  = |  Recipient Context  |
+          +---------------------+    +---------------------+ 
+          |  Recipient Context  |  = |  Sender Context     |
           '---------------------'    '---------------------'
                    Client                   Server
                       |                       |
@@ -316,7 +318,7 @@ where:
 
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV.
 
-Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. OSCORE sets the salt default value to empty byte string, which in {{RFC5869}} is converted to a string of zeroes (see Section 2.2 of {{RFC5869}}).
+Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. OSCORE sets the salt default value to empty byte string, which is converted to a string of zeroes (see Section 2.2 of {{RFC5869}}).
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
@@ -1364,7 +1366,7 @@ Applications need to consider that certain message fields and messages types are
 
 ## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. Such a procedure must ensure that the requirements of the security context parameters for the intended use are complied with (see {{req-params}}) and also in error situations. It is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. Such a procedure must ensure that the requirements of the security context parameters for the intended use are complied with (see {{req-params}}) and also in error situations. While recipient IDs are allowed to coincide between different security contexts (see {{req-params}}),  this may cause a server to process multiple verifications before finding the right security context or rejecting a message. Moreover, it is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
 
 ## Master Secret {#master-secret}
 
@@ -1386,7 +1388,7 @@ A verified OSCORE request enables the server to verify the identity of the entit
 
 ## Cryptographic Considerations
 
-The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the AEAD nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the AEAD nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*. AEAD algorithms with unpredictable nonces are not supported.
 
 In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct AEAD keys, the AEAD nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have a good amount of randomness (see {{master-secret}}).
 
