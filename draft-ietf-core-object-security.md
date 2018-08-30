@@ -316,7 +316,19 @@ where:
 
    * L is the size of the key/nonce for the AEAD algorithm used, in bytes.
 
-For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV.
+For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV. Assuming use of the default algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+
+~~~~~~~~~~~
+PRK = HMAC-SHA-256(Master Salt, Master Secret)
+~~~~~~~~~~~
+
+and as L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and the Sender Key, Recipient Key, and Common IV are therefore the first 16 or 13 bytes of
+
+~~~~~~~~~~~
+output parameter = HMAC-SHA-256(PRK, info | 0x01)
+~~~~~~~~~~~
+
+where different info are used for each derived parameter.
 
 Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. OSCORE sets the salt default value to empty byte string, which is converted to a string of zeroes (see Section 2.2 of {{RFC5869}}).
 
@@ -727,8 +739,8 @@ NOTE: The format of the external_aad is for simplicity the same for requests and
 The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{RFC8152}}. In non-CDDL notation, where \| denotes byte string concatenation:
 
 ~~~~~~~~~~~
-   AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
-       = 0x8368456E63727970743040 | external_aad
+AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
+    = 0x8368456E63727970743040 | external_aad
 ~~~~~~~~~~~
 
 # OSCORE Header Compression {#compression}
