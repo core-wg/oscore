@@ -709,13 +709,15 @@ NOTE: The plaintext contains all CoAP data that needs to be encrypted end-to-end
 The external_aad SHALL be a CBOR array as defined below:
 
 ~~~~~~~~~~~ CDDL
-external_aad = [
+aad_array = [
    oscore_version : uint,
    algorithms : [ alg_aead : int / tstr ],
    request_kid : bstr,
    request_piv : bstr,
    options : bstr
 ]
+
+external_aad = bstr .cbor aad_array
 ~~~~~~~~~~~
 
 where:
