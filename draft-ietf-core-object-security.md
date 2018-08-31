@@ -1603,7 +1603,7 @@ The columns of the registry are:
 
 * specification: This contains a pointer to the specification defining the entry.
 
-The initial contents of the registry can be found in {{table-flagbyte}}. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'. This entry is going to be specified in a future document, and will be used to expand the OSCORE Octet in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
+The initial contents of the registry can be found in the table below. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'. This entry is going to be specified in a future document, and will be used to expand the OSCORE Octet in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
 
 ~~~~~~~~~~~
 +--------------+-------------+---------------------+-------------------+
@@ -1629,7 +1629,7 @@ The initial contents of the registry can be found in {{table-flagbyte}}. The spe
 |    8-63      | Unassigned  |                     |                   |
 +--------------+-------------+---------------------+-------------------+
 ~~~~~~~~~~~
-{: #table-flagbyte artwork-align="center"}
+{: artwork-align="center"}
 
 ## Expert Review Instructions {#exp-instr}
 
