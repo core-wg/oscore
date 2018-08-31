@@ -509,6 +509,8 @@ Inner Observe SHALL be used to protect the value of the Observe option between t
 
 The server SHALL include a new Partial IV (see {{cose-object}}) in responses (with or without the Observe option) to Observe registrations, except for the first response where Partial IV MAY be omitted.
 
+For cancellations, Section 3.6 of {{RFC7641}} specifies that all options MUST be identical to those in the registration request except for Observe and the set of ETag Options. For OSCORE messages, the OSCORE option and the payload are not identical to those in the registration either. The server MUST accept cancellations for a target resource where the OSCORE option and the payload are not identical to those in the registration.
+
 {{RFC7252}} does not specify how the server should act upon receiving the same Token in different requests. When using OSCORE, the server SHOULD NOT remove an active observation just because it receives a request with the same Token.
 
 Since POST with Observe is not defined, for messages with Observe, the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05 (Content) for responses (see {{coap-header}}). 
