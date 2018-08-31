@@ -706,9 +706,11 @@ NOTE: The plaintext contains all CoAP data that needs to be encrypted end-to-end
 
 ## Additional Authenticated Data {#AAD}
 
-The external_aad SHALL be a CBOR array as defined below:
+The external_aad SHALL be a CBOR array wrapped in a bstr object as defined below:
 
 ~~~~~~~~~~~ CDDL
+external_aad = bstr .cbor aad_array
+
 aad_array = [
    oscore_version : uint,
    algorithms : [ alg_aead : int / tstr ],
@@ -716,8 +718,6 @@ aad_array = [
    request_piv : bstr,
    options : bstr
 ]
-
-external_aad = bstr .cbor aad_array
 ~~~~~~~~~~~
 
 where:
