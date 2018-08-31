@@ -738,12 +738,27 @@ The oscore_version and algorithms parameters are established out-of-band and are
 
 NOTE: The format of the external_aad is for simplicity the same for requests and responses, although some parameters, e.g. request_kid, need not be integrity protected in all requests.
 
-The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{RFC8152}}. In non-CDDL notation, where \| denotes byte string concatenation:
+The Additional Authenticated Data (AAD) is composed from the external_add as described in Section 5.3 of {{RFC8152}}:
 
 ~~~~~~~~~~~
 AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
-    = 0x8368456E63727970743040 | external_aad
 ~~~~~~~~~~~
+
+The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16-64-128 (10), request_kid = 0x00, request_piv = 0x25 and no Class I options. 
+
+~~~~~~~~~~~
+oscore_version = 0x1
+algorithms = 0x810A
+request_kid = 0x00
+request_piv = 0x25
+options = 0x
+
+external_aad = 0x8501810A4100412540
+
+AAD = 0x8368456E63727970743040498501810A4100412540
+~~~~~~~~~~~
+
+Note that the first 11 bytes are always the same, as they do not depend on the input parameters, used to construct the external_aad.
 
 # OSCORE Header Compression {#compression}
 
