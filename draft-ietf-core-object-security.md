@@ -747,7 +747,7 @@ AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16-64-128 (10), request_kid = 0x00, request_piv = 0x25 and no Class I options. 
 
 ~~~~~~~~~~~
-oscore_version = 0x1
+oscore_version = 0x01
 algorithms = 0x810A
 request_kid = 0x00
 request_piv = 0x25
