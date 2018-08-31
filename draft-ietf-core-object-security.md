@@ -1603,7 +1603,7 @@ The columns of the registry are:
 
 * specification: This contains a pointer to the specification defining the entry.
 
-The initial contents of the registry can be found in the table below. The specification column for all rows in that table should be this document. Additionally, the entry with Bit Position of 0 is to be marked as 'Reserved'. This entry is going to be specified in a future document, and will be used to expand the space for the OSCORE flag bits in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
+The initial contents of the registry can be found in the table below. The specification column for all rows in that table should be this document. The entries with Bit Position of 0 and 1 are to be marked as 'Reserved'. The entry with Bit Position of 1 is going to be specified in a future document, and will be used to expand the space for the OSCORE flag bits in {{obj-sec-value}}, so that entries 8-63 of the registry are defined.
 
 ~~~~~~~~~~~
 +--------------+-------------+---------------------+-------------------+
@@ -1611,7 +1611,9 @@ The initial contents of the registry can be found in the table below. The specif
 +--------------+-------------+---------------------+-------------------+
 |       0      | Reserved    |                     |                   |
 +--------------+-------------+---------------------+-------------------+
-|     1-2      | Unassigned  |                     |                   |
+|       1      | Reserved    |                     |                   |
++--------------+-------------+---------------------+-------------------+
+|       2      | Unassigned  |                     |                   |
 +--------------+-------------+---------------------+-------------------+
 |       3      | Kid Context | Set to 1 if kid     | [[this document]] |
 |              | Flag        | context is present  |                   |
@@ -1633,7 +1635,7 @@ The initial contents of the registry can be found in the table below. The specif
 
 ## Expert Review Instructions {#exp-instr}
 
-The expert reviewers for the registry defined in this document are expected to ensure that the usage solves a valid use case that could not be solved better in a different way, that it is not going to duplicate one that is already registered, and that the registered point is likely to be used in deployments. They are furthermore expected to check the clarity of purpose and use of the requested code points. Experts should take into account the expected usage of entries when approving point assignment, and the length of the encoded value should be weighed against the number of code points left that encode to that size and the size of device it will be used on. Experts should block registration for entries 8-63 until these points are defined (i.e. until the mechanism for the OSCORE flag bits expansion via bit 0 is specified).
+The expert reviewers for the registry defined in this document are expected to ensure that the usage solves a valid use case that could not be solved better in a different way, that it is not going to duplicate one that is already registered, and that the registered point is likely to be used in deployments. They are furthermore expected to check the clarity of purpose and use of the requested code points. Experts should take into account the expected usage of entries when approving point assignment, and the length of the encoded value should be weighed against the number of code points left that encode to that size and the size of device it will be used on. Experts should block registration for entries 8-63 until these points are defined (i.e. until the mechanism for the OSCORE flag bits expansion via bit 1 is specified).
 
 --- back
 
