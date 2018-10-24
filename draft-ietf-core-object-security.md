@@ -1,7 +1,7 @@
 ---
 title: Object Security for Constrained RESTful Environments (OSCORE)
 abbrev: OSCORE
-docname: draft-ietf-core-object-security-latest
+docname: draft-ietf-core-object-security-15
 
 ipr: trust200902
 wg: CoRE Working Group
@@ -42,7 +42,6 @@ normative:
   RFC4086:
   RFC4648:
   RFC5234:
-  RFC5246:
   RFC6347:
   RFC7049:
   RFC7230:
@@ -56,6 +55,7 @@ normative:
   RFC8174:
   RFC8288:
   RFC8323:
+  RFC8446:
   
   
 informative:
@@ -96,7 +96,7 @@ This document defines Object Security for Constrained RESTful Environments (OSCO
 
 # Introduction {#intro}
 
-The Constrained Application Protocol (CoAP) {{RFC7252}} is a web transfer protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS {{RFC6347}} for security. CoAP-to-CoAP, HTTP-to-CoAP, and CoAP-to-HTTP proxies require DTLS or TLS {{RFC5246}} to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of, the message payload and metadata in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
+The Constrained Application Protocol (CoAP) {{RFC7252}} is a web transfer protocol, designed for constrained nodes and networks {{RFC7228}}, and may be mapped from HTTP {{RFC8075}}. CoAP specifies the use of proxies for scalability and efficiency and references DTLS {{RFC6347}} for security. CoAP-to-CoAP, HTTP-to-CoAP, and CoAP-to-HTTP proxies require DTLS or TLS {{RFC8446}} to be terminated at the proxy. The proxy therefore not only has access to the data required for performing the intended proxy functionality, but is also able to eavesdrop on, or manipulate any part of, the message payload and metadata in transit between the endpoints. The proxy can also inject, delete, or reorder packets since they are no longer protected by (D)TLS.
 
 This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports the Observe {{RFC7641}}, Block-wise {{RFC7959}}, and No-Response {{RFC7967}} options, as well as the PATCH and FETCH methods {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
@@ -653,8 +653,8 @@ The Sender ID and Context ID are used to establish the necessary input parameter
 
 The high level design of the AEAD nonce follows Section 4.4 of {{I-D.mcgrew-iv-gen}}, here follows the detailed construction (see Figure 8):
 
-1. left-pad the Partial IV (PIV) in network byte order with zeroes to exactly 5 bytes,
-2. left-pad the Sender ID of the endpoint that generated the Partial IV (ID_PIV) in network byte order with zeroes to exactly nonce length minus 6 bytes,
+1. left-pad the Partial IV (PIV) with zeroes to exactly 5 bytes,
+2. left-pad the Sender ID of the endpoint that generated the Partial IV (ID_PIV) with zeroes to exactly nonce length minus 6 bytes,
 3. concatenate the size of the ID_PIV (a single byte S) with the padded ID_PIV and the padded PIV,
 4. and then XOR with the Common IV.
  
@@ -2242,7 +2242,7 @@ Signaling messages used in CoAP over TCP {{RFC8323}} are intended to be hop-by-h
 ### HTTP Message Fields
 
 In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial-of-service attacks.
-It is recommended to additionally use TLS {{RFC5246}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
+It is recommended to additionally use TLS {{RFC8446}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
 
 
 # CDDL Summary {#cddl-sum}
