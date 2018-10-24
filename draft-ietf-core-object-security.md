@@ -1,7 +1,7 @@
 ---
 title: Object Security for Constrained RESTful Environments (OSCORE)
 abbrev: OSCORE
-docname: draft-ietf-core-object-security-15
+docname: draft-ietf-core-object-security-latest
 
 ipr: trust200902
 wg: CoRE Working Group
@@ -2280,7 +2280,7 @@ A `type` can be one of:
 # Acknowledgments
 {: numbered="no"}
 
-The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Esko Dijk, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Michael Richardson, Jim Schaad, Peter van der Stok, Dave Thaler, Marco Tiloca, William Vignat, and Mališa Vucinic.
+The following individuals provided input to this document: Christian Amsüss, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Esko Dijk, Jaro Fietz, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Michael Richardson, Jim Schaad, Peter van der Stok, Dave Thaler, Marco Tiloca, William Vignat, and Mališa Vucinic.
 
 Ludwig Seitz and Göran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova.
 
