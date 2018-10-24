@@ -792,7 +792,7 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
     - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
     - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
-    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 3 of {{ver-req}}.
+    - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 2 of {{ver-req}}.
 
 The flag bits are registered in the OSCORE Flag Bits registry specified in {{oscore-flag-bits}}.
 
