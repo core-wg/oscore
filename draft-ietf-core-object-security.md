@@ -2149,7 +2149,7 @@ From there:
 
 # Overview of Security Properties {#overview-sec-properties}
 
-## Threat Model
+## Threat Model {#threat-model}
 
 This section describes the threat model using the terms of {{RFC3552}}.
 
@@ -2221,7 +2221,7 @@ Since the Sender IDs are unique, ID_PIV is different from the Sender ID of the e
 
 ## Unprotected Message Fields {#unprot-fields}
 
-This section lists and discusses issues with unprotected message fields.
+This sections analyses attacks on message fields which are not protected by OSCORE according to the threat model {{threat-model}}.
 
 ### CoAP Header Fields {#sec-coap-headers}
 
