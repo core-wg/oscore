@@ -1774,16 +1774,16 @@ An application may derive a security context once and use it for the lifetime of
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose: in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
+This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
 
-* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
+1. The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
 
-* The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid context, kid) are verified with this security context.
+2. The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message verifies then the server responds with a 4.01 Unauthorized containing the Echo option {{I-D.ietf-core-echo-request-tag}} protected with the new security context.
 
+3. The client receiving a 4.01 Unauthorized with the Echo option protected with the new security context now makes its intended request to the client. The request contains additionally the Echo option with the same value as received, and the (kid context, kid) as in step 1.
 
-As an alternative procedure to reduce the subsequent overhead in requests due to kid context, the verification of a message with a new ID Context may trigger the server to generate a new kid to replace the Client Sender ID in future requests. A client may e.g. indicate support for such a procedure by requesting a special well-known URI and receive the new kid in the response, which together with the input parameters and the ID context is used to derive the new security context which may be identified only by its kid. The details are out of scope for this specification.
+4. The server receiving a request with a security context matching (kid context, kid) and an Echo option verifies the message and the Echo option value as described in {{I-D.ietf-core-echo-request-tag}}. If everything verfies the request is performed and the response is protected with the new security context. The old security context derived with the same pre-established input parameters is deleted. Further requests with this security context may omit the kid context. 
 
-The procedures may be complemented with the use of the Echo option for verifying the aliveness of the client requesting a new security context.
 
 # Test Vectors
 
