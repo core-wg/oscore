@@ -60,6 +60,7 @@ normative:
   
 informative:
 
+  RFC3552:
   RFC3986:
   RFC5116:
   RFC5869:
@@ -1435,7 +1436,7 @@ In order to prevent cryptanalysis when the same plaintext is repeatedly encrypte
 
 The Inner Block options enable the sender to split large messages into OSCORE-protected blocks such that the receiving endpoint can verify blocks before having received the complete message. The Outer Block options allow for arbitrary proxy fragmentation operations that cannot be verified by the endpoints, but can by policy be restricted in size since the Inner Block options allow for secure fragmentation of very large messages. A maximum message size (above which the sending endpoint fragments the message and the receiving endpoint discards the message, if complying to the policy) may be obtained as part of normal resource discovery.
 
-## Privacy Considerations
+## Privacy Considerations {#priv-cons}
 
 Privacy threats executed through intermediary nodes are considerably reduced by means of OSCORE. End-to-end integrity protection and encryption of the message payload and all options that are not used for proxy operations, provide mitigation against attacks on sensor and actuator communication, which may have a direct impact on the personal sphere.
 
@@ -2147,6 +2148,25 @@ From there:
 * Protected CoAP response (OSCORE message): 0x64445d1f00003974920100ff4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (34 bytes)
 
 # Overview of Security Properties {#overview-sec-properties}
+
+## Threat Model
+
+This section describes the threat model using the terms of {{RFC3552}}.
+
+It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+OSCORE targets the protection of the CoAP Request/Response sub-layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
+
+OSCORE does not protect the CoAP Messaging sub-layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
+
+Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP proxy operations (see Section 5.7 of {{RFC7252}}). 
+
+Attacks on unprotected CoAP message fields generally causes denial-of-service attacks which are out of scope of this document, more details are given in {{unprot-fields}}. 
+
+Attacks against the CoAP Request-Response layer are in scope. OSCORE is intended to protect against eavesdropping, spoofing, insertion, modification, deletion, replay, and man-in-the middle attacks. 
+
+OSCORE is susceptible to traffic analysis as discussed later in {{overview-sec-properties}}.
+
 
 ## Supporting Proxy Operations {#supp-proxy-op}
 
