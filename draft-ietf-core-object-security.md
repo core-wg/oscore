@@ -987,9 +987,13 @@ If the endpoint uses a persistently stored partial security context, it MUST NOT
 
 ### Sequence Number {#seq-numb}
 
-To prevent reuse of Sender Sequence Numbers, an endpoint may perform the following procedure during normal operations:
+To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
 
-* Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number in persistent memory. After boot, the endpoint initiates the Sender Sequence Number to the value stored in persistent memory + K. Storing to persistent memory can be costly. The value K gives a trade-off between the number of storage operations and efficient use of Sender Sequence Numbers.
+  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in persistent memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus a factor F times K: SSN2 = SSN1 + F * K, where F is a positive integer. 
+  
+    * Storing to persistent memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
+
+    * Writing to persistent memory may be subject to delays; the factor F must be set so the probability of the last Sender Sequence Number used before reboot being larger than SSN2 is negligible. If this cannot be guaranteed, the randomized process of {{master-secret-multiple}} must be used instead.
 
 ### Replay Window {#reboot-replay}
 
