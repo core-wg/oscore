@@ -153,7 +153,7 @@ Readers are expected to be familiar with the terms and concepts described in CoA
 
 The term "hop" is used to denote a particular leg in the end-to-end path. The concept "hop-by-hop" (as in "hop-by-hop encryption" or "hop-by-hop fragmentation") opposed to "end-to-end", is used in this document to indicate that the messages are processed accordingly in the intermediaries, rather than just forwarded to the next node.
 
-The term "stop processing" is used throughout the document to denote that the message is not passed up to the CoAP Request/Response layer (see {{fig-stack}}).
+The term "stop processing" is used throughout the document to denote that the message is not passed up to the CoAP Request/Response Layer (see {{fig-stack}}).
 
 The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender ID/Key, Recipient ID/Key, ID Context, and Common IV are defined in {{context-definition}}.
 
@@ -578,7 +578,7 @@ U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-fields-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}
 
-Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
+Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response Layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
 The CoAP Header field Code is protected by OSCORE. Code SHALL be encrypted and integrity protected (Class E) to prevent an intermediary from eavesdropping on or manipulating the Code (e.g., changing from GET to DELETE). 
 
@@ -979,11 +979,11 @@ If the verification of the response succeeds, and the received Partial IV was gr
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover:
+To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover, for example:
 
-1. The endpoints can run a key establishment protocol resulting in a fresh Master Secret, from which an entirely new Security Context is derived.  This could be a key exchange protocol providing forward secrecy, which typically requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
+1. The endpoints can run a key exchange protocol providing forward secrecy resulting in a fresh Master Secret, from which an entirely new Security Context is derived. This requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
 
-2. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which may be more lightweight but also requires some amount of randomness.
+2. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which may be more lightweight and may not require additional randomness.
 
 3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See Appendix B.2 for an example.
 
@@ -2174,16 +2174,17 @@ From there:
 
 This section describes the threat model using the terms of {{RFC3552}}.
 
-It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, delay, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire.                                                                   
-OSCORE targets the protection of the CoAP Request/Response sub-layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
+It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, delay, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire.
+                                                                 
+OSCORE targets the protection of the CoAP request/response layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
 
-OSCORE does not protect the CoAP Messaging sub-layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
+OSCORE does not protect the CoAP messaging layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
 
 Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). 
 
 Attacks on unprotected CoAP message fields generally causes denial-of-service attacks which are out of scope of this document, more details are given in {{unprot-fields}}. 
 
-Attacks against the CoAP Request-Response layer are in scope. OSCORE is intended to protect against eavesdropping, spoofing, insertion, modification, deletion, replay, and man-in-the middle attacks. 
+Attacks against the CoAP request-response layer are in scope. OSCORE is intended to protect against eavesdropping, spoofing, insertion, modification, deletion, replay, and man-in-the middle attacks. 
 
 OSCORE is susceptible to traffic analysis as discussed later in {{overview-sec-properties}}.
 
