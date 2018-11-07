@@ -1002,11 +1002,11 @@ In {{seq-numb}} and {{reboot-replay}} we describe methods to recover from partia
 
 To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
 
-  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in non-volatile memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus a factor F times K: SSN2 = SSN1 + F * K, where F is a positive integer. 
+  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in non-volatile memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus K plus F: SSN2 = SSN1 + K + F, where F is a positive integer. 
   
     * Writing to non-volatile memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
 
-    * Writing to non-volatile memory may be subject to delays, or failure; the factor F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
+    * Writing to non-volatile memory may be subject to delays, or failure; F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
     
 If timely write to non-volatile memory cannot be guaranteed the method described in this section MUST NOT be used.
 
