@@ -979,9 +979,15 @@ If the verification of the response succeeds, and the received Partial IV was gr
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the request Token, Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of an unplanned reboot.
+To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover:
 
-After boot, an endpoint can either use a persistently stored complete or partial security context, or establish a new security context with each endpoint it communicates with. However, establishing a fresh security context may have a non-negligible cost in terms of, e.g., power consumption.
+1. The endpoints can run a key establisment protocol resulting in a fresh Master Secret, from which an entirely new Security Context is derived.  This could be a key exchange protocol providing forward secrecy, which typically requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which is more lightweight but also requires some amount of randomness.
+
+2. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See Appendix B.2 for an example.
+
+3. An endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers based on careful use of persistant memory as is discussed in this section.
+
+Some devices may have  no good source of randomness but predictable limitations of persistant memory, which motivates the third option.
 
 If the endpoint uses a persistently stored partial security context, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. Some ways to achieve this are described in the following sections.
 
