@@ -997,6 +997,7 @@ There are known issues related to writing to non-volatile memory. For example, o
 
 In {{seq-numb}} and {{reboot-replay}} we describe methods to recover from partial loss of security context based on the use of non-volatile memory. If the endpoint uses a partial security context in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. 
 
+
 ### Sequence Number {#seq-numb}
 
 To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
@@ -1447,7 +1448,7 @@ A verified OSCORE request enables the server to verify the identity of the entit
 
 ## Cryptographic Considerations
 
-The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the AEAD nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*. AEAD algorithms that require unpredictable nonces are not supported.
+The maximum sender sequence number is dependent on the AEAD algorithm. The maximum sender sequence number is 2^40 - 1, or any algorithm specific lower limit, after which a new security context must be generated. The mechanism to build the AEAD nonce ({{nonce}}) assumes that the nonce is at least 56 bits, and the Partial IV is at most 40 bits. The mandatory-to-implement AEAD algorithm AES-CCM-16-64-128 is selected for compatibility with CCM\*. AEAD algorithms that require unpredictable nonces are not supported.
 
 In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct AEAD keys, the AEAD nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have a good amount of randomness (see {{master-secret}}).
 
@@ -1794,16 +1795,16 @@ An application may derive a security context once and use it for the lifetime of
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose: in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
+This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
 
-* The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
+1. The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
 
-* The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message verifies then a new security context with this ID Context is stored in the server, and used in the response. Further requests with the same (kid context, kid) are verified with this security context.
+2. The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message passes verification (see {{ver-req}}) made with the newly derived security context, then the server responds with a 4.01 Unauthorized containing the Echo option {{I-D.ietf-core-echo-request-tag}} protected with the new security context.
 
+3. The client receiving a 4.01 Unauthorized with the Echo option protected with the new security context, which passes verification (as in {{ver-res}}), makes its intended request to the server. The request contains additionally the Echo option with the same value received in step 2, and the (kid context, kid) as in step 1.
 
-As an alternative procedure to reduce the subsequent overhead in requests due to kid context, the verification of a message with a new ID Context may trigger the server to generate a new kid to replace the Client Sender ID in future requests. A client may e.g. indicate support for such a procedure by requesting a special well-known URI and receive the new kid in the response, which together with the input parameters and the ID context is used to derive the new security context which may be identified only by its kid. The details are out of scope for this specification.
+4. The server receiving a request with a security context matching (kid context, kid) and an Echo option verifies the message (see {{ver-req}}) and the Echo option value as described in {{I-D.ietf-core-echo-request-tag}}. If everything passes verification, the request is passed-on to the CoAP request-response layer, and the response is protected with the new security context. The old security context derived with the same pre-established input parameters is deleted. Further requests with this security context may omit the kid context. 
 
-The procedures may be complemented with the use of the Echo option for verifying the aliveness of the client requesting a new security context.
 
 # Test Vectors
 
@@ -2173,13 +2174,12 @@ From there:
 
 This section describes the threat model using the terms of {{RFC3552}}.
 
-It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire. 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire.                                                                   
 OSCORE targets the protection of the CoAP Request/Response sub-layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
 
 OSCORE does not protect the CoAP Messaging sub-layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
 
-Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP proxy operations (see Section 5.7 of {{RFC7252}}). 
+Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). 
 
 Attacks on unprotected CoAP message fields generally causes denial-of-service attacks which are out of scope of this document, more details are given in {{unprot-fields}}. 
 
@@ -2251,7 +2251,7 @@ This sections analyses attacks on message fields which are not protected by OSCO
 
 * Code. The Outer CoAP Code of an OSCORE message is POST or FETCH for requests with corresponding response codes. The use of FETCH reveals no more than what is revealed by the Outer Observe option. Changing the Outer Code may be a denial-of-service attack by causing errors in the proxy processing. 
 
-* Type/Message ID. The Type/Message ID fields {{RFC7252}} reveal information about the UDP transport binding, e.g. an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP {{RFC8323}}, and does not impact the request/response message. A change of these fields in a UDP hop is a denial-of-service attack. By sending an ACK, an attacker can make the endpoint believe that the other endpoint received the previous message. By sending a RST, an attacker may be able to cancel an observation, make one endpoint believe the other endpoint is alive, or make one endpoint endpoint believe that the other endpoint is missing some context. By changing a NON to a CON, the attacker can cause the receiving endpoint to respond to messages for which no response was requested.
+* Type/Message ID. The Type/Message ID fields {{RFC7252}} reveal information about the UDP transport binding, e.g. an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP {{RFC8323}}, and does not impact the request/response message. A change of these fields in a UDP hop is a denial-of-service attack. By sending an ACK, an attacker can make the endpoint believe that the other endpoint received the previous message. By sending a RST, an attacker may be able to cancel an observation, make one endpoint believe the other endpoint is alive, or make one endpoint endpoint believe that the other endpoint is missing some context. By changing a NON to a CON, the attacker can cause the receiving endpoint to ACK messages for which no ACK was requested.
 
 * Length. This field contain the length of the message {{RFC8323}} which may be used for traffic analysis. These message fields are not present in CoAP over UDP, and does not impact the request/response message. A change of Length is a denial-of-service attack similar to changing TCP header fields.
 
@@ -2259,7 +2259,7 @@ This sections analyses attacks on message fields which are not protected by OSCO
 
 * Max-Age. The Outer Max-Age is set to zero to avoid unnecessary caching of OSCORE error responses. Changing this value thus may cause unnecessary caching. No additional information is carried with this option.
 
-* Proxy-Uri/Proxy-Scheme. These options are used in forward proxy deployments. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. The other parts of Proxy-Uri cannot be protected since they are allowed to be changed by a forward proxy. The server can verify what scheme is used in the last hop, but not what was requested by the client or what was used in previous hops. 
+* Proxy-Uri/Proxy-Scheme. These options are used in CoAP forward proxy deployments. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. The other parts of Proxy-Uri cannot be protected because forward proxies need to change them in order to perform their functions. The server can verify what scheme is used in the last hop, but not what was requested by the client or what was used in previous hops. 
 
 * Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, and the application needs to handle the consequences of that (see {{uri-host}}). 
 The Uri-Host may either be omitted, reveal information equivalent to that of the IP address or more privacy-sensitive information, which is discouraged.
