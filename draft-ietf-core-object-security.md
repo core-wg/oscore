@@ -981,25 +981,33 @@ If the verification of the response succeeds, and the received Partial IV was gr
 
 To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover:
 
-1. The endpoints can run a key establisment protocol resulting in a fresh Master Secret, from which an entirely new Security Context is derived.  This could be a key exchange protocol providing forward secrecy, which typically requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which is more lightweight but also requires some amount of randomness.
+1. The endpoints can run a key establishment protocol resulting in a fresh Master Secret, from which an entirely new Security Context is derived.  This could be a key exchange protocol providing forward secrecy, which typically requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
 
-2. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See Appendix B.2 for an example.
+2. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which may be more lightweight but also requires some amount of randomness.
 
-3. An endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers based on careful use of persistant memory as is discussed in this section.
+3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See Appendix B.2 for an example.
 
-Some devices may have  no good source of randomness but predictable limitations of persistant memory, which motivates the third option.
+4. An endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers based on careful use of non-volatile memory as is discussed in this section.
 
-If the endpoint uses a persistently stored partial security context, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. Some ways to achieve this are described in the following sections.
+This document RECOMMENDS the use of a key exchange protocol. 
+
+Note that the alternatives above may be combined. In practice, the choice of method depends on the capabilities of the devices deployed.
+
+There are known issues related to writing to non-volatile memory. For example, one issue relates to the limited number of erase operations during a life time of a flash drive. Another issue relates to the time and uncertainty about a write operation to be completed. However, some devices may have no good source of randomness but predictable limitations in writing to non-volatile memory, which motivates the fourth option. 
+
+In {{seq-numb}} and {{reboot-replay}} we describe methods to recover from partial loss of security context based on the use of non-volatile memory. If the endpoint uses a partial security context in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. 
 
 ### Sequence Number {#seq-numb}
 
 To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
 
-  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in persistent memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus a factor F times K: SSN2 = SSN1 + F * K, where F is a positive integer. 
+  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in non-volatile memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus a factor F times K: SSN2 = SSN1 + F * K, where F is a positive integer. 
   
-    * Storing to persistent memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
+    * Writing to non-volatile memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
 
-    * Writing to persistent memory may be subject to delays; the factor F must be set so the probability of the last Sender Sequence Number used before reboot being larger than SSN2 is negligible. If this cannot be guaranteed, the randomized process of {{master-secret-multiple}} must be used instead.
+    * Writing to non-volatile memory may be subject to delays, or failure; the factor F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
+    
+If timely write to non-volatile memory cannot be guaranteed the method described in this section MUST NOT be used.
 
 ### Replay Window {#reboot-replay}
 
@@ -1008,6 +1016,8 @@ To prevent accepting replay of previously received requests, the server may perf
 * For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Sender Sequence Number (initiated as in {{seq-numb}}) when generating the AEAD nonce and MUST include it as Partial IV in the response.
 
 If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window of Sender Sequence Numbers.
+
+If timely write to non-volatile memory cannot be guaranteed, the method described in this section MUST NOT be used.
 
 ### Replay of Notifications
 
