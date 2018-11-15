@@ -985,46 +985,12 @@ To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting repl
 
 2. An alternative is to use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}, which may be more lightweight and may not require additional randomness.
 
-3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See Appendix B.2 for an example.
+3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See {{master-secret-multiple}} for an example.
 
-4. An endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers based on careful use of non-volatile memory as is discussed in this section.
+4. Under certain circumstances an endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers. This requires that the mutable parts of the security context are available throughout the lifetime of the device, or that the device can recover security context data based on careful use of non-volatile memory, see {{master-secret-once}} for an example. If an endpoint makes use of a partial security context stored in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages.
+ 
+The choice of method may depend on capabilities of the devices deployed and the solution architecture. This document RECOMMENDS the use of a key exchange protocol. 
 
-This document RECOMMENDS the use of a key exchange protocol. 
-
-Note that the alternatives above may be combined. In practice, the choice of method depends on the capabilities of the devices deployed.
-
-There are known issues related to writing to non-volatile memory. For example, one issue relates to the limited number of erase operations during a life time of a flash drive. Another issue relates to the time and uncertainty about a write operation to be completed. However, some devices may have no good source of randomness but predictable limitations in writing to non-volatile memory, which motivates the fourth option. 
-
-In {{seq-numb}} and {{reboot-replay}} we describe methods to recover from partial loss of security context based on the use of non-volatile memory. If the endpoint uses a partial security context in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages. 
-
-
-### Sequence Number {#seq-numb}
-
-To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
-
-  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in non-volatile memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus K plus F: SSN2 = SSN1 + K + F, where F is a positive integer. 
-  
-    * Writing to non-volatile memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
-
-    * Writing to non-volatile memory may be subject to delays, or failure; F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
-    
-If timely write to non-volatile memory cannot be guaranteed the method described in this section MUST NOT be used.
-
-### Replay Window {#reboot-replay}
-
-To prevent accepting replay of previously received requests, the server may perform the following procedure after boot:
-
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Sender Sequence Number (initiated as in {{seq-numb}}) when generating the AEAD nonce and MUST include it as Partial IV in the response.
-
-If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window of Sender Sequence Numbers.
-
-If timely write to non-volatile memory cannot be guaranteed, the method described in this section MUST NOT be used.
-
-### Replay of Notifications
-
-To prevent accepting replay of previously received notifications, the client may perform the following procedure after boot:
-
-* The client forgets about earlier registrations, removes all Notification Numbers and registers using Observe.
 
 # Processing {#processing}
 
@@ -1785,9 +1751,46 @@ The server verifies that the Partial IV has not been received before. The client
 
 Two examples complying with the requirements on the security context parameters ({{req-params}}) are given in this section.
 
-## Master Secret Used Once
+## Master Secret Used Once {#master-secret-once}
 
-An application may derive a security context once and use it for the lifetime of a device. For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. This specification describes techniques for persistent storage of the security context and synchronization of sequence numbers (see {{context-state}}) to ensure that security is maintained with the existing security context.
+An application may derive a security context once and use it for the lifetime of a device. For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. 
+
+In order to handle loss of mutable security context such as sequence numbers, the device may implement procedures for writing to non-volatile memory during normal operations and updating the security context after reboot, provided that the procedures comply with the requirements on the security context. This section gives examples of such procedures.
+
+There are known issues related to writing to non-volatile memory. For example, flash drives may have a limited number of erase operations during its life time. Also, the time for a write operation to non-volatile memory to be completed may be unpredictable, e.g. due to caching, which may result in important security context data not being stored at the time when the device reboots. 
+
+However, some devices may have predictable limits for writing to non-volatile memory but no good source of randomness, in which case procedures such as those described in this section may be preferred.
+
+ 
+### Sequence Number {#seq-numb}
+
+To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
+
+  * Before using a Sender Sequence Number that is evenly divisible by K, where K is a positive integer, store the Sender Sequence Number (SSN1) in non-volatile memory. After boot, the endpoint initiates the new Sender Sequence Number (SSN2) to the value stored in persistent memory plus K plus F: SSN2 = SSN1 + K + F, where F is a positive integer. 
+  
+    * Writing to non-volatile memory can be costly; the value K gives a trade-off between frequency of storage operations and efficient use of Sender Sequence Numbers. 
+
+    * Writing to non-volatile memory may be subject to delays, or failure; F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
+    
+If timely write to non-volatile memory cannot be guaranteed the method described in this section MUST NOT be used.
+
+### Replay Window {#reboot-replay}
+
+To prevent accepting replay of previously received requests, the server may perform the following procedure after boot:
+
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with the Echo option {{I-D.ietf-core-echo-request-tag}} to get a request with verifiable freshness. The server MUST use its Sender Sequence Number (initiated as in {{seq-numb}}) when generating the AEAD nonce and MUST include it as Partial IV in the response.
+
+If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window of Sender Sequence Numbers.
+
+If timely write to non-volatile memory cannot be guaranteed, the method described in this section MUST NOT be used.
+
+
+### Replay of Notifications
+
+To prevent accepting replay of previously received notifications, the client may perform the following procedure after boot:
+
+* The client forgets about earlier registrations, removes all Notification Numbers and registers using Observe.
+
 
 ## Master Secret Used Multiple Times {#master-secret-multiple}
 
