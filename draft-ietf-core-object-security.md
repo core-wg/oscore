@@ -435,7 +435,7 @@ Some options require special processing as specified in this section.
 
 An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in {{RFC7252}}), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in {{inner-options}}.
 
-An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermediary caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option since the responses appear to the OSCORE-unaware intermediary as 2.04 Changed responses, which are non-cacheable (see {{coap-header}}).
+An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections {{replay-protection}}{: format="counter"}, {{ver-req}}{: format="counter"}, and {{ver-res}}{: format="counter"}, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermediary caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option since the responses appear to the OSCORE-unaware intermediary as 2.04 (Changed) responses, which are non-cacheable (see {{coap-header}}).
 
 The Outer Max-Age message field is processed according to {{outer-options}}.
 
@@ -548,7 +548,7 @@ A client MUST consider the notification with the highest Partial IV as the fresh
 
 No-Response {{RFC7967}} is an optional feature used by the client to communicate its disinterest in certain classes of responses to a particular request. An implementation MAY support {{RFC7252}} and the OSCORE option without supporting {{RFC7967}}. 
 
-If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD NOT be present. The server SHALL ignore the Outer No-Response option. The client MAY set the Outer No-Response value to 26 ('suppress all known codes') if the Inner value is set to 26. The client MUST be prepared to receive and discard 5.04 Gateway Timeout error messages from intermediaries potentially resulting from destination time out due to no response.
+If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by OSCORE as specified in {{inner-options}}. The Outer option SHOULD NOT be present. The server SHALL ignore the Outer No-Response option. The client MAY set the Outer No-Response value to 26 ('suppress all known codes') if the Inner value is set to 26. The client MUST be prepared to receive and discard 5.04 (Gateway Timeout) error messages from intermediaries potentially resulting from destination time out due to no response.
 
 
 #### OSCORE
@@ -962,7 +962,7 @@ For requests and notifications, OSCORE also provides relative freshness in the s
 
 ## Replay Protection {#replay-protection}
 
-In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV = Sender Sequence Number received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 Unauthorized error message. Also, the server MAY set an Outer Max-Age option with value zero, to inform any intermediary that the response is not to be cached. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV = Sender Sequence Number received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 (Unauthorized) error message. Also, the server MAY set an Outer Max-Age option with value zero, to inform any intermediary that the response is not to be cached. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
 Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
@@ -1022,9 +1022,9 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 2. Decompress the COSE Object ({{compression}}) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter, additionally using the 'kid context', if present. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request. 
 
-   * If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 Bad Option error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
+   * If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 (Bad Option) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Failed to decode COSE".
    
-   * If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 Unauthorized error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
+   * If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 (Unauthorized) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload SHOULD contain the string "Security context not found".
 
 3. Verify that the 'Partial IV' has not been received before using the Replay Window, as described in {{replay-protection}}.
 
@@ -1034,7 +1034,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 6. Decrypt the COSE object using the Recipient Key, as per {{RFC8152}} Section 5.3. (The decrypt operation includes the verification of the integrity.)
 
-   * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 Bad Request error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Decryption failed" string.
+   * If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 (Bad Request) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the "Decryption failed" string.
 
    * If decryption succeeds, update the Replay Window, as described in {{sequence-numbers}}.
 
@@ -1807,9 +1807,9 @@ This example shows how a client initiates the establishment of a new security co
 
 1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client makes a POST request to /.well-known/oscore with empty payload, protected with the first security context. The 'kid context' in the OSCORE option is set to B1.
 
-2. The server receiving an OSCORE request with 'kid' matching the Recipient ID of pre-established input parameters, but with a new 'kid context' B1, derives a first security context using ID Context = B1. If the request passes verification (see {{ver-req}}) made with the first security context, and the decrypted Uri-Path is /.well-known/oscore, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.03 (Changed) with empty payload, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
+2. The server receiving an OSCORE request with 'kid' matching the Recipient ID of pre-established input parameters, but with a new 'kid context' B1, derives a first security context using ID Context = B1. If the request passes verification (see {{ver-req}}) made with the first security context, and the decrypted Uri-Path is /.well-known/oscore, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.04 (Changed) with empty payload, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
 
-3. The client receiving a response to its request to /oscore with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2). If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 2.03, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the 'kid context'.
+3. The client receiving a response to its request to /oscore with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2). If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 2.04, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the 'kid context'.
 
 4. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. The first security context derived could have been overwritten by the second security already in step 2, but any old security context needs to be kept until the confirmation request is verified in step 4. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
 
@@ -2119,7 +2119,7 @@ From there:
 
 ## Test Vector 7: OSCORE Response, Server {#tv7}
 
-This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid' nor a Partial IV. Note that some parameters are derived from the request.
+This section contains a test vector for an OSCORE protected 2.05 (Content) response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid' nor a Partial IV. Note that some parameters are derived from the request.
 
 Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -2154,7 +2154,7 @@ From there:
 
 ##  Test Vector 8: OSCORE Response with Partial IV, Server {#tv8}
 
-This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid', but contains a  Partial IV. Note that some parameters are derived from the request.
+This section contains a test vector for an OSCORE protected 2.05 (Content) response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid', but contains a  Partial IV. Note that some parameters are derived from the request.
 
 Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
