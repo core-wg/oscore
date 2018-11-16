@@ -623,21 +623,23 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses unless a new security context is being established, see {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If the security context has a non-empty ID Context, and a request was rejected by the server with 4.00 (Bad Request), then the client MAY send repeat a request with 'kid context' = ID Context, as the ID Context may have been lost by the server.
+   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses unless a new security context is being established, see {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If the security context has a non-empty ID Context, and a request was rejected by the server with 4.00 (Bad Request), then the client MAY send another request with 'kid context' = ID Context, as the ID Context may have been lost by the server.
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
 The encryption process is described in Section 5.3 of {{RFC8152}}.
 
-## Kid Context {#context-hint}
+## ID Context and 'kid context' {#context-hint}
 
 For certain use cases, e.g. deployments where the same Sender ID is used with multiple contexts, it is possible (and sometimes necessary, see {{req-params}}) for the client to use an ID Context to distinguish the security contexts (see {{context-definition}}). For example:
 
-* If the client has a unique identifier in some namespace, then that identifier can be used as ID Context. 
+* If the client has a unique identifier in some namespace then that identifier can be used as ID Context. 
+
+* The ID Context may be used to add randomness to the Sender and Recipient Contexts, see {{master-secret-multiple}}.
 
 * In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as ID Context to enable different security contexts for a server belonging to multiple groups.
 
-The Sender ID and Context ID are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context, see {{tab-1}}.
+The Sender ID and ID Context are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter may be used to transport the Sender ID, the new COSE header parameter 'kid context' may be used to transport the ID Context, see {{tab-1}}.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
