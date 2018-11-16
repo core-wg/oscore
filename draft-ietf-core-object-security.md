@@ -623,7 +623,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses unless a new security context is being established, see {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If the security context has a non-empty ID Context, and a request was rejected by the server with 4.00 (Bad Request), then the client MAY send repeat a request with kid context = ID Context, as the ID Context may have been lost by the server.
+   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses unless a new security context is being established, see {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If the security context has a non-empty ID Context, and a request was rejected by the server with 4.00 (Bad Request), then the client MAY send repeat a request with 'kid context' = ID Context, as the ID Context may have been lost by the server.
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -647,7 +647,7 @@ The Sender ID and Context ID are used to establish the necessary input parameter
 | context  |        |            |                | context for kid |
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
-{: #tab-1 title="Common Header Parameter kid context for the COSE object" artwork-align="center"}
+{: #tab-1 title="Common Header Parameter 'kid context' for the COSE object" artwork-align="center"}
 
 
 ## AEAD Nonce {#nonce}
@@ -773,7 +773,7 @@ The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE option and 
 
 ## Encoding of the OSCORE Option Value {#obj-sec-value}
 
-The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the kid context parameter (length and value), and the kid parameter as follows:
+The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the 'kid context' parameter (length and value), and the 'kid' parameter as follows:
 
 ~~~~~~~~~~~                
  0 1 2 3 4 5 6 7 <------------- n bytes -------------->
@@ -791,23 +791,23 @@ The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial I
 * The first byte, containing the OSCORE flag bits, encodes the following set of bits and the length of the Partial IV parameter:
 
     - The three least significant bits encode the Partial IV length n. If n = 0 then the Partial IV is not present in the compressed COSE object. The values n = 6 and n = 7 are reserved.
-    - The fourth least significant bit is the kid flag, k: it is set to 1 if the kid is present in the compressed COSE object.
-    - The fifth least significant bit is the kid context flag, h: it is set to 1 if the compressed COSE object contains a kid context (see {{context-hint}}).
+    - The fourth least significant bit is the 'kid' flag, k: it is set to 1 if the kid is present in the compressed COSE object.
+    - The fifth least significant bit is the 'kid context' flag, h: it is set to 1 if the compressed COSE object contains a 'kid context (see {{context-hint}}).
     - The sixth to eighth least significant bits are reserved for future use. These bits SHALL be set to zero when not in use. According to this specification, if any of these bits are set to 1 the message is considered to be malformed and decompression fails as specified in item 2 of {{ver-req}}.
 
 The flag bits are registered in the OSCORE Flag Bits registry specified in {{oscore-flag-bits}}.
 
 * The following n bytes encode the value of the Partial IV, if the Partial IV is present (n > 0).
 
-* The following 1 byte encode the length of the kid context ({{context-hint}}) s, if the kid context flag is set (h = 1).
+* The following 1 byte encode the length of the 'kid context' ({{context-hint}}) s, if the 'kid context' flag is set (h = 1).
 
-* The following s bytes encode the kid context, if the kid context flag is set (h = 1).
+* The following s bytes encode the 'kid context', if the 'kid context' flag is set (h = 1).
 
-* The remaining bytes encode the value of the kid, if the kid is present (k = 1).
+* The remaining bytes encode the value of the 'kid', if the 'kid' is present (k = 1).
 
-Note that the kid MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
+Note that the 'kid' MUST be the last field of the OSCORE option value, even in case reserved bits are used and additional fields are added to it.
 
-The length of the OSCORE option thus depends on the presence and length of Partial IV, kid context, kid, as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
+The length of the OSCORE option thus depends on the presence and length of Partial IV, 'kid context', 'kid', as specified in this section, and on the presence and length of the other parameters, as defined in the separate documents.
 
 ## Encoding of the OSCORE Payload {#oscore-payl}
 
@@ -942,7 +942,7 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
 
 ## Message Binding
 
-In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised intermediaries, OSCORE binds responses to the requests by including the kid and Partial IV of the request in the AAD of the response. The server therefore needs to store the kid and Partial IV of the request until all responses have been sent.
+In order to prevent response delay and mismatch attacks {{I-D.mattsson-core-coap-actuators}} from on-path attackers and compromised intermediaries, OSCORE binds responses to the requests by including the 'kid' and Partial IV of the request in the AAD of the response. The server therefore needs to store the 'kid' and Partial IV of the request until all responses have been sent.
 
 ## Sequence Numbers {#nonce-uniqueness}
 
@@ -1451,7 +1451,7 @@ The 'kid context' parameter is added to the "COSE Header Parameters Registry":
 * Label: TBD2
 * Value Type: bstr
 * Value Registry: 
-* Description: Identifies the context for kid
+* Description: Identifies the context for 'kid'
 * Reference: {{context-hint}} of this document
 
 Note to IANA: Label assignment in (Integer value between 1 and 255) is requested. (RFC Editor: Delete this note after IANA assignment)
@@ -1622,8 +1622,8 @@ The initial contents of the registry can be found in the table below. The specif
 +--------------+-------------+---------------------+-------------------+
 |       2      | Unassigned  |                     |                   |
 +--------------+-------------+---------------------+-------------------+
-|       3      | Kid Context | Set to 1 if kid     | [[this document]] |
-|              | Flag        | context is present  |                   |
+|       3      | Kid Context | Set to 1 if 'kid    | [[this document]] |
+|              | Flag        | context' is present |                   |
 |              |             | in the compressed   |                   |
 |              |             | COSE object         |                   |
 +--------------+-------------+---------------------+-------------------+
@@ -1805,11 +1805,11 @@ This section gives examples of deriving new security contexts by adding randomne
 This example shows how a client initiates the establishment of a new security context, e.g. because the client has rebooted, by making a request to a reserved server resource: /oscore. The procedure is repeated for each server.
 
 
-1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client makes a POST request to /.well-known/oscore with empty payload, protected with the first security context. The kid context in the OSCORE option is set to B1.
+1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client makes a POST request to /.well-known/oscore with empty payload, protected with the first security context. The 'kid context' in the OSCORE option is set to B1.
 
-2. The server receiving an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context B1, derives a first security context using ID Context = B1. If the request passes verification (see {{ver-req}}) made with the first security context, and the decrypted Uri-Path is /.well-known/oscore, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.03 (Changed) with empty payload, protected with the second security context. The kid context in the OSCORE option is set to B2.
+2. The server receiving an OSCORE request with 'kid' matching the Recipient ID of pre-established input parameters, but with a new 'kid context' B1, derives a first security context using ID Context = B1. If the request passes verification (see {{ver-req}}) made with the first security context, and the decrypted Uri-Path is /.well-known/oscore, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.03 (Changed) with empty payload, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
 
-3. The client receiving a response to its request to /oscore with kid context B2, derives a second security context using ID Context = H(B1 \|\| B2). If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 2.03, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the kid context.
+3. The client receiving a response to its request to /oscore with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2). If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 2.03, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the 'kid context'.
 
 4. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. The first security context derived could have been overwritten by the second security already in step 2, but any old security context needs to be kept until the confirmation request is verified in step 4. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
 
@@ -1818,9 +1818,9 @@ This example shows how a client initiates the establishment of a new security co
 
 This example shows how a server initiates the establishment of a new security context, e.g. because the server has rebooted, by responding similarly as in {{client-ini}} to an arbitrary request. The procedure is repeated for each client.
 
-1. The server receives an OSCORE request from a client with which it does not have a fresh security context, e.g. the replay window may be stale. The server verifies the request with kid matching the Recipient ID of pre-established input parameters, if necessary by deriving the first security context. If the request passes verification (see {{ver-req}}) made with the first security context, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where B1 denotes the ID Context used to derive the first security context, \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). If the decrypted Uri-Path is /.well-known/oscore then the processing continues as in {{client-ini}}, else the server responds with a 4.01 (Unauthorized) with empty payload, protected with the second security context. The kid context in the OSCORE option is set to B2.
+1. The server receives an OSCORE request from a client with which it does not have a fresh security context, e.g. the replay window may be stale. The server verifies the request with 'kid' matching the Recipient ID of pre-established input parameters, if necessary by deriving the first security context. If the request passes verification (see {{ver-req}}) made with the first security context, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where B1 denotes the ID Context used to derive the first security context, \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). If the decrypted Uri-Path is /.well-known/oscore then the processing continues as in {{client-ini}}, else the server responds with a 4.01 (Unauthorized) with empty payload, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
 
-2. The client receiving a response with kid context B2, derives a second security context using ID Context = H(B1 \|\| B2), where B1 denotes the ID Context of the first security context. If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 4.01, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the kid context.
+2. The client receiving a response with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2), where B1 denotes the ID Context of the first security context. If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 4.01, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the 'kid context'.
 
 3. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
 
@@ -2079,7 +2079,7 @@ From there:
 
 ## Test Vector 6: OSCORE Request, Client {#tv6}
 
-This section contains a test vector for an OSCORE protected CoAP GET request for an application that sets the ID Context and requires it to be sent in the request, so kid context is present in the protected message. This test vector uses the security context derived in {{key-der-kc}}. The unprotected request only contains the Uri-Path and Uri-Host options.
+This section contains a test vector for an OSCORE protected CoAP GET request for an application that sets the ID Context and requires it to be sent in the request, so 'kid context' is present in the protected message. This test vector uses the security context derived in {{key-der-kc}}. The unprotected request only contains the Uri-Path and Uri-Host options.
 
 Unprotected CoAP request: 0x44012f8eef9bbf7a396c6f63616c686f737483747631 (22 bytes)
 
@@ -2119,7 +2119,7 @@ From there:
 
 ## Test Vector 7: OSCORE Response, Server {#tv7}
 
-This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid nor a Partial IV. Note that some parameters are derived from the request.
+This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid' nor a Partial IV. Note that some parameters are derived from the request.
 
 Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -2154,7 +2154,7 @@ From there:
 
 ##  Test Vector 8: OSCORE Response with Partial IV, Server {#tv8}
 
-This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a kid, but contains a  Partial IV. Note that some parameters are derived from the request.
+This section contains a test vector for an OSCORE protected 2.05 Content response to the request in {{tv4}}. The unprotected response has payload "Hello World!" and no options. The protected response does not contain a 'kid', but contains a  Partial IV. Note that some parameters are derived from the request.
 
 Unprotected CoAP response: 0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
@@ -2233,7 +2233,7 @@ OSCORE depends on a pre-established random Master Secret ({{master-secret}}) use
 
 * Non-replayability: An attacker should not be able to cause the receiver to accept a message which it has previously received and accepted. 
 
-In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the kid and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
+In the above, the attacker is anyone except the endpoints, e.g. a compromised intermediary. Informally, OSCORE provides these properties by AEAD-protecting the plaintext with a strong key and uniqueness of (key, nonce) pairs. AEAD encryption {{RFC5116}} provides confidentiality and integrity for the data. Response-request binding is provided by including the 'kid' and Partial IV of the request in the AAD of the response. Non-replayability of requests and notifications is provided by using unique (key, nonce) pairs and a replay protection mechanism (application dependent, see {{replay-protection}}).
 
 OSCORE is susceptible to a variety of traffic analysis attacks based on observing the length and timing of encrypted packets. OSCORE does not provide any specific defenses against this form of attack but the application may use a padding mechanism to prevent an attacker from directly determine the length of the padding. However, information about padding may still be revealed by side-channel attacks observing differences in timing.
 
