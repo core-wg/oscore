@@ -1798,15 +1798,24 @@ To prevent accepting replay of previously received notifications, the client may
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-This section gives an example of an application allowing new security contexts to be derived from input parameters pre-established between client and server for this purpose; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}):  
+This section gives examples of deriving new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}).
 
-1. The client generates an ID Context which has previously not been used with the pre-established input parameters and derives a new security context. ID context may be pseudo-random and large for stochastic uniqueness, but care must be taken e.g. to avoid re-use of the same seed for random number generation. Using this new security context, the client generates an OSCORE request with (kid context, kid) = (ID Context, Sender ID) in the OSCORE option.
+### Client-initiated Generation of New Security Context
 
-2. The server receiving such an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context, derives the security context using ID Context = kid context. If the message passes verification (see {{ver-req}}) made with the newly derived security context, then the server responds with a 4.01 Unauthorized containing the Echo option {{I-D.ietf-core-echo-request-tag}} protected with the new security context.
+This example assumes that a reserved server resource, /oscore, is requested by the client when a new security context needs to be established, e.g. because the client has rebooted. The procedure is repeated for each server.
 
-3. The client receiving a 4.01 Unauthorized with the Echo option protected with the new security context, which passes verification (as in {{ver-res}}), makes its intended request to the server. The request contains additionally the Echo option with the same value received in step 2, and the (kid context, kid) as in step 1.
 
-4. The server receiving a request with a security context matching (kid context, kid) and an Echo option verifies the message (see {{ver-req}}) and the Echo option value as described in {{I-D.ietf-core-echo-request-tag}}. If everything passes verification, the request is passed-on to the CoAP request-response layer, and the response is protected with the new security context. The old security context derived with the same pre-established input parameters is deleted. Further requests with this security context may omit the kid context. 
+1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client makes a POST request to /.well-known/oscore with empty payload, protected with the first security context. The kid context in the OSCORE option is set to B1.
+
+2. The server receiving an OSCORE request with kid matching the Recipient ID of pre-established input parameters, but with a new kid context B1, derives a first security context using ID Context = B1. If the request passes verification (see {{ver-req}}) made with the first security context, and the decrypted Uri-Path is /.well-known/oscore, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1||B2), where || denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.03 (Changed) with empty payload, protected with the second security context. The kid context in the OSCORE option is set to B2.
+
+3. The client receiving a response to its request to /oscore with kid context B2, derives a second security context using ID Context = H(B1||B2). If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 2.03, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the kid context.
+
+4. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. The first security context derived could have been overwritten by the second security already in step 2, but any old security context needs to be kept until the confirmation request is verified in step 4. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
+
+
+### Server-initiated Generation of New Security Context
+
 
 
 # Test Vectors
