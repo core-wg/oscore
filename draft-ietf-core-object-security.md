@@ -1800,9 +1800,9 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives examples of deriving new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}).
 
-### Client-initiated Generation of New Security Context 
+### Client-initiated Generation of New Security Context {#client-ini}
 
-This example assumes that a reserved server resource, /oscore, is requested by the client when a new security context needs to be established, e.g. because the client has rebooted. The procedure is repeated for each server.
+This example shows how a client initiates the establishment of a new security context, e.g. because the client has rebooted, by making a request to a reserved server resource: /oscore. The procedure is repeated for each server.
 
 
 1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client makes a POST request to /.well-known/oscore with empty payload, protected with the first security context. The kid context in the OSCORE option is set to B1.
@@ -1816,7 +1816,13 @@ This example assumes that a reserved server resource, /oscore, is requested by t
 
 ### Server-initiated Generation of New Security Context
 
+This example shows how a server initiates the establishment of a new security context, e.g. because the server has rebooted, by responding similarly as in {{client-ini}} to an arbitrary request. The procedure is repeated for each client.
 
+1. The server receives an OSCORE request from a client with which it does not have a fresh security context, e.g. the replay window may be stale. The server verifies the request with kid matching the Recipient ID of pre-established input parameters, if necessary by deriving the first security context. If the request passes verification (see {{ver-req}}) made with the first security context, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where B1 denotes the ID Context used to derive the first security context, \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). If the decrypted Uri-Path is /.well-known/oscore then the processing continues as in {{client-ini}}, else the server responds with a 4.01 (Unauthorized) with empty payload, protected with the second security context. The kid context in the OSCORE option is set to B2.
+
+2. The client receiving a response with kid context B2, derives a second security context using ID Context = H(B1 \|\| B2), where B1 denotes the ID Context of the first security context. If the request passes verification (see {{ver-res}}) made with the second security context, and the decrypted Code is 4.01, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary request to the server using the new security context. Requests may omit the kid context.
+
+3. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
 
 
 
