@@ -1379,7 +1379,6 @@ This section is giving an example of how a request and a response between a CoAP
 
 Note that the HTTP Code 2.04 (Changed) in the next-to-last message is the mapping of HTTP Status Code 200, whereas the CoAP Code 2.05 (Content) in the last message is the value that was encrypted within the compressed COSE object carried in the Body of the HTTP response.
 
-
 # Security Considerations {#sec-considerations}
 
 An overview of the security properties is given in {{overview-sec-properties}}.
