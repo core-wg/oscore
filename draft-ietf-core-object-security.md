@@ -623,7 +623,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter (see {{context-hint}}) containing an ID Context (see {{context-definition}}). This parameter MAY be present in requests and MUST NOT be present in responses unless a new security context is being established, see {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If the security context has a non-empty ID Context, and a request was rejected by the server with 4.00 (Bad Request), then the client MAY send another request with 'kid context' = ID Context, as the ID Context may have been lost by the server.
+   * Optionally, a 'kid context' parameter (see {{context-hint}}). This parameter MAY be present in requests, and if so MUST contain an ID Context (see {{context-definition}}). This parameter SHOULD NOT be present in responses: an example of how 'kid context' can be used in responses is given in {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request.
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -639,7 +639,7 @@ For certain use cases, e.g. deployments where the same Sender ID is used with mu
 
 * In case of group communication {{I-D.ietf-core-oscore-groupcomm}}, a group identifier can be used as ID Context to enable different security contexts for a server belonging to multiple groups.
 
-The Sender ID and ID Context are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter may be used to transport the Sender ID, the new COSE header parameter 'kid context' may be used to transport the ID Context, see {{tab-1}}.
+The Sender ID and ID Context are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context in requests, see {{tab-1}}.
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
@@ -1802,6 +1802,8 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives examples of deriving new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}).
 
+The ID Context may have been lost by the server, so a client might need to communicate it to the server.
+
 ### Client-initiated Generation of New Security Context {#client-ini}
 
 This example shows how a client initiates the establishment of a new security context, e.g. because the client has rebooted, by making a request to a reserved server resource: /oscore. The procedure is repeated for each server.
@@ -1825,7 +1827,6 @@ This example shows how a server initiates the establishment of a new security co
 2. The client receiving a response with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2), where B1 denotes the ID Context of the first security context. If the request passes verification (see {{ver-res}}) using the second security context, and the decrypted Code is 4.01, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must immediately send an ordinary OSCORE request to the server using the new security context. Requests may omit the 'kid context'.  
 
 3. If the server receives a request that passes verification (see {{ver-req}}) using the second security context, then the server discards all other security contexts of this client. If the server does not receive any confirmation request within some pre-defined time, then the second security context may be deleted.
-
 
 
 # Test Vectors
