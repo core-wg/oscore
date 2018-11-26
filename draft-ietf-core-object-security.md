@@ -1795,35 +1795,52 @@ To prevent accepting replay of previously received notifications, the client may
 
 ## Master Secret Used Multiple Times {#master-secret-multiple}
 
-{{sec-context-establish}} recommends that the Master Secret is obtained from a key establishment protocol providing forward secrecy. 
+{{sec-context-establish}} recommends that the Master Secret is obtained from a key establishment protocol providing forward secrecy.
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-This section gives examples of deriving new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}). The random input is transported between client and server in the 'kid context' parameter as described below, which allows new security contexts to be established with certain message exchanges. Note that when the ID Context is known by both client and server, the 'kid context' may be omitted, and conversely, the 'kid context' parameter can be used in a request to remind the server of the ID context, should it have been lost.
+This section gives an example of a protocol to derive new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}). The random input is transported between client and server in the 'kid context' parameter as described below, and used in the value of the ID Context parameter which results in new security contexts.
 
+Note that the ID Context of an established security context may be sent in the 'kid context' together with 'kid' in a request to facilitate for the server to locate a security context. However, the 'kid context' may be omitted since the ID Context is expected to be known by both client and server.
 
-### Client-initiated Generation of New Security Context {#client-ini}
+The procedure described in this section may only be required when the mutable part of security context is lost in client or server. The procedure may additionally be used when the client and server need to derive a new security context, for example for (re-)commissioning a device/server with fixed input parameters provisioned to the client out-of-band.
 
-This example shows how a client initiates the establishment of a new security context, e.g. because the client has rebooted, by making a request to a reserved server resource (e.g. /.well-known/oscore) indicating a client-initiated generation of new security context. The procedure is repeated for each server.
+The client may initiate the establishment of a new security context, e.g. because it has rebooted, by making a request protected with a temporary security context. The server receiving a request for which it does not have a fresh security context but can still verify the request, sends a 4.01 (Unauthorized) response protected with another security context. This allows the client a server to communicate the need for establishing a new security context, more details are provided below with reference to {{fig-B2}}.
 
-1. The client generates a pseudo-random stochastically unique byte string B1, and uses this as ID Context together with the input parameters shared with the server to derive a first temporary security context. The client makes a POST request to a reserved resource  with empty payload, protected with the first security context. The 'kid context' in the OSCORE option is set to B1.
+The server and client must be pre-provisioned with a time interval during which the protocol must be finished, after the first message is received. If the client and server do not run the exchange successfully in this time interval, then they must discard the temporary security contexts established. This protects against an attacker overloading the endpoints with creation of several temporary security contexts.
 
-2. The server receiving an OSCORE request with 'kid' matching the Recipient ID of pre-established input parameters, but with a different 'kid context' B1, derives a temporary security context using ID Context = B1. If the request passes verification (see {{ver-req}}) using this temporary security context, and the decrypted Uri-Path is this reserved server resource, then the server generates a pseudo-random stochastically unique byte string B2. The server now deletes the temporary security context and derives a second security context with ID Context = H(B1 \|\| B2), where \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). The server responds with a 2.04 (Changed) with empty payload, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
+1. If the client does not have a fresh security context with the server, then it generates a pseudo-random byte string R1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, and with 'kid context' = R1. The request may target a special resource used for updating security contexts.
 
-3. The client receiving a response to its request to the reserved resource, with 'kid context' = B2, derives a second security context using ID Context = H(B1 \|\| B2). If the request passes verification (see {{ver-res}}) using the second security context, and the decrypted Code is 2.04, then the client deletes the first security context and uses the second security context in future communication with the server. As a confirmation, the client must send an ordinary OSCORE request to the server using the new security context within a pre-defined time, to validate the creation of the new security context. Requests may omit the 'kid context'.
+2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context, ID1 = R1 or because the server may have lost part of its security context, e.g. ID1 or replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a pseudo-random  byte string R2, and derives a second security context with ID Context = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, and containing 'kid context' = R2.
 
-4. If the server receives a request that passes verification (see {{ver-req}}) using the second security context within the pre-defined time, then the server discards all other security contexts of this client that used the same Recipient ID. The temporary security context was overwritten by the second security already in step 2, but an old security context needs to be kept until the confirmation request is verified in step 4. If the server does not receive any confirmation request passing verification within the pre-defined time, then the second security context may be deleted.
+3. The client receives a response with 'kid context' = R2 to an OSCORE request it made with 'kid context' = ID1. The client derives a second security context using ID Context = R2 \|\| ID1. If the client can verify the response (see {{ver-res}}) using the second security context, then the client makes a request protected with a third security context derived from ID Context = R2 \|\| R3, where R3 is a pseudo-random byte string generated by the client. The request includes 'kid context' = R2 \|\| R3.
 
+4. If the server receives a request with 'kid context' = ID3, where the first part of ID3 is identical to a stored R2 using in 'kid context' of a recent response, then the server derives a third security context with ID Context = ID3. If the server can verify the request (see {{ver-req}}) with the third security context, then the server marks the third security context to be used with this client. The security context is established, and the previous temporary contexts are deleted. The server performs the action of the request and sends a response.
 
-### Server-initiated Generation of New Security Context
+5. If the client receives a response with the request with the third security context and the response verifies (see {{ver-res}}), then the client marks the third security context to be used with this server. The security context is established, and the previous temporary contexts are deleted. The client acts on the decrypted response.
 
-This example shows how a server initiates the establishment of a new security context when the existing security context is not fresh, e.g. because the replay window is stale due to the server having rebooted. The procedure includes a response similar as in {{client-ini}}, but to an arbitrary request. The procedure is repeated for each client.
+~~~~~~~~~~~
+                      Client                    Server
+                        |                         |
+1. Protect with         |                         |
+   ID Context = ID1     |-- kid_context = ID1 --->| 2. Verify with
+                        |                         |    ID Context = ID1
+                        |                         | 
+                        |                         |    Protect with
+3. Verify with          |<--- kid_context = R2 ---|    ID Context = R2||ID1
+   ID Context = R2||ID1 |                         | 
+                        |                         |
+   Protect with         |                         |
+   ID Context = R2||R3  |- kid_context = R2||R3 ->| 4. Verify with 
+                        |                         |    ID Context = R2||R3
+                        |                         | 
+                        |                         |    Protect with
+5. Verify with          |<------------------------|    ID Context = R2||R3
+   ID Context = R2||R3  |                         | 
 
-1. The server receives an OSCORE request from a client with which it does not have a fresh security context. The server verifies the request with a first security context derived from pre-established input parameters with Recipient ID matching 'kid'. If the request passes verification (see {{ver-req}}) using the first security context, then the server generates a pseudo-random stochastically unique byte string B2. The server now derives a second security context with ID Context = H(B1 \|\| B2), where B1 denotes the ID Context used to derive the first security context, \|\| denotes concatenation of byte strings, and H is the hash function used in the HKDF input parameter (default is SHA-256). If the decrypted Uri-Path is a reserved resource for client-initiated generation of new security context, then the processing continues as in step 2 of {{client-ini}}, else the server responds with a 4.01 (Unauthorized) with a diagnostic payload indicating that the server is requesting a fresh security context, protected with the second security context. The 'kid context' in the OSCORE option is set to B2.
+~~~~~~~~~~~
+{: #fig-B2 title="Procedure for establishing new security context." artwork-align="center"}
 
-2. The client receiving a response with 'kid context' B2, derives a second security context using ID Context = H(B1 \|\| B2), where B1 denotes the ID Context of the first security context. If the request passes verification (see {{ver-res}}) using the second security context, and the decrypted Code is 4.01, then the client deletes the first security contexts and uses the second security context in future communication with the server. As a confirmation, the client must send an ordinary OSCORE request to the server using the new security context within some pre-defined time, to validate the creation of the new security context. Requests may omit the 'kid context'.  
-
-3. If the server receives a request that passes verification (see {{ver-req}}) using the second security context within the pre-defined time, then the server discards all other security contexts of this client that used the same Recipient ID. If the server does not receive any confirmation request passing verification within the pre-defined time, then the second security context may be deleted.
 
 
 # Test Vectors
