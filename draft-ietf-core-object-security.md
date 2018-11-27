@@ -1795,29 +1795,34 @@ To prevent accepting replay of previously received notifications, the client may
 
 ## Master Secret Used Multiple Times {#master-secret-multiple}
 
-{{sec-context-establish}} recommends that the Master Secret is obtained from a key establishment protocol providing forward secrecy.
-
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-This section gives an example of a protocol to derive new security contexts by adding randomness to the input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}). The random input is transported between client and server in the 'kid context' parameter as described below, and used in the value of the ID Context parameter which results in new security contexts.
+### Adding Randomness to ID Context
 
-Note that the ID Context of an established security context may be sent in the 'kid context' together with 'kid' in a request to facilitate for the server to locate a security context. However, the 'kid context' may be omitted since the ID Context is expected to be known by both client and server.
+This section gives an example of a protocol which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter.
 
-The procedure described in this section may only be required when the mutable part of security context is lost in client or server. The procedure may additionally be used when the client and server need to derive a new security context, for example for (re-)commissioning a device/server with fixed input parameters provisioned to the client out-of-band.
+Note that the ID Context of an established security context may be sent in the 'kid context' together with 'kid' in a request to facilitate for the server to locate a security context, or the 'kid context' may be omitted since the ID Context is expected to be known by both client and server.
 
-The client may initiate the establishment of a new security context, e.g. because it has rebooted, by making a request protected with a temporary security context. The server receiving a request for which it does not have a fresh security context but can still verify the request, sends a 4.01 (Unauthorized) response protected with another security context. This allows the client a server to communicate the need for establishing a new security context, more details are provided below with reference to {{fig-B2}}.
+The procedure described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The procedure may additionally be used when the client and server need to derive a new security context, for example for (re-)commissioning a device/server with fixed input parameters provisioned to the client out-of-band.
 
-The server and client must be pre-provisioned with a time interval during which the protocol must be finished, after the first message is received. If the client and server do not run the exchange successfully in this time interval, then they must discard the temporary security contexts established. This protects against an attacker overloading the endpoints with creation of several temporary security contexts.
+In this example, the client initiates the establishment of a new security context by making a request protected with a temporary security context. The server receiving a request for which it does not have a fresh security context but can still verify the request, sends a 4.01 (Unauthorized) response protected with another security context. This allows both client and server to initiate the need for establishing a new security context. More details are provided below with reference to {{fig-B2}}.
+
 
 1. If the client does not have a fresh security context with the server, then it generates a pseudo-random byte string R1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, and with 'kid context' = R1. The request may target a special resource used for updating security contexts.
 
-2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context, ID1 = R1 or because the server may have lost part of its security context, e.g. ID1 or replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a pseudo-random  byte string R2, and derives a second security context with ID Context = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, and containing 'kid context' = R2.
+2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context ID1 = R1, or because the server may have lost part of its security context, e.g. ID1 or the replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a pseudo-random byte string R2, and derives a second security context with ID Context = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, containing 'kid context' = R2, and caches R2.
 
 3. The client receives a response with 'kid context' = R2 to an OSCORE request it made with 'kid context' = ID1. The client derives a second security context using ID Context = R2 \|\| ID1. If the client can verify the response (see {{ver-res}}) using the second security context, then the client makes a request protected with a third security context derived from ID Context = R2 \|\| R3, where R3 is a pseudo-random byte string generated by the client. The request includes 'kid context' = R2 \|\| R3.
 
-4. If the server receives a request with 'kid context' = ID3, where the first part of ID3 is identical to a stored R2 using in 'kid context' of a recent response, then the server derives a third security context with ID Context = ID3. If the server can verify the request (see {{ver-req}}) with the third security context, then the server marks the third security context to be used with this client. The security context is established, and the previous temporary contexts are deleted. The server performs the action of the request and sends a response.
+4. If the server receives a request with 'kid context' = ID3, where the first part of ID3 is identical to the cached R2, then the server derives a third security context with ID Context = ID3. If the server can verify the request (see {{ver-req}}) with the third security context, then the server marks the third security context to be used with this client and removes R2 from the cache. The security context is established, and the previous temporary security contexts are deleted. The server responds using the same security context as in the request.
 
-5. If the client receives a response with the request with the third security context and the response verifies (see {{ver-res}}), then the client marks the third security context to be used with this server. The security context is established, and the previous temporary contexts are deleted. The client acts on the decrypted response.
+5. If the client receives a response with the request with the third security context and the response verifies (see {{ver-res}}), then the client marks the third security context to be used with this server. The security context is established, and the previous temporary contexts are deleted. 
+
+
+The second request between client and server sent in step 3 can be an ordinary request. The server performs the action of the request and sends an response after having successfully completed the security context related operations in step 4. The client acts on the response after having successfully completed step 5.
+
+
+
 
 ~~~~~~~~~~~
                       Client                    Server
@@ -1840,6 +1845,25 @@ The server and client must be pre-provisioned with a time interval during which 
 
 ~~~~~~~~~~~
 {: #fig-B2 title="Procedure for establishing new security context." artwork-align="center"}
+
+### Authentication and (key, nonce) Uniqueness
+
+Informally, the following properties are required for this protocol:
+
+1. Each protocol message is authenticated to originate from the other endpoint
+  
+2. Each endpoint can assert that the AEAD key and nonce are not reused
+
+The first property follows from how the endpoints verify received messages using security contexts derived from the pre-shared Master Secret.
+
+The second property follows from how the endpoints contribute randomness to the security contexts so that the Sender Key, Recipient Key and Common IV in the first, second and third security contexts are all different.
+
+
+### Statelessness
+
+
+### Denial of Service
+
 
 
 
