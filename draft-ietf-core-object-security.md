@@ -981,7 +981,7 @@ If the verification of the response succeeds, and the received Partial IV was gr
 
 ## Losing Part of the Context State {#context-state}
 
-To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, Replay Window, and Notification Numbers. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover, for example:
+To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting replayed messages, an endpoint needs to handle the situation of losing rapidly changing parts of the context, such as the Sender Sequence Number, and Replay Window. These are typically stored in RAM and therefore lost in the case of e.g. an unplanned reboot. There are different alternatives to recover, for example:
 
 1. The endpoints can run a key exchange protocol providing forward secrecy resulting in a fresh Master Secret, from which an entirely new Security Context is derived. This requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
 
@@ -989,7 +989,7 @@ To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting repl
 
 3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts. This typically requires a good source of randomness and a message exchange, but not as large performance impact as a key exchange protocol, and no trusted third party. See {{master-secret-multiple}} for an example.
 
-4. Under certain circumstances an endpoint can reuse an existing Security Context with updated Sender Sequence Number, Replay Window, and Notification Numbers. This requires that the mutable parts of the security context are available throughout the lifetime of the device, or that the device can recover security context data based on careful use of non-volatile memory, see {{master-secret-once}} for an example. If an endpoint makes use of a partial security context stored in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages.
+4. Under certain circumstances an endpoint can reuse an existing Security Context with updated Sender Sequence Number, and Replay Window. This requires that the mutable parts of the security context are available throughout the lifetime of the device, or that the device can recover security context data based on careful use of non-volatile memory, see {{master-secret-once}} for an example. If an endpoint makes use of a partial security context stored in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages.
  
 The choice of method may depend on capabilities of the devices deployed and the solution architecture. This document RECOMMENDS the use of a key exchange protocol. 
 
