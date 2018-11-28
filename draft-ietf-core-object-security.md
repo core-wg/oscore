@@ -1752,11 +1752,11 @@ The server verifies that the Partial IV has not been received before. The client
 
 # Deployment Examples {#deployment-examples}
 
-Two examples are given in this section.
+For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. Two examples are given in this section. In the first example, the security context is only derived once from the Master Secret. In the second example, security contexts are derived multiple times using random inputs.
 
 ## Security Context Derived Once {#master-secret-once}
 
-An application may derive a security context once and use it for the lifetime of a device. For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. 
+An application may derive a security context once and use it for the lifetime of a device. 
 
 ### Sequence Number {#seq-numb}
 
