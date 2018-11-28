@@ -1786,7 +1786,7 @@ If the server using the Echo option can verify a second request as fresh, then t
 
 This method allows the re-use of the AEAD nonce generated from the server's Sender Sequence Number = 0: this is acceptable as the only changing information in the 4.01 (Unauthorized) error message is the value of the Echo option.
 
-### Notifications
+### Notifications {#replay-notif}
 
 To prevent accepting replay of previously received notifications, the client may perform the following procedure after boot:
 
