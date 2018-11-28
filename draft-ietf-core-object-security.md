@@ -985,15 +985,15 @@ To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting repl
 
 1. The endpoints can reuse an existing Security Context after updating the mutable parts of the security context (Sender Sequence Number, and Replay Window). This requires that the mutable parts of the security context are available throughout the lifetime of the device, or that the device can recover security context data based on careful use of non-volatile memory, see {{nv-memory}} for an example. If an endpoint makes use of a partial security context stored in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages.
 
-2. The server can update the Replay Window by using the Echo option {{I-D.ietf-core-echo-request-tag}} and an AEAD nonce constructed from its own Sender Sequence Number, see {{unused-sn}} for an example. This method MUST NOT be used if the application allows for the server to encode the AEAD nonce with its Sender ID in responses to regular requests.
+2. The endpoints can update the server's Replay Window by using the Echo option {{I-D.ietf-core-echo-request-tag}}, see {{unused-sn}} for an example. This method only updates the Replay Window and does not update the server's Sender Sequence Number, so it MUST NOT be used if the application allows for the server to encode the AEAD nonce using its Sender Sequence Number in responses to regular requests, or if the server supports Observe.
 
 3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts, see {{master-secret-multiple}} for an example. This typically requires a good source of randomness. 
 
 4. The endpoints can use a trusted-third party assisted key establishment protocol such as {{I-D.ietf-ace-oscore-profile}}. This requires the execution of three-party protocol and may require a good source of randomness.
 
-5. The endpoints can run a key exchange protocol providing forward secrecy resulting in a fresh Master Secret, from which an entirely new Security Context is derived. This requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
+5. The endpoints can run a key exchange protocol providing forward secrecy resulting in a fresh Master Secret, from which an entirely new Security Context is derived. This requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost, e.g. in terms of power consumption. 
 
-The choice of method may depend on capabilities of the devices deployed and the solution architecture. The endpoints need to be configured with information about which method is used. Using a key exchange protocol is necessary for deployments that require forward secrecy. 
+The endpoints need to be configured with information about which method is used. The choice of method may depend on capabilities of the devices deployed and the solution architecture. Using a key exchange protocol is necessary for deployments that require forward secrecy.
 
 
 # Processing {#processing}
