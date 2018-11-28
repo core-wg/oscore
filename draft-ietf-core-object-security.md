@@ -1789,15 +1789,17 @@ If the server using the Echo option can verify a second request as fresh, then t
 
 If timely write to non-volatile memory cannot be guaranteed, the method described in this section MUST NOT be used.
 
-### Unused Server Sender Sequence Number {#unused-sn}
+### Updating the Server's Replay Window {#unused-sn}
 
-To prevent reuse of AEAD nonce, the server which does not support Observe may perform the following procedure after boot:
+In case of loss of security context on the server, if the server does not use its own Sender Sequence Number to encode AEAD nonces (see step 3 of {{prot-res}}) and does not support Observe, updating the server's Replay Window would be sufficient to restore a complete security context on the server.
 
-* When a server with a stale Replay Window receives a request, it replies with a 4.01 (Unauthorized) containing an Echo option, using the AEAD nonce encoded with its own Sender ID and fixed Partial IV = 0. 
+To prevent accepting replay of previously received requests, the server which does not support Observe and does not use its own encoded AEAD nonce in response may perform the following procedure after boot:
 
-If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the Replay Window of Sender Sequence Numbers. 
+* When a server with a stale Replay Window receives a request, it replies with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}, using the AEAD nonce encoded with its own Sender ID and fixed Sender Sequence Number = 0. 
 
-This requires that the server does not support Observe, and does not use its own Sender Sequence Number to protect responses (see step 3 in {{prot-res}}). 
+If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the Replay Window of Sender Sequence Numbers.
+
+If the server supports Observe or uses its own Sender Sequence Number to protect responses (see step 3 in {{prot-res}}), the method described in this section MUST NOT be used, as it may lead to nonce re-use. Also, this method MUST NOT be used if the client can not guarantee non-reuse of its own Sender Sequence Numbers (e.g. by using {{nv-memory}}).
 
 ### Replay of Notifications
 
