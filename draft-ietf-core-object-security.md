@@ -1797,8 +1797,6 @@ To prevent accepting replay of previously received notifications, the client may
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases.
 
-### Adding Randomness to ID Context
-
 This section gives an example of a protocol which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server; in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter.
 
 Note that the ID Context of an established security context may be sent in the 'kid context' together with 'kid' in a request to facilitate for the server to locate a security context, or the 'kid context' may be omitted since the ID Context is expected to be known by both client and server.
@@ -1846,23 +1844,28 @@ The second request between client and server sent in step 3 can be an ordinary r
 ~~~~~~~~~~~
 {: #fig-B2 title="Procedure for establishing new security context." artwork-align="center"}
 
-### Authentication and (key, nonce) Uniqueness
 
-Informally, the following properties are required for this protocol:
+The following properties are valid for this protocol:
 
-1. Each protocol message is authenticated to originate from the other endpoint
+* All protocol messages can be verified to originate from the other endpoint
   
-2. Each endpoint can assert that the AEAD key and nonce are not reused
-
-The first property follows from how the endpoints verify received messages using security contexts derived from the pre-shared Master Secret.
-
-The second property follows from how the endpoints contribute randomness to the security contexts so that the Sender Key, Recipient Key and Common IV in the first, second and third security contexts are all different.
+This follows from how the endpoints verify received messages using security contexts derived from the pre-shared Master Secret.
 
 
-### Statelessness
+* The AEAD key and nonce are not reused
+
+This follows from how the endpoints contribute randomness to the security contexts so that the Sender Key, Recipient Key and Common IV in the first, second and third security contexts are all different. 
+
 
 
 ### Denial of Service
+
+An on path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
+
+The first request may be a replay of a previous client request. This causes the server to generate the second security context and send a response. But if the response did not have a matching request the client will discard it.
+
+However, multiple requests needs to be handled by the server. The server may have room for only a few security contexts. An adversary can 
+
 
 
 
