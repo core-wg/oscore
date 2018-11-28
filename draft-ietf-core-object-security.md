@@ -1752,19 +1752,19 @@ The server verifies that the Partial IV has not been received before. The client
 
 # Deployment Examples {#deployment-examples}
 
-Two examples complying with the requirements on the security context parameters ({{req-params}}) are given in this section.
+Two examples are given in this section.
 
-## Master Secret Used Once {#master-secret-once}
+## Security Context Derived Once {#master-secret-once}
 
 An application may derive a security context once and use it for the lifetime of a device. For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. 
 
 ### Non-Volatile Memory {#nv-memory}
 
-In order to handle loss of mutable security context such as sequence numbers, the device may implement procedures for writing to non-volatile memory during normal operations and updating the security context after reboot, provided that the procedures comply with the requirements on the security context. This section gives examples of such procedures.
+In order to handle loss of mutable security context parameters such as sequence numbers, the device may implement procedures for writing to non-volatile memory during normal operations and updating the security context after reboot, provided that the procedures comply with the requirements on the security context parameters ({{req-params}}). This section gives examples of such procedures.
 
-There are known issues related to writing to non-volatile memory. For example, flash drives may have a limited number of erase operations during its life time. Also, the time for a write operation to non-volatile memory to be completed may be unpredictable, e.g. due to caching, which may result in important security context data not being stored at the time when the device reboots. 
+There are known issues related to writing to non-volatile memory. For example, flash drives may have a limited number of erase operations during its life time. Also, the time for a write operation to non-volatile memory to be completed may be unpredictable, e.g. due to caching, which could result in important security context data not being stored at the time when the device reboots. 
 
-However, some devices may have predictable limits for writing to non-volatile memory but no good source of randomness, in which case procedures such as those described in this section may be preferred.
+However, many devices have predictable limits for writing to non-volatile memory, are physically limited to only send a small amount of messages per minute, and may have no good source of randomness
 
  
 #### Sequence Number {#seq-numb}
@@ -1777,7 +1777,7 @@ To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the f
 
     * Writing to non-volatile memory may be subject to delays, or failure; F MUST be set so that the last Sender Sequence Number used before reboot is never larger than SSN2. 
     
-If timely write to non-volatile memory cannot be guaranteed the method described in this section MUST NOT be used.
+If F cannot be set so SSN2 is always larger than the last Sender Sequence Number used before reboot, the method described in this section MUST NOT be used.
 
 #### Replay Window {#reboot-replay}
 
