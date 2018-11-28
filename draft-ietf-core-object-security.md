@@ -993,7 +993,7 @@ To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting repl
 
 5. The endpoints can run a key exchange protocol providing forward secrecy resulting in a fresh Master Secret, from which an entirely new Security Context is derived. This requires a good source of randomness, and additionally, the transmission and processing of the protocol may have a non-negligible cost in terms of, e.g., power consumption. 
 
-The choice of method may depend on capabilities of the devices deployed and the solution architecture. Using a key exchange protocol is necessary for deployments that require forward secrecy. 
+The choice of method may depend on capabilities of the devices deployed and the solution architecture. The endpoints need to be configured with information about which method is used. Using a key exchange protocol is necessary for deployments that require forward secrecy. 
 
 
 # Processing {#processing}
