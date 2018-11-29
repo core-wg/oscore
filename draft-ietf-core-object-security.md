@@ -623,7 +623,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter (see {{context-hint}}). This parameter MAY be present in requests, and if so MUST contain an ID Context (see {{context-definition}}). This parameter SHOULD NOT be present in responses: an example of how 'kid context' can be used in responses is given in {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. If a request without 'kid context' results in an error indicating that the server could not find the security context, the client may send a new request and include the 'kid context'.
+   * Optionally, a 'kid context' parameter (see {{context-hint}}). This parameter MAY be present in requests, and if so MUST contain an ID Context (see {{context-definition}}). This parameter SHOULD NOT be present in responses: an example of how 'kid context' can be used in responses is given in {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. 
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -641,7 +641,7 @@ For certain use cases, e.g. deployments where the same Sender ID is used with mu
 
 The Sender ID and ID Context are used to establish the necessary input parameters and in the derivation of the security context (see {{context-derivation}}). 
 
-Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context in requests, see {{tab-1}}.
+Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE header parameter 'kid context' is used to transport the ID Context in requests, see {{tab-1}}. 
  
 ~~~~~~~~~~
 +----------+--------+------------+----------------+-----------------+
@@ -652,6 +652,8 @@ Whereas the 'kid' parameter is used to transport the Sender ID, the new COSE hea
 +----------+--------+------------+----------------+-----------------+
 ~~~~~~~~~~
 {: #tab-1 title="Common Header Parameter 'kid context' for the COSE object" artwork-align="center"}
+
+If ID Context is non-empty and the client sends a request without 'kid context' which results in an error indicating that the server could not find the security context, then the client could include the ID Context in the 'kid context' when making another request. Note that since the error is unprotected it may have been spoofed and the real response blocked by an on-path attacker.
 
 
 ## AEAD Nonce {#nonce}
@@ -1801,9 +1803,9 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives an example of a procedure which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server, in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter. This procedure MUST NOT be used unless both endpoints have good sources of randomness.
 
-During normal requests the ID Context of an established security context may be sent in the 'kid context' which together with 'kid' facilitate for the server to locate a security context; or the 'kid context' may be omitted since the ID Context is expected to be known to both client and server (see {{cose-object}}). 
+During normal requests the ID Context of an established security context may be sent in the 'kid context' which together with 'kid' facilitate for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
 
-The procedure described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The procedure may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret) it can be deployed multiple times if ID Context is randomized at each deployment.
+The procedure described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The procedure may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
 
 The procedure is described below with reference to {{fig-B2}}.
 
@@ -1844,9 +1846,9 @@ The procedure is described below with reference to {{fig-B2}}.
 The second request in this procedure (sent in step 3) can be an ordinary request. The server performs the action of the request and sends a response after having successfully completed the security context related operations in step 4. The client acts on the response after having successfully completed step 5.
 
 
-When sending request #2, the client is assured that the Sender Key (derived with the random value R3) is fresh and has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was recently created by the server.
+When sending request #2, the client is assured that the Sender Key (derived with the random value R3) has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was created by the server as a reaction its request #2.
 	
-Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was recently created by the client. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) is fresh and has never been used before.
+Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client as a reaction to its response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
 
 
@@ -1856,12 +1858,11 @@ An on-path attacker may inject a message causing the endpoint to verify the mess
 
 Request #1 may be a replay of a previous client request. This causes the server to generate the second security context and send a response. But if the response did not have a matching request the client will discard it. 
 
-To avoid storing state for procedure runs which may never complete, the server may set a timer at caching of R2 and remove R2 from the cache at timeout. 
+To avoid storing state for procedure runs which may never complete, the server should set a timer at caching of R2, and remove R2 and associated security contexts from the cache at timeout. 
 
 The server may only have room for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-Replaying response #1 will fail to verify since the response is bound to request #1. Replaying request #2 will fail to verify since it is only valid once for this value of R2. Replaying response #2 will fail to verify since the response is bound to request #2. 
-
+Replaying response #1 will fail to verify since the response is bound to request #1, through the ID context used in response #1, and the Partial IV of the request included in the external_aad. If request #2 is replayed after the corresponding R2 has been removed from cache, then it will be interpreted as a request #1 which is handled as the case above. Replaying request #2 will fail to verify since it is only valid once for this value of R2. Replaying response #2 will fail to verify since the response, like ordinary OSCORE responses, is bound to request #2.
 
 
 # Test Vectors
