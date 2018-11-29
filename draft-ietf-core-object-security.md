@@ -1856,18 +1856,17 @@ Similarly, when receiving request #2, the server is assured that the request (pr
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
-Request #1 may be a replay of a previous client request. This causes the server to generate the second security context and send a response. But if the response did not have a matching request the client will discard it. 
+To avoid storing state for procedure runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. 
 
-To avoid storing state for procedure runs which may never complete, the server should set a timer at caching of R2, and remove R2 and associated security contexts from the cache at timeout. 
+The server may only have space for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-The server may only have room for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+Request #1 may be a replay of a previous client request, and this may not be detected since the server does not have the security context. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
 
-Replaying response #1 in response to another request will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
+If request #2 is replayed then it will not be accepted by the server as a request #2, since the corresponding R2 has been removed from cache. It may however be interpreted by the server as a request #1, in which case it causes the server to generate a second security context and send a response. That response is associated to request #2, but protected with a security context as if it was a request #1 and will therefore fail to verify, if not directly discarded  by the client due to no matching request.
 
-If request #2 is replayed after the corresponding R2 has been removed from cache, then it will not be accepted by the server as a request #2. It may however be interpreted by the server as a request #1, in which case it causes the server to generate a new security context and send a response. The response is associated to request #2, but protected with a security context as if it was a request #1 and will therefore fail to verify since the client uses the same security context as request #2.
+Replaying response #1 in response to some request will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
 
-Replaying response #2 in response to another request will fail to verify for the same reason as response #1 above.
-
+Replaying response #2 in response to another request will fail to verify for the same reason as response #1.
 
 # Test Vectors
 
