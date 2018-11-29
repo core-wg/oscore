@@ -1810,19 +1810,19 @@ The procedure is described below with reference to {{fig-B2}}.
 ~~~~~~~~~~~
                       Client                    Server
                         |                         |
-1. Protect with         |                         |
-   ID Context = ID1     |-- kid_context = ID1 --->| 2. Verify with
-                        |                         |    ID Context = ID1
+1. Protect with         |      request #1         |
+   ID Context = ID1     |------------------------>| 2. Verify with
+                        |    kid_context = ID1    |    ID Context = ID1
                         |                         | 
-                        |                         |    Protect with
-3. Verify with          |<--- kid_context = R2 ---|    ID Context = R2||ID1
-   ID Context = R2||ID1 |                         | 
+                        |      response #1        |    Protect with
+3. Verify with          |<------------------------|    ID Context = R2||ID1
+   ID Context = R2||ID1 |     kid_context = R2    | 
                         |                         |
-   Protect with         |                         |
-   ID Context = R2||R3  |- kid_context = R2||R3 ->| 4. Verify with 
-                        |                         |    ID Context = R2||R3
+   Protect with         |       request #2        |
+   ID Context = R2||R3  |------------------------>| 4. Verify with 
+                        |  kid_context = R2||R3   |    ID Context = R2||R3
                         |                         | 
-                        |                         |    Protect with
+                        |       response #2       |    Protect with
 5. Verify with          |<------------------------|    ID Context = R2||R3
    ID Context = R2||R3  |                         | 
 
@@ -1844,20 +1844,23 @@ The procedure is described below with reference to {{fig-B2}}.
 The second request in this procedure (sent in step 3) can be an ordinary request. The server performs the action of the request and sends a response after having successfully completed the security context related operations in step 4. The client acts on the response after having successfully completed step 5.
 
 
-TBD Properties of client and server
+When sending request #2, the client is assured that the Sender Key (derived with the random value R3) is fresh and has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was recently created by the server.
+	
+Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was recently created by the client. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) is fresh and has never been used before.
+
 
 
 ### Denial of Service
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
-The first request may be a replay of a previous client request. This causes the server to generate the second security context and send a response. But if the response did not have a matching request the client will discard it. 
+Request #1 may be a replay of a previous client request. This causes the server to generate the second security context and send a response. But if the response did not have a matching request the client will discard it. 
 
 To avoid storing state for procedure runs which may never complete, the server may set a timer at caching of R2 and remove R2 from the cache at timeout. 
 
-The server may only have room for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a first request of the procedure and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+The server may only have room for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-Replaying the first response will fail to verify since the response is bound to the request. Replaying the second request will fail to verify since it is only valid once for this value of R2. Replaying the second response will fail to verify since the response is bound to the second request. 
+Replaying response #1 will fail to verify since the response is bound to request #1. Replaying request #2 will fail to verify since it is only valid once for this value of R2. Replaying response #2 will fail to verify since the response is bound to request #2. 
 
 
 
