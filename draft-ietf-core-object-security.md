@@ -1780,7 +1780,7 @@ If F cannot be set so SSN2 is always larger than the last Sender Sequence Number
 
 In case of loss of security context on the server, to prevent accepting replay of previously received requests, the server may perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with a 4.01 (Unauthorized) message, containing only the Echo option {{I-D.ietf-core-echo-request-tag}} and no diagnostic payload, in order to get a request with verifiable freshness. The server MUST use a fixed Sender Sequence Number = 0 when generating the AEAD nonce and MUST include it as Partial IV in the response. The server MUST NOT use the Sender Sequence Number = 0 to generate the AEAD nonce for any other response.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with a 4.01 (Unauthorized) message, containing only the Echo option {{I-D.ietf-core-echo-request-tag}} and no diagnostic payload, in order to get a request with verifiable freshness. The server MUST use a fixed Sender Sequence Number = 2^40 - 1 when generating the AEAD nonce and MUST include it as Partial IV in the response. The server MUST set the maximum Sender Sequence Number to 2^40 - 2, and MUST NOT use 2^40 - 1 to generate the AEAD nonce for any other response.
 
 If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
