@@ -1862,7 +1862,11 @@ To avoid storing state for procedure runs which may never complete, the server s
 
 The server may only have room for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-Replaying response #1 will fail to verify since the response is bound to request #1, through the ID context used in response #1, and the Partial IV of the request included in the external_aad. If request #2 is replayed after the corresponding R2 has been removed from cache, then it will be interpreted as a request #1 which is handled as the case above. Replaying request #2 will fail to verify since it is only valid once for this value of R2. Replaying response #2 will fail to verify since the response, like ordinary OSCORE responses, is bound to request #2.
+Replaying response #1 in response to another request will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
+
+If request #2 is replayed after the corresponding R2 has been removed from cache, then it will not be accepted by the server as a request #2. It may however be interpreted by the server as a request #1, in which case it causes the server to generate a new security context and send a response. The response is associated to request #2, but protected with a security context as if it was a request #1 and will therefore fail to verify since the client uses the same security context as request #2.
+
+Replaying response #2 in response to another request will fail to verify for the same reason as response #1 above.
 
 
 # Test Vectors
