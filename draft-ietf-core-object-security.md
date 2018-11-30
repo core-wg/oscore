@@ -1860,7 +1860,7 @@ To avoid storing state for protocol runs which may never complete, the server sh
 
 The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocols in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-Request #1 may be a replay of a previous client request, and this may not be detected because the server does not have a fresh replay window. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
+Replaying an old request with a value of 'kid_context' which the server does not recognize could trigger the protocol. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
 
 Replaying response #1 in response to some request other than request #1 will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
 
