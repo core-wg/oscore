@@ -447,7 +447,7 @@ When the Uri-Host and Uri-Port are set to their default values (see Section 5.10
 In order to support forward proxy operations, Proxy-Scheme, Uri-Host, and Uri-Port need to be Class U. 
 For the use of Proxy-Uri, see {{proxy-uri}}. 
 
-Manipulation of unprotected message fields (including Uri-Host, Uri-Port, destination IP/port or request scheme) MUST NOT lead to an OSCORE message becoming verified by an unintended server. Different servers SHOULD have different security contexts.
+Manipulation of unprotected message fields (including Uri-Host, Uri-Port, destination IP/port or request scheme) MUST NOT lead to an OSCORE message becoming verified by an unintended server. Different servers SHALL have different security contexts.
 
 
 #### Proxy-Uri {#proxy-uri}
@@ -1399,7 +1399,7 @@ Applications need to consider that certain message fields and messages types are
 
 ## Security Context Establishment {#sec-context-establish}
 
-The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID such as the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. Such a procedure must ensure that the requirements of the security context parameters for the intended use are complied with (see {{req-params}}) and also in error situations. While recipient IDs are allowed to coincide between different security contexts (see {{req-params}}),  this may cause a server to process multiple verifications before finding the right security context or rejecting a message. Moreover, it is recommended to use a key establishment protocol which provides forward secrecy whenever possible. Considerations for deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
+The use of COSE_Encrypt0 and AEAD to protect messages as specified in this document requires an established security context. The method to establish the security context described in {{context-derivation}} is based on a common Master Secret and unique Sender IDs. The necessary input parameters may be pre-established or obtained using a key establishment protocol augmented with establishment of Sender/Recipient ID, such as a key exchange protocol or the OSCORE profile of the ACE framework {{I-D.ietf-ace-oscore-profile}}. Such a procedure must ensure that the requirements of the security context parameters for the intended use are complied with (see {{req-params}}) and also in error situations. While recipient IDs are allowed to coincide between different security contexts (see {{req-params}}), this may cause a server to process multiple verifications before finding the right security context or rejecting a message. Considerations for deploying OSCORE with a fixed Master Secret are given in {{deployment-examples}}.
 
 ## Master Secret {#master-secret}
 
