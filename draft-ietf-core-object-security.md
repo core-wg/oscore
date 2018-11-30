@@ -1801,13 +1801,13 @@ To prevent accepting replay of previously received notifications, the client may
 
 An application which does not require forward secrecy may allow multiple security contexts to be derived from one Master Secret. The requirements on the security context parameters must be fulfilled ({{req-params}}) even if the client or server is rebooted, recommissioned or in error cases. 
 
-This section gives an example of a procedure which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server, in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter. This procedure MUST NOT be used unless both endpoints have good sources of randomness.
+This section gives an example of a protocol which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server, in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter. This protocol MUST NOT be used unless both endpoints have good sources of randomness.
 
 During normal requests the ID Context of an established security context may be sent in the 'kid context' which together with 'kid' facilitate for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
 
-The procedure described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The procedure may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
+The protocol described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
 
-The procedure is described below with reference to {{fig-B2}}.
+The protocol is described below with reference to {{fig-B2}}.
 
 ~~~~~~~~~~~
                       Client                    Server
@@ -1829,7 +1829,7 @@ The procedure is described below with reference to {{fig-B2}}.
    ID Context = R2||R3  |                         | 
 
 ~~~~~~~~~~~
-{: #fig-B2 title="Procedure for establishing a new security context." artwork-align="center"}
+{: #fig-B2 title="Protocol for establishing a new security context." artwork-align="center"}
 
 
 1. If the client does not have a fresh security context with the server, then it generates a random byte string R1, 8 bytes long, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, and with 'kid context' = R1. The request may target a special resource used for updating security contexts.
@@ -1842,13 +1842,13 @@ The procedure is described below with reference to {{fig-B2}}.
 
 5. If the client receives a response with the request with the third security context and the response verifies (see {{ver-res}}), then the client marks the third security context to be used with this server. This security context replaces the previous security context with the server, and the first and second security contexts are deleted. 
 
+If verification fails in any step, the endpoint stops processing the message.
 
-The second request in this procedure (sent in step 3) can be an ordinary request. The server performs the action of the request and sends a response after having successfully completed the security context related operations in step 4. The client acts on the response after having successfully completed step 5.
+Request #2 can be an ordinary request. The server performs the action of the request and sends response #2 after having successfully completed the security context related operations in step 4. The client acts on response #2 after having successfully completed step 5.
 
-
-When sending request #2, the client is assured that the Sender Key (derived with the random value R3) has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was created by the server as a reaction its request #2.
+When sending request #2, the client is assured that the Sender Key (derived with the random value R3) has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was created by the server in response to request #2.
 	
-Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client as a reaction to its response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
+Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client in response to response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
 
 
@@ -1856,17 +1856,15 @@ Similarly, when receiving request #2, the server is assured that the request (pr
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
-To avoid storing state for procedure runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. 
+To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. 
 
-The server may only have space for a limited number of security contexts, or only be able to handle a limited number of procedures in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocols in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-Request #1 may be a replay of a previous client request, and this may not be detected since the server does not have the security context. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
+Request #1 may be a replay of a previous client request, and this may not be detected because the server does not have a fresh replay window. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
 
-If request #2 is replayed then it will not be accepted by the server as a request #2, since the corresponding R2 has been removed from cache. It may however be interpreted by the server as a request #1, in which case it causes the server to generate a second security context and send a response. That response is associated to request #2, but protected with a security context as if it was a request #1 and will therefore fail to verify, if not directly discarded  by the client due to no matching request.
+Replaying response #1 in response to some request other than request #1 will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
 
-Replaying response #1 in response to some request will fail to verify, since the integrity of response #1 is associated to request #1, through the ID context used in response #1, and the Partial IV of request #1 included in the external_aad of response #1. 
-
-Replaying response #2 in response to another request will fail to verify for the same reason as response #1.
+If request #2 has already been well received, then the server has a fresh security context so a replay of request #2 is handled by the normal replay protection mechanism. Similarly if response #2 has already been received, a replay of response #2 to some other request from the client will fail by the normal verification of binding of response to request.
 
 # Test Vectors
 
