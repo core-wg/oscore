@@ -1851,13 +1851,13 @@ When sending request #2, the client is assured that the Sender Key (derived with
 Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client in response to response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
 
-### Denial of Service
+### Attack Considerations
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
-To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. 
+To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. This information should be flushed at reboot.
 
-The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocols in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocol runs in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
 Replaying an old request with a value of 'kid_context' which the server does not recognize could trigger the protocol. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
 
