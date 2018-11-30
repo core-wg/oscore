@@ -1803,9 +1803,9 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives an example of a protocol which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server, in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter. This protocol MUST NOT be used unless both endpoints have good sources of randomness.
 
-During normal requests the ID Context of an established security context may be sent in the 'kid context' which together with 'kid' facilitate for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
+During normal requests the ID Context of an established security context may be sent in the 'kid context' which, together with 'kid', facilitates for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
 
-The protocol described in this section may only be needed when the mutable part of security context is lost in client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
+The protocol described in this section may only be needed when the mutable part of security context is lost in the client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
 
 The protocol is described below with reference to {{fig-B2}}.
 
@@ -1832,11 +1832,11 @@ The protocol is described below with reference to {{fig-B2}}.
 {: #fig-B2 title="Protocol for establishing a new security context." artwork-align="center"}
 
 
-1. If the client does not have a fresh security context with the server, then it generates a random byte string R1, 8 bytes long, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, and with 'kid context' = R1. The request may target a special resource used for updating security contexts.
+1. If the client does not have a fresh security context with the server, then it generates a random 8-byte long string R1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, containing 'kid context' = R1. The request may target a special resource used for updating security contexts.
 
-2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context ID1 = R1, or because the server may have lost part of its security context, e.g. ID1 or the replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a random byte string R2, 8 bytes long, and derives a second security context with ID Context =  ID2 = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, containing 'kid context' = R2, and caches R2.
+2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context ID1 = R1, or because the server has lost part of its security context, e.g. ID1 or the replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a random 8-byte long string R2, and derives a second security context with ID Context = ID2 = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, containing 'kid context' = R2, and caches R2.
 
-3. The client receives a response with 'kid context' = R2 to an OSCORE request it made with ID Context = ID1. The client derives a second security context using ID Context = ID2 = R2 \|\| ID1. If the client can verify the response (see {{ver-res}}) using the second security context, then the client makes a request protected with a third security context derived from ID Context = ID3 = R2 \|\| R3, where R3 is an 8 byte long random byte string generated by the client. The request includes 'kid context' = R2 \|\| R3.
+3. The client receives a response with 'kid context' = R2 to an OSCORE request it made with ID Context = ID1. The client derives a second security context using ID Context = ID2 = R2 \|\| ID1. If the client can verify the response (see {{ver-res}}) using the second security context, then the client makes a request protected with a third security context derived from ID Context = ID3 = R2 \|\| R3, where R3 is an 8-byte long random byte string generated by the client. The request includes 'kid context' = R2 \|\| R3.
 
 4. If the server receives a request with 'kid context' = ID3, where the first part of ID3 is identical to the cached R2, then the server derives a third security context with ID Context = ID3. If the server can verify the request (see {{ver-req}}) with the third security context, then the server marks the third security context to be used with this client and removes R2 from the cache. This security context replaces the previous security context with the client, and the first and the second security contexts are deleted. The server responds using the same security context as in the request.
 
@@ -1847,9 +1847,8 @@ If verification fails in any step, the endpoint stops processing the message.
 Request #2 can be an ordinary request. The server performs the action of the request and sends response #2 after having successfully completed the security context related operations in step 4. The client acts on response #2 after having successfully completed step 5.
 
 When sending request #2, the client is assured that the Sender Key (derived with the random value R3) has never been used before. When receiving response #2, the client is assured that the response (protected with a key derived from the random value R3 and the Master Secret) was created by the server in response to request #2.
-	
-Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client in response to response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
+Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client in response to response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
 
 ### Denial of Service
@@ -2235,7 +2234,7 @@ From there:
 This section describes the threat model using the terms of {{RFC3552}}.
 
 It is assumed that the endpoints running OSCORE have not themselves been compromised. The attacker is assumed to have control of the CoAP channel over which the endpoints communicate, including intermediary nodes. The attacker is capable of launching any passive or active, on-path or off-path attacks; including eavesdropping, traffic analysis, spoofing, insertion, modification, deletion, delay, replay, man-in-the-middle, and denial-of-service attacks. This means that the attacker can read any CoAP message on the network and undetectably remove, change, or inject forged messages onto the wire.
-                                                                 
+
 OSCORE targets the protection of the CoAP request/response layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
 
 OSCORE does not protect the CoAP messaging layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
