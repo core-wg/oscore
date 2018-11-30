@@ -989,7 +989,7 @@ To prevent reuse of an AEAD nonce with the same AEAD key, or from accepting repl
 
 1. The endpoints can reuse an existing Security Context after updating the mutable parts of the security context (Sender Sequence Number, and Replay Window). This requires that the mutable parts of the security context are available throughout the lifetime of the device, or that the device can recover security context data based on careful use of non-volatile memory, see {{seq-numb}} and {{reboot-replay}} for an example. If an endpoint makes use of a partial security context stored in non-volatile memory, it MUST NOT reuse a previous Sender Sequence Number and MUST NOT accept previously received messages.
 
-2. The endpoints can only update the server's Replay Window by using the Echo option {{I-D.ietf-core-echo-request-tag}}, see {{reboot-replay}} for an example. This method only updates the Replay Window and does not update the server's Sender Sequence Number, so it MUST be complemented by a method for updating the Sender Sequence Number (e.g. by using {{seq-numb}}) if the application allows for the server to encode the AEAD nonce using its Sender Sequence Number in responses to regular requests, or if the server supports Observe. This method MUST NOT be used if the client can not guarantee non-reuse of its own Sender Sequence Numbers (e.g. by using {{seq-numb}}).
+2. The endpoints can update the server's Replay Window by using the Echo option {{I-D.ietf-core-echo-request-tag}}, see {{reboot-replay}} for an example. This method only updates the Replay Window and does not update the server's Sender Sequence Number, so it MUST be complemented by a method for updating the Sender Sequence Number (e.g. by using {{seq-numb}}) if the application allows for the server to encode the AEAD nonce using its Sender Sequence Number in responses to regular requests, or if the server supports Observe. This method MUST NOT be used unless the client can guarantee its own Sender Sequence Numbers are not reused (e.g. by using {{seq-numb}}).
 
 3. The endpoints can reuse an existing shared Master Secret and derive new Sender and Recipient Contexts, see {{master-secret-multiple}} for an example. This typically requires a good source of randomness. 
 
@@ -1788,7 +1788,7 @@ In case of loss of security context on the server, to prevent accepting replay o
 
 If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
 
-This method allows the re-use of the AEAD nonce generated from the server's Sender Sequence Number = 0: this is acceptable as the only changing information in the 4.01 (Unauthorized) error message is the value of the Echo option.
+This method allows the re-use of the AEAD nonce generated from the server's Sender Sequence Number = 2^40 - 1: this is acceptable as the only changing information in the 4.01 (Unauthorized) error message is the value of the Echo option.
 
 ### Notifications {#replay-notif}
 
