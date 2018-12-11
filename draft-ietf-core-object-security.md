@@ -1859,7 +1859,7 @@ The server may need to clear up state from protocol runs which never complete, e
 
 As an alternative to caching R2, the server could generate R2 in a way that it can verify it at reception of request #2. Such a procedure MUST NOT lead to the server accepting replayed request #2 messages. One construction is that the server generates a secret random HMAC key K_HMAC at reboot for each set of static security context parameters. Steps below refer to {{master-secret-multiple}}:
 
-* In step 2, the server generates R2 = S2 || HMAC(K_HMAC, S2) where S2 is a 4 byte random byte string, and the HMAC is truncated to 4 bytes. Neither R2, S2 nor derived first and second security contexts need to be cached.
+* In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is a 4 byte random byte string, and the HMAC is truncated to 4 bytes. Neither R2, S2 nor derived first and second security contexts need to be cached.
  
 * In step 4 instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the substep of removing the cached value of R2 is replaced with generating a new random K_HMAC for this security context. (The last substep is protecting against replay of request #2.)
 
