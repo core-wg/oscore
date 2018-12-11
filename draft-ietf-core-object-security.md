@@ -1850,8 +1850,10 @@ When sending request #2, the client is assured that the Sender Key (derived with
 
 Similarly, when receiving request #2, the server is assured that the request (protected with a key derived from the random value R2 and the Master Secret) was created by the client in response to response #1. When sending response #2, the server is assured that the Sender Key (derived with the random value R2) has never been used before.
 
+Replay of request #1 may exhaust state in the server. Denial-of-service considerations are made in {{attack-cons}}.
+Alternatives to caching R2 are discussed in {{impl-cons}}. The server MUST NOT accept replayed request #2 messages. 
 
-### Attack Considerations
+### Attack Considerations {#attack-cons}
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
@@ -1861,11 +1863,16 @@ Replaying response #1 in response to some request other than request #1 will fai
 
 If request #2 has already been well received, then the server has a fresh security context so a replay of request #2 is handled by the normal replay protection mechanism. Similarly if response #2 has already been received, a replay of response #2 to some other request from the client will fail by the normal verification of binding of response to request.
 
-### Implementation Considerations
+### Implementation Considerations {#impl-cons}
 
-To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. This information should be flushed at reboot.
+The server may need to clear up state from protocol runs which never complete, e.g. set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. Additionally, state information can be flushed at reboot. The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocol runs in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
 
-The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocol runs in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+As an alternative to caching R2, the server could generate R2 in a way that it can verify it at reception of request #2. Such a procedure MUST NOT lead to the server accepting replayed request #2 messages. One construction is that the server generates a secret random HMAC key K_HMAC at reboot for each set of static security context parameters. Steps below refer to {{master-secret-multiple}}:
+
+* In step 2, the server generates R2 = S2 || HMAC(K_HMAC, S2) where S2 is a 4 byte random byte string, and the HMAC is truncated to 4 bytes. R2 or S2 need not be cached.
+ 
+* In step 4 instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the HMAC, and the process continues accordingly depending on verification success or failure. In case of success, the step of removing the cached value of R2 is replaced with generating a new K_HMAC for this security context.
+
 
 
 # Test Vectors
