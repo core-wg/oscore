@@ -1803,7 +1803,7 @@ An application which does not require forward secrecy may allow multiple securit
 
 This section gives an example of a protocol which adds randomness to the ID Context parameter and uses that together with input parameters pre-established between client and server, in particular Master Secret, Master Salt and Sender/Recipient ID (see {{context-derivation}}), to derive new security contexts. The random input is transported between client and server in the 'kid context' parameter. This protocol MUST NOT be used unless both endpoints have good sources of randomness.
 
-During normal requests the ID Context of an established security context may be sent in the 'kid context' which, together with 'kid', facilitates for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
+During normal requests the ID Context of an established security context may be sent in the 'kid context' which, together with 'kid', facilitates for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{context-hint}}.
 
 The protocol described in this section may only be needed when the mutable part of security context is lost in the client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment. 
 
@@ -1861,7 +1861,10 @@ As an alternative to caching R2, the server could generate R2 in a way that it c
 
 * In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is a 4 byte random byte string, and the HMAC is truncated to 4 bytes. Neither R2, S2 nor derived first and second security contexts need to be cached.
  
-* In step 4 instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the substep of removing the cached value of R2 is replaced with generating a new random K_HMAC for this security context. (The last substep is protecting against replay of request #2.)
+* In step 4, instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the substep of removing the cached value of R2 is replaced with generating a new random K_HMAC for this security context. (The last substep is protecting against replay of request #2.)
+
+Two endpoints sharing a security context may accidently run two instances of the protocol in parallel, each in the role of client, e.g. after a power outage affecting both endpoints. Such a race condition could potentially lead to both protocols failing, and both endpoints repeateadly re-initiating the protocol without converging. Both endpoints can detect this situation and it can be handled in different ways. The requests could potentially be more spread out in time, for example by only update the security context when the endpoint actually needs to make a request, potentially adding a random delay before requests immediately after reboot or if such parallel protocol runs are detected.
+
 
 
 ### Attack Considerations {#attack-cons}
