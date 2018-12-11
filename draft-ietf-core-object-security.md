@@ -1805,9 +1805,10 @@ This section gives an example of a protocol which adds randomness to the ID Cont
 
 During normal requests the ID Context of an established security context may be sent in the 'kid context' which, together with 'kid', facilitates for the server to locate a security context. Alternatively, the 'kid context' may be omitted since the ID Context is expected to be known to both client and server, see {{cose-object}}. 
 
-The protocol described in this section may only be needed when the mutable part of security context is lost in the client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment.
+The protocol described in this section may only be needed when the mutable part of security context is lost in the client or server, e.g. when the endpoint has rebooted. The protocol may additionally be used whenever the client and server need to derive a new security context. For example, if a device is provisioned with one fixed set of input parameters (including Master Secret, Sender and Recipient Identifiers) then a randomized ID Context ensures that the security context is different for each deployment. 
 
-The protocol is described below with reference to {{fig-B2}}.
+The protocol is described below with reference to {{fig-B2}}. The client or server may initiate the protocol, in the latter case step 1 is omitted.
+
 
 ~~~~~~~~~~~
                       Client                    Server
@@ -1832,7 +1833,7 @@ The protocol is described below with reference to {{fig-B2}}.
 {: #fig-B2 title="Protocol for establishing a new security context." artwork-align="center"}
 
 
-1. If the client does not have a fresh security context with the server, then it generates a random 8-byte long string R1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, containing 'kid context' = R1. The request may target a special resource used for updating security contexts.
+1. (Optional) If the client does not have a fresh security context with the server, then it generates a random 8-byte long string R1, and uses this as ID Context together with the input parameters shared with the server to derive a first security context. The client sends an OSCORE request to the server protected with the first security context, containing 'kid context' = R1. The request may target a special resource used for updating security contexts.
 
 2. The server receives an OSCORE request for which it does not have a fresh security context, because the client has generated a new security context ID1 = R1, or because the server has lost part of its security context, e.g. ID1 or the replay window. If the server is able to verify the request (see {{ver-req}}) with a new derived first security context using the received 'kid context'= ID1 as ID context and the input parameters associated to the received 'kid', then the server generates a random 8-byte long string R2, and derives a second security context with ID Context = ID2 = R2 \|\| ID1. The server sends a 4.01 (Unauthorized) response protected with the second security context, containing 'kid context' = R2, and caches R2.
 
