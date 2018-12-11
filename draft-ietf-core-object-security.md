@@ -1855,15 +1855,18 @@ Similarly, when receiving request #2, the server is assured that the request (pr
 
 An on-path attacker may inject a message causing the endpoint to verify the message. A message crafted without access to the Master Secret will fail to verify.
 
-To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. This information should be flushed at reboot.
-
-The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocol runs in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
-
 Replaying an old request with a value of 'kid_context' which the server does not recognize could trigger the protocol. This causes the server to generate the second security context and send a response. But if the client did not expect a response it will be discarded.
 
 Replaying response #1 in response to some request other than request #1 will fail to verify, since response #1 is associated to request #1, through the dependencies of ID Contexts and the Partial IV of request #1 included in the external_aad of response #1. 
 
 If request #2 has already been well received, then the server has a fresh security context so a replay of request #2 is handled by the normal replay protection mechanism. Similarly if response #2 has already been received, a replay of response #2 to some other request from the client will fail by the normal verification of binding of response to request.
+
+### Implementation Considerations
+
+To avoid storing state for protocol runs which may never complete, the server should set a timer when caching R2, and remove R2 and the associated security contexts from the cache at timeout. This information should be flushed at reboot.
+
+The server may only have space for a limited number of security contexts, or only be able to handle a limited number of protocol runs in parallel. If the server receives a request #1 and is not capable of executing it then it may respond with an unprotected 5.03 (Service Unavailable).
+
 
 # Test Vectors
 
