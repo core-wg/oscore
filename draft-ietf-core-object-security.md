@@ -763,7 +763,6 @@ The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16
 * aad_array: 0x8501810a4100412540 (9 bytes)
 * external_aad: 0x498501810a4100412540 (10 bytes)
 * AAD: 0x8368456e63727970743040498501810a4100412540 (21 bytes)
-~~~~~~~~~~~
 
 Note that the AAD consists of a fixed string of 11 bytes concatenated with the external_aad.
 
