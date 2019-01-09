@@ -193,13 +193,13 @@ The endpoints protect messages to send using the Sender Context and verify messa
 An endpoint uses its Sender ID (SID) to derive its Sender Context, and the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in {{fig-context}}. 
 
 ~~~~~~~~~~~
-          .------------------------------------------------.
-          |                 Common Context                 |
-          +---------------------.----.---------------------+        
-          |  Sender Context     |  = |  Recipient Context  |
-          +---------------------+    +---------------------+ 
-          |  Recipient Context  |  = |  Sender Context     |
-          '---------------------'    '---------------------'
+          .-----------------------------------------------.
+          |                Common Context                 |
+          +---------------------.---.---------------------+        
+          |    Sender Context   | = |  Recipient Context  |
+          +---------------------+   +---------------------+ 
+          |  Recipient Context  | = |    Sender Context   |
+          '---------------------'   '---------------------'
                    Client                   Server
                       |                       |
 Retrieve context for  | OSCORE request:       |
@@ -298,11 +298,11 @@ where:
 
 ~~~~~~~~~~~ CDDL
    info = [
-       id : bstr,
-       id_context : bstr / nil,
-       alg_aead : int / tstr,
-       type : tstr,
-       L : uint
+     id : bstr,
+     id_context : bstr / nil,
+     alg_aead : int / tstr,
+     type : tstr,
+     L : uint,
    ]
 ~~~~~~~~~~~
 where:
@@ -623,7 +623,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
-   * Optionally, a 'kid context' parameter (see {{context-hint}}). This parameter MAY be present in requests, and if so MUST contain an ID Context (see {{context-definition}}). This parameter SHOULD NOT be present in responses: an example of how 'kid context' can be used in responses is given in {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. 
+   * Optionally, a 'kid context' parameter (see {{context-hint}}). This parameter MAY be present in requests, and if so, MUST contain an ID Context (see {{context-definition}}). This parameter SHOULD NOT be present in responses: an example of how 'kid context' can be used in responses is given in {{master-secret-multiple}}. If 'kid context' is present in the request, then the server SHALL use a security context with that ID Context when verifying the request. 
 
 -  The 'ciphertext' field is computed from the secret key (Sender Key or Recipient Key), AEAD nonce (see {{nonce}}), plaintext (see {{plaintext}}), and the Additional Authenticated Data (AAD) (see {{AAD}}) following Section 5.2 of {{RFC8152}}.
 
@@ -721,11 +721,11 @@ The external_aad SHALL be a CBOR array wrapped in a bstr object as defined below
 external_aad = bstr .cbor aad_array
 
 aad_array = [
-   oscore_version : uint,
-   algorithms : [ alg_aead : int / tstr ],
-   request_kid : bstr,
-   request_piv : bstr,
-   options : bstr
+  oscore_version : uint,
+  algorithms : [ alg_aead : int / tstr ],
+  request_kid : bstr,
+  request_piv : bstr,
+  options : bstr,
 ]
 ~~~~~~~~~~~
 
@@ -832,9 +832,9 @@ This section covers a list of OSCORE Header Compression examples for requests an
     Before compression (24 bytes):
 
       [
-      h'',
-      { 4:h'25', 6:h'05' },
-      h'aea0155667924dff8a24e4cb35b9'
+        h'',
+        { 4:h'25', 6:h'05' },
+        h'aea0155667924dff8a24e4cb35b9',
       ]
 ~~~~~~~~~~~
 
@@ -855,9 +855,9 @@ This section covers a list of OSCORE Header Compression examples for requests an
     Before compression (23 bytes):
 
       [
-      h'',
-      { 4:h'', 6:h'00' },
-      h'aea0155667924dff8a24e4cb35b9'
+        h'',
+        { 4:h'', 6:h'00' },
+        h'aea0155667924dff8a24e4cb35b9',
       ]
 ~~~~~~~~~~~
 
@@ -882,9 +882,9 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
     Before compression (30 bytes):
 
       [
-      h'',
-      { 4:h'', 6:h'05', 8:h'44616c656b' },
-      h'aea0155667924dff8a24e4cb35b9'
+        h'',
+        { 4:h'', 6:h'05', 8:h'44616c656b' },
+        h'aea0155667924dff8a24e4cb35b9',
       ]
 ~~~~~~~~~~~
 
@@ -905,9 +905,9 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
     Before compression (18 bytes):
 
       [
-      h'',
-      {},
-      h'aea0155667924dff8a24e4cb35b9'
+        h'',
+        {},
+        h'aea0155667924dff8a24e4cb35b9',
       ]
 ~~~~~~~~~~~
 
@@ -928,9 +928,9 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
     Before compression (21 bytes):
 
       [
-      h'',
-      { 6:h'07' },
-      h'aea0155667924dff8a24e4cb35b9'
+        h'',
+        { 6:h'07' },
+        h'aea0155667924dff8a24e4cb35b9',
       ]
 ~~~~~~~~~~~
 
@@ -944,7 +944,7 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
       Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
 ~~~~~~~~~~~
 
-# Message Binding, Sequence Numbers, Freshness and Replay Protection {#sequence-numbers}
+# Message Binding, Sequence Numbers, Freshness, and Replay Protection {#sequence-numbers}
 
 ## Message Binding
 
@@ -968,7 +968,7 @@ For requests and notifications, OSCORE also provides relative freshness in the s
 
 ## Replay Protection {#replay-protection}
 
-In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV = Sender Sequence Number received in the COSE object has not been received before. If this verification fails the server SHALL stop processing the message, and MAY optionally respond with a 4.01 (Unauthorized) error message. Also, the server MAY set an Outer Max-Age option with value zero, to inform any intermediary that the response is not to be cached. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
+In order to protect from replay of requests, the server's Recipient Context includes a Replay Window. A server SHALL verify that a Partial IV = Sender Sequence Number received in the COSE object has not been received before. If this verification fails, the server SHALL stop processing the message, and MAY optionally respond with a 4.01 (Unauthorized) error message. Also, the server MAY set an Outer Max-Age option with value zero, to inform any intermediary that the response is not to be cached. The diagnostic payload MAY contain the "Replay detected" string. The size and type of the Replay Window depends on the use case and the protocol with which the OSCORE message is transported. In case of reliable and ordered transport from endpoint to endpoint, e.g. TCP, the server MAY just store the last received Partial IV and require that newly received Partial IVs equals the last received Partial IV + 1. However, in case of mixed reliable and unreliable transports and where messages may be lost, such a replay mechanism may be too restrictive and the default replay window be more suitable (see {{initial-replay}}).
 
 Responses (with or without Partial IV) are protected against replay as they are bound to the request and the fact that only a single response is accepted. Note that the Partial IV is not used for replay protection in this case.
 
@@ -1054,7 +1054,7 @@ A server receiving a request containing the OSCORE option SHALL perform the foll
 
 If Block-wise is supported, insert the following step before any other:
 
-A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+A.  If Block-wise is present in the request, then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 
 ## Protecting the Response {#prot-res}
@@ -1117,7 +1117,7 @@ A client receiving a response containing the OSCORE option SHALL perform the fol
 
 If Block-wise is supported, insert the following step before any other:
 
-A.  If Block-wise is present in the request then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
+A.  If Block-wise is present in the request, then process the Outer Block options according to {{RFC7959}}, until all blocks of the request have been received (see {{block-options}}).
 
 ### Supporting Observe {#observe-ver-res}
 
@@ -1863,7 +1863,7 @@ As an alternative to caching R2, the server could generate R2 in such a way that
  
 * In step 4, instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the associated K_HMAC is given a new random value. (The latter corresponds to removing the cached value of R2 in step 4 of {{master-secret-multiple}}, and makes the server reject replays of request #2.)
 
-Two endpoints sharing a security context may accidently initiate two instances of the protocol at the same time, each in the role of client, e.g. after a power outage affecting both endpoints. Such a race condition could potentially lead to both protocols failing, and both endpoints repeateadly re-initiating the protocol without converging. Both endpoints can detect this situation and it can be handled in different ways. The requests could potentially be more spread out in time, for example by only initiating this protocol when the endpoint actually needs to make a request, potentially adding a random delay before requests immediately after reboot or if such parallel protocol runs are detected.
+Two endpoints sharing a security context may accidently initiate two instances of the protocol at the same time, each in the role of client, e.g. after a power outage affecting both endpoints. Such a race condition could potentially lead to both protocols failing, and both endpoints repeatedly re-initiating the protocol without converging. Both endpoints can detect this situation and it can be handled in different ways. The requests could potentially be more spread out in time, for example by only initiating this protocol when the endpoint actually needs to make a request, potentially adding a random delay before requests immediately after reboot or if such parallel protocol runs are detected.
 
 
 
