@@ -370,6 +370,9 @@ An OSCORE message may contain both an Inner and an Outer instance of a certain C
 
 A summary of how options are protected is shown in {{fig-option-protection}}. Note that some options may have both Inner and Outer message fields which are protected accordingly. Certain options require special processing as is described in {{special-options}}.
 
+Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. If a new CoAP option is of class U, the potential issues with
+the option being unprotected SHOULD be documented (see {{unprot-fields}}).
+
 ~~~~~~~~~~~
   +------+-----------------+---+---+
   | No.  | Name            | E | U |
@@ -401,9 +404,6 @@ E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-option-protection title="Protection of CoAP Options" artwork-align="center"}
-
-Options that are unknown or for which OSCORE processing is not defined SHALL be processed as class E (and no special processing). Specifications of new CoAP options SHOULD define how they are processed with OSCORE. A new COAP option SHOULD be of class E unless it requires proxy processing. If a new CoAP option is of class U, the potential issues with
-the option being unprotected SHOULD be documented (see {{unprot-fields}}).
 
 ### Inner Options {#inner-options}
 
