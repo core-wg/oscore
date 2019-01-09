@@ -101,6 +101,8 @@ The Constrained Application Protocol (CoAP) {{RFC7252}} is a web transfer protoc
 
 This document defines the Object Security for Constrained RESTful Environments (OSCORE) security protocol, protecting CoAP and CoAP-mappable HTTP requests and responses end-to-end across intermediary nodes such as CoAP forward proxies and cross-protocol translators including HTTP-to-CoAP proxies {{RFC8075}}. In addition to the core CoAP features defined in {{RFC7252}}, OSCORE supports the Observe {{RFC7641}}, Block-wise {{RFC7959}}, and No-Response {{RFC7967}} options, as well as the PATCH and FETCH methods {{RFC8132}}. An analysis of end-to-end security for CoAP messages through some types of intermediary nodes is performed in {{I-D.hartke-core-e2e-security-reqs}}. OSCORE essentially protects the RESTful interactions; the request method, the requested resource, the message payload, etc. (see {{protected-fields}}). OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token which may change between the endpoints, and those are therefore processed as defined in {{RFC7252}}. Additionally, since the message formats for CoAP over unreliable transport {{RFC7252}} and for CoAP over reliable transport {{RFC8323}} differ only in terms of CoAP Messaging Layer, OSCORE can be applied to both unreliable and reliable transports (see {{fig-stack}}). 
 
+OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE may be used over any underlying layer, such as e.g. UDP or TCP, and with non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may also be used in different ways with HTTP. OSCORE messages may be transported in HTTP, and OSCORE may also be used to protect CoAP-mappable HTTP messages, as described below.
+
 ~~~~~~~~~~~
 +-----------------------------------+
 |            Application            |
@@ -117,9 +119,6 @@ This document defines the Object Security for Constrained RESTful Environments (
 +-----------------------------------+  
 ~~~~~~~~~~~
 {: #fig-stack title="Abstract Layering of CoAP with OSCORE" artwork-align="center"}
-
-
-OSCORE works in very constrained nodes and networks, thanks to its small message size and the restricted code and memory requirements in addition to what is required by CoAP. Examples of the use of OSCORE are given in {{examples}}. OSCORE may be used over any underlying layer, such as e.g. UDP or TCP, and with non-IP transports (e.g., {{I-D.bormann-6lo-coap-802-15-ie}}). OSCORE may also be used in different ways with HTTP. OSCORE messages may be transported in HTTP, and OSCORE may also be used to protect CoAP-mappable HTTP messages, as described below.
 
 OSCORE is designed to protect as much information as possible while still allowing CoAP proxy operations ({{coap-coap-proxy}}). It works with existing CoAP-to-CoAP forward proxies {{RFC7252}}, but an OSCORE-aware proxy will be more efficient. HTTP-to-CoAP proxies {{RFC8075}} and CoAP-to-HTTP proxies can also be used with OSCORE, as specified in {{http-op}}. OSCORE may be used together with TLS or DTLS over one or more hops in the end-to-end path, e.g. transported with HTTPS in one hop and with plain CoAP in another hop. The use of OSCORE does not affect the URI scheme and OSCORE can therefore be used with any URI scheme defined for CoAP or HTTP. The application decides the conditions for which OSCORE is required. 
 
