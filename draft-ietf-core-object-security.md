@@ -222,7 +222,7 @@ The Common Context contains the following parameters:
 
 * AEAD Algorithm. The COSE AEAD algorithm to use for encryption.
 
-* An HMAC-based key derivation function HKDF {{RFC5869}} used to derive Sender Key, Recipient Key, and Common IV.
+* HKDF Algorithm. An HMAC-based key derivation function HKDF {{RFC5869}} used to derive Sender Key, Recipient Key, and Common IV.
 
 * Master Secret. Variable length, random byte string (see {{master-secret}}) used to derive AEAD keys and Common IV.
 
@@ -272,7 +272,7 @@ The following input parameters MAY be pre-established. In case any of these para
 
   - Default is the empty byte string
 
-* HMAC-based Key Derivation Function (HKDF)
+* HKDF Algorithm
 
   - Default is HKDF SHA-256
 
