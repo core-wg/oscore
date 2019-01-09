@@ -750,23 +750,19 @@ NOTE: The format of the external_aad is for simplicity the same for requests and
 The Additional Authenticated Data (AAD) is composed from the external_aad as described in Section 5.3 of {{RFC8152}}:
 
 ~~~~~~~~~~~
-AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
+   AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 ~~~~~~~~~~~
 
-The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16-64-128 (10), request_kid = 0x00, request_piv = 0x25 and no Class I options. 
+The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16-64-128 (10), request_kid = 0x00, request_piv = 0x25 and no Class I options: 
 
-~~~~~~~~~~~
-oscore_version = 0x01
-algorithms = 0x810a
-request_kid = 0x00
-request_piv = 0x25
-options = 0x
-
-aad_array = 0x8501810a4100412540
-
-external_aad = 0x498501810a4100412540
-
-AAD = 0x8368456e63727970743040498501810a4100412540
+* oscore_version: 0x01 (1 byte)
+* algorithms: 0x810a (2 bytes)
+* request_kid: 0x00 (1 byte)
+* request_piv: 0x25 (1 byte)
+* options: 0x (0 bytes)
+* aad_array: 0x8501810a4100412540 (9 bytes)
+* external_aad: 0x498501810a4100412540 (10 bytes)
+* AAD: 0x8368456e63727970743040498501810a4100412540 (21 bytes)
 ~~~~~~~~~~~
 
 Note that the AAD consists of a fixed string of 11 bytes concatenated with the external_aad.
