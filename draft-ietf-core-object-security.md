@@ -837,11 +837,11 @@ This section covers a list of OSCORE Header Compression examples for requests an
 ~~~~~~~~~~~
     After compression (17 bytes):
 
-      Flag byte: 0b00001001 = 0x09
+      Flag byte: 0b00001001 = 0x09 (1 byte)
 
-      Option Value: 09 05 25 (3 bytes)
+      Option Value: 0x090525 (3 bytes)
 
-      Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+      Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 ~~~~~~~~~~~
 
 {: req}
@@ -860,11 +860,11 @@ This section covers a list of OSCORE Header Compression examples for requests an
 ~~~~~~~~~~~
     After compression (16 bytes):
 
-      Flag byte: 0b00001001 = 0x09
+      Flag byte: 0b00001001 = 0x09 (1 byte)
 
-      Option Value: 09 00 (2 bytes)
+      Option Value: 0x0900 (2 bytes)
 
-      Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+      Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 ~~~~~~~~~~~
 
 {: req}
@@ -887,11 +887,11 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
 ~~~~~~~~~~~
     After compression (22  bytes):
 
-      Flag byte: 0b00011001 = 0x19
+      Flag byte: 0b00011001 = 0x19 (1 byte)
 
-      Option Value: 19 05 05 44 61 6c 65 6b (8 bytes)
+      Option Value: 0x19050544616c656b (8 bytes)
 
-      Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+      Payload: 0xae a0155667924dff8a24e4cb35b9 (14 bytes)
 ~~~~~~~~~~~
 
 {: req}
@@ -910,11 +910,11 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
 ~~~~~~~~~~~
     After compression (14 bytes):
 
-      Flag byte: 0b00000000 = 0x00
+      Flag byte: 0b00000000 = 0x00 (1 byte)
 
-      Option Value: (0 bytes)
+      Option Value: 0x (0 bytes)
 
-      Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+      Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 ~~~~~~~~~~~
 
 {: req}
@@ -933,11 +933,11 @@ NOTE (IANA registration) that the following example uses kid context = 8. This m
 ~~~~~~~~~~~
     After compression (16 bytes):
 
-      Flag byte: 0b00000001 = 0x01
+      Flag byte: 0b00000001 = 0x01 (1 byte)
 
-      Option Value: 01 07 (2 bytes)
+      Option Value: 0x0107 (2 bytes)
 
-      Payload: ae a0 15 56 67 92 4d ff 8a 24 e4 cb 35 b9 (14 bytes)
+      Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 ~~~~~~~~~~~
 
 # Message Binding, Sequence Numbers, Freshness, and Replay Protection {#sequence-numbers}
