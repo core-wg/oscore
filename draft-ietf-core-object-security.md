@@ -696,7 +696,7 @@ The plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 
 - all Inner option message fields (see {{inner-options}}) present in the original CoAP message (see {{coap-options}}). The options are encoded as described in Section 3.1 of {{RFC7252}}, where the delta is the difference to the previously included instance of Class E option; and
 
-- the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xFF).
+- the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xff).
 
 ~~~~~~~~~~~
  0                   1                   2                   3   
@@ -757,16 +757,16 @@ The following is an example of AAD constructed using AEAD Algorithm = AES-CCM-16
 
 ~~~~~~~~~~~
 oscore_version = 0x01
-algorithms = 0x810A
+algorithms = 0x810a
 request_kid = 0x00
 request_piv = 0x25
 options = 0x
 
-aad_array = 0x8501810A4100412540
+aad_array = 0x8501810a4100412540
 
-external_aad = 0x498501810A4100412540
+external_aad = 0x498501810a4100412540
 
-AAD = 0x8368456E63727970743040498501810A4100412540
+AAD = 0x8368456e63727970743040498501810a4100412540
 ~~~~~~~~~~~
 
 Note that the AAD consists of a fixed string of 11 bytes concatenated with the external_aad.
