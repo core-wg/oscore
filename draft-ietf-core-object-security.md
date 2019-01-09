@@ -1530,11 +1530,12 @@ Note to IANA: The value in the "Number" field is the same value that's being ass
 The HTTP OSCORE header field is added to the Message Headers registry:
 
 ~~~~~~~~~~~
-+-------------------+----------+----------+---------------------------------+
-| Header Field Name | Protocol | Status   | Reference                       |
-+-------------------+----------+----------+---------------------------------+
-| OSCORE            | http     | standard | [[this document]], Section 11.1 |
-+-------------------+----------+----------+---------------------------------+
++-------------------+----------+----------+------------- -------+
+| Header Field Name | Protocol | Status   | Reference           |
++-------------------+----------+----------+---------------------+
+| OSCORE            | http     | standard | [[this document]],  |
+|                   |          |          | Section 11.1        |
++-------------------+----------+----------+---------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
@@ -1809,26 +1810,24 @@ The protocol described in this section may only be needed when the mutable part 
 
 The protocol is described below with reference to {{fig-B2}}. The client or the server may initiate the protocol, in the latter case step 1 is omitted.
 
-
 ~~~~~~~~~~~
-                      Client                    Server
-                        |                         |
-1. Protect with         |      request #1         |
-   ID Context = ID1     |------------------------>| 2. Verify with
-                        |    kid_context = ID1    |    ID Context = ID1
-                        |                         | 
-                        |      response #1        |    Protect with
-3. Verify with          |<------------------------|    ID Context = R2||ID1
-   ID Context = R2||ID1 |     kid_context = R2    | 
-                        |                         |
-   Protect with         |       request #2        |
-   ID Context = R2||R3  |------------------------>| 4. Verify with 
-                        |  kid_context = R2||R3   |    ID Context = R2||R3
-                        |                         | 
-                        |       response #2       |    Protect with
-5. Verify with          |<------------------------|    ID Context = R2||R3
-   ID Context = R2||R3  |                         | 
-
+                      Client                Server
+                        |                      |
+1. Protect with         |      request #1      |
+   ID Context = ID1     |--------------------->| 2. Verify with
+                        |  kid_context = ID1   |    ID Context = ID1
+                        |                      | 
+                        |      response #1     |    Protect with
+3. Verify with          |<---------------------|    ID Context = R2||ID1
+   ID Context = R2||ID1 |   kid_context = R2   |
+                        |                      |
+   Protect with         |      request #2      |
+   ID Context = R2||R3  |--------------------->| 4. Verify with 
+                        | kid_context = R2||R3 |    ID Context = R2||R3
+                        |                      | 
+                        |      response #2     |    Protect with
+5. Verify with          |<---------------------|    ID Context = R2||R3
+   ID Context = R2||R3  |                      | 
 ~~~~~~~~~~~
 {: #fig-B2 title="Protocol for establishing a new security context." artwork-align="center"}
 
