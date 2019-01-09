@@ -1522,7 +1522,7 @@ Note to IANA: The value in the "Number" field is the same value that's being ass
 The HTTP OSCORE header field is added to the Message Headers registry:
 
 ~~~~~~~~~~~
-+-------------------+----------+----------+------------- -------+
++-------------------+----------+----------+---------------------+
 | Header Field Name | Protocol | Status   | Reference           |
 +-------------------+----------+----------+---------------------+
 | OSCORE            | http     | standard | [[this document]],  |
