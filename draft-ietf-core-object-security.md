@@ -697,6 +697,8 @@ The plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
 
 - the Payload of original CoAP message, if present, and in that case prefixed by the one-byte Payload Marker (0xff).
 
+NOTE: The plaintext contains all CoAP data that needs to be encrypted end-to-end between the endpoints.
+
 ~~~~~~~~~~~
  0                   1                   2                   3   
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
@@ -709,8 +711,6 @@ The plaintext is formatted as a CoAP message without Header (see {{fig-plaintext
    is payload)
 ~~~~~~~~~~~
 {: #fig-plaintext title="Plaintext" artwork-align="center"}
-
-NOTE: The plaintext contains all CoAP data that needs to be encrypted end-to-end between the endpoints.
 
 ## Additional Authenticated Data {#AAD}
 
