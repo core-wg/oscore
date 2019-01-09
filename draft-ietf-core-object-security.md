@@ -6,6 +6,7 @@ docname: draft-ietf-core-object-security-latest
 ipr: trust200902
 wg: CoRE Working Group
 cat: std
+updates: 7252
 
 coding: utf-8
 pi:
