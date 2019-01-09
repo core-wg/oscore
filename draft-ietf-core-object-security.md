@@ -554,10 +554,6 @@ If used, No-Response MUST be Inner. The Inner No-Response SHALL be processed by 
 
 The OSCORE option is only defined to be present in OSCORE messages, as an indication that OSCORE processing have been performed. The content in the OSCORE option is neither encrypted nor integrity protected as a whole but some part of the content of this option is protected (see {{AAD}}). Nested use of OSCORE is not supported: If OSCORE processing detects an OSCORE option in the original CoAP message, then processing SHALL be stopped.
 
-## CoAP Header Fields and Payload {#coap-header}
-
-A summary of how the CoAP header fields and payload are protected is shown in {{fig-fields-protection}}, including fields specific to CoAP over UDP and CoAP over TCP (marked accordingly in the table).
-
 ~~~~~~~~~~~
       +------------------+---+---+
       | Field            | E | U |
@@ -576,6 +572,10 @@ E = Encrypt and Integrity Protect (Inner)
 U = Unprotected (Outer)
 ~~~~~~~~~~~
 {: #fig-fields-protection title="Protection of CoAP Header Fields and Payload" artwork-align="center"}
+
+## CoAP Header Fields and Payload {#coap-header}
+
+A summary of how the CoAP header fields and payload are protected is shown in {{fig-fields-protection}}, including fields specific to CoAP over UDP and CoAP over TCP (marked accordingly in the table).
 
 Most CoAP Header fields (i.e. the message fields in the fixed 4-byte header) are required to be read and/or changed by CoAP proxies and thus cannot in general be protected end-to-end between the endpoints. As mentioned in {{intro}}, OSCORE protects the CoAP Request/Response Layer only, and not the Messaging Layer (Section 2 of {{RFC7252}}), so fields such as Type and Message ID are not protected with OSCORE. 
 
