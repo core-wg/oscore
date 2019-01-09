@@ -1663,13 +1663,13 @@ Client  Proxy  Server
   |       |       |
   +------>|       |            Code: 0.02 (POST)
   | POST  |       |           Token: 0x8c
-  |       |       |          OSCORE: [kid:5f,Partial IV:42]
+  |       |       |          OSCORE: [kid:5f, Partial IV:42]
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}
   |       |       |
   |       +------>|            Code: 0.02 (POST)
   |       | POST  |           Token: 0x7b
-  |       |       |          OSCORE: [kid:5f,Partial IV:42]
+  |       |       |          OSCORE: [kid:5f, Partial IV:42]
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"alarm_status"}
   |       |       |
@@ -1702,14 +1702,14 @@ Client  Proxy  Server
   +------>|       |            Code: 0.05 (FETCH)
   | FETCH |       |           Token: 0x83
   |       |       |         Observe: 0
-  |       |       |          OSCORE: [kid:ca,Partial IV:15]
+  |       |       |          OSCORE: [kid:ca, Partial IV:15]
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}
   |       |       |
   |       +------>|            Code: 0.05 (FETCH)
   |       | FETCH |           Token: 0xbe
   |       |       |         Observe: 0
-  |       |       |          OSCORE: [kid:ca,Partial IV:15]
+  |       |       |          OSCORE: [kid:ca, Partial IV:15]
   |       |       |         Payload: {Code:0.01,
   |       |       |                   Uri-Path:"glucose"}
   |       |       |
