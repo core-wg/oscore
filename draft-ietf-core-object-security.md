@@ -320,13 +320,13 @@ where:
 For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}) is used, the integer value for alg_aead is 10, the value for L is 16 for keys and 13 for the Common IV. Assuming use of the default algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
 ~~~~~~~~~~~
-PRK = HMAC-SHA-256(Master Salt, Master Secret)
+   PRK = HMAC-SHA-256(Master Salt, Master Secret)
 ~~~~~~~~~~~
 
 and as L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and the Sender Key, Recipient Key, and Common IV are therefore the first 16 or 13 bytes of
 
 ~~~~~~~~~~~
-output parameter = HMAC-SHA-256(PRK, info | 0x01)
+   output parameter = HMAC-SHA-256(PRK, info | 0x01)
 ~~~~~~~~~~~
 
 where different info are used for each derived parameter and where \| denotes byte string concatenation.
