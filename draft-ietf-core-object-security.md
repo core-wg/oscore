@@ -1442,6 +1442,8 @@ The length of message fields can reveal information about the message. Applicati
 
 Note to RFC Editor: Please replace all occurrences of "[[this document\]\]" with the RFC number of this specification.
 
+Note to IANA: Please note all occurrences of "TBD1" in this specification should be assigned the same number.
+
 ## COSE Header Parameters Registry
 
 The 'kid context' parameter is added to the "COSE Header Parameters Registry":
