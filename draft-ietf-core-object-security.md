@@ -326,10 +326,10 @@ For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in {{RFC8152}}
 and as L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and the Sender Key, Recipient Key, and Common IV are therefore the first 16 or 13 bytes of
 
 ~~~~~~~~~~~
-   output parameter = HMAC-SHA-256(PRK, info | 0x01)
+   output parameter = HMAC-SHA-256(PRK, info || 0x01)
 ~~~~~~~~~~~
 
-where different info are used for each derived parameter and where \| denotes byte string concatenation.
+where different info are used for each derived parameter and where \|\| denotes byte string concatenation.
 
 Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros. For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. OSCORE sets the salt default value to empty byte string, which is converted to a string of zeroes (see Section 2.2 of {{RFC5869}}).
 
