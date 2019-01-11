@@ -335,7 +335,9 @@ Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a
 
 ### Initial Sequence Numbers and Replay Window {#initial-replay}
 
-The Sender Sequence Number is initialized to 0.  The supported types of replay protection and replay window length is application specific and depends on how OSCORE is transported, see {{replay-protection}}. The default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
+The Sender Sequence Number is initialized to 0.  
+
+The supported types of replay protection and replay window length is application specific and depends on how OSCORE is transported, see {{replay-protection}}. The default is DTLS-type replay protection with a window size of 32 initiated as described in Section 4.1.2.6 of {{RFC6347}}. 
 
 ## Requirements on the Security Context Parameters {#req-params}
 
@@ -619,7 +621,7 @@ The COSE Object SHALL be a COSE_Encrypt0 object with fields defined as follows
 
 - The 'unprotected' field includes:
 
-   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading bytes of value zero SHALL be removed when encoding the Partial IV, except in the case of Partial IV of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. The Partial IV SHALL be present in responses to Observe registrations (see {{observe-registration}}), otherwise the Partial IV will not typically be present in responses. 
+   * The 'Partial IV' parameter. The value is set to the Sender Sequence Number. All leading bytes of value zero SHALL be removed when encoding the Partial IV, except in the case of Partial IV of value 0 which is encoded to the byte string 0x00. This parameter SHALL be present in requests. The Partial IV SHALL be present in responses to Observe registrations (see {{observe-registration}}), otherwise the Partial IV will not typically be present in responses (for one exception, see {{reboot-replay}}). 
 
    * The 'kid' parameter. The value is set to the Sender ID. This parameter SHALL be present in requests and will not typically be present in responses. An example where the Sender ID is included in a response is the extension of OSCORE to group communication {{I-D.ietf-core-oscore-groupcomm}}.
    
@@ -1751,19 +1753,19 @@ The server verifies that the Partial IV has not been received before. The client
 
 # Deployment Examples {#deployment-examples}
 
-For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device. Two examples are given in this section. In the first example, the security context is only derived once from the Master Secret. In the second example, security contexts are derived multiple times using random inputs.
+For many IoT deployments, a 128 bit uniformly random Master Key is sufficient for encrypting all data exchanged with the IoT device throughout its lifetime. Two examples are given in this section. In the first example, the security context is only derived once from the Master Secret. In the second example, security contexts are derived multiple times using random inputs.
 
 ## Security Context Derived Once {#master-secret-once}
 
-An application may derive a security context once and use it for the lifetime of a device. 
+An application that only derives the security context once needs to handle the loss of mutable security context parameters, e.g. due to reboot. 
 
-### Sequence Number {#seq-numb}
+### Sender Sequence Number {#seq-numb}
 
-In order to handle loss of mutable security context parameters such as sequence numbers, the device may implement procedures for writing to non-volatile memory during normal operations and updating the security context after reboot, provided that the procedures comply with the requirements on the security context parameters ({{req-params}}). This section gives an example of such a procedure.
+In order to handle loss of Sender Sequence Numbers, the device may implement procedures for writing to non-volatile memory during normal operations and updating the security context after reboot, provided that the procedures comply with the requirements on the security context parameters ({{req-params}}). This section gives an example of such a procedure.
 
 There are known issues related to writing to non-volatile memory. For example, flash drives may have a limited number of erase operations during its life time. Also, the time for a write operation to non-volatile memory to be completed may be unpredictable, e.g. due to caching, which could result in important security context data not being stored at the time when the device reboots. 
 
-However, many devices have predictable limits for writing to non-volatile memory, are physically limited to only send a small amount of messages per minute, and may have no good source of randomness
+However, many devices have predictable limits for writing to non-volatile memory, are physically limited to only send a small amount of messages per minute, and may have no good source of randomness.
 
 To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may perform the following procedure during normal operations:
 
@@ -1779,11 +1781,10 @@ If F cannot be set so SSN2 is always larger than the last Sender Sequence Number
 
 In case of loss of security context on the server, to prevent accepting replay of previously received requests, the server may perform the following procedure after boot:
 
-* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with a 4.01 (Unauthorized) message, containing only the Echo option {{I-D.ietf-core-echo-request-tag}} and no diagnostic payload, in order to get a request with verifiable freshness. The server MUST use a fixed Sender Sequence Number = 2^40 - 1 when generating the AEAD nonce and MUST include it as Partial IV in the response. The server MUST set the maximum Sender Sequence Number to 2^40 - 2, and MUST NOT use 2^40 - 1 to generate the AEAD nonce for any other response.
+* The server updates its Sender Sequence Number as specified in {{seq-numb}}, to be used as Partial IV in the response containing the Echo option (next bullet).
 
-If the server using the Echo option can verify a second request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window.
+* For each stored security context, the first time after boot the server receives an OSCORE request, the server responds with an OSCORE protected 4.01 (Unauthorized), containing only the Echo option {{I-D.ietf-core-echo-request-tag}} and no diagnostic payload. The server MUST use its Partial IV when generating the AEAD nonce and MUST include the Partial IV in the response (see {{cose-object}}). If the server with use of the Echo option can verify a second OSCORE request as fresh, then the Partial IV of the second request is set as the lower limit of the replay window of that security context.
 
-This method allows the re-use of the AEAD nonce generated from the server's Sender Sequence Number = 2^40 - 1: this is acceptable as the only changing information in the 4.01 (Unauthorized) error message is the value of the Echo option.
 
 ### Notifications {#replay-notif}
 
