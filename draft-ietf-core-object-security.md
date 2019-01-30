@@ -2245,9 +2245,9 @@ It is assumed that the endpoints running OSCORE have not themselves been comprom
 
 OSCORE targets the protection of the CoAP request/response layer (Section 2 of {{RFC7252}}) between the endpoints, including the CoAP Payload, Code, Uri-Path/Uri-Query, and the other Class E option instances ({{coap-options}}). 
 
-OSCORE does not protect the CoAP messaging layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses. 
+OSCORE does not protect the CoAP messaging layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses.
 
-Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). 
+Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). The supported proxies (forwarding, cross-protocol e.g. CoAP to CoAP-mappable protocols such as HTTP) must be able to change certain Class U options (by instruction from the Client), resulting in the CoAP request being redirected to the server. Changes caused by the proxy may result in the request not reaching the server or reaching the wrong server. For cross-protocol proxies, mappings are done on the Outer part of the message so these protocols are essentially used as transport, and the result of proxy operation impacts mainly how the protected message reaches or does not reach the destination endpoint.
 
 Attacks on unprotected CoAP message fields generally causes denial-of-service attacks which are out of scope of this document, more details are given in {{unprot-fields}}. 
 
@@ -2258,11 +2258,11 @@ OSCORE is susceptible to traffic analysis as discussed later in {{overview-sec-p
 
 ## Supporting Proxy Operations {#supp-proxy-op}
 
-CoAP is designed to work with intermediaries reading and/or changing CoAP message fields to perform supporting operations in constrained environments, e.g. forwarding and cross-protocol translations. 
+CoAP is designed to work with intermediaries reading and/or changing CoAP message fields to perform supporting operations in constrained environments, e.g. forwarding and cross-protocol translations.
 
 Securing CoAP on transport layer protects the entire message between the endpoints in which case CoAP proxy operations are not possible. In order to enable proxy operations, security on transport layer needs to be terminated at the proxy in which case the CoAP message in its entirety is unprotected in the proxy. 
 
-Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}, in particular forwarding is detailed in Section 2.2.1. The client and server are assumed to be honest, while proxies and gateways are only trusted to perform their intended operations. 
+Requirements for CoAP end-to-end security are specified in {{I-D.hartke-core-e2e-security-reqs}}, in particular forwarding is detailed in Section 2.2.1. The client and server are assumed to be honest, while proxies and gateways are only trusted to perform their intended operations.
 
 By working at the CoAP layer, OSCORE enables different CoAP message fields to be protected differently, which allows message fields required for proxy operations to be available to the proxy while message fields intended for the other endpoint remain protected. In the remainder of this section we analyze how OSCORE protects the protected message fields and the consequences of message fields intended for proxy operation being unprotected.
 
