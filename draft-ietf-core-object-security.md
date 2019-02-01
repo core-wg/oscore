@@ -1837,7 +1837,7 @@ The protocol is described below with reference to {{fig-B2}}. The client or the 
 
 If verification fails in any step, the endpoint stops processing the message.
 
-The length of the nonces R1, R2, and R3 is application specific. The application needs to define the length of the nonces such the probability of collisions negligable; typically, at least 8 bytes long.
+The length of the nonces R1, R2, and R3 is application specific. The application needs to set the length of each nonce such the probability of its value being repeated is negligable; typically, at least 8 bytes long.
 
 Request #2 can be an ordinary request. The server performs the action of the request and sends response #2 after having successfully completed the security context related operations in step 4. The client acts on response #2 after having successfully completed step 5.
 
@@ -1853,7 +1853,7 @@ The server may only have space for a limited number of security contexts, or onl
 
 As an alternative to caching R2, the server could generate R2 in such a way that it can be sent (in response #1) and verified (at reception of request #2) as the value of R2 it had generated. Such a procedure MUST NOT lead to the server accepting replayed request #2 messages. One construction is that the server generates a secret random HMAC key K_HMAC at reboot for each set of static security context parameters. Steps below refer to {{master-secret-multiple}}:
 
-* In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is an 8 bytes random byte string, and the HMAC is truncated to 8 bytes. Neither R2, S2 nor the derived first and second security contexts need to be cached.
+* In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is an 8 bytes long random byte string, and the HMAC is truncated to 8 bytes. Neither R2, S2 nor the derived first and second security contexts need to be cached.
  
 * In step 4, instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the associated K_HMAC is given a new random value. (The latter corresponds to removing the cached value of R2 in step 4 of {{master-secret-multiple}}, and makes the server reject replays of request #2.)
 
@@ -2247,7 +2247,7 @@ OSCORE targets the protection of the CoAP request/response layer (Section 2 of {
 
 OSCORE does not protect the CoAP messaging layer (Section 2 of {{RFC7252}}) or other lower layers involved in routing and transporting the CoAP requests and responses.
 
-Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). The supported proxies (forwarding, cross-protocol e.g. CoAP to CoAP-mappable protocols such as HTTP) must be able to change certain Class U options (by instruction from the Client), resulting in the CoAP request being redirected to the server. Changes caused by the proxy may result in the request not reaching the server or reaching the wrong server. For cross-protocol proxies, mappings are done on the Outer part of the message so these protocols are essentially used as transport. Manipulation of these options may thus impact if the protected message reaches or does not reach the destination endpoint.
+Additionally, OSCORE does not protect Class U option instances ({{coap-options}}), as these are used to support CoAP forward proxy operations (see Section 5.7.2 of {{RFC7252}}). The supported proxies (forwarding, cross-protocol e.g. CoAP to CoAP-mappable protocols such as HTTP) must be able to change certain Class U options (by instruction from the Client), resulting in the CoAP request being redirected to the server. Changes caused by the proxy may result in the request not reaching the server or reaching the wrong server. For cross-protocol proxies, mappings are done on the Outer part of the message so these protocols are essentially used as transport. Manipulation of these options may thus impact whether the protected message reaches or does not reach the destination endpoint.
 
 Attacks on unprotected CoAP message fields generally causes denial-of-service attacks which are out of scope of this document, more details are given in {{unprot-fields}}. 
 
