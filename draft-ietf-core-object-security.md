@@ -1837,7 +1837,7 @@ The protocol is described below with reference to {{fig-B2}}. The client or the 
 
 If verification fails in any step, the endpoint stops processing the message.
 
-The length of the nonces R1, R2, and R3 is application specific. The application needs to define the length of the nonces such the probability of collisions negligable; typically, at least 8-byte long.
+The length of the nonces R1, R2, and R3 is application specific. The application needs to define the length of the nonces such the probability of collisions negligable; typically, at least 8 bytes long.
 
 Request #2 can be an ordinary request. The server performs the action of the request and sends response #2 after having successfully completed the security context related operations in step 4. The client acts on response #2 after having successfully completed step 5.
 
