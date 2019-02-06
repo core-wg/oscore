@@ -1839,7 +1839,7 @@ The protocol is described below with reference to {{fig-B2}}. The client or the 
 If verification fails in any step, the endpoint stops processing that message.
 
 The length of the nonces R1, R2, and R3 is application specific. The application needs to set the length of each nonce such the probability of its value being repeated is negligable; typically, at least 8 bytes long. Since R2 may be generated as the result of a replayed request #1, the probability for collision needs to consider the birthday paradox.
-For example, setting the length of R2 to 8 bytes results in an average collision after 2^32 response #1 messages, which  makes collisions improbable for a constrained server handling at most a request per second. 
+For example, setting the length of R2 to 8 bytes results in an average collision after 2^32 response #1 messages, which  makes collisions improbable for a constrained server handling of the order of a request per second. 
 
 Request #2 can be an ordinary request. The server performs the action of the request and sends response #2 after having successfully completed the security context related operations in step 4. The client acts on response #2 after having successfully completed step 5.
 
@@ -1861,11 +1861,11 @@ As an alternative to caching R2, the server could generate R2 in such a way that
 
 The server generates a fresh K_HMAC when it receives a message from a client for which it neither has a fresh security context (e.g. because of reboot, as mentioned in {{context-state}}) nor an existing K_HMAC. K_HMAC may have an expiration time, after which it is erased. K_HMAC is used until a run of the protocol is completed (after verification of request #2), or until it expires, what ever comes first. Steps below refer to modifications to {{master-secret-multiple}}:
 
-* In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is a random byte string, and the HMAC is truncated to 8 bytes, see below. Neither R2, S2 nor the derived first and second security contexts need to be cached.
+* In step 2, the server generates R2 = S2 \|\| HMAC(K_HMAC, S2) where S2 is a random byte string, and the HMAC is truncated to 8 bytes. Neither R2, S2 nor the derived first and second security contexts need to be cached.
  
 * In step 4, instead of verifying that R2 coincides with the cached value, the server looks up the associated K_HMAC and verifies the truncated HMAC, and the processing continues accordingly depending on verification success or failure. In case of success, the associated K_HMAC is erased. (The latter corresponds to removing the cached values of R2 in step 4 of {{master-secret-multiple}}, and makes the server reject replays of request #2.)
 
-The length of S2 is application specific and the probability for collisions needs to consider the birthday paradox. For example, setting the length of S2 to 8 bytes results in an average collision after 2^32 response #1 messages, which  makes collisions improbable for a constrained server handling at most a request per second. 
+The length of S2 is application specific and the probability for collisions needs to consider the birthday paradox. For example, setting the length of S2 to 8 bytes results in an average collision after 2^32 response #1 messages, which  makes collisions improbable for a constrained server handling of the order of a request per second. 
 
 
 Two endpoints sharing a security context may accidently initiate two instances of the protocol at the same time, each in the role of client, e.g. after a power outage affecting both endpoints. Such a race condition could potentially lead to both protocols failing, and both endpoints repeatedly re-initiating the protocol without converging. Both endpoints can detect this situation and it can be handled in different ways. The requests could potentially be more spread out in time, for example by only initiating this protocol when the endpoint actually needs to make a request, potentially adding a random delay before requests immediately after reboot or if such parallel protocol runs are detected.
