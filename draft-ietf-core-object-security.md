@@ -1420,6 +1420,7 @@ The maximum sender sequence number is dependent on the AEAD algorithm. The maxim
 
 In order to prevent cryptanalysis when the same plaintext is repeatedly encrypted by many different users with distinct AEAD keys, the AEAD nonce is formed by mixing the sequence number with a secret per-context initialization vector (Common IV) derived along with the keys (see Section 3.1 of {{RFC8152}}), and by using a Master Salt in the key derivation (see {{MF00}} for an overview). The Master Secret, Sender Key, Recipient Key, and Common IV must be secret, the rest of the parameters may be public. The Master Secret must have a good amount of randomness (see {{master-secret}}).
 
+The ID Context, Sender ID, and Partial IV are always at least implicitly integrity protected, as manipulation leads to the wrong nonce or key being used and therefore results in decryption failure.
 
 ## Message Segmentation
 
