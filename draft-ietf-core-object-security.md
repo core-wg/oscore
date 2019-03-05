@@ -2354,6 +2354,8 @@ Cancellations ({{observe-registration}}) are not bound to the corresponding regi
 
 Error messages occurring during CoAP processing are protected end-to-end. Error messages occurring during OSCORE processing are not always possible to protect, e.g. if the receiving endpoint cannot locate the right security context. For this setting, unprotected error messages are allowed as specified to prevent extensive retransmissions. Those error messages can be spoofed or manipulated, which is a potential denial-of-service attack.
 
+This specification specifies OPTIONAL error codes and RECOMMENDS the use of specific diagnostic payloads for OSCORE processing error messages. Such messages might reveal information about how many and which security contexts exist on the server. Servers MAY want to omit the diagnostic payload of error messages, use the same error code for all errors, or avoid responding alltogether in case of OSCORE processing errors, if that is a security concern for the application. Moreover, clients MUST NOT rely on the error code or the diagnostic payload to trigger specific actions, as these errors are unprotected and can be spoofed or manipulated.
+
 Signaling messages used in CoAP over TCP {{RFC8323}} are intended to be hop-by-hop; spoofing signaling messages can be used as a denial-of-service attack of a TCP connection. 
 
 ### HTTP Message Fields
