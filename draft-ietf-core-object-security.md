@@ -1207,7 +1207,7 @@ Since redirects are not defined in the mappings between HTTP and CoAP {{RFC8075}
 * the CoAP-to-HTTP proxy copies the HTTP OSCORE header field and body to the new request
 * the target of the redirect has the necessary OSCORE security context required to decrypt and verify the message
 
-Since OSCORE requires HTTP body to be preserved across redirects, the HTTP server is recommended to reply with 307 or 308 instead of 301 or 302.
+Since OSCORE requires HTTP body to be preserved across redirects, the HTTP server is RECOMMENDED to reply with 307 or 308 instead of 301 or 302.
 
 For the case of HTTP client to CoAP server, although redirect is not defined for CoAP servers {{RFC7252}}, an HTTP client receiving a redirect should generate a new OSCORE request for the server it was redirected to. 
 
@@ -1390,7 +1390,7 @@ An overview of the security properties is given in {{overview-sec-properties}}.
 
 In scenarios with intermediary nodes such as proxies or gateways, transport layer security such as (D)TLS only protects data hop-by-hop. As a consequence, the intermediary nodes can read and modify any information. The trust model where all intermediary nodes are considered trustworthy is problematic, not only from a privacy perspective, but also from a security perspective, as the intermediaries are free to delete resources on sensors and falsify commands to actuators (such as "unlock door", "start fire alarm", "raise bridge"). Even in the rare cases where all the owners of the intermediary nodes are fully trusted, attacks and data breaches make such an architecture brittle.
 
-(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is recommended, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
+(D)TLS protects hop-by-hop the entire message. OSCORE protects end-to-end all information that is not required for proxy operations (see {{protected-fields}}). (D)TLS and OSCORE can be combined, thereby enabling end-to-end security of the message payload, in combination with hop-by-hop protection of the entire message, during transport between end-point and intermediary node. In particular when OSCORE is used with HTTP, the additional TLS protection of HTTP hops is RECOMMENDED, e.g. between an HTTP endpoint and a proxy translating between HTTP and CoAP.
 
 Applications need to consider that certain message fields and messages types are not protected end-to-end and may be spoofed or manipulated. The consequences of unprotected message fields are analyzed in {{unprot-fields}}. 
 
@@ -2361,7 +2361,7 @@ Signaling messages used in CoAP over TCP {{RFC8323}} are intended to be hop-by-h
 ### HTTP Message Fields
 
 In contrast to CoAP, where OSCORE does not protect header fields to enable CoAP-CoAP proxy operations, the use of OSCORE with HTTP is restricted to transporting a protected CoAP message over an HTTP hop. Any unprotected HTTP message fields may reveal information about the transport of the OSCORE message and enable various denial-of-service attacks.
-It is recommended to additionally use TLS {{RFC8446}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
+It is RECOMMENDED to additionally use TLS {{RFC8446}} for HTTP hops, which enables encryption and integrity protection of headers, but still leaves some information for traffic analysis.
 
 
 # CDDL Summary {#cddl-sum}
