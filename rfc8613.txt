@@ -200,12 +200,12 @@ RFC 8613                         OSCORE                         May 2019
    essentially protects the RESTful interactions: the request method,
    the requested resource, the message payload, etc. (see Section 4),
    where "RESTful" refers to the Representational State Transfer (REST)
-   Architecture [REST].  OSCORE protects neither the CoAP Messaging
-   Layer nor the CoAP Token, which may change between the endpoints;
+   Architecture [REST].  OSCORE protects neither the CoAP messaging
+   layer nor the CoAP Token, which may change between the endpoints;
    therefore, those are processed as defined in [RFC7252].
    Additionally, since the message formats for CoAP over unreliable
    transport [RFC7252] and for CoAP over reliable transport [RFC8323]
-   differ only in terms of CoAP Messaging Layer, OSCORE can be applied
+   differ only in terms of CoAP messaging layer, OSCORE can be applied
    to both unreliable and reliable transports (see Figure 1).
 
    OSCORE works in very constrained nodes and networks, thanks to its
@@ -325,7 +325,7 @@ RFC 8613                         OSCORE                         May 2019
    the intermediaries, rather than just forwarded to the next node.
 
    The term "stop processing" is used throughout the document to denote
-   that the message is not passed up to the CoAP Request/Response Layer
+   that the message is not passed up to the CoAP request/response layer
    (see Figure 1).
 
    The terms Common Context, Sender Context, Recipient Context, Master
@@ -565,7 +565,7 @@ RFC 8613                         OSCORE                         May 2019
 
 
    All input parameters need to be known and agreed on by both
-   endpoints, but the replay window may be different in the two
+   endpoints, but the Replay Window may be different in the two
    endpoints.  The way the input parameters are preestablished is
    application specific.  Considerations of security context
    establishment are given in Section 12.2 and examples of deploying
@@ -620,7 +620,7 @@ Selander, et al.             Standards Track                   [Page 11]
 RFC 8613                         OSCORE                         May 2019
 
 
-   o  L is the size of the key/nonce for the AEAD algorithm used, in
+   o  L is the size of the key/nonce for the AEAD Algorithm used, in
       bytes.
 
    For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in
@@ -719,7 +719,7 @@ RFC 8613                         OSCORE                         May 2019
 
    Protection of Signaling messages (Section 5 of [RFC8323]) is
    specified in Section 4.3.  The other parts of this section target
-   Request/Response messages.
+   request/response messages.
 
    Message fields of the CoAP message may be protected end-to-end
    between CoAP client and CoAP server in different ways:
@@ -766,16 +766,16 @@ RFC 8613                         OSCORE                         May 2019
    processing as is described in Section 4.1.3.
 
    Options that are unknown or for which OSCORE processing is not
-   defined SHALL be processed as class E (and no special processing).
+   defined SHALL be processed as Class E (and no special processing).
    Specifications of new CoAP options SHOULD define how they are
-   processed with OSCORE.  A new COAP option SHOULD be of class E unless
+   processed with OSCORE.  A new COAP option SHOULD be of Class E unless
    it requires proxy processing.  If a new CoAP option is of class U,
    the potential issues with the option being unprotected SHOULD be
    documented (see Appendix D.5).
 
 4.1.1.  Inner Options
 
-   Inner option message fields (class E) are used to communicate
+   Inner option message fields (Class E) are used to communicate
    directly with the other endpoint.
 
    The sending endpoint SHALL write the Inner option message fields
@@ -912,7 +912,7 @@ RFC 8613                         OSCORE                         May 2019
    Uri-Host, Uri-Port, Uri-Path, and Uri-Query options according to
    Section 6.4 of [RFC7252].
 
-   Uri-Path and Uri-Query are class E options and SHALL be protected and
+   Uri-Path and Uri-Query are Class E options and SHALL be protected and
    processed as Inner options (Section 4.1.1).
 
    The Proxy-Uri option of the OSCORE message SHALL be set to the
@@ -1223,11 +1223,11 @@ RFC 8613                         OSCORE                         May 2019
    shown in Figure 6, including fields specific to CoAP over UDP and
    CoAP over TCP (marked accordingly in the table).
 
-   Most CoAP Header fields (i.e., the message fields in the fixed 4-byte
+   Most CoAP header fields (i.e., the message fields in the fixed 4-byte
    header) are required to be read and/or changed by CoAP proxies; thus,
    they cannot, in general, be protected end-to-end from one endpoint to
    the other.  As mentioned in Section 1, OSCORE protects the CoAP
-   Request/Response Layer only and not the Messaging Layer (Section 2 of
+   request/response layer only and not the messaging layer (Section 2 of
 
 
 
@@ -1239,7 +1239,7 @@ RFC 8613                         OSCORE                         May 2019
    [RFC7252]), so fields such as Type and Message ID are not protected
    with OSCORE.
 
-   The CoAP Header field Code is protected by OSCORE.  Code SHALL be
+   The CoAP header field Code is protected by OSCORE.  Code SHALL be
    encrypted and integrity protected (Class E) to prevent an
    intermediary from eavesdropping on or manipulating it (e.g., changing
    from GET to DELETE).
@@ -1253,7 +1253,7 @@ RFC 8613                         OSCORE                         May 2019
    the OSCORE message and write the Code of the COSE object plaintext
    (Section 5.3) into the decrypted CoAP message.
 
-   The other currently defined CoAP Header fields are Unprotected (Class
+   The other currently defined CoAP header fields are Unprotected (Class
    U).  The sending endpoint SHALL write all other header fields of the
    original message into the header of the OSCORE message.  The
    receiving endpoint SHALL write the header fields from the received
@@ -1280,7 +1280,7 @@ RFC 8613                         OSCORE                         May 2019
       Settings Message (CSM) SHALL be sent.  The subsequent signaling
       message SHALL be protected.
 
-   o  Signaling messages SHALL be protected as CoAP Request messages,
+   o  Signaling messages SHALL be protected as CoAP request messages,
       except in the case in which the Signaling message is a response to
       a previous Signaling message; then it SHALL be protected as a CoAP
 
@@ -1292,8 +1292,8 @@ Selander, et al.             Standards Track                   [Page 23]
 RFC 8613                         OSCORE                         May 2019
 
 
-      Response message.  For example, 7.02 (Ping) is protected as a CoAP
-      Request and 7.03 (Pong) as a CoAP response.
+      response message.  For example, 7.02 (Ping) is protected as a CoAP
+      request and 7.03 (Pong) as a CoAP response.
 
    o  The Outer Code for Signaling messages SHALL be set to 0.02 (POST),
       unless it is a response to a previous Signaling message, in which
@@ -1326,7 +1326,7 @@ RFC 8613                         OSCORE                         May 2019
    encrypted and integrity protected, and Additional Authenticated Data
    (AAD) denotes the data that is to be integrity protected only.
 
-   The COSE Object SHALL be a COSE_Encrypt0 object with fields defined
+   The COSE object SHALL be a COSE_Encrypt0 object with fields defined
    as follows:
 
    o  The 'protected' field is empty.
@@ -1479,7 +1479,7 @@ RFC 8613                         OSCORE                         May 2019
 
 5.3.  Plaintext
 
-   The plaintext is formatted as a CoAP message without Header (see
+   The plaintext is formatted as a CoAP message without header (see
    Figure 9) consisting of:
 
    o  the Code of the original CoAP message as defined in Section 3 of
@@ -1612,7 +1612,7 @@ RFC 8613                         OSCORE                         May 2019
    object is called the "compressed COSE object".
 
    The COSE_Encrypt0 object used in OSCORE is transported in the OSCORE
-   option and in the Payload.  The Payload contains the Ciphertext of
+   option and in the Payload.  The Payload contains the ciphertext of
    the COSE object.  The headers of the COSE object are compactly
    encoded as described in the next section.
 
@@ -2044,7 +2044,7 @@ RFC 8613                         OSCORE                         May 2019
        described in Section 5.2.
 
    4.  Encrypt the COSE object using the Sender Key. Compress the COSE
-       Object as specified in Section 6.
+       object as specified in Section 6.
 
    5.  Format the OSCORE message according to Section 4.  The OSCORE
        option is added (see Section 4.1.2).
@@ -2054,12 +2054,12 @@ RFC 8613                         OSCORE                         May 2019
    A server receiving a request containing the OSCORE option SHALL
    perform the following steps:
 
-   1.  Discard Code and all class E options (marked in Figure 5 with 'x'
+   1.  Discard Code and all Class E options (marked in Figure 5 with 'x'
        in column E) present in the received message.  For example, an
        If-Match Outer option is discarded, but an Uri-Host Outer option
        is not discarded.
 
-   2.  Decompress the COSE Object (Section 6) and retrieve the Recipient
+   2.  Decompress the COSE object (Section 6) and retrieve the Recipient
        Context associated with the Recipient ID in the 'kid' parameter,
        additionally using the 'kid context', if present.  If either the
        decompression or the COSE message fails to decode, or the server
@@ -2096,7 +2096,7 @@ RFC 8613                         OSCORE                         May 2019
        Section 5.4.
 
    5.  Compute the AEAD nonce from the Recipient ID, Common IV, and the
-       'Partial IV' parameter, received in the COSE Object.
+       'Partial IV' parameter, received in the COSE object.
 
    6.  Decrypt the COSE object using the Recipient Key, as per
        Section 5.3 of [RFC8152].  (The decrypt operation includes the
@@ -2158,7 +2158,7 @@ RFC 8613                         OSCORE                         May 2019
           Partial IV.
 
    4.  Encrypt the COSE object using the Sender Key. Compress the COSE
-       Object as specified in Section 6.  If the AEAD nonce was
+       object as specified in Section 6.  If the AEAD nonce was
        constructed from a new Partial IV, this Partial IV MUST be
        included in the message.  If the AEAD nonce from the request was
        used, the Partial IV MUST NOT be included in the message.
@@ -2207,12 +2207,12 @@ RFC 8613                         OSCORE                         May 2019
    A client receiving a response containing the OSCORE option SHALL
    perform the following steps:
 
-   1.  Discard Code and all class E options (marked in Figure 5 with 'x'
+   1.  Discard Code and all Class E options (marked in Figure 5 with 'x'
        in column E) present in the received message.  For example, ETag
        Outer option is discarded, as well as Max-Age Outer option.
 
    2.  Retrieve the Recipient Context in the Security Context associated
-       with the Token.  Decompress the COSE Object (Section 6).  If
+       with the Token.  Decompress the COSE object (Section 6).  If
        either the decompression or the COSE message fails to decode,
        then go to 8.
 
@@ -2226,7 +2226,7 @@ RFC 8613                         OSCORE                         May 2019
 
        *  If the Partial IV is present in the response, compute the AEAD
           nonce from the Recipient ID, Common IV, and the 'Partial IV'
-          parameter, received in the COSE Object.
+          parameter, received in the COSE object.
 
    5.  Decrypt the COSE object using the Recipient Key, as per
        Section 5.3 [RFC8152].  (The decrypt operation includes the
@@ -2345,7 +2345,7 @@ RFC 8613                         OSCORE                         May 2019
 
    o  Since a CoAP response is only applicable to the original CoAP
       request, caching is in general not useful.  In support of existing
-      proxies, OSCORE uses the outer Max-Age option, see
+      proxies, OSCORE uses the Outer Max-Age option, see
       Section 4.1.3.1.
 
 
@@ -2387,7 +2387,7 @@ RFC 8613                         OSCORE                         May 2019
 
 11.1.  The HTTP OSCORE Header Field
 
-   The HTTP OSCORE Header Field (see Section 13.4) is used for carrying
+   The HTTP OSCORE header field (see Section 13.4) is used for carrying
    the content of the CoAP OSCORE option when transporting OSCORE
    messages over HTTP hops.
 
@@ -2761,7 +2761,7 @@ RFC 8613                         OSCORE                         May 2019
 
    Replay attacks need to be considered in different parts of the
    implementation.  Most AEAD algorithms require a unique nonce for each
-   message, for which the sender sequence numbers in the COSE message
+   message, for which the Sender Sequence Numbers in the COSE message
    field 'Partial IV' is used.  If the recipient accepts any sequence
    number larger than the one previously received, then the problem of
    sequence number synchronization is avoided.  With reliable transport,
@@ -2771,7 +2771,7 @@ RFC 8613                         OSCORE                         May 2019
    message (see Section 7.5).
 
    Note that sharing a security context between servers may open up for
-   replay attacks, for example, if the replay windows are not
+   replay attacks, for example, if the Replay Windows are not
    synchronized.
 
 12.5.  Client Aliveness
@@ -2786,8 +2786,8 @@ RFC 8613                         OSCORE                         May 2019
 
 12.6.  Cryptographic Considerations
 
-   The maximum sender sequence number is dependent on the AEAD
-   algorithm.  The maximum sender sequence number is 2^40 - 1, or any
+   The maximum Sender Sequence Number is dependent on the AEAD
+   algorithm.  The maximum Sender Sequence Number is 2^40 - 1, or any
    algorithm-specific lower limit, after which a new security context
    must be generated.  The mechanism to build the AEAD nonce
    (Section 5.2) assumes that the nonce is at least 56 bits, and the
@@ -2845,7 +2845,7 @@ RFC 8613                         OSCORE                         May 2019
    for example, matching of CON and ACK (CoAP Message Identifier),
    matching of request and responses (Token) and traffic analysis.
    OSCORE does not provide protection for HTTP header fields that are
-   not both CoAP-mappable and class E.  The HTTP message fields that are
+   not both CoAP-mappable and Class E.  The HTTP message fields that are
    visible to on-path entities are only used for the purpose of
    transporting the OSCORE message, whereas the application-layer
    message is encoded in CoAP and encrypted.
@@ -2870,8 +2870,8 @@ RFC 8613                         OSCORE                         May 2019
    signaling messages reveal information about the reliable transport
    used on a leg of the path.  Using the mechanisms described in
    Section 7.5 may reveal when a device goes through a reboot.  This can
-   be mitigated by the device storing the precise state of sender
-   sequence number and replay window on a clean shutdown.
+   be mitigated by the device storing the precise state of Sender
+   Sequence Number and Replay Window on a clean shutdown.
 
    The length of message fields can reveal information about the
    message.  Applications may use a padding scheme to protect against
@@ -3647,7 +3647,7 @@ RFC 8613                         OSCORE                         May 2019
       include the Partial IV in the response (see Section 5).  If the
       server with use of the Echo option can verify a second OSCORE
       request as fresh, then the Partial IV of the second request is set
-      as the lower limit of the replay window of that security context.
+      as the lower limit of the Replay Window of that security context.
 
 B.1.3.  Notifications
 
@@ -3738,7 +3738,7 @@ RFC 8613                         OSCORE                         May 2019
        a valid security context, either because the client has generated
        a new security context ID1 = R1 or because the server has lost
        part of its security context, e.g., ID Context, Sender Sequence
-       Number or replay window.  If the server is able to verify the
+       Number or Replay Window.  If the server is able to verify the
        request (see Section 8.2) with the new derived first security
        context using the received ID1 (transported in 'kid context') as
        ID Context and the input parameters associated to the received
@@ -4631,7 +4631,7 @@ D.2.  Supporting Proxy Operations
 
 D.3.  Protected Message Fields
 
-   Protected message fields are included in the Plaintext (Section 5.3)
+   Protected message fields are included in the plaintext (Section 5.3)
    and the Additional Authenticated Data (Section 5.4) of the
    COSE_Encrypt0 object and encrypted using an AEAD algorithm.
 
