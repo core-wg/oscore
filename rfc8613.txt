@@ -2719,7 +2719,7 @@ RFC 8613                         OSCORE                         May 2019
    of the Authentication and Authorization for Constrained Environments
    (ACE) framework [OSCORE-PROFILE].  Such a procedure must ensure that
    the requirements of the security context parameters for the intended
-   use are complied with (see Section 3.3) and also in error situations.
+   use are complied with (see Section 3.3) even in error situations.
    While recipient IDs are allowed to coincide between different
    security contexts (see Section 3.3), this may cause a server to
    process multiple verifications before finding the right security
