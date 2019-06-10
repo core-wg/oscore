@@ -90,13 +90,13 @@ Table of Contents
      6.2.  Encoding of the OSCORE Payload  . . . . . . . . . . . . .  31
      6.3.  Examples of Compressed COSE Objects . . . . . . . . . . .  31
    7.  Message Binding, Sequence Numbers, Freshness, and Replay
-       Protection  . . . . . . . . . . . . . . . . . . . . . . . . .  33
-     7.1.  Message Binding . . . . . . . . . . . . . . . . . . . . .  33
+       Protection  . . . . . . . . . . . . . . . . . . . . . . . . .  34
+     7.1.  Message Binding . . . . . . . . . . . . . . . . . . . . .  34
      7.2.  Sequence Numbers  . . . . . . . . . . . . . . . . . . . .  34
      7.3.  Freshness . . . . . . . . . . . . . . . . . . . . . . . .  34
-     7.4.  Replay Protection . . . . . . . . . . . . . . . . . . . .  34
-     7.5.  Losing Part of the Context State  . . . . . . . . . . . .  35
-   8.  Processing  . . . . . . . . . . . . . . . . . . . . . . . . .  36
+     7.4.  Replay Protection . . . . . . . . . . . . . . . . . . . .  35
+     7.5.  Losing Part of the Context State  . . . . . . . . . . . .  36
+   8.  Processing  . . . . . . . . . . . . . . . . . . . . . . . . .  37
      8.1.  Protecting the Request  . . . . . . . . . . . . . . . . .  37
      8.2.  Verifying the Request . . . . . . . . . . . . . . . . . .  37
      8.3.  Protecting the Response . . . . . . . . . . . . . . . . .  39
@@ -1055,11 +1055,11 @@ RFC 8613                         OSCORE                         May 2019
 
    For cancellations, Section 3.6 of [RFC7641] specifies that all
    options MUST be identical to those in the registration request except
-   for Observe and the set of ETag Options.  For OSCORE messages, this
-   matching is to be done to the options in the decrypted message.
+   for the Observe option and the set of ETag options.  For OSCORE
+   messages, this matching is to be done to the options in the decrypted
+   message.
 
-   [RFC7252] does not specify how the server should act upon receiving
-   the same Token in different requests.  When using OSCORE, the server
+
 
 
 
@@ -1068,23 +1068,26 @@ Selander, et al.             Standards Track                   [Page 19]
 RFC 8613                         OSCORE                         May 2019
 
 
+   [RFC7252] does not specify how the server should act upon receiving
+   the same Token in different requests.  When using OSCORE, the server
    SHOULD NOT remove an active observation just because it receives a
    request with the same Token.
 
-   Since POST with Observe is not defined, for messages with Observe,
-   the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05
-   (Content) for responses (see Section 4.2).
+   Since POST with the Observe option is not defined, for messages with
+   Observe option, the Outer Code MUST be set to 0.05 (FETCH) for
+   requests and to 2.05 (Content) for responses (see Section 4.2).
 
 4.1.3.5.1.  Registrations and Cancellations
 
-   The Inner and Outer Observe in the request MUST contain the Observe
-   value of the original CoAP request; 0 (registration) or 1
+   The Inner and Outer Observe options in the request MUST contain the
+   Observe value of the original CoAP request; 0 (registration) or 1
    (cancellation).
 
-   Every time a client issues a new Observe request, a new Partial IV
-   MUST be used (see Section 5), and so the payload and OSCORE option
-   are changed.  The server uses the Partial IV of the new request as
-   the 'request_piv' of all associated notifications (see Section 5.4).
+   Every time a client issues a new request with the Observe option, a
+   new Partial IV MUST be used (see Section 5), and so the payload and
+   OSCORE option are changed.  The server uses the Partial IV of the new
+   request as the 'request_piv' of all associated notifications (see
+   Section 5.4).
 
    Intermediaries are not assumed to have access to the OSCORE security
    context used by the endpoints; thus, they cannot make requests or
@@ -1093,18 +1096,18 @@ RFC 8613                         OSCORE                         May 2019
    has the following consequences and limitations for Observe
    operations.
 
-   o  An intermediary node removing the Outer Observe 0 does not change
-      the registration request to a request without Observe (see
-      Section 2 of [RFC7641]).  Instead other means for cancellation may
-      be used as described in Section 3.6 of [RFC7641].
+   o  An intermediary node removing the Outer Observe 0 option does not
+      change the registration request to a request without Observe
+      option (see Section 2 of [RFC7641]).  Instead other means for
+      cancellation may be used as described in Section 3.6 of [RFC7641].
 
    o  An intermediary node is not able to transform a normal response
       into an OSCORE-protected Observe notification (see Figure 7 of
       [RFC7641]) that verifies as coming from the server.
 
    o  An intermediary node is not able to initiate an OSCORE protected
-      Observe registration (Observe with value 0) that verifies as
-      coming from the client.  An OSCORE-aware intermediary SHALL NOT
+      Observe registration (Observe option with value 0) that verifies
+      as coming from the client.  An OSCORE-aware intermediary SHALL NOT
       initiate registrations of observations (see Section 10).  If an
       OSCORE-unaware proxy resends an old registration message from a
       client, the replay protection mechanism in the server will be
@@ -1114,9 +1117,6 @@ RFC 8613                         OSCORE                         May 2019
       notification.  Alternatively, the server MAY send a new
       notification.
 
-   o  An intermediary node is not able to initiate an OSCORE-protected
-      Observe cancellation (Observe with value 1) that verifies as
-
 
 
 Selander, et al.             Standards Track                   [Page 20]
@@ -1124,12 +1124,14 @@ Selander, et al.             Standards Track                   [Page 20]
 RFC 8613                         OSCORE                         May 2019
 
 
-      coming from the client.  An application MAY decide to allow
-      intermediaries to cancel Observe registrations, e.g., to send
-      Observe with value 1 (see Section 3.6 of [RFC7641]); however, that
-      can also be done with other methods, e.g., reusing the Token in a
-      different request or sending a RST message.  This is out of scope
-      for this specification.
+   o  An intermediary node is not able to initiate an OSCORE-protected
+      Observe cancellation (Observe option with value 1) that verifies
+      as coming from the client.  An application MAY decide to allow
+      intermediaries to cancel Observe registrations, e.g., to send the
+      Observe option with value 1 (see Section 3.6 of [RFC7641]);
+      however, that can also be done with other methods, e.g., reusing
+      the Token in a different request or sending a RST message.  This
+      is out of scope for this specification.
 
 4.1.3.5.2.  Notifications
 
@@ -1143,13 +1145,13 @@ RFC 8613                         OSCORE                         May 2019
    details of replay protection of notifications are specified in
    Section 7.4.1.
 
-   For notifications, the Inner Observe value MUST be empty (see
-   Section 3.2 of [RFC7252]).  The Outer Observe in a notification is
-   needed for intermediary nodes to allow multiple responses to one
-   request, and it may be set to the value of Observe in the original
-   CoAP message.  The client performs ordering of notifications and
-   replay protection by comparing their Partial IVs and SHALL ignore the
-   Outer Observe value.
+   For notifications, the Inner Observe option value MUST be empty (see
+   Section 3.2 of [RFC7252]).  The Outer Observe option in a
+   notification is needed for intermediary nodes to allow multiple
+   responses to one request, and it may be set to the value of the
+   Observe option in the original CoAP message.  The client performs
+   ordering of notifications and replay protection by comparing their
+   Partial IVs and SHALL ignore the Outer Observe option value.
 
    If the client receives a response to an Observe request without an
    Inner Observe option, then it verifies the response as a non-Observe
@@ -1160,7 +1162,7 @@ RFC 8613                         OSCORE                         May 2019
    A client MUST consider the notification with the highest Partial IV
    as the freshest, regardless of the order of arrival.  In order to
    support existing Observe implementations, the OSCORE client
-   implementation MAY set the Observe value to the three least
+   implementation MAY set the Observe option value to the three least
    significant bytes of the Partial IV.  Implementations need to make
    sure that the notification without Partial IV is considered the
    oldest.
@@ -1169,8 +1171,6 @@ RFC 8613                         OSCORE                         May 2019
 
    No-Response [RFC7967] is an optional feature used by the client to
    communicate its disinterest in certain classes of responses to a
-   particular request.  An implementation MAY support [RFC7252] and the
-   OSCORE option without supporting [RFC7967].
 
 
 
@@ -1179,6 +1179,9 @@ Selander, et al.             Standards Track                   [Page 21]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   particular request.  An implementation MAY support [RFC7252] and the
+   OSCORE option without supporting [RFC7967].
 
    If used, No-Response MUST be Inner.  The Inner No-Response SHALL be
    processed by OSCORE as specified in Section 4.1.1.  The Outer option
@@ -1225,9 +1228,6 @@ RFC 8613                         OSCORE                         May 2019
 
    Most CoAP header fields (i.e., the message fields in the fixed 4-byte
    header) are required to be read and/or changed by CoAP proxies; thus,
-   they cannot, in general, be protected end-to-end from one endpoint to
-   the other.  As mentioned in Section 1, OSCORE protects the CoAP
-   request/response layer only and not the messaging layer (Section 2 of
 
 
 
@@ -1236,6 +1236,9 @@ Selander, et al.             Standards Track                   [Page 22]
 RFC 8613                         OSCORE                         May 2019
 
 
+   they cannot, in general, be protected end-to-end from one endpoint to
+   the other.  As mentioned in Section 1, OSCORE protects the CoAP
+   request/response layer only and not the messaging layer (Section 2 of
    [RFC7252]), so fields such as Type and Message ID are not protected
    with OSCORE.
 
@@ -1280,9 +1283,6 @@ RFC 8613                         OSCORE                         May 2019
       Settings Message (CSM) SHALL be sent.  The subsequent signaling
       message SHALL be protected.
 
-   o  Signaling messages SHALL be protected as CoAP request messages,
-      except in the case in which the Signaling message is a response to
-      a previous Signaling message; then it SHALL be protected as a CoAP
 
 
 
@@ -1292,6 +1292,9 @@ Selander, et al.             Standards Track                   [Page 23]
 RFC 8613                         OSCORE                         May 2019
 
 
+   o  Signaling messages SHALL be protected as CoAP request messages,
+      except in the case in which the Signaling message is a response to
+      a previous Signaling message; then it SHALL be protected as a CoAP
       response message.  For example, 7.02 (Ping) is protected as a CoAP
       request and 7.03 (Pong) as a CoAP response.
 
@@ -1337,9 +1340,6 @@ RFC 8613                         OSCORE                         May 2019
          Sequence Number.  All leading bytes of value zero SHALL be
          removed when encoding the Partial IV, except in the case of
          Partial IV value 0, which is encoded to the byte string 0x00.
-         This parameter SHALL be present in requests.  The Partial IV
-         SHALL be present in responses to Observe registrations (see
-         Section 4.1.3.5.1); otherwise, the Partial IV will not
 
 
 
@@ -1348,6 +1348,9 @@ Selander, et al.             Standards Track                   [Page 24]
 RFC 8613                         OSCORE                         May 2019
 
 
+         This parameter SHALL be present in requests.  The Partial IV
+         SHALL be present in responses to Observe registrations (see
+         Section 4.1.3.5.1); otherwise, the Partial IV will not
          typically be present in responses (for one exception, see
          Appendix B.1.2).
 
@@ -1393,9 +1396,6 @@ RFC 8613                         OSCORE                         May 2019
    input parameters and in the derivation of the security context (see
    Section 3.2).
 
-   While the 'kid' parameter is used to transport the Sender ID, the new
-   COSE header parameter 'kid context' is used to transport the ID
-   Context in requests, see Figure 7.
 
 
 
@@ -1403,6 +1403,10 @@ Selander, et al.             Standards Track                   [Page 25]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   While the 'kid' parameter is used to transport the Sender ID, the new
+   COSE header parameter 'kid context' is used to transport the ID
+   Context in requests, see Figure 7.
 
    +----------+--------+------------+----------------+-----------------+
    |   Name   |  Label | Value Type | Value Registry |   Description   |
@@ -1448,10 +1452,6 @@ RFC 8613                         OSCORE                         May 2019
    when there is a single response to a request), the request and the
    response should typically use the same nonce to reduce message
    overhead.  Both alternatives provide all the required security
-   properties, see Section 7.4 and Appendix D.4.  The only non-Observe
-   scenario where a Partial IV must be included in a response is when
-   the server is unable to perform replay protection, see
-   Appendix B.1.2.  For processing instructions see Section 8.
 
 
 
@@ -1459,6 +1459,11 @@ Selander, et al.             Standards Track                   [Page 26]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   properties, see Section 7.4 and Appendix D.4.  The only non-Observe
+   scenario where a Partial IV must be included in a response is when
+   the server is unable to perform replay protection, see
+   Appendix B.1.2.  For processing instructions see Section 8.
 
               <- nonce length minus 6 B -> <-- 5 bytes -->
          +---+-------------------+--------+---------+-----+
@@ -1497,6 +1502,20 @@ RFC 8613                         OSCORE                         May 2019
    NOTE: The plaintext contains all CoAP data that needs to be encrypted
    end-to-end between the endpoints.
 
+
+
+
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 27]
+
+RFC 8613                         OSCORE                         May 2019
+
+
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1508,13 +1527,6 @@ RFC 8613                         OSCORE                         May 2019
         is payload)
 
                             Figure 9: Plaintext
-
-
-
-Selander, et al.             Standards Track                   [Page 27]
-
-RFC 8613                         OSCORE                         May 2019
-
 
 5.4.  Additional Authenticated Data
 
@@ -1551,6 +1563,15 @@ RFC 8613                         OSCORE                         May 2019
 
    o  options: contains the Class I options (see Section 4.1.2) present
       in the original CoAP message encoded as described in Section 3.1
+
+
+
+
+Selander, et al.             Standards Track                   [Page 28]
+
+RFC 8613                         OSCORE                         May 2019
+
+
       of [RFC7252], where the delta is the difference from the
       previously included instance of class I option.
 
@@ -1564,13 +1585,6 @@ RFC 8613                         OSCORE                         May 2019
 
    The Additional Authenticated Data (AAD) is composed from the
    external_aad as described in Section 5.3 of [RFC8152]:
-
-
-
-Selander, et al.             Standards Track                   [Page 28]
-
-RFC 8613                         OSCORE                         May 2019
-
 
       AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 
@@ -1606,6 +1620,14 @@ RFC 8613                         OSCORE                         May 2019
    support a large number of different stateless use cases and is not
    fully optimized for use as a stateful security protocol, leading to a
    larger than necessary message expansion.  In this section, we define
+
+
+
+Selander, et al.             Standards Track                   [Page 29]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    a stateless header compression mechanism, simply removing redundant
    information from the COSE objects, which significantly reduces the
    per-packet overhead.  The result of applying this mechanism to a COSE
@@ -1615,18 +1637,6 @@ RFC 8613                         OSCORE                         May 2019
    option and in the Payload.  The Payload contains the ciphertext of
    the COSE object.  The headers of the COSE object are compactly
    encoded as described in the next section.
-
-
-
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 29]
-
-RFC 8613                         OSCORE                         May 2019
-
 
 6.1.  Encoding of the OSCORE Option Value
 
@@ -1667,6 +1677,13 @@ RFC 8613                         OSCORE                         May 2019
          to 1, the message is considered to be malformed and
          decompression fails as specified in item 2 of Section 8.2.
 
+
+
+Selander, et al.             Standards Track                   [Page 30]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    The flag bits are registered in the "OSCORE Flag Bits" registry
    specified in Section 13.7.
 
@@ -1675,14 +1692,6 @@ RFC 8613                         OSCORE                         May 2019
 
    o  The following 1 byte encodes the length s of the 'kid context'
       (Section 5.1), if the 'kid context' flag is set (h = 1).
-
-
-
-
-Selander, et al.             Standards Track                   [Page 30]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    o  The following s bytes encode the 'kid context', if the 'kid
       context' flag is set (h = 1).
@@ -1719,15 +1728,6 @@ RFC 8613                         OSCORE                         May 2019
    1.  Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid =
        0x25, and Partial IV = 0x05
 
-       Before compression (24 bytes):
-
-         [
-           h'',
-           { 4:h'25', 6:h'05' },
-           h'aea0155667924dff8a24e4cb35b9',
-         ]
-
-
 
 
 
@@ -1739,6 +1739,14 @@ Selander, et al.             Standards Track                   [Page 31]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+       Before compression (24 bytes):
+
+         [
+           h'',
+           { 4:h'25', 6:h'05' },
+           h'aea0155667924dff8a24e4cb35b9',
+         ]
 
        After compression (17 bytes):
 
@@ -1778,6 +1786,16 @@ RFC 8613                         OSCORE                         May 2019
            h'aea0155667924dff8a24e4cb35b9',
          ]
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 32]
+
+RFC 8613                         OSCORE                         May 2019
+
+
        After compression (22  bytes):
 
          Flag byte: 0b00011001 = 0x19 (1 byte)
@@ -1788,13 +1806,6 @@ RFC 8613                         OSCORE                         May 2019
 
    4.  Response with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and no
        Partial IV
-
-
-
-Selander, et al.             Standards Track                   [Page 32]
-
-RFC 8613                         OSCORE                         May 2019
-
 
        Before compression (18 bytes):
 
@@ -1831,6 +1842,16 @@ RFC 8613                         OSCORE                         May 2019
 
          Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 33]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 7.  Message Binding, Sequence Numbers, Freshness, and Replay Protection
 
 7.1.  Message Binding
@@ -1841,16 +1862,6 @@ RFC 8613                         OSCORE                         May 2019
    the 'kid' and Partial IV of the request in the AAD of the response.
    Therefore, the server needs to store the 'kid' and Partial IV of the
    request until all responses have been sent.
-
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 33]
-
-RFC 8613                         OSCORE                         May 2019
-
 
 7.2.  Sequence Numbers
 
@@ -1888,6 +1899,15 @@ RFC 8613                         OSCORE                         May 2019
    server created the response before receiving the request, i.e., it
    does not verify server aliveness.
 
+
+
+
+
+Selander, et al.             Standards Track                   [Page 34]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    For requests and notifications, OSCORE also provides relative
    freshness in the sense that the received Partial IV allows a
    recipient to determine the relative order of requests or responses.
@@ -1900,14 +1920,6 @@ RFC 8613                         OSCORE                         May 2019
    COSE object (see Section 6.1) has not been received before.  If this
    verification fails, the server SHALL stop processing the message, and
    it MAY optionally respond with a 4.01 (Unauthorized) error message.
-
-
-
-Selander, et al.             Standards Track                   [Page 34]
-
-RFC 8613                         OSCORE                         May 2019
-
-
    Also, the server MAY set an Outer Max-Age option with value zero to
    inform any intermediary that the response is not to be cached.  The
    diagnostic payload MAY contain the string "Replay detected".  The
@@ -1931,7 +1943,8 @@ RFC 8613                         OSCORE                         May 2019
 
 7.4.1.  Replay Protection of Notifications
 
-   The following applies additionally when Observe is supported.
+   The following applies additionally when the Observe option is
+   supported.
 
    The Notification Number is initialized to the Partial IV of the first
    successfully verified notification in response to the registration
@@ -1944,6 +1957,13 @@ RFC 8613                         OSCORE                         May 2019
    Applications MAY decide that a client only processes notifications
    that have a greater Partial IV than the Notification Number.
 
+
+
+Selander, et al.             Standards Track                   [Page 35]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    If the verification of the response succeeds, and the received
    Partial IV was greater than the Notification Number, then the client
    SHALL overwrite the corresponding Notification Number with the
@@ -1955,15 +1975,6 @@ RFC 8613                         OSCORE                         May 2019
    acceptance of replayed messages, an endpoint needs to handle the
    situation of losing rapidly changing parts of the context, such as
    the Sender Sequence Number and Replay Window.  These are typically
-
-
-
-
-Selander, et al.             Standards Track                   [Page 35]
-
-RFC 8613                         OSCORE                         May 2019
-
-
    stored in RAM and therefore lost in the case of, e.g., an unplanned
    reboot.  There are different alternatives to recover, for example:
 
@@ -2002,6 +2013,13 @@ RFC 8613                         OSCORE                         May 2019
    exchange protocol is necessary for deployments that require forward
    secrecy.
 
+
+
+Selander, et al.             Standards Track                   [Page 36]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 8.  Processing
 
    This section describes the OSCORE message processing.  Additional
@@ -2012,14 +2030,6 @@ RFC 8613                         OSCORE                         May 2019
    endpoints MUST keep the association (Token, {Security Context,
    Partial IV of the request}), in order to be able to find the Security
    Context and compute the AAD to protect or verify the response.  The
-
-
-
-Selander, et al.             Standards Track                   [Page 36]
-
-RFC 8613                         OSCORE                         May 2019
-
-
    association MAY be forgotten after it has been used to successfully
    protect or verify the response, with the exception of Observe
    processing, where the association MUST be kept as long as the
@@ -2059,6 +2069,13 @@ RFC 8613                         OSCORE                         May 2019
        If-Match Outer option is discarded, but an Uri-Host Outer option
        is not discarded.
 
+
+
+Selander, et al.             Standards Track                   [Page 37]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    2.  Decompress the COSE object (Section 6) and retrieve the Recipient
        Context associated with the Recipient ID in the 'kid' parameter,
        additionally using the 'kid context', if present.  If either the
@@ -2066,15 +2083,6 @@ RFC 8613                         OSCORE                         May 2019
        fails to retrieve a Recipient Context with Recipient ID
        corresponding to the 'kid' parameter received, then the server
        SHALL stop processing the request.
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 37]
-
-RFC 8613                         OSCORE                         May 2019
-
 
        *  If either the decompression or the COSE message fails to
           decode, the server MAY respond with a 4.02 (Bad Option) error
@@ -2116,6 +2124,14 @@ RFC 8613                         OSCORE                         May 2019
 
    8.  The decrypted CoAP request is processed according to [RFC7252].
 
+
+
+
+Selander, et al.             Standards Track                   [Page 38]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 8.2.1.  Supporting Block-wise
 
    If Block-wise is supported, insert the following step before any
@@ -2124,13 +2140,6 @@ RFC 8613                         OSCORE                         May 2019
    A.  If Block-wise is present in the request, then process the Outer
    Block options according to [RFC7959], until all blocks of the request
    have been received (see Section 4.1.3.4).
-
-
-
-Selander, et al.             Standards Track                   [Page 38]
-
-RFC 8613                         OSCORE                         May 2019
-
 
 8.3.  Protecting the Response
 
@@ -2171,15 +2180,6 @@ RFC 8613                         OSCORE                         May 2019
    If Observe is supported, insert the following step between step 2 and
    3 of Section 8.3:
 
-   A.  If the response is an observe notification:
-
-   o  If the response is the first notification:
-
-      *  compute the AEAD nonce as described in Section 5.2:
-
-         +  Either use the AEAD nonce from the request, or
-
-
 
 
 
@@ -2187,6 +2187,14 @@ Selander, et al.             Standards Track                   [Page 39]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   A.  If the response is an Observe notification:
+
+   o  If the response is the first notification:
+
+      *  compute the AEAD nonce as described in Section 5.2:
+
+         +  Either use the AEAD nonce from the request, or
 
          +  Encode the Partial IV (Sender Sequence Number in network
             byte order) and increment the Sender Sequence Number by one.
@@ -2228,14 +2236,6 @@ RFC 8613                         OSCORE                         May 2019
           nonce from the Recipient ID, Common IV, and the 'Partial IV'
           parameter, received in the COSE object.
 
-   5.  Decrypt the COSE object using the Recipient Key, as per
-       Section 5.3 [RFC8152].  (The decrypt operation includes the
-       verification of the integrity.)  If decryption fails, then go to
-       8.
-
-   6.  Add decrypted Code, options and payload to the decrypted request.
-       The OSCORE option is removed.
-
 
 
 
@@ -2243,6 +2243,14 @@ Selander, et al.             Standards Track                   [Page 40]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   5.  Decrypt the COSE object using the Recipient Key, as per
+       Section 5.3 [RFC8152].  (The decrypt operation includes the
+       verification of the integrity.)  If decryption fails, then go to
+       8.
+
+   6.  Add decrypted Code, options and payload to the decrypted request.
+       The OSCORE option is removed.
 
    7.  The decrypted CoAP response is processed according to [RFC7252].
 
@@ -2266,13 +2274,13 @@ RFC 8613                         OSCORE                         May 2019
 
    A.  If the request was an Observe registration, then:
 
-   o  If the Partial IV is not present in the response, and Inner
-      Observe is present, and the AEAD nonce from the request was
+   o  If the Partial IV is not present in the response, and the Inner
+      Observe option is present, and the AEAD nonce from the request was
       already used once, then go to 8.
 
-   o  If the Partial IV is present in the response and Inner Observe is
-      present, then follow the processing described in Section 4.1.3.5.2
-      and Section 7.4.1, then:
+   o  If the Partial IV is present in the response and the Inner Observe
+      option is present, then follow the processing described in
+      Section 4.1.3.5.2 and Section 7.4.1, then:
 
       *  initialize the Notification Number (if first successfully
          verified notification), or
@@ -2284,14 +2292,6 @@ RFC 8613                         OSCORE                         May 2019
 
    B.  In case any of the previous erroneous conditions apply: the
    client SHALL stop processing the response.  An error condition
-   occurring while processing a response to an observation request does
-   not cancel the observation.  A client MUST NOT react to failure by
-   re-registering the observation immediately.
-
-
-
-
-
 
 
 
@@ -2299,6 +2299,10 @@ Selander, et al.             Standards Track                   [Page 41]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   occurring while processing a response to an observation request does
+   not cancel the observation.  A client MUST NOT react to failure by
+   re-registering the observation immediately.
 
 9.  Web Linking
 
@@ -2343,10 +2347,6 @@ RFC 8613                         OSCORE                         May 2019
 
    However, not all CoAP proxy operations are useful:
 
-   o  Since a CoAP response is only applicable to the original CoAP
-      request, caching is in general not useful.  In support of existing
-      proxies, OSCORE uses the Outer Max-Age option, see
-      Section 4.1.3.1.
 
 
 
@@ -2355,6 +2355,11 @@ Selander, et al.             Standards Track                   [Page 42]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   o  Since a CoAP response is only applicable to the original CoAP
+      request, caching is in general not useful.  In support of existing
+      proxies, OSCORE uses the Outer Max-Age option, see
+      Section 4.1.3.1.
 
    o  Proxy processing of the (Outer) Observe option as defined in
       [RFC7641] is specified in Section 4.1.3.5.
@@ -2398,11 +2403,6 @@ RFC 8613                         OSCORE                         May 2019
    payload (see Section 6.2).  No additional semantics are provided by
    other message fields.
 
-   Using the Augmented Backus-Naur Form (ABNF) notation of [RFC5234],
-   including the following core ABNF syntax rules defined by that
-   specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP
-   OSCORE header field value is as follows.
-
 
 
 
@@ -2411,6 +2411,11 @@ Selander, et al.             Standards Track                   [Page 43]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   Using the Augmented Backus-Naur Form (ABNF) notation of [RFC5234],
+   including the following core ABNF syntax rules defined by that
+   specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP
+   OSCORE header field value is as follows.
 
    base64url-char = ALPHA / DIGIT / "-" / "_"
 
@@ -2455,11 +2460,6 @@ RFC 8613                         OSCORE                         May 2019
    redirect is not defined for CoAP servers [RFC7252], an HTTP client
    receiving a redirect should generate a new OSCORE request for the
    server it was redirected to.
-
-
-
-
-
 
 
 
@@ -3656,7 +3656,7 @@ B.1.3.  Notifications
    booting:
 
    o  The client forgets about earlier registrations and removes all
-      Notification Numbers and registers using Observe.
+      Notification Numbers and registers using the Observe option.
 
 B.2.  Security Context Derived Multiple Times
 
@@ -4833,9 +4833,9 @@ RFC 8613                         OSCORE                         May 2019
 
    o  Observe.  The Outer Observe option is intended for a proxy to
       support forwarding of Observe messages, but it is ignored by the
-      endpoints since the Inner Observe determines the processing in the
-      endpoints.  Since the Partial IV provides absolute ordering of
-      notifications, it is not possible for an intermediary to spoof
+      endpoints since the Inner Observe option determines the processing
+      in the endpoints.  Since the Partial IV provides absolute ordering
+      of notifications, it is not possible for an intermediary to spoof
       reordering (see Section 4.1.3.5).  The absence of Partial IV,
       since only allowed for the first notification, does not prevent
       correct ordering of notifications.  The size and distributions of
