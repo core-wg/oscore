@@ -4828,8 +4828,8 @@ RFC 8613                         OSCORE                         May 2019
       Uri-Port may be changed by an adversary, and the application needs
       to handle the consequences of that (see Section 4.1.3.2).  The
       Uri-Host may either be omitted, reveal information equivalent to
-      that of the IP address or more privacy-sensitive information,
-      which is discouraged.
+      that of the IP address, or reveal more privacy-sensitive
+      information, which is discouraged.
 
    o  Observe.  The Outer Observe option is intended for a proxy to
       support forwarding of Observe messages, but it is ignored by the
