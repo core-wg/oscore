@@ -1238,9 +1238,9 @@ RFC 8613                         OSCORE                         May 2019
 
    they cannot, in general, be protected end-to-end from one endpoint to
    the other.  As mentioned in Section 1, OSCORE protects the CoAP
-   request/response layer only and not the messaging layer (Section 2 of
-   [RFC7252]), so fields such as Type and Message ID are not protected
-   with OSCORE.
+   request/response layer only and not the CoAP messaging layer
+   (Section 2 of [RFC7252]), so fields such as Type and Message ID are
+   not protected with OSCORE.
 
    The CoAP header field Code is protected by OSCORE.  Code SHALL be
    encrypted and integrity protected (Class E) to prevent an
@@ -3458,16 +3458,16 @@ A.1.  Secure Access to Sensor
 
                     Figure 12: Secure Access to Sensor
 
-   The request/response Codes are encrypted by OSCORE and only dummy
-   Codes (POST/Changed) are visible in the header of the OSCORE message.
-   The option Uri-Path ("alarm_status") and payload ("0") are encrypted.
+   The CoAP request/response Codes are encrypted by OSCORE and only
+   dummy Codes (POST/Changed) are visible in the header of the OSCORE
+   message.  The option Uri-Path ("alarm_status") and payload ("0") are
+   encrypted.
 
    The COSE header of the request contains an identifier (5f),
    indicating which security context was used to protect the message and
    a Partial IV (42).
 
-   The server verifies the request as specified in Section 8.2.  The
-   client verifies the response as specified in Section 8.4.
+
 
 
 
@@ -3475,6 +3475,9 @@ Selander, et al.             Standards Track                   [Page 62]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   The server verifies the request as specified in Section 8.2.  The
+   client verifies the response as specified in Section 8.4.
 
 A.2.  Secure Subscribe to Sensor
 
@@ -3521,9 +3524,6 @@ A.2.  Secure Subscribe to Sensor
         |       |       |                   Content-Format:0, "180"}
         |       |       |
         |<------+       |            Code: 2.05 (Content)
-        |  2.05 |       |           Token: 0x83
-        |       |       |         Observe: 8
-        |       |       |          OSCORE: [Partial IV:36]
 
 
 
@@ -3532,6 +3532,9 @@ Selander, et al.             Standards Track                   [Page 63]
 RFC 8613                         OSCORE                         May 2019
 
 
+        |  2.05 |       |           Token: 0x83
+        |       |       |         Observe: 8
+        |       |       |          OSCORE: [Partial IV:36]
         |       |       |         Payload: {Code:2.05,
         |       |       |                   Content-Format:0, "180"}
         |       |       |
@@ -3576,9 +3579,6 @@ B.1.1.  Sender Sequence Number
    implement procedures for writing to non-volatile memory during normal
    operations and updating the security context after reboot, provided
    that the procedures comply with the requirements on the security
-   context parameters (Section 3.3).  This section gives an example of
-   such a procedure.
-
 
 
 
@@ -3587,6 +3587,9 @@ Selander, et al.             Standards Track                   [Page 64]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   context parameters (Section 3.3).  This section gives an example of
+   such a procedure.
 
    There are known issues related to writing to non-volatile memory.
    For example, flash drives may have a limited number of erase
@@ -3633,9 +3636,6 @@ B.1.2.  Replay Window
 
    o  For each stored security context, the first time after booting,
       the server receives an OSCORE request, the server responds with an
-      OSCORE protected 4.01 (Unauthorized), containing only the Echo
-      option [CoAP-ECHO-REQ-TAG] and no diagnostic payload.  The server
-      MUST use its Partial IV when generating the AEAD nonce and MUST
 
 
 
@@ -3644,6 +3644,9 @@ Selander, et al.             Standards Track                   [Page 65]
 RFC 8613                         OSCORE                         May 2019
 
 
+      OSCORE protected 4.01 (Unauthorized), containing only the Echo
+      option [CoAP-ECHO-REQ-TAG] and no diagnostic payload.  The server
+      MUST use its Partial IV when generating the AEAD nonce and MUST
       include the Partial IV in the response (see Section 5).  If the
       server with use of the Echo option can verify a second OSCORE
       request as fresh, then the Partial IV of the second request is set
@@ -3689,9 +3692,6 @@ B.2.  Security Context Derived Multiple Times
    of input parameters (including Master Secret, Sender and Recipient
    Identifiers), then a randomized ID Context ensures that the security
    context is different for each deployment.
-
-
-
 
 
 
