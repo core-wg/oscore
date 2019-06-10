@@ -2391,17 +2391,17 @@ RFC 8613                         OSCORE                         May 2019
    the content of the CoAP OSCORE option when transporting OSCORE
    messages over HTTP hops.
 
-   The HTTP OSCORE header field is only used in POST requests and 200
-   (OK) responses.  When used, the HTTP header field Content-Type is set
-   to 'application/oscore' (see Section 13.5) indicating that the HTTP
-   body of this message contains the OSCORE payload (see Section 6.2).
-   No additional semantics are provided by other message fields.
+   The HTTP OSCORE header field is only used in POST requests and
+   responses with HTTP Status Code 200 (OK).  When used, the HTTP header
+   field Content-Type is set to 'application/oscore' (see Section 13.5)
+   indicating that the HTTP body of this message contains the OSCORE
+   payload (see Section 6.2).  No additional semantics are provided by
+   other message fields.
 
    Using the Augmented Backus-Naur Form (ABNF) notation of [RFC5234],
    including the following core ABNF syntax rules defined by that
    specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP
    OSCORE header field value is as follows.
-
 
 
 
@@ -2593,11 +2593,11 @@ RFC 8613                         OSCORE                         May 2019
      Content-Type: text/plain
      Body: Exterminate! Exterminate!
 
-   Note that the HTTP Status Code 200 in the next-to-last message is the
-   mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status Code 200
-   in the last message is the mapping of the CoAP Code 2.05 (Content),
-   which was encrypted within the compressed COSE object carried in the
-   Body of the HTTP response.
+   Note that the HTTP Status Code 200 (OK) in the next-to-last message
+   is the mapping of CoAP Code 2.04 (Changed), whereas the HTTP Status
+   Code 200 (OK) in the last message is the mapping of the CoAP Code
+   2.05 (Content), which was encrypted within the compressed COSE object
+   carried in the Body of the HTTP response.
 
 11.6.  Example: CoAP Client and HTTP Server
 
@@ -2662,7 +2662,7 @@ RFC 8613                         OSCORE                         May 2019
      Payload: Exterminate! Exterminate!
 
    Note that the HTTP Code 2.04 (Changed) in the next-to-last message is
-   the mapping of HTTP Status Code 200, whereas the CoAP Code 2.05
+   the mapping of HTTP Status Code 200 (OK), whereas the CoAP Code 2.05
    (Content) in the last message is the value that was encrypted within
    the compressed COSE object carried in the Body of the HTTP response.
 
