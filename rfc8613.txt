@@ -3604,7 +3604,7 @@ RFC 8613                         OSCORE                         May 2019
 
    o  Before using a Sender Sequence Number that is evenly divisible by
       K, where K is a positive integer, store the Sender Sequence Number
-      (SSN1) in no n-volatile memory.  After boot, the endpoint
+      (SSN1) in no n-volatile memory.  After booting, the endpoint
       initiates the new Sender Sequence Number (SSN2) to the value
       stored in persistent memory plus K plus F: SSN2 = SSN1 + K + F,
       where F is a positive integer.
@@ -3625,14 +3625,14 @@ B.1.2.  Replay Window
 
    In case of loss of security context on the server, to prevent
    accepting replay of previously received requests, the server may
-   perform the following procedure after boot:
+   perform the following procedure after booting:
 
    o  The server updates its Sender Sequence Number as specified in
       Appendix B.1.1 to be used as Partial IV in the response containing
       the Echo option (next bullet).
 
-   o  For each stored security context, the first time after boot, the
-      server receives an OSCORE request, the server responds with an
+   o  For each stored security context, the first time after booting,
+      the server receives an OSCORE request, the server responds with an
       OSCORE protected 4.01 (Unauthorized), containing only the Echo
       option [CoAP-ECHO-REQ-TAG] and no diagnostic payload.  The server
       MUST use its Partial IV when generating the AEAD nonce and MUST
@@ -3653,7 +3653,7 @@ B.1.3.  Notifications
 
    To prevent the acceptance of replay of previously received
    notifications, the client may perform the following procedure after
-   boot:
+   booting:
 
    o  The client forgets about earlier registrations and removes all
       Notification Numbers and registers using Observe.
