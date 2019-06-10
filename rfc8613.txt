@@ -1910,7 +1910,7 @@ RFC 8613                         OSCORE                         May 2019
 
    Also, the server MAY set an Outer Max-Age option with value zero to
    inform any intermediary that the response is not to be cached.  The
-   diagnostic payload MAY contain the "Replay detected" string.  The
+   diagnostic payload MAY contain the string "Replay detected".  The
    size and type of the Replay Window depends on the use case and the
    protocol with which the OSCORE message is transported.  In case of
    reliable and ordered transport from endpoint to endpoint, e.g., TCP,
@@ -2105,8 +2105,8 @@ RFC 8613                         OSCORE                         May 2019
        *  If decryption fails, the server MUST stop processing the
           request and MAY respond with a 4.00 (Bad Request) error
           message.  The server MAY set an Outer Max-Age option with
-          value zero.  The diagnostic payload MAY contain the
-          "Decryption failed" string.
+          value zero.  The diagnostic payload MAY contain the string
+          "Decryption failed".
 
        *  If decryption succeeds, update the Replay Window, as described
           in Section 7.
