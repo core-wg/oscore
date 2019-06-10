@@ -198,14 +198,15 @@ RFC 8613                         OSCORE                         May 2019
    end-to-end security for CoAP messages through some types of
    intermediary nodes is performed in [CoAP-E2E-Sec].  OSCORE
    essentially protects the RESTful interactions: the request method,
-   the requested resource, the message payload, etc. (see Section 4).
-   OSCORE protects neither the CoAP Messaging Layer nor the CoAP Token,
-   which may change between the endpoints; therefore, those are
-   processed as defined in [RFC7252].  Additionally, since the message
-   formats for CoAP over unreliable transport [RFC7252] and for CoAP
-   over reliable transport [RFC8323] differ only in terms of CoAP
-   Messaging Layer, OSCORE can be applied to both unreliable and
-   reliable transports (see Figure 1).
+   the requested resource, the message payload, etc. (see Section 4),
+   where "RESTful" refers to the Representational State Transfer (REST)
+   Architecture [REST].  OSCORE protects neither the CoAP Messaging
+   Layer nor the CoAP Token, which may change between the endpoints;
+   therefore, those are processed as defined in [RFC7252].
+   Additionally, since the message formats for CoAP over unreliable
+   transport [RFC7252] and for CoAP over reliable transport [RFC8323]
+   differ only in terms of CoAP Messaging Layer, OSCORE can be applied
+   to both unreliable and reliable transports (see Figure 1).
 
    OSCORE works in very constrained nodes and networks, thanks to its
    small message size and the restricted code and memory requirements in
@@ -216,7 +217,6 @@ RFC 8613                         OSCORE                         May 2019
    HTTP.  OSCORE messages may be transported in HTTP, and OSCORE may
    also be used to protect CoAP-mappable HTTP messages, as described
    below.
-
 
 
 
@@ -328,9 +328,9 @@ RFC 8613                         OSCORE                         May 2019
    that the message is not passed up to the CoAP Request/Response Layer
    (see Figure 1).
 
-   The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender
-   ID/Key, Recipient ID/Key, ID Context, and Common IV are defined in
-   Section 3.1.
+   The terms Common Context, Sender Context, Recipient Context, Master
+   Secret, Master Salt, Sender ID, Sender Key, Recipient ID, Recipient
+   Key, ID Context, and Common IV are defined in Section 3.1.
 
 
 
@@ -638,8 +638,8 @@ RFC 8613                         OSCORE                         May 2019
 
       output parameter = HMAC-SHA-256(PRK, info || 0x01)
 
-   where different info are used for each derived parameter and where ||
-   denotes byte string concatenation.
+   where different values of 'info' are used for each derived parameter
+   and where || denotes byte string concatenation.
 
    Note that [RFC5869] specifies that if the salt is not provided, it is
    set to a string of zeros.  For implementation purposes, not providing
@@ -1088,9 +1088,10 @@ RFC 8613                         OSCORE                         May 2019
 
    Intermediaries are not assumed to have access to the OSCORE security
    context used by the endpoints; thus, they cannot make requests or
-   transform responses with the OSCORE option which verify at the
-   receiving endpoint as coming from the other endpoint.  This has the
-   following consequences and limitations for Observe operations.
+   transform responses with the OSCORE option that pass verification (at
+   the receiving endpoint) as having come from the other endpoint.  This
+   has the following consequences and limitations for Observe
+   operations.
 
    o  An intermediary node removing the Outer Observe 0 does not change
       the registration request to a request without Observe (see
@@ -1115,7 +1116,6 @@ RFC 8613                         OSCORE                         May 2019
 
    o  An intermediary node is not able to initiate an OSCORE-protected
       Observe cancellation (Observe with value 1) that verifies as
-      coming from the client.  An application MAY decide to allow
 
 
 
@@ -1124,6 +1124,7 @@ Selander, et al.             Standards Track                   [Page 20]
 RFC 8613                         OSCORE                         May 2019
 
 
+      coming from the client.  An application MAY decide to allow
       intermediaries to cancel Observe registrations, e.g., to send
       Observe with value 1 (see Section 3.6 of [RFC7641]); however, that
       can also be done with other methods, e.g., reusing the Token in a
@@ -1170,7 +1171,6 @@ RFC 8613                         OSCORE                         May 2019
    communicate its disinterest in certain classes of responses to a
    particular request.  An implementation MAY support [RFC7252] and the
    OSCORE option without supporting [RFC7967].
-
 
 
 
@@ -1225,8 +1225,8 @@ RFC 8613                         OSCORE                         May 2019
 
    Most CoAP Header fields (i.e., the message fields in the fixed 4-byte
    header) are required to be read and/or changed by CoAP proxies; thus,
-   they cannot, in general, be protected end-to-end between the
-   endpoints.  As mentioned in Section 1, OSCORE protects the CoAP
+   they cannot, in general, be protected end-to-end from one endpoint to
+   the other.  As mentioned in Section 1, OSCORE protects the CoAP
    Request/Response Layer only and not the Messaging Layer (Section 2 of
 
 
@@ -1424,7 +1424,8 @@ RFC 8613                         OSCORE                         May 2019
 5.2.  AEAD Nonce
 
    The high-level design of the AEAD nonce follows Section 4.4 of
-   [IV-GEN], here follows the detailed construction (see Figure 8):
+   [IV-GEN].  The detailed construction of the AEAD nonce is presented
+   here (see Figure 8):
 
    1.  left-pad the Partial IV (PIV) with zeroes to exactly 5 bytes,
 
@@ -1451,7 +1452,6 @@ RFC 8613                         OSCORE                         May 2019
    scenario where a Partial IV must be included in a response is when
    the server is unable to perform replay protection, see
    Appendix B.1.2.  For processing instructions see Section 8.
-
 
 
 
@@ -1673,8 +1673,8 @@ RFC 8613                         OSCORE                         May 2019
    o  The following n bytes encode the value of the Partial IV, if the
       Partial IV is present (n > 0).
 
-   o  The following 1 byte encodes the length of the 'kid context'
-      (Section 5.1) s, if the 'kid context' flag is set (h = 1).
+   o  The following 1 byte encodes the length s of the 'kid context'
+      (Section 5.1), if the 'kid context' flag is set (h = 1).
 
 
 
@@ -1694,10 +1694,10 @@ RFC 8613                         OSCORE                         May 2019
    value, even in the case in which reserved bits are used and
    additional fields are added to it.
 
-   Thus the length of the OSCORE option depends on the presence and
+   The length of the OSCORE option thus depends on the presence and
    length of Partial IV, 'kid context', 'kid', as specified in this
-   section, and on the presence and length of the other parameters, as
-   defined in the separate documents.
+   section, and on the presence and length of additional parameters, as
+   defined in the future documents registering those parameters.
 
 6.2.  Encoding of the OSCORE Payload
 
@@ -1774,7 +1774,7 @@ RFC 8613                         OSCORE                         May 2019
 
          [
            h'',
-           { 4:h'', 6:h'05', 8:h'44616c656b' },
+           { 4:h'', 6:h'05', 10:h'44616c656b' },
            h'aea0155667924dff8a24e4cb35b9',
          ]
 
@@ -1895,11 +1895,11 @@ RFC 8613                         OSCORE                         May 2019
 7.4.  Replay Protection
 
    In order to protect from replay of requests, the server's Recipient
-   Context includes a Replay Window.  A server SHALL verify that a
-   Partial IV = Sender Sequence Number received in the COSE object has
-   not been received before.  If this verification fails, the server
-   SHALL stop processing the message, and it MAY optionally respond with
-   a 4.01 (Unauthorized) error message.  Also, the server MAY set an
+   Context includes a Replay Window.  A server SHALL verify that the
+   Sender Sequence Number received in the Partial IV parameter of the
+   COSE object (see Section 6.1) has not been received before.  If this
+   verification fails, the server SHALL stop processing the message, and
+   it MAY optionally respond with a 4.01 (Unauthorized) error message.
 
 
 
@@ -1908,17 +1908,18 @@ Selander, et al.             Standards Track                   [Page 34]
 RFC 8613                         OSCORE                         May 2019
 
 
-   Outer Max-Age option with value zero to inform any intermediary that
-   the response is not to be cached.  The diagnostic payload MAY contain
-   the "Replay detected" string.  The size and type of the Replay Window
-   depends on the use case and the protocol with which the OSCORE
-   message is transported.  In case of reliable and ordered transport
-   from endpoint to endpoint, e.g., TCP, the server MAY just store the
-   last received Partial IV and require that newly received Partial IVs
-   equal the last received Partial IV + 1.  However, in the case of
-   mixed reliable and unreliable transports and where messages may be
-   lost, such a replay mechanism may be too restrictive and the default
-   replay window may be more suitable (see Section 3.2.2).
+   Also, the server MAY set an Outer Max-Age option with value zero to
+   inform any intermediary that the response is not to be cached.  The
+   diagnostic payload MAY contain the "Replay detected" string.  The
+   size and type of the Replay Window depends on the use case and the
+   protocol with which the OSCORE message is transported.  In case of
+   reliable and ordered transport from endpoint to endpoint, e.g., TCP,
+   the server MAY just store the last received Partial IV and require
+   that newly received Partial IVs equal the last received Partial IV +
+   1.  However, in the case of mixed reliable and unreliable transports
+   and where messages may be lost, such a replay mechanism may be too
+   restrictive and the default replay window may be more suitable (see
+   Section 3.2.2).
 
    Responses (with or without Partial IV) are protected against replay
    as they are bound to the request and the fact that only a single
@@ -1954,8 +1955,7 @@ RFC 8613                         OSCORE                         May 2019
    acceptance of replayed messages, an endpoint needs to handle the
    situation of losing rapidly changing parts of the context, such as
    the Sender Sequence Number and Replay Window.  These are typically
-   stored in RAM and therefore lost in the case of, e.g., an unplanned
-   reboot.  There are different alternatives to recover, for example:
+
 
 
 
@@ -1963,6 +1963,9 @@ Selander, et al.             Standards Track                   [Page 35]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   stored in RAM and therefore lost in the case of, e.g., an unplanned
+   reboot.  There are different alternatives to recover, for example:
 
    1.  The endpoints can reuse an existing Security Context after
        updating the mutable parts of the security context (Sender
@@ -2009,9 +2012,6 @@ RFC 8613                         OSCORE                         May 2019
    endpoints MUST keep the association (Token, {Security Context,
    Partial IV of the request}), in order to be able to find the Security
    Context and compute the AAD to protect or verify the response.  The
-   association MAY be forgotten after it has been used to successfully
-   protect or verify the response, with the exception of Observe
-
 
 
 
@@ -2020,6 +2020,8 @@ Selander, et al.             Standards Track                   [Page 36]
 RFC 8613                         OSCORE                         May 2019
 
 
+   association MAY be forgotten after it has been used to successfully
+   protect or verify the response, with the exception of Observe
    processing, where the association MUST be kept as long as the
    Observation is active.
 
@@ -2065,9 +2067,7 @@ RFC 8613                         OSCORE                         May 2019
        corresponding to the 'kid' parameter received, then the server
        SHALL stop processing the request.
 
-       *  If either the decompression or the COSE message fails to
-          decode, the server MAY respond with a 4.02 (Bad Option) error
-          message.  The server MAY set an Outer Max-Age option with
+
 
 
 
@@ -2076,6 +2076,9 @@ Selander, et al.             Standards Track                   [Page 37]
 RFC 8613                         OSCORE                         May 2019
 
 
+       *  If either the decompression or the COSE message fails to
+          decode, the server MAY respond with a 4.02 (Bad Option) error
+          message.  The server MAY set an Outer Max-Age option with
           value zero.  The diagnostic payload MAY contain the string
           "Failed to decode COSE".
 
@@ -2121,9 +2124,6 @@ RFC 8613                         OSCORE                         May 2019
    A.  If Block-wise is present in the request, then process the Outer
    Block options according to [RFC7959], until all blocks of the request
    have been received (see Section 4.1.3.4).
-
-
-
 
 
 
@@ -3351,10 +3351,10 @@ RFC 8613                         OSCORE                         May 2019
               for Constrained Environments Framework", Work in
               Progress, draft-ietf-ace-oscore-profile-07, February 2019.
 
-   [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
-              Text on Security Considerations", BCP 72, RFC 3552,
-              DOI 10.17487/RFC3552, July 2003,
-              <https://www.rfc-editor.org/info/rfc3552>.
+   [REST]     Fielding, R., "Architectural Styles and the Design of
+              Network-based Software Architectures", Ph.D.
+              Dissertation, University of California, Irvine, 2010.
+
 
 
 
@@ -3363,6 +3363,11 @@ Selander, et al.             Standards Track                   [Page 60]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
+              Text on Security Considerations", BCP 72, RFC 3552,
+              DOI 10.17487/RFC3552, July 2003,
+              <https://www.rfc-editor.org/info/rfc3552>.
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
@@ -3407,11 +3412,6 @@ Appendix A.  Scenario Examples
    Section 2.2.1.1 of [CoAP-E2E-Sec].  The message exchanges are made,
    based on the assumption that there is a security context established
    between client and server.  For simplicity, these examples only
-   indicate the content of the messages without going into detail of the
-   (compressed) COSE message format.
-
-
-
 
 
 
@@ -3419,6 +3419,9 @@ Selander, et al.             Standards Track                   [Page 61]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   indicate the content of the messages without going into detail of the
+   (compressed) COSE message format.
 
 A.1.  Secure Access to Sensor
 
@@ -3465,9 +3468,6 @@ A.1.  Secure Access to Sensor
 
    The server verifies the request as specified in Section 8.2.  The
    client verifies the response as specified in Section 8.4.
-
-
-
 
 
 
