@@ -1655,11 +1655,11 @@ RFC 8613                         OSCORE                         May 2019
          reserved.
 
       *  The fourth least significant bit is the 'kid' flag, k.  It is
-         set to 1 if the kid is present in the compressed COSE object.
+         set to 1 if 'kid' is present in the compressed COSE object.
 
       *  The fifth least significant bit is the 'kid context' flag, h.
          It is set to 1 if the compressed COSE object contains a 'kid
-         context (see Section 5.1).
+         context' (see Section 5.1).
 
       *  The sixth-to-eighth least significant bits are reserved for
          future use.  These bits SHALL be set to zero when not in use.
