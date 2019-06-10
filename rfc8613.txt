@@ -162,7 +162,7 @@ RFC 8613                         OSCORE                         May 2019
      D.5.  Unprotected Message Fields  . . . . . . . . . . . . . . .  85
    Appendix E.  CDDL Summary . . . . . . . . . . . . . . . . . . . .  88
    Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  89
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  90
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  89
 
 
 
@@ -4923,7 +4923,7 @@ Appendix E.  CDDL Summary
 
    Data structure definitions in the present specification employ the
    CDDL language for conciseness and precision.  CDDL is defined in
-   [CDDL], which at the time of writing this appendix is in the process
+   [CDDL], which has not yet been published as an RFC.  Therefore, this
 
 
 
@@ -4932,9 +4932,8 @@ Selander, et al.             Standards Track                   [Page 88]
 RFC 8613                         OSCORE                         May 2019
 
 
-   of completion.  As the document is not yet available for a normative
-   reference, the present appendix defines the small subset of CDDL that
-   is being used in the present specification.
+   appendix defines the small subset of CDDL that is used in the present
+   specification.
 
    Within the subset being used here, a CDDL rule is of the form "name =
    type", where "name" is the name given to the "type".  A "type" can be
@@ -4976,6 +4975,7 @@ Acknowledgments
    Seitz had additional funding from the SSF project SEC4Factory under
    the grant RIT17-0032.
 
+Authors' Addresses
 
 
 
@@ -4987,8 +4987,6 @@ Selander, et al.             Standards Track                   [Page 89]
 
 RFC 8613                         OSCORE                         May 2019
 
-
-Authors' Addresses
 
    Goeran Selander
    Ericsson AB
@@ -5012,6 +5010,8 @@ Authors' Addresses
    RISE
 
    Email: ludwig.seitz@ri.se
+
+
 
 
 
