@@ -105,7 +105,7 @@ Table of Contents
    10. CoAP-to-CoAP Forwarding Proxy . . . . . . . . . . . . . . . .  42
    11. HTTP Operations . . . . . . . . . . . . . . . . . . . . . . .  43
      11.1.  The HTTP OSCORE Header Field . . . . . . . . . . . . . .  43
-     11.2.  CoAP-to-HTTP Mapping . . . . . . . . . . . . . . . . . .  44
+     11.2.  CoAP-to-HTTP Mapping . . . . . . . . . . . . . . . . . .  45
      11.3.  HTTP-to-CoAP Mapping . . . . . . . . . . . . . . . . . .  45
      11.4.  HTTP Endpoints . . . . . . . . . . . . . . . . . . . . .  45
 
@@ -119,18 +119,18 @@ RFC 8613                         OSCORE                         May 2019
      11.5.  Example: HTTP Client and CoAP Server . . . . . . . . . .  46
      11.6.  Example: CoAP Client and HTTP Server . . . . . . . . . .  47
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  48
-     12.1.  End-to-end Protection  . . . . . . . . . . . . . . . . .  48
+     12.1.  End-to-end Protection  . . . . . . . . . . . . . . . . .  49
      12.2.  Security Context Establishment . . . . . . . . . . . . .  49
-     12.3.  Master Secret  . . . . . . . . . . . . . . . . . . . . .  49
+     12.3.  Master Secret  . . . . . . . . . . . . . . . . . . . . .  50
      12.4.  Replay Protection  . . . . . . . . . . . . . . . . . . .  50
      12.5.  Client Aliveness . . . . . . . . . . . . . . . . . . . .  50
-     12.6.  Cryptographic Considerations . . . . . . . . . . . . . .  50
+     12.6.  Cryptographic Considerations . . . . . . . . . . . . . .  51
      12.7.  Message Segmentation . . . . . . . . . . . . . . . . . .  51
      12.8.  Privacy Considerations . . . . . . . . . . . . . . . . .  51
    13. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  52
      13.1.  COSE Header Parameters Registry  . . . . . . . . . . . .  52
-     13.2.  CoAP Option Numbers Registry . . . . . . . . . . . . . .  52
-     13.3.  CoAP Signaling Option Numbers Registry . . . . . . . . .  53
+     13.2.  CoAP Option Numbers Registry . . . . . . . . . . . . . .  53
+     13.3.  CoAP Signaling Option Numbers Registry . . . . . . . . .  54
      13.4.  Header Field Registrations . . . . . . . . . . . . . . .  54
      13.5.  Media Type Registration  . . . . . . . . . . . . . . . .  54
      13.6.  CoAP Content-Formats Registry  . . . . . . . . . . . . .  55
@@ -1184,7 +1184,7 @@ RFC 8613                         OSCORE                         May 2019
    processed by OSCORE as specified in Section 4.1.1.  The Outer option
    SHOULD NOT be present.  The server SHALL ignore the Outer No-Response
    option.  The client MAY set the Outer No-Response value to 26
-   ('suppress all known codes') if the Inner value is set to 26.  The
+   (suppress all known codes) if the Inner value is set to 26.  The
    client MUST be prepared to receive and discard 5.04 (Gateway Timeout)
    error messages from intermediaries potentially resulting from
    destination time out due to no response.
@@ -2447,19 +2447,19 @@ RFC 8613                         OSCORE                         May 2019
       context required to decrypt and verify the message.
 
    Since OSCORE requires the HTTP body to be preserved across redirects,
-   the HTTP server is RECOMMENDED to reply with 307 or 308 instead of
-   301 or 302.
+   the HTTP server is RECOMMENDED to reply with 307 (Temporary Redirect)
+   or 308 (Permanent Redirect) instead of 301 (Moved Permanently) or 302
+   (Found).
 
    For the case of HTTP-client-to-CoAP-server redirects, although
    redirect is not defined for CoAP servers [RFC7252], an HTTP client
    receiving a redirect should generate a new OSCORE request for the
    server it was redirected to.
 
-11.2.  CoAP-to-HTTP Mapping
 
-   Section 10.1 of [RFC7252] describes the fundamentals of the CoAP-to-
-   HTTP cross-protocol mapping process.  The additional rules for OSCORE
-   messages are as follows:
+
+
+
 
 
 
@@ -2467,6 +2467,12 @@ Selander, et al.             Standards Track                   [Page 44]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+11.2.  CoAP-to-HTTP Mapping
+
+   Section 10.1 of [RFC7252] describes the fundamentals of the CoAP-to-
+   HTTP cross-protocol mapping process.  The additional rules for OSCORE
+   messages are as follows:
 
    o  The HTTP OSCORE header field value is set to:
 
@@ -2510,12 +2516,6 @@ RFC 8613                         OSCORE                         May 2019
    mapped to HTTP as described in Section 11.2 and sent in compliance
    with the rules in Section 11.1.
 
-   The receiving HTTP endpoint maps the HTTP message to a CoAP message
-   using [RFC8075] and Section 11.3.  The resulting OSCORE message is
-   processed as defined in this document.  If successful, the plaintext
-   CoAP message is translated to HTTP for normal processing in the
-   endpoint.
-
 
 
 
@@ -2523,6 +2523,12 @@ Selander, et al.             Standards Track                   [Page 45]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   The receiving HTTP endpoint maps the HTTP message to a CoAP message
+   using [RFC8075] and Section 11.3.  The resulting OSCORE message is
+   processed as defined in this document.  If successful, the plaintext
+   CoAP message is translated to HTTP for normal processing in the
+   endpoint.
 
 11.5.  Example: HTTP Client and CoAP Server
 
@@ -2562,12 +2568,6 @@ RFC 8613                         OSCORE                         May 2019
      Content-Format: 0
      Payload: Exterminate! Exterminate!
 
-   [CoAP response -- CoAP Server to Proxy]
-
-     2.04 Changed
-     OSCORE: [empty]
-     Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
-
 
 
 
@@ -2579,6 +2579,12 @@ Selander, et al.             Standards Track                   [Page 46]
 
 RFC 8613                         OSCORE                         May 2019
 
+
+   [CoAP response -- CoAP Server to Proxy]
+
+     2.04 Changed
+     OSCORE: [empty]
+     Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
    [HTTP response -- Proxy to HTTP Client]
 
@@ -2618,6 +2624,18 @@ RFC 8613                         OSCORE                         May 2019
      OSCORE: 09 25
      Payload: 09 07 01 13 61 f7 0f d2 97 b1 [binary]
 
+
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 47]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    [HTTP request -- Proxy to HTTP Server]
 
      POST http://server.url/ HTTP/1.1
@@ -2628,13 +2646,6 @@ RFC 8613                         OSCORE                         May 2019
    [HTTP request -- After server object security processing]
 
      GET http://server.url/orders HTTP/1.1
-
-
-
-Selander, et al.             Standards Track                   [Page 47]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    [HTTP response -- Before server object security processing]
 
@@ -2670,6 +2681,17 @@ RFC 8613                         OSCORE                         May 2019
 
    An overview of the security properties is given in Appendix D.
 
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 48]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 12.1.  End-to-end Protection
 
    In scenarios with intermediary nodes such as proxies or gateways,
@@ -2683,14 +2705,6 @@ RFC 8613                         OSCORE                         May 2019
    "raise bridge").  Even in the rare cases where all the owners of the
    intermediary nodes are fully trusted, attacks and data breaches make
    such an architecture brittle.
-
-
-
-
-Selander, et al.             Standards Track                   [Page 48]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    (D)TLS protects hop-by-hop the entire message.  OSCORE protects end-
    to-end all information that is not required for proxy operations (see
@@ -2726,6 +2740,14 @@ RFC 8613                         OSCORE                         May 2019
    context or rejecting a message.  Considerations for deploying OSCORE
    with a fixed Master Secret are given in Appendix B.
 
+
+
+
+Selander, et al.             Standards Track                   [Page 49]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 12.3.  Master Secret
 
    OSCORE uses HKDF [RFC5869] and the established input parameters to
@@ -2740,13 +2762,6 @@ RFC 8613                         OSCORE                         May 2019
    of randomness but not necessarily distributed uniformly (or for which
    an attacker has some partial knowledge) and derive from it one or
    more cryptographically strong secret keys [RFC5869].
-
-
-
-Selander, et al.             Standards Track                   [Page 49]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    Therefore, the main requirement for the OSCORE Master Secret, in
    addition to being secret, is that it have a good amount of
@@ -2781,6 +2796,14 @@ RFC 8613                         OSCORE                         May 2019
    that the client is currently involved in the communication, since the
    message may be a delayed delivery of a previously generated request,
    which now reaches the server.  To verify the aliveness of the client
+
+
+
+Selander, et al.             Standards Track                   [Page 50]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    the server may use the Echo option in the response to a request from
    the client (see [CoAP-ECHO-REQ-TAG]).
 
@@ -2794,15 +2817,6 @@ RFC 8613                         OSCORE                         May 2019
    Partial IV is at most 40 bits.  The mandatory-to-implement AEAD
    algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
    AEAD algorithms that require unpredictable nonces are not supported.
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 50]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    In order to prevent cryptanalysis when the same plaintext is
    repeatedly encrypted by many different users with distinct AEAD keys,
@@ -2837,6 +2851,15 @@ RFC 8613                         OSCORE                         May 2019
    reduced by means of OSCORE.  End-to-end integrity protection and
    encryption of the message payload and all options that are not used
    for proxy operations provide mitigation against attacks on sensor and
+
+
+
+
+Selander, et al.             Standards Track                   [Page 51]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    actuator communication, which may have a direct impact on the
    personal sphere.
 
@@ -2852,14 +2875,6 @@ RFC 8613                         OSCORE                         May 2019
 
    COSE message fields, i.e., the OSCORE option, may reveal information
    about the communicating endpoints.  For example, 'kid' and 'kid
-
-
-
-Selander, et al.             Standards Track                   [Page 51]
-
-RFC 8613                         OSCORE                         May 2019
-
-
    context', which are intended to help the server find the right
    context, may reveal information about the client.  Tracking 'kid' and
    'kid context' to one server may be used for correlating requests from
@@ -2894,6 +2909,13 @@ RFC 8613                         OSCORE                         May 2019
 
    o  Description: Identifies the context for the key identifier
 
+
+
+Selander, et al.             Standards Track                   [Page 52]
+
+RFC 8613                         OSCORE                         May 2019
+
+
    o  Reference: Section 5.1 of this document
 
 13.2.  CoAP Option Numbers Registry
@@ -2906,15 +2928,6 @@ RFC 8613                         OSCORE                         May 2019
              +--------+-----------------+-------------------+
              |     9  | OSCORE          | [RFC8613]         |
              +--------+-----------------+-------------------+
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 52]
-
-RFC 8613                         OSCORE                         May 2019
-
 
    Furthermore, the following existing entries in the "CoAP Option
    Numbers" registry have been updated with a reference to the document
@@ -2949,6 +2962,16 @@ RFC 8613                         OSCORE                         May 2019
    provide a reference to the document where the OSCORE processing of
    that CoAP Option is defined.
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 53]
+
+RFC 8613                         OSCORE                         May 2019
+
+
 13.3.  CoAP Signaling Option Numbers Registry
 
    The OSCORE option has been added to the "CoAP Signaling Option
@@ -2959,18 +2982,6 @@ RFC 8613                         OSCORE                         May 2019
      +------------+--------+---------------------+-------------------+
      | 7.xx (all) |     9  | OSCORE              | [RFC8613]         |
      +------------+--------+---------------------+-------------------+
-
-
-
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 53]
-
-RFC 8613                         OSCORE                         May 2019
-
 
 13.4.  Header Field Registrations
 
@@ -2990,17 +3001,6 @@ RFC 8613                         OSCORE                         May 2019
    "Media Types" registry.  This media type is used to indicate that the
    content is an OSCORE message.  The OSCORE body cannot be understood
    without the OSCORE header field value and the security context.
-
-
-
-
-
-
-
-
-
-
-
 
 
 
