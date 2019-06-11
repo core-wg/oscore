@@ -740,12 +740,12 @@ RFC 8613                         OSCORE                         May 2019
 
    The sending endpoint SHALL transfer Class E message fields in the
    ciphertext of the COSE object in the OSCORE message.  The sending
-   endpoint SHALL include Class I message fields in the Additional
-   Authenticated Data (AAD) of the AEAD algorithm, allowing the
-   receiving endpoint to detect if the value has changed in transfer.
-   Class U message fields SHALL NOT be protected in transfer.  Class I
-   and Class U message field values are transferred in the header or
-   options part of the OSCORE message, which is visible to proxies.
+   endpoint SHALL include Class I message fields in the AAD of the AEAD
+   algorithm, allowing the receiving endpoint to detect if the value has
+   changed in transfer.  Class U message fields SHALL NOT be protected
+   in transfer.  Class I and Class U message field values are
+   transferred in the header or options part of the OSCORE message,
+   which is visible to proxies.
 
    Message fields not visible to proxies, i.e., transported in the
    ciphertext of the COSE object, are called "Inner" (Class E).  Message
@@ -1370,8 +1370,8 @@ RFC 8613                         OSCORE                         May 2019
 
    o  The 'ciphertext' field is computed from the secret key (Sender Key
       or Recipient Key), AEAD nonce (see Section 5.2), plaintext (see
-      Section 5.3), and the Additional Authenticated Data (AAD) (see
-      Section 5.4) following Section 5.2 of [RFC8152].
+      Section 5.3), and the AAD (see Section 5.4) following Section 5.2
+      of [RFC8152].
 
    The encryption process is described in Section 5.3 of [RFC8152].
 
@@ -1583,8 +1583,8 @@ RFC 8613                         OSCORE                         May 2019
    requests and responses, although some parameters, e.g., request_kid,
    need not be integrity protected in all requests.
 
-   The Additional Authenticated Data (AAD) is composed from the
-   external_aad as described in Section 5.3 of [RFC8152]:
+   The AAD is composed from the external_aad as described in Section 5.3
+   of [RFC8152]:
 
       AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 
@@ -2045,8 +2045,8 @@ RFC 8613                         OSCORE                         May 2019
 
    1.  Retrieve the Sender Context associated with the target resource.
 
-   2.  Compose the Additional Authenticated Data and the plaintext, as
-       described in Sections 5.3 and 5.4.
+   2.  Compose the AAD and the plaintext, as described in Sections 5.3
+       and 5.4.
 
    3.  Encode the Partial IV (Sender Sequence Number in network byte
        order) and increment the Sender Sequence Number by one.  Compute
@@ -2100,8 +2100,7 @@ RFC 8613                         OSCORE                         May 2019
    3.  Verify that the 'Partial IV' has not been received before using
        the Replay Window, as described in Section 7.4.
 
-   4.  Compose the Additional Authenticated Data, as described in
-       Section 5.4.
+   4.  Compose the AAD, as described in Section 5.4.
 
    5.  Compute the AEAD nonce from the Recipient ID, Common IV, and the
        'Partial IV' parameter, received in the COSE object.
@@ -2123,6 +2122,7 @@ RFC 8613                         OSCORE                         May 2019
        request.  The OSCORE option is removed.
 
    8.  The decrypted CoAP request is processed according to [RFC7252].
+
 
 
 
@@ -2154,8 +2154,8 @@ RFC 8613                         OSCORE                         May 2019
    1.  Retrieve the Sender Context in the Security Context associated
        with the Token.
 
-   2.  Compose the Additional Authenticated Data and the plaintext, as
-       described in Sections 5.3 and 5.4.
+   2.  Compose the AAD and the plaintext, as described in Sections 5.3
+       and 5.4.
 
    3.  Compute the AEAD nonce as described in Section 5.2:
 
@@ -2224,8 +2224,7 @@ RFC 8613                         OSCORE                         May 2019
        either the decompression or the COSE message fails to decode,
        then go to 8.
 
-   3.  Compose the Additional Authenticated Data, as described in
-       Section 5.4.
+   3.  Compose the AAD, as described in Section 5.4.
 
    4.  Compute the AEAD nonce
 
@@ -2235,6 +2234,7 @@ RFC 8613                         OSCORE                         May 2019
        *  If the Partial IV is present in the response, compute the AEAD
           nonce from the Recipient ID, Common IV, and the 'Partial IV'
           parameter, received in the COSE object.
+
 
 
 
@@ -3602,8 +3602,8 @@ RFC 8613                         OSCORE                         May 2019
    volatile memory, are physically limited to only send a small amount
    of messages per minute, and may have no good source of randomness.
 
-   To prevent reuse of Sender Sequence Number (SSN), an endpoint may
-   perform the following procedure during normal operations:
+   To prevent reuse of Sender Sequence Number, an endpoint may perform
+   the following procedure during normal operations:
 
    o  Before using a Sender Sequence Number that is evenly divisible by
       K, where K is a positive integer, store the Sender Sequence Number
@@ -4632,8 +4632,8 @@ D.2.  Supporting Proxy Operations
 D.3.  Protected Message Fields
 
    Protected message fields are included in the plaintext (Section 5.3)
-   and the Additional Authenticated Data (Section 5.4) of the
-   COSE_Encrypt0 object and encrypted using an AEAD algorithm.
+   and the AAD (Section 5.4) of the COSE_Encrypt0 object and encrypted
+   using an AEAD algorithm.
 
    OSCORE depends on a preestablished random Master Secret
    (Section 12.3) used to derive encryption keys, and a construction for
@@ -4694,12 +4694,12 @@ D.4.  Uniqueness of (key, nonce)
    encrypted by different endpoints use different keys.  It remains to
    be proven that the nonces used by the fixed endpoint are unique.
 
-   Since the Common IV is fixed, the nonces are determined by a Partial
-   IV (PIV) and the Sender ID of the endpoint generating that Partial IV
-   (ID_PIV).  The nonce construction (Section 5.2) with the size of the
-   ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs.
-   There are two cases:
-
+   Since the Common IV is fixed, the nonces are determined by PIV, where
+   PIV takes the value of the Partial IV of the request or of the
+   response, and by the Sender ID of the endpoint generating that
+   Partial IV (ID_PIV).  The nonce construction (Section 5.2) with the
+   size of the ID_PIV (S) creates unique nonces for different (ID_PIV,
+   PIV) pairs.  There are two cases:
 
 
 
