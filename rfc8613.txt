@@ -497,9 +497,9 @@ RFC 8613                         OSCORE                         May 2019
       verify messages received.  Derived from Common Context and
       Recipient ID.  Length is determined by the AEAD Algorithm.
 
-   o  Replay Window (Server only).  The replay window to verify requests
-      received.  Replay protection is described in Section 7.4 and
-      Section 3.2.2.
+   o  Replay Window (Server only).  The replay window used to verify
+      requests received.  Replay protection is described in Section 7.4
+      and Section 3.2.2.
 
 
 
@@ -553,8 +553,8 @@ RFC 8613                         OSCORE                         May 2019
 
    o  Replay Window
 
-      *  Default is DTLS-type replay protection with a window size of 32
-         [RFC6347]
+      *  The default mechanism is an anti-replay sliding window (see
+         Section 4.1.2.6 of [RFC6347] with a window size of 32
 
 
 
@@ -651,11 +651,11 @@ RFC 8613                         OSCORE                         May 2019
 
    The Sender Sequence Number is initialized to 0.
 
-   The supported types of replay protection and replay window length is
+   The supported types of replay protection and replay window size is
    application specific and depends on how OSCORE is transported (see
-   Section 7.4).  The default is DTLS-type replay protection with a
-   window size of 32 initiated as described in Section 4.1.2.6 of
-   [RFC6347].
+   Section 7.4).  The default mechanism is the anti-replay window of
+   received messages used by IPsec AH/ESP and DTLS (see Section 4.1.2.6
+   of [RFC6347]) with a window size of 32.
 
 3.3.  Requirements on the Security Context Parameters
 
