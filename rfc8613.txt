@@ -638,7 +638,7 @@ RFC 8613                         OSCORE                         May 2019
 
       output parameter = HMAC-SHA-256(PRK, info || 0x01)
 
-   where different values of 'info' are used for each derived parameter
+   where different values of info are used for each derived parameter
    and where || denotes byte string concatenation.
 
    Note that [RFC5869] specifies that if the salt is not provided, it is
@@ -3840,24 +3840,24 @@ B.2.1.  Implementation Considerations
 
    The server may only have space for a few security contexts or only be
    able to handle a few protocol runs in parallel.  The server may
-   legitimately receive multiple request #1 messages using the same non-
-   mutable security context, e.g., due to packet loss.  Replays of old
-   request #1 messages could be difficult for the server to distinguish
-   from legitimate.  The server needs to handle the case when the
-   maximum number of cached R2s is reached.  If the server receives a
-   request #1 and is not capable of executing it then it may respond
-   with an unprotected 5.03 (Service Unavailable).  The server may clear
-   up state from protocol runs that never complete, e.g., set a timer
-   when caching R2, and remove R2 and the associated security contexts
-   from the cache at timeout.  Additionally, state information can be
-   flushed at reboot.
+   legitimately receive multiple request #1 messages using the same
+   immutable security context, e.g., because of packet loss.  Replays of
+   old request #1 messages could be difficult for the server to
+   distinguish from legitimate.  The server needs to handle the case
+   when the maximum number of cached R2s is reached.  If the server
+   receives a request #1 and is not capable of executing it then it may
+   respond with an unprotected 5.03 (Service Unavailable).  The server
+   may clear up state from protocol runs that never complete, e.g., set
+   a timer when caching R2, and remove R2 and the associated security
+   contexts from the cache at timeout.  Additionally, state information
+   can be flushed at reboot.
 
    As an alternative to caching R2, the server could generate R2 in such
    a way that it can be sent (in response #1) and verified (at reception
    of request #2) as the value of R2 it had generated.  Such a procedure
    MUST NOT lead to the server accepting replayed request #2 messages.
    One construction described in the following is based on using a
-   secret random HMAC key K_HMAC per set of non-mutable security context
+   secret random HMAC key K_HMAC per set of immutable security context
    parameters associated with a client.  This construction allows the
    server to handle verification of R2 in response #2 at the cost of
 
