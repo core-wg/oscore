@@ -10,7 +10,7 @@ Updates: 7252                                               F. Palombini
 Category: Standards Track                                    Ericsson AB
 ISSN: 2070-1721                                                 L. Seitz
                                                                     RISE
-                                                                May 2019
+                                                               June 2019
 
 
      Object Security for Constrained RESTful Environments (OSCORE)
@@ -57,7 +57,7 @@ Copyright Notice
 
 Selander, et al.             Standards Track                    [Page 1]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    publication of this document.  Please review these documents
@@ -113,7 +113,7 @@ Table of Contents
 
 Selander, et al.             Standards Track                    [Page 2]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
      11.5.  Example: HTTP Client and CoAP Server . . . . . . . . . .  46
@@ -169,7 +169,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 3]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 1.  Introduction
@@ -225,7 +225,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 4]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
                +-----------------------------------+
@@ -281,7 +281,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 5]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
           Client                                          Server
@@ -337,7 +337,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 6]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 2.  The OSCORE Option
@@ -393,7 +393,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 7]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    the security context is composed of a "Common Context", a "Sender
@@ -449,7 +449,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 8]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  HKDF Algorithm.  An HMAC-based key derivation function (HKDF)
@@ -505,7 +505,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                    [Page 9]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    All parameters except Sender Sequence Number and Replay Window are
@@ -561,7 +561,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 10]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    All input parameters need to be known and agreed on by both
@@ -617,7 +617,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 11]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  L is the size of the key/nonce for the AEAD Algorithm used, in
@@ -673,7 +673,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 12]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Different methods can be used to assign Sender IDs: a protocol that
@@ -729,7 +729,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 13]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Class E: encrypted and integrity protected,
@@ -785,7 +785,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 14]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    object (Section 5.3) and then remove the Inner option message fields
@@ -841,7 +841,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 15]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    The processing of Outer options by the receiving endpoint is
@@ -897,7 +897,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 16]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Manipulation of unprotected message fields (including Uri-Host, Uri-
@@ -953,7 +953,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 17]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Uri-Path and Uri-Query follow the processing defined in
@@ -1009,7 +1009,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 18]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    maximum unfragmented message size (MAX_UNFRAGMENTED_SIZE) considering
@@ -1065,7 +1065,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 19]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [RFC7252] does not specify how the server should act upon receiving
@@ -1074,7 +1074,7 @@ RFC 8613                         OSCORE                         May 2019
    request with the same Token.
 
    Since POST with the Observe option is not defined, for messages with
-   Observe option, the Outer Code MUST be set to 0.05 (FETCH) for
+   the Observe option, the Outer Code MUST be set to 0.05 (FETCH) for
    requests and to 2.05 (Content) for responses (see Section 4.2).
 
 4.1.3.5.1.  Registrations and Cancellations
@@ -1097,7 +1097,7 @@ RFC 8613                         OSCORE                         May 2019
    operations.
 
    o  An intermediary node removing the Outer Observe 0 option does not
-      change the registration request to a request without Observe
+      change the registration request to a request without the Observe
       option (see Section 2 of [RFC7641]).  Instead other means for
       cancellation may be used as described in Section 3.6 of [RFC7641].
 
@@ -1121,7 +1121,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 20]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  An intermediary node is not able to initiate an OSCORE-protected
@@ -1177,7 +1177,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 21]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    particular request.  An implementation MAY support [RFC7252] and the
@@ -1233,7 +1233,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 22]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    they cannot, in general, be protected end-to-end from one endpoint to
@@ -1289,7 +1289,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 23]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Signaling messages SHALL be protected as CoAP request messages,
@@ -1345,7 +1345,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 24]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
          This parameter SHALL be present in requests.  The Partial IV
@@ -1401,7 +1401,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 25]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    While the 'kid' parameter is used to transport the Sender ID, the new
@@ -1457,7 +1457,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 26]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    properties, see Section 7.4 and Appendix D.4.  The only non-Observe
@@ -1513,7 +1513,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 27]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       0                   1                   2                   3
@@ -1569,7 +1569,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 28]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       of [RFC7252], where the delta is the difference from the
@@ -1625,7 +1625,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 29]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    a stateless header compression mechanism, simply removing redundant
@@ -1681,7 +1681,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 30]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    The flag bits are registered in the "OSCORE Flag Bits" registry
@@ -1737,7 +1737,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 31]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
        Before compression (24 bytes):
@@ -1793,7 +1793,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 32]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
        After compression (22  bytes):
@@ -1849,7 +1849,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 33]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 7.  Message Binding, Sequence Numbers, Freshness, and Replay Protection
@@ -1905,7 +1905,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 34]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    For requests and notifications, OSCORE also provides relative
@@ -1961,7 +1961,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 35]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    If the verification of the response succeeds, and the received
@@ -2017,7 +2017,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 36]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 8.  Processing
@@ -2073,7 +2073,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 37]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    2.  Decompress the COSE object (Section 6) and retrieve the Recipient
@@ -2129,7 +2129,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 38]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 8.2.1.  Supporting Block-wise
@@ -2177,15 +2177,15 @@ RFC 8613                         OSCORE                         May 2019
 
 8.3.1.  Supporting Observe
 
-   If Observe is supported, insert the following step between step 2 and
-   3 of Section 8.3:
+   If Observe is supported, insert the following step between steps 2
+   and 3 of Section 8.3:
 
 
 
 
 Selander, et al.             Standards Track                   [Page 39]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    A.  If the response is an Observe notification:
@@ -2241,7 +2241,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 40]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    5.  Decrypt the COSE object using the Recipient Key, as per
@@ -2297,7 +2297,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 41]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    occurring while processing a response to an observation request does
@@ -2353,7 +2353,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 42]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Since a CoAP response is only applicable to the original CoAP
@@ -2409,7 +2409,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 43]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Using the Augmented Backus-Naur Form (ABNF) notation of [RFC5234],
@@ -2465,7 +2465,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 44]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 11.2.  CoAP-to-HTTP Mapping
@@ -2521,7 +2521,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 45]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    The receiving HTTP endpoint maps the HTTP message to a CoAP message
@@ -2577,7 +2577,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 46]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [CoAP response -- CoAP Server to Proxy]
@@ -2633,7 +2633,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 47]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [HTTP request -- Proxy to HTTP Server]
@@ -2689,7 +2689,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 48]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 12.1.  End-to-end Protection
@@ -2745,7 +2745,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 49]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 12.3.  Master Secret
@@ -2801,7 +2801,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 50]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    the server may use the Echo option in the response to a request from
@@ -2857,7 +2857,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 51]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    actuator communication, which may have a direct impact on the
@@ -2913,7 +2913,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 52]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Reference: Section 5.1 of this document
@@ -2969,7 +2969,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 53]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 13.3.  CoAP Signaling Option Numbers Registry
@@ -3025,7 +3025,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 54]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
      Type name: application
@@ -3081,7 +3081,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 55]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    NOT be used in the OSCORE message.  The OSCORE payload cannot be
@@ -3137,7 +3137,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 56]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 +--------------+-------------+-----------------------------+-----------+
@@ -3193,7 +3193,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 57]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
@@ -3249,7 +3249,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 58]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [RFC8075]  Castellani, A., Loreto, S., Rahman, A., Fossati, T., and
@@ -3305,7 +3305,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 59]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [CoAP-802.15.4]
@@ -3361,7 +3361,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 60]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
@@ -3417,7 +3417,7 @@ Appendix A.  Scenario Examples
 
 Selander, et al.             Standards Track                   [Page 61]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    indicate the content of the messages without going into detail of the
@@ -3473,7 +3473,7 @@ A.1.  Secure Access to Sensor
 
 Selander, et al.             Standards Track                   [Page 62]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    The server verifies the request as specified in Section 8.2.  The
@@ -3529,7 +3529,7 @@ A.2.  Secure Subscribe to Sensor
 
 Selander, et al.             Standards Track                   [Page 63]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
         |  2.05 |       |           Token: 0x83
@@ -3585,7 +3585,7 @@ B.1.1.  Sender Sequence Number
 
 Selander, et al.             Standards Track                   [Page 64]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    context parameters (Section 3.3).  This section gives an example of
@@ -3641,7 +3641,7 @@ B.1.2.  Replay Window
 
 Selander, et al.             Standards Track                   [Page 65]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       OSCORE protected 4.01 (Unauthorized), containing only the Echo
@@ -3697,7 +3697,7 @@ B.2.  Security Context Derived Multiple Times
 
 Selander, et al.             Standards Track                   [Page 66]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    The protocol is described below with reference to Figure 14.  The
@@ -3753,7 +3753,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 67]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
        server may receive several requests #1 associated with one
@@ -3809,7 +3809,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 68]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Request #2 can be an ordinary request.  The server performs the
@@ -3865,7 +3865,7 @@ B.2.1.  Implementation Considerations
 
 Selander, et al.             Standards Track                   [Page 69]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    storing the K_HMAC keys and a slightly larger message overhead in
@@ -3921,7 +3921,7 @@ B.2.2.  Attack Considerations
 
 Selander, et al.             Standards Track                   [Page 70]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    a response.  But if the client did not expect a response, it will be
@@ -3977,7 +3977,7 @@ C.1.1.  Client
 
 Selander, et al.             Standards Track                   [Page 71]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    From the previous parameters,
@@ -4033,7 +4033,7 @@ C.1.2.  Server
 
 Selander, et al.             Standards Track                   [Page 72]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
@@ -4089,7 +4089,7 @@ C.2.1.  Client
 
 Selander, et al.             Standards Track                   [Page 73]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 C.2.2.  Server
@@ -4145,7 +4145,7 @@ C.3.1.  Client
 
 Selander, et al.             Standards Track                   [Page 74]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Recipient ID: 0x01 (1 byte)
@@ -4201,7 +4201,7 @@ C.3.2.  Server
 
 Selander, et al.             Standards Track                   [Page 75]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  info (for Recipient Key): 0x85404837cbf3210017a2d30a634b657910 (17
@@ -4257,7 +4257,7 @@ C.4.  Test Vector 4: OSCORE Request, Client
 
 Selander, et al.             Standards Track                   [Page 76]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Partial IV: 0x14 (1 byte)
@@ -4313,7 +4313,7 @@ C.5.  Test Vector 5: OSCORE Request, Client
 
 Selander, et al.             Standards Track                   [Page 77]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Sender Sequence Number: 20
@@ -4369,7 +4369,7 @@ C.6.  Test Vector 6: OSCORE Request, Client
 
 Selander, et al.             Standards Track                   [Page 78]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  ID Context: 0x37cbf3210017a2d3 (8 bytes)
@@ -4425,7 +4425,7 @@ C.7.  Test Vector 7: OSCORE Response, Server
 
 Selander, et al.             Standards Track                   [Page 79]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Unprotected CoAP response:
@@ -4481,7 +4481,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 80]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
 C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
@@ -4537,7 +4537,7 @@ C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
 Selander, et al.             Standards Track                   [Page 81]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    From there:
@@ -4593,7 +4593,7 @@ D.1.  Threat Model
 
 Selander, et al.             Standards Track                   [Page 82]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Attacks against the CoAP request-response layer are in scope.  OSCORE
@@ -4649,7 +4649,7 @@ D.3.  Protected Message Fields
 
 Selander, et al.             Standards Track                   [Page 83]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    o  Integrity: An attacker should not be able to craft a new OSCORE
@@ -4705,7 +4705,7 @@ D.4.  Uniqueness of (key, nonce)
 
 Selander, et al.             Standards Track                   [Page 84]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    A.  For requests, and responses with Partial IV (e.g., Observe
@@ -4761,7 +4761,7 @@ D.5.1.  CoAP Header Fields
 
 Selander, et al.             Standards Track                   [Page 85]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       service attack, since it may prevent the client to identify to
@@ -4817,7 +4817,7 @@ D.5.2.  CoAP Options
 
 Selander, et al.             Standards Track                   [Page 86]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       change them in order to perform their functions.  The server can
@@ -4873,7 +4873,7 @@ RFC 8613                         OSCORE                         May 2019
 
 Selander, et al.             Standards Track                   [Page 87]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
       expected to reveal any sensitive information about the message
@@ -4929,7 +4929,7 @@ Appendix E.  CDDL Summary
 
 Selander, et al.             Standards Track                   [Page 88]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    appendix defines the small subset of CDDL that is used in the present
@@ -4985,7 +4985,7 @@ Authors' Addresses
 
 Selander, et al.             Standards Track                   [Page 89]
 
-RFC 8613                         OSCORE                         May 2019
+RFC 8613                         OSCORE                        June 2019
 
 
    Goeran Selander
