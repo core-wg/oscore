@@ -1376,11 +1376,10 @@ RFC 8613                         OSCORE                        June 2019
          Sequence Number.  All leading bytes of value zero SHALL be
          removed when encoding the Partial IV, except in the case of
          Partial IV value 0, which is encoded to the byte string 0x00.
-         This parameter SHALL be present in requests.  The Partial IV
-         SHALL be present in responses to Observe registrations (see
-         Section 4.1.3.5.1); otherwise, the Partial IV will not
-         typically be present in responses (for one exception, see
-         Appendix B.1.2).
+         This parameter SHALL be present in requests and will not
+         typically be present in responses (for two exceptions, see
+         Observe notifications (xref target="notifications"/>) and
+         Replay Window synchronization (Appendix B.1.2)).
 
       *  The 'kid' parameter.  The value is set to the Sender ID.  This
          parameter SHALL be present in requests and will not typically
@@ -1395,6 +1394,7 @@ RFC 8613                         OSCORE                        June 2019
          used in responses is given in Appendix B.2.  If 'kid context'
          is present in the request, then the server SHALL use a security
          context with that ID Context when verifying the request.
+
 
 
 
