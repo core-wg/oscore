@@ -1972,16 +1972,17 @@ RFC 8613                         OSCORE                        June 2019
    The following applies additionally when the Observe option is
    supported.
 
-   The Notification Number is initialized to the Partial IV of the first
-   successfully verified notification in response to the registration
-   request.  A client MUST only accept at most one Observe notification
-   without Partial IV, and treat it as the oldest notification received.
-   A client receiving a notification containing a Partial IV SHALL
-   compare the Partial IV with the Notification Number associated to
-   that Observe registration.  The client MUST stop processing
-   notifications with a Partial IV that has been previously received.
-   Applications MAY decide that a client only processes notifications
-   that have a greater Partial IV than the Notification Number.
+   The Notification Number (see Section 4.1.3.5.2) is initialized to the
+   Partial IV of the first successfully verified notification in
+   response to the registration request.  A client MUST only accept at
+   most one Observe notification without Partial IV, and treat it as the
+   oldest notification received.  A client receiving a notification
+   containing a Partial IV SHALL compare the Partial IV with the
+   Notification Number associated to that Observe registration.  The
+   client MUST stop processing notifications with a Partial IV that has
+   been previously received.  Applications MAY decide that a client only
+   processes notifications that have a greater Partial IV than the
+   Notification Number.
 
    If the verification of the response succeeds, and the received
    Partial IV was greater than the Notification Number, then the client
@@ -2009,7 +2010,6 @@ RFC 8613                         OSCORE                        June 2019
        context stored in non-volatile memory, it MUST NOT reuse a
        previous Sender Sequence Number and MUST NOT accept previously
        received messages.
-
 
 
 
