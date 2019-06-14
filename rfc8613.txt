@@ -888,9 +888,9 @@ RFC 8613                         OSCORE                        June 2019
    intermediary node caching it.  Setting the Outer Max-Age to zero
    relieves the intermediary from uselessly caching responses.
    Successful OSCORE responses do not need to include an Outer Max-Age
-   option since the responses appear to the OSCORE-unaware intermediary
-   as 2.04 (Changed) responses, which are non-cacheable (see
-   Section 4.2).
+   option.  Except when the Observe option (see Section 4.1.3.5) is
+   used, responses appear to the OSCORE-unaware intermediary as 2.04
+   (Changed) responses, which are non-cacheable (see Section 4.2).  For
 
 
 
@@ -899,6 +899,9 @@ Selander, et al.             Standards Track                   [Page 16]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   Observe responses, which are cacheable, an Outer Max-Age option with
+   value 0 may be used to avoid unnecessary proxy caching.
 
    The Outer Max-Age message field is processed according to
    Section 4.1.2.
@@ -944,10 +947,7 @@ RFC 8613                         OSCORE                        June 2019
    is expected that the authors will create Uri-* options that allow
    decomposing the Proxy-Uri, and specifying the OSCORE processing.
 
-   An example of how Proxy-Uri is processed is given here.  Assume that
-   the original CoAP message contains:
 
-   o  Proxy-Uri = "coap://example.com/resource?q=1"
 
 
 
@@ -955,6 +955,11 @@ Selander, et al.             Standards Track                   [Page 17]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   An example of how Proxy-Uri is processed is given here.  Assume that
+   the original CoAP message contains:
+
+   o  Proxy-Uri = "coap://example.com/resource?q=1"
 
    During OSCORE processing, Proxy-Uri is split into:
 
@@ -997,12 +1002,7 @@ RFC 8613                         OSCORE                        June 2019
    both in case of Inner and Outer Block-wise transfers, provided all
    blocks are received.
 
-4.1.3.4.1.  Inner Block Options
 
-   The sending CoAP endpoint MAY fragment a CoAP message as defined in
-   [RFC7959] before the message is processed by OSCORE.  In this case,
-   the Block options SHALL be processed by OSCORE as normal Inner
-   options (Section 4.1.1).  The receiving CoAP endpoint SHALL process
 
 
 
@@ -1012,6 +1012,12 @@ Selander, et al.             Standards Track                   [Page 18]
 RFC 8613                         OSCORE                        June 2019
 
 
+4.1.3.4.1.  Inner Block Options
+
+   The sending CoAP endpoint MAY fragment a CoAP message as defined in
+   [RFC7959] before the message is processed by OSCORE.  In this case,
+   the Block options SHALL be processed by OSCORE as normal Inner
+   options (Section 4.1.1).  The receiving CoAP endpoint SHALL process
    the OSCORE message before processing Block-wise as defined in
    [RFC7959].
 
@@ -1054,12 +1060,6 @@ RFC 8613                         OSCORE                        June 2019
 
    The support for Observe [RFC7641] with OSCORE targets the
    requirements on forwarding of Section 2.2.1 of [CoAP-E2E-Sec], i.e.,
-   that observations go through intermediary nodes, as illustrated in
-   Figure 8 of [RFC7641].
-
-   Inner Observe SHALL be used to protect the value of the Observe
-   option between the endpoints.  Outer Observe SHALL be used to support
-   forwarding by intermediary nodes.
 
 
 
@@ -1067,6 +1067,13 @@ Selander, et al.             Standards Track                   [Page 19]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   that observations go through intermediary nodes, as illustrated in
+   Figure 8 of [RFC7641].
+
+   Inner Observe SHALL be used to protect the value of the Observe
+   option between the endpoints.  Outer Observe SHALL be used to support
+   forwarding by intermediary nodes.
 
    The server SHALL include a new Partial IV (see Section 5) in
    responses (with or without the Observe option) to Observe
@@ -1109,13 +1116,6 @@ RFC 8613                         OSCORE                        June 2019
 
    o  An intermediary node removing the Outer Observe 0 option does not
       change the registration request to a request without the Observe
-      option (see Section 2 of [RFC7641]).  Instead other means for
-      cancellation may be used as described in Section 3.6 of [RFC7641].
-
-   o  An intermediary node is not able to transform a normal response
-      into an OSCORE-protected Observe notification (see Figure 7 of
-      [RFC7641]) that verifies as coming from the server.
-
 
 
 
@@ -1123,6 +1123,13 @@ Selander, et al.             Standards Track                   [Page 20]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+      option (see Section 2 of [RFC7641]).  Instead other means for
+      cancellation may be used as described in Section 3.6 of [RFC7641].
+
+   o  An intermediary node is not able to transform a normal response
+      into an OSCORE-protected Observe notification (see Figure 7 of
+      [RFC7641]) that verifies as coming from the server.
 
    o  An intermediary node is not able to initiate an OSCORE protected
       Observe registration (Observe option with value 0) that verifies
@@ -1165,13 +1172,6 @@ RFC 8613                         OSCORE                        June 2019
    ordering of notifications and replay protection by comparing their
    Partial IVs and SHALL ignore the Outer Observe option value.
 
-   If the client receives a response to an Observe request without an
-   Inner Observe option, then it verifies the response as a non-Observe
-   response, as specified in Section 8.4.  If the client receives a
-   response to a non-Observe request with an Inner Observe option, then
-   it stops processing the message, as specified in Section 8.4.
-
-
 
 
 
@@ -1179,6 +1179,12 @@ Selander, et al.             Standards Track                   [Page 21]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   If the client receives a response to an Observe request without an
+   Inner Observe option, then it verifies the response as a non-Observe
+   response, as specified in Section 8.4.  If the client receives a
+   response to a non-Observe request with an Inner Observe option, then
+   it stops processing the message, as specified in Section 8.4.
 
    A client MUST consider the notification with the highest Partial IV
    as the freshest, regardless of the order of arrival.  In order to
@@ -1213,12 +1219,6 @@ RFC 8613                         OSCORE                        June 2019
    (see Section 5.4).  Nested use of OSCORE is not supported: If OSCORE
    processing detects an OSCORE option in the original CoAP message,
    then processing SHALL be stopped.
-
-
-
-
-
-
 
 
 
