@@ -476,8 +476,9 @@ RFC 8613                         OSCORE                        June 2019
    The Sender Context contains the following parameters:
 
    o  Sender ID.  Byte string used to identify the Sender Context, to
-      derive AEAD keys and Common IV, and to ensure unique AEAD nonces.
-      Maximum length is determined by the AEAD Algorithm.
+      derive AEAD keys and Common IV, and to contribute to the
+      uniqueness of AEAD nonces.  Maximum length is determined by the
+      AEAD Algorithm.
 
    o  Sender Key. Byte string containing the symmetric AEAD key to
       protect messages to send.  Derived from Common Context and Sender
@@ -492,14 +493,13 @@ RFC 8613                         OSCORE                        June 2019
    The Recipient Context contains the following parameters:
 
    o  Recipient ID.  Byte string used to identify the Recipient Context,
-      to derive AEAD keys and Common IV, and to ensure unique AEAD
-      nonces.  Maximum length is determined by the AEAD Algorithm.
+      to derive AEAD keys and Common IV, and to contribute to the
+      uniqueness of AEAD nonces.  Maximum length is determined by the
+      AEAD Algorithm.
 
    o  Recipient Key. Byte string containing the symmetric AEAD key to
       verify messages received.  Derived from Common Context and
       Recipient ID.  Length is determined by the AEAD Algorithm.
-
-
 
 
 
@@ -1953,8 +1953,8 @@ RFC 8613                         OSCORE                        June 2019
 
    Responses (with or without Partial IV) are protected against replay
    as they are bound to the request and the fact that only a single
-   response is accepted.  Note that the Partial IV is not used for
-   replay protection in this case.
+   response is accepted.  In this case the Partial IV is not used for
+   replay protection of responses.
 
 
 
@@ -2001,10 +2001,10 @@ RFC 8613                         OSCORE                        June 2019
        updating the mutable parts of the security context (Sender
        Sequence Number and Replay Window).  This requires that the
        mutable parts of the security context are available throughout
-       the lifetime of the device or that the device can establish safe
-       security context after loss of mutable security context data.
-       Examples are given based on careful use of non-volatile memory,
-       see Appendix B.1.1 and the use of the Echo option, see
+       the lifetime of the device or that the device can establish a
+       fresh security context after loss of mutable security context
+       data.  Examples are given based on careful use of non-volatile
+       memory, see Appendix B.1.1 and the use of the Echo option, see
        Appendix B.1.2.  If an endpoint makes use of a partial security
        context stored in non-volatile memory, it MUST NOT reuse a
        previous Sender Sequence Number and MUST NOT accept previously
@@ -3663,7 +3663,7 @@ RFC 8613                         OSCORE                        June 2019
 
    o  Before using a Sender Sequence Number that is evenly divisible by
       K, where K is a positive integer, store the Sender Sequence Number
-      (SSN1) in no n-volatile memory.  After booting, the endpoint
+      (SSN1) in non-volatile memory.  After booting, the endpoint
       initiates the new Sender Sequence Number (SSN2) to the value
       stored in persistent memory plus K plus F: SSN2 = SSN1 + K + F,
       where F is a positive integer.
