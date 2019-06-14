@@ -1594,7 +1594,7 @@ RFC 8613                         OSCORE                        June 2019
       previously included instance of class I option.
 
    The oscore_version and algorithms parameters are established out-of-
-   band; thus, they are transported in OSCORE, but the external_aad
+   band; thus, they are not transported in OSCORE, but the external_aad
    allows to verify that they are the same in both endpoints.
 
    NOTE: The format of the external_aad is, for simplicity, the same for
