@@ -2287,9 +2287,9 @@ RFC 8613                         OSCORE                        June 2019
    If Block-wise is supported, insert the following step before any
    other:
 
-   A.  If Block-wise is present in the request, then process the Outer
-   Block options according to [RFC7959], until all blocks of the request
-   have been received (see Section 4.1.3.4).
+   A.  If Block-wise is present in the response, then process the Outer
+   Block options according to [RFC7959], until all blocks of the
+   response have been received (see Section 4.1.3.4).
 
 
 
