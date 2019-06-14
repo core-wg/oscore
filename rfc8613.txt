@@ -2270,7 +2270,7 @@ RFC 8613                         OSCORE                        June 2019
           parameter, received in the COSE object.
 
    5.  Decrypt the COSE object using the Recipient Key, as per
-       Section 5.3 [RFC8152].  (The decrypt operation includes the
+       Section 5.3 of [RFC8152].  (The decrypt operation includes the
        verification of the integrity.)  If decryption fails, then go to
        8.
 
