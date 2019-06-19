@@ -3593,10 +3593,13 @@ is almost published, with the document approved already,
 so we think that, as soon as that is done, the second sentence 
 should be removed. In the meantime, we have replaced the original 
 with the proposal.
+
+[auth-fp] CDDL has been published, so the second sentence was removed,
+and RFC8610 has been made normative.
 -->
 
 <t>Data structure definitions in the present specification employ the
-CDDL language for conciseness and precision.  CDDL is defined in
+CDDL language for conciseness and precision 
 <xref target="RFC8610"/>. This appendix summarizes the small subset of CDDL that is used 
 in the present specification.</t>
 
