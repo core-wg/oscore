@@ -2102,7 +2102,9 @@ RFC 8613                         OSCORE                        June 2019
 
    2.  Decompress the COSE object (Section 6) and retrieve the Recipient
        Context associated with the Recipient ID in the 'kid' parameter,
-       additionally using the 'kid context', if present.  If either the
+       additionally using the 'kid context', if present.  Note that the
+       Recipient Context MAY be retrieved by deriving a new security
+       context, e.g. as described in Appendix B.2.  If either the
        decompression or the COSE message fails to decode, or the server
        fails to retrieve a Recipient Context with Recipient ID
        corresponding to the 'kid' parameter received, then the server
@@ -2119,9 +2121,7 @@ RFC 8613                         OSCORE                        June 2019
           the server MAY respond with a 4.01 (Unauthorized) error
           message.  The server MAY set an Outer Max-Age option with
           value zero.  The diagnostic payload MAY contain the string
-          "Security context not found".  Alternatively, the server MAY
-          be configured to derive a new security context with the
-          received Recipient ID, as specified in Appendix B.2.
+          "Security context not found".
 
 
 
