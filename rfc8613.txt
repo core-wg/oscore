@@ -148,21 +148,21 @@ RFC 8613                         OSCORE                        June 2019
    Appendix C.  Test Vectors . . . . . . . . . . . . . . . . . . . .  72
      C.1.  Test Vector 1: Key Derivation with Master Salt  . . . . .  72
      C.2.  Test Vector 2: Key Derivation without Master Salt . . . .  74
-     C.3.  Test Vector 3: Key Derivation with ID Context . . . . . .  75
+     C.3.  Test Vector 3: Key Derivation with ID Context . . . . . .  76
      C.4.  Test Vector 4: OSCORE Request, Client . . . . . . . . . .  77
      C.5.  Test Vector 5: OSCORE Request, Client . . . . . . . . . .  78
-     C.6.  Test Vector 6: OSCORE Request, Client . . . . . . . . . .  79
-     C.7.  Test Vector 7: OSCORE Response, Server  . . . . . . . . .  80
+     C.6.  Test Vector 6: OSCORE Request, Client . . . . . . . . . .  80
+     C.7.  Test Vector 7: OSCORE Response, Server  . . . . . . . . .  81
      C.8.  Test Vector 8: OSCORE Response with Partial IV, Server  .  82
    Appendix D.  Overview of Security Properties  . . . . . . . . . .  83
      D.1.  Threat Model  . . . . . . . . . . . . . . . . . . . . . .  83
      D.2.  Supporting Proxy Operations . . . . . . . . . . . . . . .  84
-     D.3.  Protected Message Fields  . . . . . . . . . . . . . . . .  84
-     D.4.  Uniqueness of (key, nonce)  . . . . . . . . . . . . . . .  85
-     D.5.  Unprotected Message Fields  . . . . . . . . . . . . . . .  86
-   Appendix E.  CDDL Summary . . . . . . . . . . . . . . . . . . . .  89
-   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  90
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  90
+     D.3.  Protected Message Fields  . . . . . . . . . . . . . . . .  85
+     D.4.  Uniqueness of (key, nonce)  . . . . . . . . . . . . . . .  86
+     D.5.  Unprotected Message Fields  . . . . . . . . . . . . . . .  87
+   Appendix E.  CDDL Summary . . . . . . . . . . . . . . . . . . . .  90
+   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  91
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  91
 
 
 
@@ -2119,10 +2119,10 @@ RFC 8613                         OSCORE                        June 2019
           the server MAY respond with a 4.01 (Unauthorized) error
           message.  The server MAY set an Outer Max-Age option with
           value zero.  The diagnostic payload MAY contain the string
-          "Security context not found".
+          "Security context not found".  Alternatively, the server MAY
+          be configured to derive a new security context with the
+          received Recipient ID, as specified in Appendix B.2.
 
-   3.  Verify that the 'Partial IV' has not been received before using
-       the Replay Window, as described in Section 7.4.
 
 
 
@@ -2131,6 +2131,9 @@ Selander, et al.             Standards Track                   [Page 38]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   3.  Verify that the 'Partial IV' has not been received before using
+       the Replay Window, as described in Section 7.4.
 
    4.  Compose the AAD, as described in Section 5.4.
 
@@ -2177,9 +2180,6 @@ RFC 8613                         OSCORE                        June 2019
    1.  Retrieve the Sender Context in the Security Context associated
        with the Token.
 
-   2.  Compose the AAD and the plaintext, as described in Sections 5.3
-       and 5.4.
-
 
 
 
@@ -2187,6 +2187,9 @@ Selander, et al.             Standards Track                   [Page 39]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   2.  Compose the AAD and the plaintext, as described in Sections 5.3
+       and 5.4.
 
    3.  Compute the AEAD nonce as described in Section 5.2:
 
@@ -2232,9 +2235,6 @@ RFC 8613                         OSCORE                        June 2019
          order) and increment the Sender Sequence Number by one.
          Compute the AEAD nonce from the Sender ID, Common IV, and
          Partial IV, then go to 4.
-
-
-
 
 
 
@@ -3756,6 +3756,11 @@ Selander, et al.             Standards Track                   [Page 67]
 RFC 8613                         OSCORE                        June 2019
 
 
+   Note that the server needs to be configured to run this protocol when
+   it is not able to retrieve an existing security context, instead of
+   stopping processing the message as described in step 2 of
+   Section 8.2.
+
    The protocol is described below with reference to Figure 14.  The
    client or the server may initiate the protocol, in the latter case
    step 1 is omitted.
@@ -3799,11 +3804,6 @@ RFC 8613                         OSCORE                        June 2019
        context using the received ID1 (transported in 'kid context') as
        ID Context and the input parameters associated to the received
        'kid', then the server generates a random string R2 and derives a
-       second security context with ID Context = ID2 = R2 || ID1.  The
-       server sends a 4.01 (Unauthorized) response protected with the
-       second security context, containing R2 wrapped in a CBOR bstr as
-       'kid context', and caches R2.  R2 MUST NOT be reused as that may
-       lead to reuse of key and nonce in response #1.  Note that the
 
 
 
@@ -3812,6 +3812,11 @@ Selander, et al.             Standards Track                   [Page 68]
 RFC 8613                         OSCORE                        June 2019
 
 
+       second security context with ID Context = ID2 = R2 || ID1.  The
+       server sends a 4.01 (Unauthorized) response protected with the
+       second security context, containing R2 wrapped in a CBOR bstr as
+       'kid context', and caches R2.  R2 MUST NOT be reused as that may
+       lead to reuse of key and nonce in response #1.  Note that the
        server may receive several requests #1 associated with one
        security context, leading to multiple parallel protocol runs.
        Multiple instances of R2 may need to be cached until one of the
@@ -3855,11 +3860,6 @@ RFC 8613                         OSCORE                        June 2019
    application needs to set the length of each nonce such that the
    probability of its value being repeated is negligible; typically, at
    least 8 bytes long.  Since R2 may be generated as the result of a
-   replayed request #1, the probability for collision of R2s is impacted
-   by the birthday paradox.  For example, setting the length of R2 to 8
-   bytes results in an average collision after 2^32 response #1
-   messages, which should not be an issue for a constrained server
-   handling on the order of one request per second.
 
 
 
@@ -3867,6 +3867,12 @@ Selander, et al.             Standards Track                   [Page 69]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   replayed request #1, the probability for collision of R2s is impacted
+   by the birthday paradox.  For example, setting the length of R2 to 8
+   bytes results in an average collision after 2^32 response #1
+   messages, which should not be an issue for a constrained server
+   handling on the order of one request per second.
 
    Request #2 can be an ordinary request.  The server performs the
    action of the request and sends response #2 after having successfully
@@ -3910,12 +3916,6 @@ B.2.1.  Implementation Considerations
 
    As an alternative to caching R2, the server could generate R2 in such
    a way that it can be sent (in response #1) and verified (at reception
-   of request #2) as the value of R2 it had generated.  Such a procedure
-   MUST NOT lead to the server accepting replayed request #2 messages.
-   One construction described in the following is based on using a
-   secret random HMAC key K_HMAC per set of immutable security context
-   parameters associated with a client.  This construction allows the
-   server to handle verification of R2 in response #2 at the cost of
 
 
 
@@ -3924,6 +3924,12 @@ Selander, et al.             Standards Track                   [Page 70]
 RFC 8613                         OSCORE                        June 2019
 
 
+   of request #2) as the value of R2 it had generated.  Such a procedure
+   MUST NOT lead to the server accepting replayed request #2 messages.
+   One construction described in the following is based on using a
+   secret random HMAC key K_HMAC per set of immutable security context
+   parameters associated with a client.  This construction allows the
+   server to handle verification of R2 in response #2 at the cost of
    storing the K_HMAC keys and a slightly larger message overhead in
    response #1.  Steps below refer to modifications to Appendix B.2:
 
@@ -3963,6 +3969,17 @@ RFC 8613                         OSCORE                        June 2019
    adding a random delay before requests immediately after reboot or if
    such parallel protocol runs are detected.
 
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 71]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 B.2.2.  Attack Considerations
 
    An on-path attacker may inject a message causing the endpoint to
@@ -3972,14 +3989,6 @@ B.2.2.  Attack Considerations
    Replaying an old request with a value of 'kid_context' that the
    server does not recognize could trigger the protocol.  This causes
    the server to generate the first and second security context and send
-
-
-
-Selander, et al.             Standards Track                   [Page 71]
-
-RFC 8613                         OSCORE                        June 2019
-
-
    a response.  But if the client did not expect a response, it will be
    discarded.  This may still result in a denial-of-service attack
    against the server, e.g., because of not being able to manage the
@@ -4016,6 +4025,17 @@ C.1.  Test Vector 1: Key Derivation with Master Salt
    In this test vector, a Master Salt of 8 bytes is used.  The default
    values are used for AEAD Algorithm and HKDF.
 
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 72]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 C.1.1.  Client
 
    Inputs:
@@ -4027,14 +4047,6 @@ C.1.1.  Client
    o  Sender ID: 0x (0 byte)
 
    o  Recipient ID: 0x01 (1 byte)
-
-
-
-
-Selander, et al.             Standards Track                   [Page 72]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    From the previous parameters,
 
@@ -4073,6 +4085,13 @@ C.1.2.  Server
 
    From the previous parameters,
 
+
+
+Selander, et al.             Standards Track                   [Page 73]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    o  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
 
    o  info (for Recipient Key): 0x8540f60a634b657910 (9 bytes)
@@ -4084,13 +4103,6 @@ C.1.2.  Server
    o  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
    o  Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
-
-
-
-Selander, et al.             Standards Track                   [Page 73]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
@@ -4128,6 +4140,14 @@ C.2.1.  Client
 
    o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
+
+
+
+Selander, et al.             Standards Track                   [Page 74]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    o  Recipient Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 
    o  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
@@ -4138,15 +4158,6 @@ C.2.1.  Client
    o  sender nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
    o  recipient nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 74]
-
-RFC 8613                         OSCORE                        June 2019
-
 
 C.2.2.  Server
 
@@ -4181,6 +4192,18 @@ C.2.2.  Server
 
    o  recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
+
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 75]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 C.3.  Test Vector 3: Key Derivation with ID Context
 
    In this test vector, a Master Salt of 8 bytes and an ID Context of 8
@@ -4196,13 +4219,6 @@ C.3.1.  Client
    o  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
    o  Sender ID: 0x (0 byte)
-
-
-
-Selander, et al.             Standards Track                   [Page 75]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  Recipient ID: 0x01 (1 byte)
 
@@ -4234,6 +4250,16 @@ RFC 8613                         OSCORE                        June 2019
 
    o  recipient nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 76]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 C.3.2.  Server
 
    Inputs:
@@ -4252,13 +4278,6 @@ C.3.2.  Server
 
    o  info (for Sender Key): 0x8541014837cbf3210017a2d30a634b657910 (18
       bytes)
-
-
-
-Selander, et al.             Standards Track                   [Page 76]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  info (for Recipient Key): 0x85404837cbf3210017a2d30a634b657910 (17
       bytes)
@@ -4290,6 +4309,13 @@ C.4.  Test Vector 4: OSCORE Request, Client
    Unprotected CoAP request:
    0x44015d1f00003974396c6f63616c686f737483747631 (22 bytes)
 
+
+
+Selander, et al.             Standards Track                   [Page 77]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    Common Context:
 
    o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
@@ -4307,14 +4333,6 @@ C.4.  Test Vector 4: OSCORE Request, Client
    o  Sender Sequence Number: 20
 
    The following COSE and cryptographic parameters are derived:
-
-
-
-
-Selander, et al.             Standards Track                   [Page 77]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  Partial IV: 0x14 (1 byte)
 
@@ -4347,6 +4365,13 @@ C.5.  Test Vector 5: OSCORE Request, Client
    request using the security context derived in Appendix C.2.  The
    unprotected request only contains the Uri-Path and Uri-Host options.
 
+
+
+Selander, et al.             Standards Track                   [Page 78]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    Unprotected CoAP request:
    0x440171c30000b932396c6f63616c686f737483747631 (22 bytes)
 
@@ -4363,14 +4388,6 @@ C.5.  Test Vector 5: OSCORE Request, Client
    o  Sender ID: 0x00 (1 bytes)
 
    o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
-
-
-
-
-Selander, et al.             Standards Track                   [Page 78]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  Sender Sequence Number: 20
 
@@ -4401,6 +4418,16 @@ RFC 8613                         OSCORE                        June 2019
    o  Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f6
       3616c686f737463091400ff4ed339a5a379b0b8bc731fffb0 (36 bytes)
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 79]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 C.6.  Test Vector 6: OSCORE Request, Client
 
    This section contains a test vector for an OSCORE-protected CoAP GET
@@ -4420,13 +4447,6 @@ C.6.  Test Vector 6: OSCORE Request, Client
    o  Key Derivation Function: HKDF SHA-256
 
    o  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
-
-
-
-Selander, et al.             Standards Track                   [Page 79]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
@@ -4456,6 +4476,14 @@ RFC 8613                         OSCORE                        June 2019
 
    o  nonce: 0x2ca58fb85ff1b81c0b7181b84a (13 bytes)
 
+
+
+
+Selander, et al.             Standards Track                   [Page 80]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    From the previous parameter, the following is derived:
 
    o  OSCORE option value: 0x19140837cbf3210017a2d3 (11 bytes)
@@ -4475,14 +4503,6 @@ C.7.  Test Vector 7: OSCORE Response, Server
    response has payload "Hello World!" and no options.  The protected
    response does not contain a 'kid' nor a Partial IV.  Note that some
    parameters are derived from the request.
-
-
-
-
-Selander, et al.             Standards Track                   [Page 80]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    Unprotected CoAP response:
    0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
@@ -4513,6 +4533,13 @@ RFC 8613                         OSCORE                        June 2019
 
    o  encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
+
+
+Selander, et al.             Standards Track                   [Page 81]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    o  nonce: 0x4622d4dd6d944168eefb549868 (13 bytes)
 
    From the previous parameter, the following is derived:
@@ -4527,18 +4554,6 @@ RFC 8613                         OSCORE                        June 2019
    o  Protected CoAP response (OSCORE message):
       0x64445d1f0000397490ffdbaad1e9a7e7b2a813d3c31524378303cdafae119106
       (32 bytes)
-
-
-
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 81]
-
-RFC 8613                         OSCORE                        June 2019
-
 
 C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
@@ -4573,6 +4588,14 @@ C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
    o  aad_array: 0x8501810a40411440 (8 bytes)
 
+
+
+
+Selander, et al.             Standards Track                   [Page 82]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
    o  plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
@@ -4587,14 +4610,6 @@ C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
    o  ciphertext: 0x4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (22
       bytes)
-
-
-
-
-Selander, et al.             Standards Track                   [Page 82]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    From there:
 
@@ -4629,6 +4644,14 @@ D.1.  Threat Model
    Additionally, OSCORE does not protect Class U option instances
    (Section 4.1), as these are used to support CoAP forward proxy
    operations (see Section 5.7.2 of [RFC7252]).  The supported proxies
+
+
+
+Selander, et al.             Standards Track                   [Page 83]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    (forwarding, cross-protocol, e.g., CoAP to CoAP-mappable protocols
    such as HTTP) must be able to change certain Class U options (by
    instruction from the Client), resulting in the CoAP request being
@@ -4642,15 +4665,6 @@ D.1.  Threat Model
    Attacks on unprotected CoAP message fields generally causes denial-
    of-service attacks which are out of scope of this document, more
    details are given in Appendix D.5.
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 83]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    Attacks against the CoAP request-response layer are in scope.  OSCORE
    is intended to protect against eavesdropping, spoofing, insertion,
@@ -4685,6 +4699,15 @@ D.2.  Supporting Proxy Operations
    protected message fields and the consequences of message fields
    intended for proxy operation being unprotected.
 
+
+
+
+
+Selander, et al.             Standards Track                   [Page 84]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 D.3.  Protected Message Fields
 
    Protected message fields are included in the plaintext (Section 5.3)
@@ -4700,13 +4723,6 @@ D.3.  Protected Message Fields
    o  Confidentiality: An attacker should not be able to determine the
       plaintext contents of a given OSCORE message or determine that
       different plaintexts are related (Section 5.3).
-
-
-
-Selander, et al.             Standards Track                   [Page 84]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    o  Integrity: An attacker should not be able to craft a new OSCORE
       message with protected message fields different from an existing
@@ -4737,6 +4753,17 @@ RFC 8613                         OSCORE                        June 2019
    information about padding may still be revealed by side-channel
    attacks observing differences in timing.
 
+
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 85]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 D.4.  Uniqueness of (key, nonce)
 
    In this section, we show that (key, nonce) pairs are unique as long
@@ -4756,13 +4783,6 @@ D.4.  Uniqueness of (key, nonce)
    Partial IV (ID_PIV).  The nonce construction (Section 5.2) with the
    size of the ID_PIV (S) creates unique nonces for different (ID_PIV,
    PIV) pairs.  There are two cases:
-
-
-
-Selander, et al.             Standards Track                   [Page 85]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    A.  For requests, and responses with Partial IV (e.g., Observe
    notifications):
@@ -4790,6 +4810,16 @@ RFC 8613                         OSCORE                        June 2019
    Context, PIV is unique for this ID_PIV, which makes all nonces in
    case B distinct.
 
+
+
+
+
+
+Selander, et al.             Standards Track                   [Page 86]
+
+RFC 8613                         OSCORE                        June 2019
+
+
 D.5.  Unprotected Message Fields
 
    This section analyzes attacks on message fields that are not
@@ -4812,14 +4842,6 @@ D.5.1.  CoAP Header Fields
       particular, this is true for notifications, where multiple
       responses are matched with one request.  Modifications of Token
       and Token Length by an on-path attacker may become a denial-of-
-
-
-
-Selander, et al.             Standards Track                   [Page 86]
-
-RFC 8613                         OSCORE                        June 2019
-
-
       service attack, since it may prevent the client to identify to
       which request the response belongs or to find the correct
       information to verify integrity of the response.
@@ -4846,6 +4868,14 @@ RFC 8613                         OSCORE                        June 2019
       response message.  A change of these fields in a UDP hop is a
       denial-of-service attack.  By sending an ACK, an attacker can make
       the endpoint believe that it does not need to retransmit the
+
+
+
+Selander, et al.             Standards Track                   [Page 87]
+
+RFC 8613                         OSCORE                        June 2019
+
+
       previous message.  By sending a RST, an attacker may be able to
       cancel an observation.  By changing a NON to a CON, the attacker
       can cause the receiving endpoint to ACK messages for which no ACK
@@ -4868,14 +4898,6 @@ D.5.2.  CoAP Options
       proxy deployments.  With OSCORE, the Proxy-Uri option does not
       contain the Uri-Path/Uri-Query parts of the URI.  The other parts
       of Proxy-Uri cannot be protected because forward proxies need to
-
-
-
-Selander, et al.             Standards Track                   [Page 87]
-
-RFC 8613                         OSCORE                        June 2019
-
-
       change them in order to perform their functions.  The server can
       verify what scheme is used in the last hop, but not what was
       requested by the client or what was used in previous hops.
@@ -4901,6 +4923,15 @@ RFC 8613                         OSCORE                        June 2019
       responses are bound to requests in OSCORE (see Appendix D.3), but
       that does not open up for attacks based on mismatched
       cancellations, since for cancellations to be accepted, all options
+
+
+
+
+Selander, et al.             Standards Track                   [Page 88]
+
+RFC 8613                         OSCORE                        June 2019
+
+
       in the decrypted message except for ETag Options MUST be the same
       (see Section 4.1.3.5).
 
@@ -4923,15 +4954,6 @@ RFC 8613                         OSCORE                        June 2019
       denial-of-service attack against the proxy operations, but since
       the option has an Inner value, its use can be securely agreed upon
       between the endpoints.  The presence of this option is not
-
-
-
-
-Selander, et al.             Standards Track                   [Page 88]
-
-RFC 8613                         OSCORE                        June 2019
-
-
       expected to reveal any sensitive information about the message
       exchange.
 
@@ -4957,6 +4979,15 @@ D.5.3.  Error and Signaling Messages
    responding altogether in case of OSCORE processing errors, if that is
    a security concern for the application.  Moreover, clients MUST NOT
    rely on the error code or the diagnostic payload to trigger specific
+
+
+
+
+Selander, et al.             Standards Track                   [Page 89]
+
+RFC 8613                         OSCORE                        June 2019
+
+
    actions, as these errors are unprotected and can be spoofed or
    manipulated.
 
@@ -4979,15 +5010,6 @@ Appendix E.  CDDL Summary
 
    Data structure definitions in the present specification employ the
    CDDL language for conciseness and precision [RFC8610].  This appendix
-
-
-
-
-Selander, et al.             Standards Track                   [Page 89]
-
-RFC 8613                         OSCORE                        June 2019
-
-
    summarizes the small subset of CDDL that is used in the present
    specification.
 
@@ -5013,6 +5035,15 @@ RFC 8613                         OSCORE                        June 2019
       array description contain elements that correspond one-to-one to
       the sequence of entries given.  Each entry of an array description
       is of the form "name : type", where "name" is the name given to
+
+
+
+
+Selander, et al.             Standards Track                   [Page 90]
+
+RFC 8613                         OSCORE                        June 2019
+
+
       the entry and "type" is the type of the array element
       corresponding to this entry.
 
@@ -5032,17 +5063,6 @@ Acknowledgments
    the grant RIT17-0032.
 
 Authors' Addresses
-
-
-
-
-
-
-
-Selander, et al.             Standards Track                   [Page 90]
-
-RFC 8613                         OSCORE                        June 2019
-
 
    Goeran Selander
    Ericsson AB
@@ -5066,26 +5086,6 @@ RFC 8613                         OSCORE                        June 2019
    RISE
 
    Email: ludwig.seitz@ri.se
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1372,9 +1372,29 @@ described in Section 3 of <xref target="IV-GEN"/>.</t>
 
 <t><list style="numbers">
   <t>Discard Code and all Class E options (marked in <xref target="fig-option-protection"/> with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.</t>
+
+  <!--
+  [Auth-fp] Editorial clarification:
+OLD:
+       *  If the server fails to retrieve a Recipient Context with
+          Recipient ID corresponding to the 'kid' parameter received,
+          the server MAY respond with a 4.01 (Unauthorized) error
+          message.  The server MAY set an Outer Max-Age option with
+          value zero.  The diagnostic payload MAY contain the string
+          "Security context not found".
+NEW:
+       *  If the server fails to retrieve a Recipient Context with
+          Recipient ID corresponding to the 'kid' parameter received,
+          the server MAY respond with a 4.01 (Unauthorized) error
+          message.  The server MAY set an Outer Max-Age option with
+          value zero.  The diagnostic payload MAY contain the string
+          "Security context not found".  Alternatively, the server MAY
+          be configured to derive a new security context with the
+          received Recipient ID, as specified in Appendix B.2.
+  -->
   <t>Decompress the COSE object (<xref target="compression"/>) and retrieve the Recipient Context associated with the Recipient ID in the 'kid' parameter, additionally using the 'kid context', if present. If either the decompression or the COSE message fails to decode, or the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, then the server SHALL stop processing the request.  <list style="symbols">
       <t>If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 (Bad Option) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Failed to decode COSE".</t>
-      <t>If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 (Unauthorized) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Security context not found".</t>
+      <t>If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 (Unauthorized) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Security context not found". Alternatively, the server MAY be configured to derive a new security context with the received Recipient ID, as specified in <xref target="master-secret-multiple"/>.</t>
     </list></t>
   <t>Verify that the 'Partial IV' has not been received before using the Replay Window, as described in <xref target="replay-protection"/>.</t>
   <t>Compose the AAD, as described in <xref target="AAD"/>.</t>
@@ -2650,6 +2670,16 @@ context. For example, if a device is provisioned with one fixed set of
 input parameters (including Master Secret, Sender and Recipient
 Identifiers), then a randomized ID Context ensures that the security
 context is different for each deployment.</t>
+
+<!--
+[Auth-fp] added the following paragraph for clarification. 
+-->
+
+<t>
+Note that the server needs to be configured to run this protocol when
+it is not able to retrieve an existing security context, instead of stopping
+processing the message as described in step 2 of <xref target="ver-req"/>.
+</t>
 
 <t>The protocol is described below with reference to <xref target="fig-B2"/>. The client or the server may initiate the protocol, in the latter case step 1 is omitted.</t>
 
