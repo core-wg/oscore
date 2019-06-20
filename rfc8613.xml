@@ -303,10 +303,11 @@ target="coap-coap-proxy"/>.</t>
 
 <t>An endpoint uses its Sender ID (SID) to derive its Sender Context; the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in <xref target="fig-context"/>.</t>
 
+<!-- [Auth-fp] minor modification to the figure, to increase readability -->
 <figure title="Retrieval and Use of the Security Context" anchor="fig-context"><artwork align="center"><![CDATA[
-          .-----------------------------------------------.
-          |                Common Context                 |
-          +---------------------.---.---------------------+        
+          .---------------------.   .---------------------.
+          |    Common Context   | = |    Common Context   |
+          +---------------------+   +---------------------+        
           |    Sender Context   | = |  Recipient Context  |
           +---------------------+   +---------------------+ 
           |  Recipient Context  | = |    Sender Context   |

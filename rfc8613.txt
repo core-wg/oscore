@@ -418,9 +418,9 @@ RFC 8613                         OSCORE                        June 2019
    not the same, but they are partly mirrored.  Retrieval and use of the
    security context are shown in Figure 4.
 
-             .-----------------------------------------------.
-             |                Common Context                 |
-             +---------------------.---.---------------------+
+             .---------------------.   .---------------------.
+             |    Common Context   | = |    Common Context   |
+             +---------------------+   +---------------------+
              |    Sender Context   | = |  Recipient Context  |
              +---------------------+   +---------------------+
              |  Recipient Context  | = |    Sender Context   |
