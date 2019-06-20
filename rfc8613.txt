@@ -967,7 +967,7 @@ RFC 8613                         OSCORE                        June 2019
 
    o  Uri-Host = "example.com"
 
-   o  Uri-Port = "5683"
+   o  Uri-Port = "5683" (default)
 
    o  Uri-Path = "resource"
 

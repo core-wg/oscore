@@ -337,7 +337,7 @@ Verify request with   |                       |
 
 "Authenticated Encryption with Associated Data (AEAD, <xref target="RFC5116"/>)"
 
-Should we align to be consisitent?
+Should we align to be consisistent?
 
 -->
 
@@ -611,11 +611,17 @@ For the use of Proxy-Uri, see <xref target="proxy-uri"/>.</t>
 </list></t>
 
 <t>During OSCORE processing, Proxy-Uri is split into:</t>
+<!--[Auth-fp] added the term "default" next to Uri-Port as it is the default value that is used here
+OLD:
+Uri-Port = "5683"
+NEW:
+Uri-Port = "5683" (default)
+-->
 
 <t><list style="symbols">
   <t>Proxy-Scheme = "coap"</t>
   <t>Uri-Host = "example.com"</t>
-  <t>Uri-Port = "5683"</t>
+  <t>Uri-Port = "5683" (default)</t>
   <t>Uri-Path = "resource"</t>
   <t>Uri-Query = "q=1"</t>
 </list></t>
