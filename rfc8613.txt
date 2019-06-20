@@ -4320,7 +4320,7 @@ RFC 8613                         OSCORE                        June 2019
 
    o  kid: 0x (0 byte)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   o  aad_array: 0x8501810a40411440 (8 bytes)
 
    o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
@@ -4380,7 +4380,7 @@ RFC 8613                         OSCORE                        June 2019
 
    o  kid: 0x00 (1 byte)
 
-   o  external_aad: 0x8501810a4100411440 (9 bytes)
+   o  aad_array: 0x8501810a4100411440 (9 bytes)
 
    o  AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
 
@@ -4446,7 +4446,7 @@ RFC 8613                         OSCORE                        June 2019
 
    o  kid context: 0x37cbf3210017a2d3 (8 bytes)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   o  aad_array: 0x8501810a40411440 (8 bytes)
 
    o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
@@ -4505,7 +4505,7 @@ RFC 8613                         OSCORE                        June 2019
 
    The following COSE and cryptographic parameters are derived:
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   o  aad_array: 0x8501810a40411440 (8 bytes)
 
    o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
@@ -4571,7 +4571,7 @@ C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
    o  Partial IV: 0x00 (1 byte)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   o  aad_array: 0x8501810a40411440 (8 bytes)
 
    o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 

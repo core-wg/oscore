@@ -2852,6 +2852,17 @@ response to request.</t>
 
 <t>Note that in <xref target="tv4"/> and all following test vectors the Token and the Message ID of the OSCORE-protected CoAP messages are set to the same value of the unprotected CoAP message to help the reader with comparisons.</t>
 
+<!--
+[Auth-fp] An implementer pointed out an error in this section (see following
+ subsections): the value we give for external_aad is in fact the value of aad_array.
+aad_array is linked to external_aad: external_aad is a CBOR bstr wrapping of 
+aad_array. We fixed the error in the following way (5 instances):
+OLD:
+external_aad: 0x8501810a40411440 (8 bytes)
+NEW:
+aad_array: 0x8501810a40411440 (8 bytes)
+-->
+
 <section anchor="key-der-tv-ms" title="Test Vector 1: Key Derivation with Master Salt">
 
 <t>In this test vector, a Master Salt of 8 bytes is used. The default values are used for AEAD Algorithm and HKDF.</t>
@@ -3107,7 +3118,7 @@ Uri-Path and Uri-Host options.</t>
 <t><list style="symbols">
   <t>Partial IV: 0x14 (1 byte)</t>
   <t>kid: 0x (0 byte)</t>
-  <t>external_aad: 0x8501810a40411440 (8 bytes)</t>
+  <t>aad_array: 0x8501810a40411440 (8 bytes)</t>
   <t>AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)</t>
   <t>plaintext: 0x01b3747631 (5 bytes)</t>
   <t>encryption key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)</t>
@@ -3155,7 +3166,7 @@ Uri-Path and Uri-Host options.</t>
 <t><list style="symbols">
   <t>Partial IV: 0x14 (1 byte)</t>
   <t>kid: 0x00 (1 byte)</t>
-  <t>external_aad: 0x8501810a4100411440 (9 bytes)</t>
+  <t>aad_array: 0x8501810a4100411440 (9 bytes)</t>
   <t>AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)</t>
   <t>plaintext: 0x01b3747631 (5 bytes)</t>
   <t>encryption key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)</t>
@@ -3205,7 +3216,7 @@ Uri-Path and Uri-Host options.</t>
   <t>Partial IV: 0x14 (1 byte)</t>
   <t>kid: 0x (0 byte)</t>
   <t>kid context: 0x37cbf3210017a2d3 (8 bytes)</t>
-  <t>external_aad: 0x8501810a40411440 (8 bytes)</t>
+  <t>aad_array: 0x8501810a40411440 (8 bytes)</t>
   <t>AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)</t>
   <t>plaintext: 0x01b3747631 (5 bytes)</t>
   <t>encryption key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)</t>
@@ -3252,7 +3263,7 @@ Uri-Path and Uri-Host options.</t>
 <t>The following COSE and cryptographic parameters are derived:</t>
 
 <t><list style="symbols">
-  <t>external_aad: 0x8501810a40411440 (8 bytes)</t>
+  <t>aad_array: 0x8501810a40411440 (8 bytes)</t>
   <t>AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)</t>
   <t>plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)</t>
   <t>encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)</t>
@@ -3299,7 +3310,7 @@ Uri-Path and Uri-Host options.</t>
 
 <t><list style="symbols">
   <t>Partial IV: 0x00 (1 byte)</t>
-  <t>external_aad: 0x8501810a40411440 (8 bytes)</t>
+  <t>aad_array: 0x8501810a40411440 (8 bytes)</t>
   <t>AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)</t>
   <t>plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)</t>
   <t>encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)</t>
