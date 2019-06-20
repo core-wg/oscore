@@ -87,7 +87,7 @@ Table of Contents
      5.4.  Additional Authenticated Data . . . . . . . . . . . . . .  28
    6.  OSCORE Header Compression . . . . . . . . . . . . . . . . . .  30
      6.1.  Encoding of the OSCORE Option Value . . . . . . . . . . .  30
-     6.2.  Encoding of the OSCORE Payload  . . . . . . . . . . . . .  31
+     6.2.  Encoding of the OSCORE Payload  . . . . . . . . . . . . .  32
      6.3.  Examples of Compressed COSE Objects . . . . . . . . . . .  32
    7.  Message Binding, Sequence Numbers, Freshness, and Replay
        Protection  . . . . . . . . . . . . . . . . . . . . . . . . .  34
@@ -592,7 +592,7 @@ RFC 8613                         OSCORE                        June 2019
    o  IKM is the Master Secret as defined above
 
    o  info is the serialization of a CBOR array consisting of (the
-      notation follows Appendix E):
+      notation follows [RFC8610] as summarized in Appendix E):
 
       info = [
         id : bstr,
@@ -1551,7 +1551,8 @@ RFC 8613                         OSCORE                        June 2019
 5.4.  Additional Authenticated Data
 
    The external_aad SHALL be a CBOR array wrapped in a bstr object as
-   defined below:
+   defined below, following the notation of [RFC8610] as summarized in
+   Appendix E:
 
    external_aad = bstr .cbor aad_array
 
@@ -1563,7 +1564,6 @@ RFC 8613                         OSCORE                        June 2019
      options : bstr,
    ]
 
-   where:
 
 
 
@@ -1571,6 +1571,8 @@ Selander, et al.             Standards Track                   [Page 28]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   where:
 
    o  oscore_version: contains the OSCORE version number.
       Implementations of this specification MUST set this field to 1.
@@ -1602,7 +1604,8 @@ RFC 8613                         OSCORE                        June 2019
    need not be integrity protected in all requests.
 
    The AAD is composed from the external_aad as described in Section 5.3
-   of [RFC8152]:
+   of [RFC8152] (the notation follows [RFC8610] as summarized in
+   Appendix E):
 
       AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 
@@ -1618,15 +1621,14 @@ RFC 8613                         OSCORE                        June 2019
 
    o  request_piv: 0x25 (1 byte)
 
-   o  options: 0x (0 bytes)
-
-
 
 
 Selander, et al.             Standards Track                   [Page 29]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   o  options: 0x (0 bytes)
 
    o  aad_array: 0x8501810a4100412540 (9 bytes)
 
@@ -1674,8 +1676,6 @@ RFC 8613                         OSCORE                        June 2019
 
                     Figure 10: The OSCORE Option Value
 
-   o  The first byte, containing the OSCORE flag bits, encodes the
-      following set of bits and the length of the Partial IV parameter:
 
 
 
@@ -1683,6 +1683,9 @@ Selander, et al.             Standards Track                   [Page 30]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   o  The first byte, containing the OSCORE flag bits, encodes the
+      following set of bits and the length of the Partial IV parameter:
 
       *  The three least significant bits encode the Partial IV length
          n.  If n = 0, then the Partial IV is not present in the
@@ -1726,10 +1729,7 @@ RFC 8613                         OSCORE                        June 2019
    section, and on the presence and length of additional parameters, as
    defined in the future documents registering those parameters.
 
-6.2.  Encoding of the OSCORE Payload
 
-   The payload of the OSCORE message SHALL encode the ciphertext of the
-   COSE object.
 
 
 
@@ -1739,6 +1739,11 @@ Selander, et al.             Standards Track                   [Page 31]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+6.2.  Encoding of the OSCORE Payload
+
+   The payload of the OSCORE message SHALL encode the ciphertext of the
+   COSE object.
 
 6.3.  Examples of Compressed COSE Objects
 
@@ -1781,11 +1786,6 @@ RFC 8613                         OSCORE                        June 2019
            { 4:h'', 6:h'00' },
            h'aea0155667924dff8a24e4cb35b9',
          ]
-
-
-
-
-
 
 
 

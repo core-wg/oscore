@@ -418,10 +418,12 @@ Should we align to be consisistent?
 
 <t>where:</t>
 
+<!-- [Auth-fp] Added ref to RFC 8610-->
+
 <t><list style="symbols">
   <t>salt is the Master Salt as defined above</t>
   <t>IKM is the Master Secret as defined above</t>
-  <t>info is the serialization of a CBOR array consisting of (the notation follows <xref target="cddl-sum"/>):</t>
+  <t>info is the serialization of a CBOR array consisting of (the notation follows <xref target="RFC8610"/> as summarized in <xref target="cddl-sum"/>):</t>
 </list></t>
 
 <figure><artwork type="CDDL"><![CDATA[
@@ -925,7 +927,8 @@ response blocked by an on-path attacker.</t>
 </section>
 <section anchor="AAD" title="Additional Authenticated Data">
 
-<t>The external_aad SHALL be a CBOR array wrapped in a bstr object as defined below:</t>
+<!-- [Auth-fp] added CDDL and Appendix B.2 ref -->
+<t>The external_aad SHALL be a CBOR array wrapped in a bstr object as defined below, following the notation of <xref target="RFC8610"/> as summarized in <xref target="cddl-sum"/>:</t>
 
 <figure><artwork type="CDDL"><![CDATA[
 external_aad = bstr .cbor aad_array
@@ -957,7 +960,8 @@ aad_array = [
 
 <t>NOTE: The format of the external_aad is, for simplicity, the same for requests and responses, although some parameters, e.g., request_kid, need not be integrity protected in all requests.</t>
 
-<t>The AAD is composed from the external_aad as described in Section 5.3 of <xref target="RFC8152"/>:</t>
+<!-- [Auth-fp] Added ref to CDDL and Appendix) -->
+<t>The AAD is composed from the external_aad as described in Section 5.3 of <xref target="RFC8152"/> (the notation follows <xref target="RFC8610"/> as summarized in <xref target="cddl-sum"/>):</t>
 
 <figure><artwork><![CDATA[
    AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
