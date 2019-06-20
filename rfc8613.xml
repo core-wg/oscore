@@ -231,7 +231,7 @@ Client                                          Server
     when, and only when, they appear in all capitals, as shown here.
         </t>
 
-<!--[auth-gs] Some of the RFCs listed in the original text are optional 
+<!--[Auth] Some of the RFCs listed in the original text are optional 
 for OSCORE and thus not required to be familiar with. We propose to 
 replace this one list with two, where optional features are included
 in the second list.
@@ -303,7 +303,7 @@ target="coap-coap-proxy"/>.</t>
 
 <t>An endpoint uses its Sender ID (SID) to derive its Sender Context; the other endpoint uses the same ID, now called Recipient ID (RID), to derive its Recipient Context. In communication between two endpoints, the Sender Context of one endpoint matches the Recipient Context of the other endpoint, and vice versa. Thus, the two security contexts identified by the same IDs in the two endpoints are not the same, but they are partly mirrored. Retrieval and use of the security context are shown in <xref target="fig-context"/>.</t>
 
-<!-- [Auth-fp] minor modification to the figure, to increase readability -->
+<!-- [Auth] minor modification to the figure, to increase readability -->
 <figure title="Retrieval and Use of the Security Context" anchor="fig-context"><artwork align="center"><![CDATA[
           .---------------------.   .---------------------.
           |    Common Context   | = |    Common Context   |
@@ -334,7 +334,7 @@ Verify request with   |                       |
 <t><list style="symbols">
   <t>AEAD Algorithm. The COSE AEAD algorithm to use for encryption.</t>
 
-<!--[auth-gs] We noted a difference between how HKDF and AEAD are referenced:
+<!--[Auth] We noted a difference between how HKDF and AEAD are referenced:
 
 "Authenticated Encryption with Associated Data (AEAD, <xref target="RFC5116"/>)"
 
@@ -351,7 +351,7 @@ Should we align to be consistent?
 
 <t>The Sender Context contains the following parameters:</t>
 
-<!--[auth-gs] Clarification: Not only Sender ID makes unique AEAD nonces.
+<!--[Auth] Clarification: Not only Sender ID makes unique AEAD nonces.
 
 -->
 
@@ -363,7 +363,7 @@ Should we align to be consistent?
 
 <t>The Recipient Context contains the following parameters:</t>
 
-<!--[auth-gs] Clarification: Not only Recipient ID makes unique AEAD nonces.
+<!--[Auth] Clarification: Not only Recipient ID makes unique AEAD nonces.
 
 -->
 
@@ -418,7 +418,7 @@ Should we align to be consistent?
 
 <t>where:</t>
 
-<!-- [Auth-fp] Added ref to RFC 8610-->
+<!-- [Auth] Added ref to RFC 8610-->
 
 <t><list style="symbols">
   <t>salt is the Master Salt as defined above</t>
@@ -576,12 +576,12 @@ U = Unprotected (Outer)
 
 <t>An Inner Max-Age message field is used to indicate the maximum time a response may be cached by the client (as defined in <xref target="RFC7252"/>), end-to-end from the server to the client, taking into account that the option is not accessible to proxies. The Inner Max-Age SHALL be processed by OSCORE as a normal Inner option, specified in <xref target="inner-options"/>.</t>
 
-<!--[auth-gs] clarifying "the intermediary caching". There are 15 other occurences of intermediary/intermediaries, I do not propose general replace.
+<!--[Auth] clarifying "the intermediary caching". There are 15 other occurences of intermediary/intermediaries, I do not propose general replace.
  -->
 
 <t>An Outer Max-Age message field is used to avoid unnecessary caching of error responses  caused by OSCORE processing at OSCORE-unaware intermediary nodes. A server MAY set a Class U Max-Age message field with value zero to such error responses, described in Sections <xref target="replay-protection" format="counter"/>, <xref target="ver-req" format="counter"/>, and <xref target="ver-res" format="counter"/>, since these error responses are cacheable, but subsequent OSCORE requests would never create a hit in the intermediary node caching it. Setting the Outer Max-Age to zero relieves the intermediary from uselessly caching responses. Successful OSCORE responses do not need to include an Outer Max-Age option. Except when the Observe option (see <xref target="observe"/>) is used, responses appear to the OSCORE-unaware intermediary as 2.04 (Changed) responses, which are non-cacheable (see <xref target="coap-header"/>). For Observe responses, which are cacheable, an Outer Max-Age option with value 0 may be used to avoid unnecessary proxy caching.</t>
 
-<!--[auth-gs] clarifying (above) why the conclusion also applies to messages with the Observe option.
+<!--[Auth] clarifying (above) why the conclusion also applies to messages with the Observe option.
  -->
 
 <t>The Outer Max-Age message field is processed according to <xref target="outer-options"/>.</t>
@@ -614,7 +614,7 @@ For the use of Proxy-Uri, see <xref target="proxy-uri"/>.</t>
 </list></t>
 
 <t>During OSCORE processing, Proxy-Uri is split into:</t>
-<!--[Auth-fp] added the term "default" next to Uri-Port as it is the default value that is used here
+<!--[Auth] added the term "default" next to Uri-Port as it is the default value that is used here
 OLD:
 Uri-Port = "5683"
 NEW:
@@ -803,9 +803,9 @@ For example, 7.02 (Ping) is protected as a CoAP request and 7.03 (Pong) as a CoA
 </section>
 <section anchor="cose-object" title="The COSE Object">
   
-  <!--[auth-gs] Replacing second (erroneous) definition of AEAD with abbrevation.
+  <!--[Auth] Replacing second (erroneous) definition of AEAD with abbrevation.
 
-  [Auth-fp] add reference to section 5.2 of RFC 8152 for the first time COSE_Encrypt0 appears.
+  [Auth] add reference to section 5.2 of RFC 8152 for the first time COSE_Encrypt0 appears.
    -->
   
 <t>This section defines how to use COSE <xref target="RFC8152"/> to wrap and protect data in the original message. OSCORE uses the untagged COSE_Encrypt0 structure (see Section 5.2 of <xref target="RFC8152"/>) with an AEAD algorithm. The AEAD key lengths, AEAD nonce length, and maximum Sender Sequence Number are algorithm dependent.</t>
@@ -816,7 +816,7 @@ For example, 7.02 (Ping) is protected as a CoAP request and 7.03 (Pong) as a CoA
 
 <t>The COSE object SHALL be a COSE_Encrypt0 object with fields defined as follows:</t>
 
-<!--[auth-gs] Correcting old text on the use of Partial IV in response.
+<!--[Auth] Correcting old text on the use of Partial IV in response.
  -->
 
 
@@ -899,7 +899,7 @@ response blocked by an on-path attacker.</t>
 </section>
 <section anchor="plaintext" title="Plaintext">
 
-  <!--[auth-gs] Correcting "without header"
+  <!--[Auth] Correcting "without header"
    -->
   
 <t>The plaintext is formatted as a CoAP message with a subset of the header (see <xref target="fig-plaintext"/>) consisting of:</t>
@@ -927,7 +927,7 @@ response blocked by an on-path attacker.</t>
 </section>
 <section anchor="AAD" title="Additional Authenticated Data">
 
-<!-- [Auth-fp] added CDDL and Appendix B.2 ref -->
+<!-- [Auth] added CDDL and Appendix B.2 ref -->
 <t>The external_aad SHALL be a CBOR array wrapped in a bstr object as defined below, following the notation of <xref target="RFC8610"/> as summarized in <xref target="cddl-sum"/>:</t>
 
 <figure><artwork type="CDDL"><![CDATA[
@@ -953,14 +953,14 @@ aad_array = [
   <t>options: contains the Class I options (see <xref target="outer-options"/>) present in the original CoAP message encoded as described in Section 3.1 of <xref target="RFC7252"/>, where the delta is the difference from the previously included instance of class I option.</t>
 </list></t>
 
-<!--[auth-gs] Correction: missing 'not'
+<!--[Auth] Correction: missing 'not'
  -->
 
 <t>The oscore_version and algorithms parameters are established out-of-band; thus, they are not transported in OSCORE, but the external_aad allows to verify that they are the same in both endpoints.</t>
 
 <t>NOTE: The format of the external_aad is, for simplicity, the same for requests and responses, although some parameters, e.g., request_kid, need not be integrity protected in all requests.</t>
 
-<!-- [Auth-fp] Added ref to CDDL and Appendix) -->
+<!-- [Auth] Added ref to CDDL and Appendix) -->
 <t>The AAD is composed from the external_aad as described in Section 5.3 of <xref target="RFC8152"/> (the notation follows <xref target="RFC8610"/> as summarized in <xref target="cddl-sum"/>):</t>
 
 <figure><artwork><![CDATA[
@@ -1261,7 +1261,7 @@ reliable and unreliable transports and where messages may be lost,
 such a replay mechanism may be too restrictive and the default replay
 window may be more suitable (see <xref target="initial-replay"/>).</t>
 
-<!--[auth-gs] Clarifying Partial IV is not used for replay protection of responses.
+<!--[Auth] Clarifying Partial IV is not used for replay protection of responses.
 
 -->
 
@@ -1274,7 +1274,7 @@ window may be more suitable (see <xref target="initial-replay"/>).</t>
 
 <t>The following applies additionally when the Observe option is supported.</t>
 
-<!--[auth-gs] Inserted reference
+<!--[Auth] Inserted reference
  -->
 
 <t>The Notification Number (see <xref target="notifications"/>)
@@ -1308,7 +1308,7 @@ Sequence Number and Replay Window. These are typically stored in RAM
 and therefore lost in the case of, e.g., an unplanned reboot. There are
 different alternatives to recover, for example:</t>
 
-<!--[auth-gs] Rephrasing unclear formulation.
+<!--[Auth] Rephrasing unclear formulation.
  -->
 
 <t><list style="numbers">
@@ -1378,7 +1378,7 @@ described in Section 3 of <xref target="IV-GEN"/>.</t>
   <t>Discard Code and all Class E options (marked in <xref target="fig-option-protection"/> with 'x' in column E) present in the received message. For example, an If-Match Outer option is discarded, but an Uri-Host Outer option is not discarded.</t>
 
   <!--
-  [Auth-fp] Editorial clarification:
+  [Auth] Editorial clarification:
 OLD:
    2.  Decompress the COSE object (Section 6) and retrieve the Recipient
        Context associated with the Recipient ID in the 'kid' parameter,
@@ -1475,7 +1475,7 @@ Then, go to 4.</t>
 
 <t>If Block-wise is supported, insert the following step before any other:</t>
 
-<!--[auth-gs] Copy-paste error from previous section "Supporting Block-wise" 
+<!--[Auth] Copy-paste error from previous section "Supporting Block-wise" 
  -->
 
 <t>A.  If Block-wise is present in the response, then process the Outer Block options according to <xref target="RFC7959"/>, until all blocks of the response have been received (see <xref target="block-options"/>).</t>
@@ -2595,7 +2595,7 @@ being stored at the time when the device reboots.</t>
 
 <t>To prevent reuse of Sender Sequence Number, an endpoint may perform the following procedure during normal operations:</t>
 
-<!--[auth-gs] Fixing typo: removing space in "no n-volatile"
+<!--[Auth] Fixing typo: removing space in "no n-volatile"
 -->
 
 
@@ -2670,7 +2670,7 @@ Identifiers), then a randomized ID Context ensures that the security
 context is different for each deployment.</t>
 
 <!--
-[Auth-fp] added the following paragraph for clarification. 
+[Auth] added the following paragraph for clarification. 
 -->
 
 <t>
@@ -2809,7 +2809,7 @@ request #1 messages could be difficult for the server to distinguish
 from legitimate. The server needs to handle the case when the maximum
 number of cached R2s is reached. If the server receives a request #1
 and is not capable of executing it then it may respond with an
-unprotected 5.03 (Service Unavailable). The server may clear up state
+unprotected 5.03 (Service Unavailable) error message. The server may clear up state
 from protocol runs that never complete, e.g., set a timer when
 caching R2, and remove R2 and the associated security contexts from
 the cache at timeout. Additionally, state information can be flushed
@@ -2884,7 +2884,7 @@ response to request.</t>
 <t>Note that in <xref target="tv4"/> and all following test vectors the Token and the Message ID of the OSCORE-protected CoAP messages are set to the same value of the unprotected CoAP message to help the reader with comparisons.</t>
 
 <!--
-[Auth-fp] An implementer pointed out an error in this section (see following
+[Auth] An implementer pointed out an error in this section (see following
  subsections): the value we give for external_aad is in fact the value of aad_array.
 aad_array is linked to external_aad: external_aad is a CBOR bstr wrapping of 
 aad_array. We fixed the error in the following way (5 instances):
@@ -3543,42 +3543,13 @@ attacks observing differences in timing.</t>
   IV, since only allowed for the first notification, does not prevent
   correct ordering of notifications. The size and distributions of
   notifications over time may reveal information about the content or
-  nature of the notifications.
-
-<!--[rfced] What does not "open up for attacks"? In other words,
-please clarify what "that" refers to.
-
-Original:
-      Cancellations (Section 4.1.3.5.1)
-      are not bound to the corresponding registrations in the same way
-      responses are bound to requests in OSCORE (see Appendix D.3), but
-      that does not open up for attacks based on mismatched
-      cancellations, since for cancellations to be accepted, all options
-      in the decrypted message except for ETag Options MUST be the same
-      (see Section 4.1.3.5).
-
-
-[Auth] "that" refers to "Cancellations are not bound to the corresponding 
-registration" (the whole sentence).
-
-[Auth-fp] New proposal (not implemented yet):
-
-      Cancellations (Section 4.1.3.5.1)
-      are not bound to the corresponding registrations in the same way
-      responses are bound to requests in OSCORE (see Appendix D.3).
-      However, that does not make attacks based on mismatched
-      cancellations possible, since for cancellations to be accepted, all options
-      in the decrypted message except for ETag Options MUST be the same
-      (see Section 4.1.3.5).
-
--->
-  Cancellations (<xref
+  nature of the notifications.  Cancellations (<xref
   target="observe-registration"/>) are not bound to the corresponding
   registrations in the same way responses are bound to requests in
-  OSCORE (see <xref target="prot-message-fields"/>), but that does not
-  open up for attacks based on mismatched cancellations, since for
-  cancellations to be accepted, all options in the decrypted message
-  except for ETag Options MUST be the same (see <xref
+  OSCORE (see <xref target="prot-message-fields"/>).  However, that does not make attacks based on mismatched
+     cancellations possible, since for cancellations to be accepted, all options
+     in the decrypted message except for ETag Options MUST be the same
+     (see <xref
   target="observe"/>).</t>
   
   <t>Block1/Block2/Size1/Size2. The Outer Block options enable
@@ -3653,7 +3624,7 @@ so we think that, as soon as that is done, the second sentence
 should be removed. In the meantime, we have replaced the original 
 with the proposal.
 
-[auth-fp] CDDL has been published, so the second sentence was removed,
+[Auth] CDDL has been published, so the second sentence was removed,
 and RFC8610 has been made normative.
 -->
 
@@ -3694,18 +3665,6 @@ array element corresponding to this entry.</t>
 <t>Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova. Ludwig Seitz had additional funding from the SSF project SEC4Factory under the grant RIT17-0032.</t>
 
 </section>
-
-<!-- [rfced] The following questions apply to the entire text.
-
-
-b1) Additionally, please review if "error message" or the like should be
-added to instances mentioning an error code for consistent usage
-throughout.
-
-[Auth] Yes, it should. What are the cases we missed?
-
-
--->
 
   </back>
 </rfc>

@@ -3908,11 +3908,11 @@ B.2.1.  Implementation Considerations
    distinguish from legitimate.  The server needs to handle the case
    when the maximum number of cached R2s is reached.  If the server
    receives a request #1 and is not capable of executing it then it may
-   respond with an unprotected 5.03 (Service Unavailable).  The server
-   may clear up state from protocol runs that never complete, e.g., set
-   a timer when caching R2, and remove R2 and the associated security
-   contexts from the cache at timeout.  Additionally, state information
-   can be flushed at reboot.
+   respond with an unprotected 5.03 (Service Unavailable) error message.
+   The server may clear up state from protocol runs that never complete,
+   e.g., set a timer when caching R2, and remove R2 and the associated
+   security contexts from the cache at timeout.  Additionally, state
+   information can be flushed at reboot.
 
    As an alternative to caching R2, the server could generate R2 in such
    a way that it can be sent (in response #1) and verified (at reception
@@ -4920,9 +4920,9 @@ D.5.2.  CoAP Options
       notifications over time may reveal information about the content
       or nature of the notifications.  Cancellations (Section 4.1.3.5.1)
       are not bound to the corresponding registrations in the same way
-      responses are bound to requests in OSCORE (see Appendix D.3), but
-      that does not open up for attacks based on mismatched
-      cancellations, since for cancellations to be accepted, all options
+      responses are bound to requests in OSCORE (see Appendix D.3).
+      However, that does not make attacks based on mismatched
+      cancellations possible, since for cancellations to be accepted,
 
 
 
@@ -4932,8 +4932,8 @@ Selander, et al.             Standards Track                   [Page 88]
 RFC 8613                         OSCORE                        June 2019
 
 
-      in the decrypted message except for ETag Options MUST be the same
-      (see Section 4.1.3.5).
+      all options in the decrypted message except for ETag Options MUST
+      be the same (see Section 4.1.3.5).
 
    o  Block1/Block2/Size1/Size2.  The Outer Block options enable
       fragmentation of OSCORE messages in addition to segmentation
