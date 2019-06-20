@@ -1352,8 +1352,9 @@ RFC 8613                         OSCORE                        June 2019
 
    This section defines how to use COSE [RFC8152] to wrap and protect
    data in the original message.  OSCORE uses the untagged COSE_Encrypt0
-   structure with an AEAD algorithm.  The AEAD key lengths, AEAD nonce
-   length, and maximum Sender Sequence Number are algorithm dependent.
+   structure (see Section 5.2 of [RFC8152]) with an AEAD algorithm.  The
+   AEAD key lengths, AEAD nonce length, and maximum Sender Sequence
+   Number are algorithm dependent.
 
    The AEAD algorithm AES-CCM-16-64-128 defined in Section 10.2 of
    [RFC8152] is mandatory to implement.  For AES-CCM-16-64-128, the
@@ -1394,7 +1395,6 @@ RFC 8613                         OSCORE                        June 2019
          used in responses is given in Appendix B.2.  If 'kid context'
          is present in the request, then the server SHALL use a security
          context with that ID Context when verifying the request.
-
 
 
 
