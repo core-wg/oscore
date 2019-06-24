@@ -4864,10 +4864,10 @@ D.5.1.  CoAP Header Fields
       reading the Type or Message ID gain information about how UDP
       messages are related to each other.  CoAP proxies are allowed to
       change Type and Message ID.  These message fields are not present
-      in CoAP over TCP [RFC8323] and does not impact the request/
-      response message.  A change of these fields in a UDP hop is a
-      denial-of-service attack.  By sending an ACK, an attacker can make
-      the endpoint believe that it does not need to retransmit the
+      in CoAP over TCP [RFC8323] and do not impact the request/response
+      message.  A change of these fields in a UDP hop is a denial-of-
+      service attack.  By sending an ACK, an attacker can make the
+      endpoint believe that it does not need to retransmit the previous
 
 
 
@@ -4876,10 +4876,10 @@ Selander, et al.             Standards Track                   [Page 87]
 RFC 8613                         OSCORE                        June 2019
 
 
-      previous message.  By sending a RST, an attacker may be able to
-      cancel an observation.  By changing a NON to a CON, the attacker
-      can cause the receiving endpoint to ACK messages for which no ACK
-      was requested.
+      message.  By sending a RST, an attacker may be able to cancel an
+      observation.  By changing a NON to a CON, the attacker can cause
+      the receiving endpoint to ACK messages for which no ACK was
+      requested.
 
    o  Length.  This field contain the length of the message [RFC8323],
       which may be used for traffic analysis.  These message fields are
