@@ -4881,11 +4881,11 @@ RFC 8613                         OSCORE                        June 2019
       the receiving endpoint to ACK messages for which no ACK was
       requested.
 
-   o  Length.  This field contain the length of the message [RFC8323],
-      which may be used for traffic analysis.  These message fields are
-      not present in CoAP over UDP and do not impact the request/
-      response message.  A change of Length is a denial-of-service
-      attack similar to changing TCP header fields.
+   o  Length.  This field contains the length of the message [RFC8323],
+      which may be used for traffic analysis.  This message field is not
+      present in CoAP over UDP and does not impact the request/response
+      message.  A change of Length is a denial-of-service attack similar
+      to changing TCP header fields.
 
 D.5.2.  CoAP Options
 

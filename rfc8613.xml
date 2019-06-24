@@ -3569,7 +3569,8 @@ attacks observing differences in timing.</t>
   presence of the Outer Observe option.</t>
   <!-- [Auth] replaced "These message fields ... does not impact" to "These message fields ... do not impact" -->
   <t>Type/Message ID. The Type/Message ID fields <xref target="RFC7252"/> reveal information about the UDP transport binding, e.g., an eavesdropper reading the Type or Message ID gain information about how UDP messages are related to each other. CoAP proxies are allowed to change Type and Message ID. These message fields are not present in CoAP over TCP <xref target="RFC8323"/> and do not impact the request/response message. A change of these fields in a UDP hop is a denial-of-service attack. By sending an ACK, an attacker can make the endpoint believe that it does not need to retransmit the previous message. By sending a RST, an attacker may be able to cancel an observation. By changing a NON to a CON, the attacker can cause the receiving endpoint to ACK messages for which no ACK was requested.</t>
-  <t>Length. This field contain the length of the message <xref target="RFC8323"/>, which may be used for traffic analysis. These message fields are not present in CoAP over UDP and do not impact the request/response message. A change of Length is a denial-of-service attack similar to changing TCP header fields.</t>
+  <!-- [Auth] replaced "This field contain" to "This field contains" and "These message fields are not present ... and do not impact" to "This message field is not present ... and does not impact"-->
+  <t>Length. This field contains the length of the message <xref target="RFC8323"/>, which may be used for traffic analysis. This message field is not present in CoAP over UDP and does not impact the request/response message. A change of Length is a denial-of-service attack similar to changing TCP header fields.</t>
 </list></t>
 
 </section>
