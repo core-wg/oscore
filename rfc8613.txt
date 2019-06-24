@@ -146,7 +146,7 @@ RFC 8613                         OSCORE                        June 2019
      B.1.  Security Context Derived Once . . . . . . . . . . . . . .  65
      B.2.  Security Context Derived Multiple Times . . . . . . . . .  67
    Appendix C.  Test Vectors . . . . . . . . . . . . . . . . . . . .  72
-     C.1.  Test Vector 1: Key Derivation with Master Salt  . . . . .  72
+     C.1.  Test Vector 1: Key Derivation with Master Salt  . . . . .  73
      C.2.  Test Vector 2: Key Derivation without Master Salt . . . .  74
      C.3.  Test Vector 3: Key Derivation with ID Context . . . . . .  76
      C.4.  Test Vector 4: OSCORE Request, Client . . . . . . . . . .  77
@@ -3548,6 +3548,7 @@ A.2.  Secure Subscribe to Sensor
         |       |       |         Observe: 0
         |       |       |          OSCORE: [kid:ca, Partial IV:15]
         |       |       |         Payload: {Code:0.01,
+        |       |       |                   Observe:0,
         |       |       |                   Uri-Path:"glucose"}
         |       |       |
         |       +------>|            Code: 0.05 (FETCH)
@@ -3555,20 +3556,23 @@ A.2.  Secure Subscribe to Sensor
         |       |       |         Observe: 0
         |       |       |          OSCORE: [kid:ca, Partial IV:15]
         |       |       |         Payload: {Code:0.01,
+        |       |       |                   Observe:0,
         |       |       |                   Uri-Path:"glucose"}
         |       |       |
         |       |<------+            Code: 2.05 (Content)
         |       |  2.05 |           Token: 0xbe
         |       |       |         Observe: 7
-        |       |       |          OSCORE: [Partial IV:32]
+        |       |       |          OSCORE: -
         |       |       |         Payload: {Code:2.05,
+        |       |       |                   Observe:-,
         |       |       |                   Content-Format:0, "220"}
         |       |       |
         |<------+       |            Code: 2.05 (Content)
         |  2.05 |       |           Token: 0x83
         |       |       |         Observe: 7
-        |       |       |          OSCORE: [Partial IV:32]
+        |       |       |          OSCORE: -
         |       |       |         Payload: {Code:2.05,
+        |       |       |                   Observe:-,
         |       |       |                   Content-Format:0, "220"}
        ...     ...     ...
         |       |       |
@@ -3576,10 +3580,6 @@ A.2.  Secure Subscribe to Sensor
         |       |  2.05 |           Token: 0xbe
         |       |       |         Observe: 8
         |       |       |          OSCORE: [Partial IV:36]
-        |       |       |         Payload: {Code:2.05,
-        |       |       |                   Content-Format:0, "180"}
-        |       |       |
-        |<------+       |            Code: 2.05 (Content)
 
 
 
@@ -3588,10 +3588,16 @@ Selander, et al.             Standards Track                   [Page 64]
 RFC 8613                         OSCORE                        June 2019
 
 
+        |       |       |         Payload: {Code:2.05,
+        |       |       |                   Observe:-,
+        |       |       |                   Content-Format:0, "180"}
+        |       |       |
+        |<------+       |            Code: 2.05 (Content)
         |  2.05 |       |           Token: 0x83
         |       |       |         Observe: 8
         |       |       |          OSCORE: [Partial IV:36]
         |       |       |         Payload: {Code:2.05,
+        |       |       |                   Observe:-,
         |       |       |                   Content-Format:0, "180"}
         |       |       |
 
@@ -3606,13 +3612,15 @@ RFC 8613                         OSCORE                        June 2019
 
    The COSE header of the request contains an identifier (ca),
    indicating the security context used to protect the message and a
-   Partial IV (15).  The COSE headers of the responses contains Partial
-   IVs (32 and 36).
+   Partial IV (15).  The COSE headers of the second response contains
+   the Partial IV (36).  The first responses uses the Partial IV of the
+   request.
 
    The server verifies that the Partial IV has not been received before.
    The client verifies that the responses are bound to the request and
    that the Partial IVs are greater than any Partial IV previously
-   received in a response bound to the request.
+   received in a response bound to the request, except for the
+   notification without Partial IV, which is considered the oldest.
 
 Appendix B.  Deployment Examples
 
@@ -3629,14 +3637,6 @@ B.1.  Security Context Derived Once
    handle the loss of mutable security context parameters, e.g., due to
    reboot.
 
-B.1.1.  Sender Sequence Number
-
-   In order to handle loss of Sender Sequence Numbers, the device may
-   implement procedures for writing to non-volatile memory during normal
-   operations and updating the security context after reboot, provided
-   that the procedures comply with the requirements on the security
-
-
 
 
 Selander, et al.             Standards Track                   [Page 65]
@@ -3644,6 +3644,12 @@ Selander, et al.             Standards Track                   [Page 65]
 RFC 8613                         OSCORE                        June 2019
 
 
+B.1.1.  Sender Sequence Number
+
+   In order to handle loss of Sender Sequence Numbers, the device may
+   implement procedures for writing to non-volatile memory during normal
+   operations and updating the security context after reboot, provided
+   that the procedures comply with the requirements on the security
    context parameters (Section 3.3).  This section gives an example of
    such a procedure.
 
@@ -3686,12 +3692,6 @@ B.1.2.  Replay Window
    accepting replay of previously received requests, the server may
    perform the following procedure after booting:
 
-   o  The server updates its Sender Sequence Number as specified in
-      Appendix B.1.1 to be used as Partial IV in the response containing
-      the Echo option (next bullet).
-
-   o  For each stored security context, the first time after booting,
-      the server receives an OSCORE request, the server responds with an
 
 
 
@@ -3700,6 +3700,12 @@ Selander, et al.             Standards Track                   [Page 66]
 RFC 8613                         OSCORE                        June 2019
 
 
+   o  The server updates its Sender Sequence Number as specified in
+      Appendix B.1.1 to be used as Partial IV in the response containing
+      the Echo option (next bullet).
+
+   o  For each stored security context, the first time after booting,
+      the server receives an OSCORE request, the server responds with an
       OSCORE protected 4.01 (Unauthorized), containing only the Echo
       option [CoAP-ECHO-REQ-TAG] and no diagnostic payload.  The server
       MUST use its Partial IV when generating the AEAD nonce and MUST
@@ -3742,12 +3748,6 @@ B.2.  Security Context Derived Multiple Times
 
    The protocol described in this section may only be needed when the
    mutable part of security context is lost in the client or server,
-   e.g., when the endpoint has rebooted.  The protocol may additionally
-   be used whenever the client and server need to derive a new security
-   context.  For example, if a device is provisioned with one fixed set
-   of input parameters (including Master Secret, Sender and Recipient
-   Identifiers), then a randomized ID Context ensures that the security
-   context is different for each deployment.
 
 
 
@@ -3755,6 +3755,13 @@ Selander, et al.             Standards Track                   [Page 67]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   e.g., when the endpoint has rebooted.  The protocol may additionally
+   be used whenever the client and server need to derive a new security
+   context.  For example, if a device is provisioned with one fixed set
+   of input parameters (including Master Secret, Sender and Recipient
+   Identifiers), then a randomized ID Context ensures that the security
+   context is different for each deployment.
 
    Note that the server needs to be configured to run this protocol when
    it is not able to retrieve an existing security context, instead of
@@ -3797,13 +3804,6 @@ RFC 8613                         OSCORE                        June 2019
 
    2.  The server receives an OSCORE request for which it does not have
        a valid security context, either because the client has generated
-       a new security context ID1 = R1 or because the server has lost
-       part of its security context, e.g., ID Context, Sender Sequence
-       Number or Replay Window.  If the server is able to verify the
-       request (see Section 8.2) with the new derived first security
-       context using the received ID1 (transported in 'kid context') as
-       ID Context and the input parameters associated to the received
-       'kid', then the server generates a random string R2 and derives a
 
 
 
@@ -3812,6 +3812,13 @@ Selander, et al.             Standards Track                   [Page 68]
 RFC 8613                         OSCORE                        June 2019
 
 
+       a new security context ID1 = R1 or because the server has lost
+       part of its security context, e.g., ID Context, Sender Sequence
+       Number or Replay Window.  If the server is able to verify the
+       request (see Section 8.2) with the new derived first security
+       context using the received ID1 (transported in 'kid context') as
+       ID Context and the input parameters associated to the received
+       'kid', then the server generates a random string R2 and derives a
        second security context with ID Context = ID2 = R2 || ID1.  The
        server sends a 4.01 (Unauthorized) response protected with the
        second security context, containing R2 wrapped in a CBOR bstr as
@@ -3853,13 +3860,6 @@ RFC 8613                         OSCORE                        June 2019
        security context with the server, and the first and second
        security contexts are deleted.
 
-   If verification fails in any step, the endpoint stops processing that
-   message.
-
-   The length of the nonces R1, R2, and R3 is application specific.  The
-   application needs to set the length of each nonce such that the
-   probability of its value being repeated is negligible; typically, at
-   least 8 bytes long.  Since R2 may be generated as the result of a
 
 
 
@@ -3868,6 +3868,13 @@ Selander, et al.             Standards Track                   [Page 69]
 RFC 8613                         OSCORE                        June 2019
 
 
+   If verification fails in any step, the endpoint stops processing that
+   message.
+
+   The length of the nonces R1, R2, and R3 is application specific.  The
+   application needs to set the length of each nonce such that the
+   probability of its value being repeated is negligible; typically, at
+   least 8 bytes long.  Since R2 may be generated as the result of a
    replayed request #1, the probability for collision of R2s is impacted
    by the birthday paradox.  For example, setting the length of R2 to 8
    bytes results in an average collision after 2^32 response #1
@@ -3909,13 +3916,6 @@ B.2.1.  Implementation Considerations
    when the maximum number of cached R2s is reached.  If the server
    receives a request #1 and is not capable of executing it then it may
    respond with an unprotected 5.03 (Service Unavailable) error message.
-   The server may clear up state from protocol runs that never complete,
-   e.g., set a timer when caching R2, and remove R2 and the associated
-   security contexts from the cache at timeout.  Additionally, state
-   information can be flushed at reboot.
-
-   As an alternative to caching R2, the server could generate R2 in such
-   a way that it can be sent (in response #1) and verified (at reception
 
 
 
@@ -3924,6 +3924,13 @@ Selander, et al.             Standards Track                   [Page 70]
 RFC 8613                         OSCORE                        June 2019
 
 
+   The server may clear up state from protocol runs that never complete,
+   e.g., set a timer when caching R2, and remove R2 and the associated
+   security contexts from the cache at timeout.  Additionally, state
+   information can be flushed at reboot.
+
+   As an alternative to caching R2, the server could generate R2 in such
+   a way that it can be sent (in response #1) and verified (at reception
    of request #2) as the value of R2 it had generated.  Such a procedure
    MUST NOT lead to the server accepting replayed request #2 messages.
    One construction described in the following is based on using a
@@ -3965,13 +3972,6 @@ RFC 8613                         OSCORE                        June 2019
    converging.  Both endpoints can detect this situation, and it can be
    handled in different ways.  The requests could potentially be more
    spread out in time, for example, by only initiating this protocol
-   when the endpoint actually needs to make a request, potentially
-   adding a random delay before requests immediately after reboot or if
-   such parallel protocol runs are detected.
-
-
-
-
 
 
 
@@ -3979,6 +3979,10 @@ Selander, et al.             Standards Track                   [Page 71]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   when the endpoint actually needs to make a request, potentially
+   adding a random delay before requests immediately after reboot or if
+   such parallel protocol runs are detected.
 
 B.2.2.  Attack Considerations
 
@@ -4020,10 +4024,6 @@ Appendix C.  Test Vectors
    the same value of the unprotected CoAP message to help the reader
    with comparisons.
 
-C.1.  Test Vector 1: Key Derivation with Master Salt
-
-   In this test vector, a Master Salt of 8 bytes is used.  The default
-   values are used for AEAD Algorithm and HKDF.
 
 
 
@@ -4035,6 +4035,11 @@ Selander, et al.             Standards Track                   [Page 72]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+C.1.  Test Vector 1: Key Derivation with Master Salt
+
+   In this test vector, a Master Salt of 8 bytes is used.  The default
+   values are used for AEAD Algorithm and HKDF.
 
 C.1.1.  Client
 
@@ -4079,11 +4084,6 @@ C.1.2.  Server
 
    o  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
-   o  Sender ID: 0x01 (1 byte)
-
-   o  Recipient ID: 0x (0 byte)
-
-   From the previous parameters,
 
 
 
@@ -4091,6 +4091,12 @@ Selander, et al.             Standards Track                   [Page 73]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   o  Sender ID: 0x01 (1 byte)
+
+   o  Recipient ID: 0x (0 byte)
+
+   From the previous parameters,
 
    o  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
 
@@ -4134,12 +4140,6 @@ C.2.1.  Client
 
    o  info (for Recipient Key): 0x854101f60a634b657910 (10 bytes)
 
-   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
-
-   Outputs:
-
-   o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
-
 
 
 
@@ -4147,6 +4147,12 @@ Selander, et al.             Standards Track                   [Page 74]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
+
+   Outputs:
+
+   o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
    o  Recipient Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 
@@ -4190,12 +4196,6 @@ C.2.2.  Server
 
    o  sender nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
 
-   o  recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
-
-
-
-
-
 
 
 
@@ -4203,6 +4203,8 @@ Selander, et al.             Standards Track                   [Page 75]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+   o  recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
 C.3.  Test Vector 3: Key Derivation with ID Context
 
@@ -4249,8 +4251,6 @@ C.3.1.  Client
    o  sender nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
    o  recipient nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
-
-
 
 
 
