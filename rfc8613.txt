@@ -3720,8 +3720,9 @@ B.1.3.  Notifications
    notifications, the client may perform the following procedure after
    booting:
 
-   o  The client forgets about earlier registrations and removes all
-      Notification Numbers and registers using the Observe option.
+   o  The client forgets about earlier registrations, and removes all
+      Notification Numbers.  The client then registers again using the
+      Observe option.
 
 B.2.  Security Context Derived Multiple Times
 
@@ -3746,8 +3747,7 @@ B.2.  Security Context Derived Multiple Times
    Alternatively, the 'kid context' may be omitted since the ID Context
    is expected to be known to both client and server; see Section 5.1.
 
-   The protocol described in this section may only be needed when the
-   mutable part of security context is lost in the client or server,
+
 
 
 
@@ -3756,6 +3756,8 @@ Selander, et al.             Standards Track                   [Page 67]
 RFC 8613                         OSCORE                        June 2019
 
 
+   The protocol described in this section may only be needed when the
+   mutable part of security context is lost in the client or server,
    e.g., when the endpoint has rebooted.  The protocol may additionally
    be used whenever the client and server need to derive a new security
    context.  For example, if a device is provisioned with one fixed set
@@ -3802,8 +3804,6 @@ RFC 8613                         OSCORE                        June 2019
        in a CBOR bstr as 'kid context'.  The request may target a
        special resource used for updating security contexts.
 
-   2.  The server receives an OSCORE request for which it does not have
-       a valid security context, either because the client has generated
 
 
 
@@ -3812,6 +3812,8 @@ Selander, et al.             Standards Track                   [Page 68]
 RFC 8613                         OSCORE                        June 2019
 
 
+   2.  The server receives an OSCORE request for which it does not have
+       a valid security context, either because the client has generated
        a new security context ID1 = R1 or because the server has lost
        part of its security context, e.g., ID Context, Sender Sequence
        Number or Replay Window.  If the server is able to verify the
@@ -3857,8 +3859,6 @@ RFC 8613                         OSCORE                        June 2019
        security context and the response verifies (see Section 8.4),
        then the client marks the third security context to be used with
        this server.  This security context replaces the previous
-       security context with the server, and the first and second
-       security contexts are deleted.
 
 
 
@@ -3867,6 +3867,9 @@ Selander, et al.             Standards Track                   [Page 69]
 
 RFC 8613                         OSCORE                        June 2019
 
+
+       security context with the server, and the first and second
+       security contexts are deleted.
 
    If verification fails in any step, the endpoint stops processing that
    message.
@@ -3913,9 +3916,6 @@ B.2.1.  Implementation Considerations
    immutable security context, e.g., because of packet loss.  Replays of
    old request #1 messages could be difficult for the server to
    distinguish from legitimate.  The server needs to handle the case
-   when the maximum number of cached R2s is reached.  If the server
-   receives a request #1 and is not capable of executing it then it may
-   respond with an unprotected 5.03 (Service Unavailable) error message.
 
 
 
@@ -3924,6 +3924,9 @@ Selander, et al.             Standards Track                   [Page 70]
 RFC 8613                         OSCORE                        June 2019
 
 
+   when the maximum number of cached R2s is reached.  If the server
+   receives a request #1 and is not capable of executing it then it may
+   respond with an unprotected 5.03 (Service Unavailable) error message.
    The server may clear up state from protocol runs that never complete,
    e.g., set a timer when caching R2, and remove R2 and the associated
    security contexts from the cache at timeout.  Additionally, state
@@ -3969,9 +3972,6 @@ RFC 8613                         OSCORE                        June 2019
    client, e.g., after a power outage affecting both endpoints.  Such a
    race condition could potentially lead to both protocols failing, and
    both endpoints repeatedly reinitiating the protocol without
-   converging.  Both endpoints can detect this situation, and it can be
-   handled in different ways.  The requests could potentially be more
-   spread out in time, for example, by only initiating this protocol
 
 
 
@@ -3980,6 +3980,9 @@ Selander, et al.             Standards Track                   [Page 71]
 RFC 8613                         OSCORE                        June 2019
 
 
+   converging.  Both endpoints can detect this situation, and it can be
+   handled in different ways.  The requests could potentially be more
+   spread out in time, for example, by only initiating this protocol
    when the endpoint actually needs to make a request, potentially
    adding a random delay before requests immediately after reboot or if
    such parallel protocol runs are detected.
@@ -4023,9 +4026,6 @@ Appendix C.  Test Vectors
    and the Message ID of the OSCORE-protected CoAP messages are set to
    the same value of the unprotected CoAP message to help the reader
    with comparisons.
-
-
-
 
 
 

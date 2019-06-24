@@ -2674,8 +2674,9 @@ being stored at the time when the device reboots.</t>
 
 <t>To prevent the acceptance of replay of previously received notifications, the client may perform the following procedure after booting:</t>
 
+<!-- [Auth] minor rephrasing for readability -->
 <t><list style="symbols">
-  <t>The client forgets about earlier registrations and removes all Notification Numbers and registers using the Observe option.</t>
+  <t>The client forgets about earlier registrations, and removes all Notification Numbers. The client then registers again using the Observe option.</t>
 </list></t>
 
 </section>
