@@ -717,7 +717,20 @@ target="inner-block-options"/>).</t>
   MAY respond to a replayed registration request with a replay of a
   cached notification. Alternatively, the server MAY send a new
   notification.</t>
-  <t>An intermediary node is not able to initiate an OSCORE-protected Observe cancellation (Observe option with value 1) that verifies as coming from the client. An application MAY decide to allow intermediaries to cancel Observe registrations, e.g., to send the Observe option with value 1 (see Section 3.6 of <xref target="RFC7641"/>); however, that can also be done with other methods, e.g., reusing the Token in a different request or sending a RST message. This is out of scope for this specification.</t>
+
+  <!-- 
+    [Auth] removed one of the examples because it is not needed and might confuse the reader rather than help readability.
+
+    OLD:
+      however, that can also be done with other methods, e.g., reusing
+      the Token in a different request or sending a RST message.  This
+      is out of scope for this specification.
+    NEW:
+      however, that can also be done with other methods, e.g., by
+      sending a RST message.  This is out of scope for this
+      specification.
+  -->
+  <t>An intermediary node is not able to initiate an OSCORE-protected Observe cancellation (Observe option with value 1) that verifies as coming from the client. An application MAY decide to allow intermediaries to cancel Observe registrations, e.g., to send the Observe option with value 1 (see Section 3.6 of <xref target="RFC7641"/>); however, that can also be done with other methods, e.g., by sending a RST message. This is out of scope for this specification.</t>
 </list></t>
 
 </section>

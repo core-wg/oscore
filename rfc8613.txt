@@ -1148,9 +1148,9 @@ RFC 8613                         OSCORE                        June 2019
       as coming from the client.  An application MAY decide to allow
       intermediaries to cancel Observe registrations, e.g., to send the
       Observe option with value 1 (see Section 3.6 of [RFC7641]);
-      however, that can also be done with other methods, e.g., reusing
-      the Token in a different request or sending a RST message.  This
-      is out of scope for this specification.
+      however, that can also be done with other methods, e.g., by
+      sending a RST message.  This is out of scope for this
+      specification.
 
 4.1.3.5.2.  Notifications
 
