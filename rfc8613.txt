@@ -4749,7 +4749,7 @@ D.3.  Protected Message Fields
    on observing the length and timing of encrypted packets.  OSCORE does
    not provide any specific defenses against this form of attack, but
    the application may use a padding mechanism to prevent an attacker
-   from directly determine the length of the padding.  However,
+   from directly determining the length of the padding.  However,
    information about padding may still be revealed by side-channel
    attacks observing differences in timing.
 
