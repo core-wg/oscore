@@ -492,7 +492,7 @@ Should we align to be consistent?
 
 <t>The remainder of this section and later sections focus on the behavior in terms of CoAP messages. If HTTP is used for a particular hop in the end-to-end path, then this section applies to the conceptual CoAP message that is mappable to/from the original HTTP message as discussed in <xref target="http-op"/>.  That is, an HTTP message is conceptually transformed to a CoAP message and then to an OSCORE message, and similarly in the reverse direction.  An actual implementation might translate directly from HTTP to OSCORE without the intervening CoAP representation.</t>
 
-<t>Protection of Signaling messages (Section 5 of <xref target="RFC8323"/>) is specified in <xref target="coap-signaling"/>. The other parts of this section target request/response messages.</t>
+<t>Protection of signaling messages (Section 5 of <xref target="RFC8323"/>) is specified in <xref target="coap-signaling"/>. The other parts of this section target request/response messages.</t>
 
 <t>Message fields of the CoAP message may be protected end-to-end between CoAP client and CoAP server in different ways:</t>
 
@@ -739,8 +739,8 @@ target="inner-block-options"/>).</t>
 
 <t>If the server accepts an Observe registration, a Partial IV MUST be included in all notifications (both successful and error), except for the first one where the Partial IV MAY be omitted. To protect against replay, the client SHALL maintain a Notification Number for each Observation it registers. The Notification Number is a non-negative integer containing the largest Partial IV of the received notifications for the associated Observe registration. Further details of replay protection of notifications are specified in <xref target="replay-notifications"/>.</t>
 
-
-<t>For notifications, the Inner Observe option value MUST be empty (see Section 3.2 of <xref target="RFC7252"/>). The Outer Observe option in a notification is needed for intermediary nodes to allow multiple responses to one request, and it may be set to the value of the Observe option in the original CoAP message. The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the Outer Observe option value.</t>
+<!-- [Auth] changed "may" to "MAY" : this was meant to be normative -->
+<t>For notifications, the Inner Observe option value MUST be empty (see Section 3.2 of <xref target="RFC7252"/>). The Outer Observe option in a notification is needed for intermediary nodes to allow multiple responses to one request, and it MAY be set to the value of the Observe option in the original CoAP message. The client performs ordering of notifications and replay protection by comparing their Partial IVs and SHALL ignore the Outer Observe option value.</t>
 
 <t>If the client receives a response to an Observe request without an Inner Observe option, then it verifies the response as a non-Observe response, as specified in <xref target="ver-res"/>. If the client receives a response to a non-Observe request with an Inner Observe option, then it stops processing the message, as specified in <xref target="ver-res"/>.</t>
 
@@ -797,21 +797,22 @@ U = Unprotected (Outer)
 </section>
 <section anchor="coap-signaling" title="Signaling Messages">
 
+<!-- [Auth] changed "Signaling" to "signaling" in the whole doc for consistency (10 instances) -->
 <t>Signaling messages (CoAP Code 7.00-7.31) were introduced to exchange information related to an underlying transport connection in the specific case of CoAP over reliable transports <xref target="RFC8323"/>.</t>
 
-<t>OSCORE MAY be used to protect Signaling if the endpoints for OSCORE coincide with the endpoints for the signaling message. If OSCORE is used to protect Signaling then:</t>
+<t>OSCORE MAY be used to protect signaling if the endpoints for OSCORE coincide with the endpoints for the signaling message. If OSCORE is used to protect signaling then:</t>
 
 <t><list style="symbols">
   <t>To comply with <xref target="RFC8323"/>, an initial empty Capabilities and Settings Message  (CSM) SHALL be sent. The subsequent signaling message SHALL be protected.</t>
-  <t>Signaling messages SHALL be protected as CoAP request messages, except in the case in which the Signaling message is a response to a previous Signaling message; then it SHALL be protected as a CoAP response message. 
+  <t>Signaling messages SHALL be protected as CoAP request messages, except in the case in which the signaling message is a response to a previous signaling message; then it SHALL be protected as a CoAP response message. 
 For example, 7.02 (Ping) is protected as a CoAP request and 7.03 (Pong) as a CoAP response.</t>
-  <t>The Outer Code for Signaling messages SHALL be set to 0.02 (POST), unless it is a response to a previous Signaling message, in which case it SHALL be set to 2.04 (Changed).</t>
-  <t>All Signaling options, except the OSCORE option, SHALL be Inner (Class E).</t>
+  <t>The Outer Code for signaling messages SHALL be set to 0.02 (POST), unless it is a response to a previous signaling message, in which case it SHALL be set to 2.04 (Changed).</t>
+  <t>All signaling options, except the OSCORE option, SHALL be Inner (Class E).</t>
 </list></t>
 
-<t>NOTE: Option numbers for Signaling messages are specific to the CoAP Code (see Section 5.2 of <xref target="RFC8323"/>).</t>
+<t>NOTE: Option numbers for signaling messages are specific to the CoAP Code (see Section 5.2 of <xref target="RFC8323"/>).</t>
 
-<t>If OSCORE is not used to protect Signaling, Signaling messages SHALL be unaltered by OSCORE.</t>
+<t>If OSCORE is not used to protect signaling, Signaling messages SHALL be unaltered by OSCORE.</t>
 
 </section>
 </section>
@@ -3708,7 +3709,8 @@ array element corresponding to this entry.</t>
 </section>
 <section numbered="no" anchor="acknowledgments" title="Acknowledgments">
 
-<t>The following individuals provided input to this document: Christian Amsuess, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Ben Campbell, Esko Dijk, Jaro Fietz, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Mirja Kuehlewind, Kathleen Moriarty, Eric Rescorla, Michael Richardson, Adam Roach, Jim Schaad, Peter van der Stok, Dave Thaler, Martin Thomson, Marco Tiloca, William Vignat, and Malisa Vucinic.</t>
+<!-- [Auth] added one person -->
+<t>The following individuals provided input to this document: Christian Amsuess, Tobias Andersson, Carsten Bormann, Joakim Brorsson, Ben Campbell, Esko Dijk, Jaro Fietz, Thomas Fossati, Martin Gunnarsson, Klaus Hartke, Rikard Hoeglund, Mirja Kuehlewind, Kathleen Moriarty, Eric Rescorla, Michael Richardson, Adam Roach, Jim Schaad, Peter van der Stok, Dave Thaler, Martin Thomson, Marco Tiloca, William Vignat, and Malisa Vucinic.</t>
 
 <t>Ludwig Seitz and Goeran Selander worked on this document as part of the CelticPlus project CyberWI, with funding from Vinnova. Ludwig Seitz had additional funding from the SSF project SEC4Factory under the grant RIT17-0032.</t>
 
