@@ -273,12 +273,13 @@ Original:
     (*) See below.
 ]]></artwork></figure>
 
+<!-- [Auth] Replaced "Option value" with "option value" for consistency with the rest of the document -->
 <t>The OSCORE option includes the OSCORE flag bits (<xref
 target="compression"/>), the Sender Sequence Number, the Sender ID,
 and the ID Context when these fields are present (<xref
 target="context"/>). The detailed format and length is specified in
 <xref target="compression"/>. If the OSCORE flag bits are all zero
-(0x00), the Option value SHALL be empty (Option Length = 0). An
+(0x00), the option value SHALL be empty (Option Length = 0). An
 endpoint receiving a CoAP message without payload that also contains
 an OSCORE option SHALL treat it as malformed and reject it.</t>
 
@@ -3580,6 +3581,7 @@ attacks observing differences in timing.</t>
   <t>Max-Age. The Outer Max-Age is set to zero to avoid unnecessary caching of OSCORE error responses. Changing this value thus may cause unnecessary caching. No additional information is carried with this option.</t>
   <t>Proxy-Uri/Proxy-Scheme. These options are used in CoAP forward proxy deployments. With OSCORE, the Proxy-Uri option does not contain the Uri-Path/Uri-Query parts of the URI. The other parts of Proxy-Uri cannot be protected because forward proxies need to change them in order to perform their functions. The server can verify what scheme is used in the last hop, but not what was requested by the client or what was used in previous hops.</t>
   <t>Uri-Host/Uri-Port. In forward proxy deployments, the Uri-Host/Uri-Port may be changed by an adversary, and the application needs to handle the consequences of that (see <xref target="uri-host"/>).  The Uri-Host may either be omitted, reveal information equivalent to that of the IP address, or reveal more privacy-sensitive information, which is discouraged.</t>
+  <!-- [Auth] replaced "ETag Options" with "ETag options" for consistency with the rest of the document-->
   <t>Observe. The Outer Observe option is intended for a proxy to
   support forwarding of Observe messages, but it is ignored by the
   endpoints since the Inner Observe option determines the processing in the
@@ -3594,7 +3596,7 @@ attacks observing differences in timing.</t>
   registrations in the same way responses are bound to requests in
   OSCORE (see <xref target="prot-message-fields"/>).  However, that does not make attacks based on mismatched
      cancellations possible, since for cancellations to be accepted, all options
-     in the decrypted message except for ETag Options MUST be the same
+     in the decrypted message except for ETag options MUST be the same
      (see <xref
   target="observe"/>).</t>
   

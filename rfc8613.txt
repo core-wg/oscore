@@ -367,7 +367,7 @@ RFC 8613                         OSCORE                        June 2019
    Sender Sequence Number, the Sender ID, and the ID Context when these
    fields are present (Section 3).  The detailed format and length is
    specified in Section 6.  If the OSCORE flag bits are all zero (0x00),
-   the Option value SHALL be empty (Option Length = 0).  An endpoint
+   the option value SHALL be empty (Option Length = 0).  An endpoint
    receiving a CoAP message without payload that also contains an OSCORE
    option SHALL treat it as malformed and reject it.
 
@@ -4932,7 +4932,7 @@ Selander, et al.             Standards Track                   [Page 88]
 RFC 8613                         OSCORE                        June 2019
 
 
-      all options in the decrypted message except for ETag Options MUST
+      all options in the decrypted message except for ETag options MUST
       be the same (see Section 4.1.3.5).
 
    o  Block1/Block2/Size1/Size2.  The Outer Block options enable
