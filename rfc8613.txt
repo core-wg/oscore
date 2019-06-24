@@ -1487,10 +1487,10 @@ RFC 8613                         OSCORE                        June 2019
    when there is a single response to a request), the request and the
    response should typically use the same nonce to reduce message
    overhead.  Both alternatives provide all the required security
-   properties, see Section 7.4 and Appendix D.4.  The only non-Observe
-   scenario where a Partial IV must be included in a response is when
-   the server is unable to perform replay protection, see
-   Appendix B.1.2.  For processing instructions see Section 8.
+   properties, see Section 7.4 and Appendix D.4.  Another non-Observe
+   scenario where a Partial IV is included in a response is when the
+   server is unable to perform replay protection, see Appendix B.1.2.
+   For processing instructions see Section 8.
 
               <- nonce length minus 6 B -> <-- 5 bytes -->
          +---+-------------------+--------+---------+-----+

@@ -890,7 +890,19 @@ response blocked by an on-path attacker.</t>
 
 <t>Note that in this specification, only AEAD algorithms that use nonces equal or greater than 7 bytes are supported. The nonce construction with S, ID_PIV, and PIV together with endpoint-unique IDs and encryption keys makes it easy to verify that the nonces used with a specific key will be unique, see <xref target="kn-uniqueness"/>.</t>
 
-<t>If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e., when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see <xref target="replay-protection"/> and <xref target="kn-uniqueness"/>. The only non-Observe scenario where a Partial IV must be included in a response is when the server is unable to perform replay protection, see <xref target="reboot-replay"/>. For processing instructions see <xref target="processing"/>.</t>
+<!-- 
+  [Auth] rephrased to remove a "must": this scenario is an example, and here we just need to refer to the appendix. 
+  OLD:
+   The only non-Observe
+   scenario where a Partial IV must be included in a response is when
+   the server is unable to perform replay protection, see
+   Appendix B.1.2.
+  NEW:
+   Another non-Observe
+   scenario where a Partial IV is included in a response is when the
+   server is unable to perform replay protection, see Appendix B.1.2.
+-->
+<t>If the Partial IV is not present in a response, the nonce from the request is used. For responses that are not notifications (i.e., when there is a single response to a request), the request and the response should typically use the same nonce to reduce message overhead. Both alternatives provide all the required security properties, see <xref target="replay-protection"/> and <xref target="kn-uniqueness"/>. Another non-Observe scenario where a Partial IV is included in a response is when the server is unable to perform replay protection, see <xref target="reboot-replay"/>. For processing instructions see <xref target="processing"/>.</t>
 
 <figure title="AEAD Nonce Formation" anchor="fig-nonce"><artwork align="center"><![CDATA[
      <- nonce length minus 6 B -> <-- 5 bytes -->
