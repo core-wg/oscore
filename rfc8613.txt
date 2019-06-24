@@ -1661,7 +1661,7 @@ RFC 8613                         OSCORE                        June 2019
 6.1.  Encoding of the OSCORE Option Value
 
    The value of the OSCORE option SHALL contain the OSCORE flag bits,
-   the Partial IV parameter, the 'kid context' parameter (length and
+   the 'Partial IV' parameter, the 'kid context' parameter (length and
    value), and the 'kid' parameter as follows:
 
           0 1 2 3 4 5 6 7 <------------- n bytes -------------->
@@ -1685,7 +1685,8 @@ RFC 8613                         OSCORE                        June 2019
 
 
    o  The first byte, containing the OSCORE flag bits, encodes the
-      following set of bits and the length of the Partial IV parameter:
+      following set of bits and the length of the 'Partial IV'
+      parameter:
 
       *  The three least significant bits encode the Partial IV length
          n.  If n = 0, then the Partial IV is not present in the
@@ -1728,7 +1729,6 @@ RFC 8613                         OSCORE                        June 2019
    length of Partial IV, 'kid context', 'kid', as specified in this
    section, and on the presence and length of additional parameters, as
    defined in the future documents registering those parameters.
-
 
 
 
@@ -1934,7 +1934,7 @@ RFC 8613                         OSCORE                        June 2019
 
    In order to protect from replay of requests, the server's Recipient
    Context includes a Replay Window.  A server SHALL verify that the
-   Sender Sequence Number received in the Partial IV parameter of the
+   Sender Sequence Number received in the 'Partial IV' parameter of the
    COSE object (see Section 6.1) has not been received before.  If this
    verification fails, the server SHALL stop processing the message, and
    it MAY optionally respond with a 4.01 (Unauthorized) error message.
@@ -2132,13 +2132,13 @@ Selander, et al.             Standards Track                   [Page 38]
 RFC 8613                         OSCORE                        June 2019
 
 
-   3.  Verify that the 'Partial IV' has not been received before using
-       the Replay Window, as described in Section 7.4.
+   3.  Verify that the Partial IV has not been received before using the
+       Replay Window, as described in Section 7.4.
 
    4.  Compose the AAD, as described in Section 5.4.
 
    5.  Compute the AEAD nonce from the Recipient ID, Common IV, and the
-       'Partial IV' parameter, received in the COSE object.
+       Partial IV, received in the COSE object.
 
    6.  Decrypt the COSE object using the Recipient Key, as per
        Section 5.3 of [RFC8152].  (The decrypt operation includes the
@@ -2266,8 +2266,8 @@ RFC 8613                         OSCORE                        June 2019
           nonce from the request is used.
 
        *  If the Partial IV is present in the response, compute the AEAD
-          nonce from the Recipient ID, Common IV, and the 'Partial IV'
-          parameter, received in the COSE object.
+          nonce from the Recipient ID, Common IV, and the Partial IV,
+          received in the COSE object.
 
    5.  Decrypt the COSE object using the Recipient Key, as per
        Section 5.3 of [RFC8152].  (The decrypt operation includes the

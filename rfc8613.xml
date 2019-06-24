@@ -1028,7 +1028,7 @@ result of applying this mechanism to a COSE object is called the
 
 <section anchor="obj-sec-value" title="Encoding of the OSCORE Option Value">
 
-<t>The value of the OSCORE option SHALL contain the OSCORE flag bits, the Partial IV parameter, the 'kid context' parameter (length and value), and the 'kid' parameter as follows:</t>
+<t>The value of the OSCORE option SHALL contain the OSCORE flag bits, the 'Partial IV' parameter, the 'kid context' parameter (length and value), and the 'kid' parameter as follows:</t>
 
 <figure title="The OSCORE Option Value" anchor="fig-option-value"><artwork align="center"><![CDATA[
  0 1 2 3 4 5 6 7 <------------- n bytes -------------->
@@ -1043,7 +1043,7 @@ result of applying this mechanism to a COSE object is called the
 ]]></artwork></figure>
 
 <t><list style="symbols">
-  <t>The first byte, containing the OSCORE flag bits, encodes the following set of bits and the length of the Partial IV parameter:  <list style="symbols">
+  <t>The first byte, containing the OSCORE flag bits, encodes the following set of bits and the length of the 'Partial IV' parameter:  <list style="symbols">
       <t>The three least significant bits encode the Partial IV length
       n. If n = 0, then the Partial IV is not present in the
       compressed COSE object. The values n = 6 and n = 7 are
@@ -1268,7 +1268,7 @@ Context includes a Replay Window.
 
 
 A server SHALL verify that the
-Sender Sequence Number received in the Partial IV parameter of the
+Sender Sequence Number received in the 'Partial IV' parameter of the
 COSE object (see <xref target="obj-sec-value"/>) has
 not been received before.
 If this verification fails, the server SHALL stop
@@ -1419,9 +1419,14 @@ NEW:
       <t>If either the decompression or the COSE message fails to decode, the server MAY respond with a 4.02 (Bad Option) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Failed to decode COSE".</t>
       <t>If the server fails to retrieve a Recipient Context with Recipient ID corresponding to the 'kid' parameter received, the server MAY respond with a 4.01 (Unauthorized) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Security context not found".</t>
     </list></t>
-  <t>Verify that the 'Partial IV' has not been received before using the Replay Window, as described in <xref target="replay-protection"/>.</t>
+  <!-- 
+    [Auth] For consistency, we replaced 'Partial IV' with Partial IV in 3 instances: 
+    we use 'Partial IV' when we are referring to the field (or parameter) in the COSE object, and we use Partial IV when we are referring to the value of the field.
+    Additionally, for the same reason, we replaced Partial IV parameter with 'Partial IV' parameter in 3 instances.
+  -->
+  <t>Verify that the Partial IV has not been received before using the Replay Window, as described in <xref target="replay-protection"/>.</t>
   <t>Compose the AAD, as described in <xref target="AAD"/>.</t>
-  <t>Compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE object.</t>
+  <t>Compute the AEAD nonce from the Recipient ID, Common IV, and the Partial IV, received in the COSE object.</t>
   <t>Decrypt the COSE object using the Recipient Key, as per Section 5.3 of <xref target="RFC8152"/>. (The decrypt operation includes the verification of the integrity.)  <list style="symbols">
       <t>If decryption fails, the server MUST stop processing the request and MAY respond with a 4.00 (Bad Request) error message. The server MAY set an Outer Max-Age option with value zero. The diagnostic payload MAY contain the string "Decryption failed".</t>
       <t>If decryption succeeds, update the Replay Window, as described in <xref target="sequence-numbers"/>.</t>
@@ -1488,7 +1493,7 @@ Then, go to 4.</t>
   <t>Compose the AAD, as described in <xref target="AAD"/>.</t>
   <t>Compute the AEAD nonce  <list style="symbols">
       <t>If the Partial IV is not present in the response, the AEAD nonce from the request is used.</t>
-      <t>If the Partial IV is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the 'Partial IV' parameter, received in the COSE object.</t>
+      <t>If the Partial IV is present in the response, compute the AEAD nonce from the Recipient ID, Common IV, and the Partial IV, received in the COSE object.</t>
     </list></t>
   <t>Decrypt the COSE object using the Recipient Key, as per Section 5.3 of <xref target="RFC8152"/>. (The decrypt operation includes the verification of the integrity.) If decryption fails, then go to 8.</t>
   <t>Add decrypted Code, options and payload to the decrypted request. The OSCORE option is removed.</t>
