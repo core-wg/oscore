@@ -3542,13 +3542,14 @@ attacks observing differences in timing.</t>
 
 <t><list style="symbols">
   <t>Version. The CoAP version <xref target="RFC7252"/> is not expected to be sensitive to disclosure. Currently, there is only one CoAP version defined. A change of this parameter is potentially a denial-of-service attack. Future versions of CoAP need to analyze attacks to OSCORE-protected messages due to an adversary changing the CoAP version.</t>
+  <!-- [Auth] replaced "matched with" with "matched to" -->
   <t>Token/Token Length. The Token field is a client-local identifier
   for differentiating between concurrent requests <xref
   target="RFC7252"/>. CoAP proxies are allowed to read and change
   Token and Token Length between hops. An eavesdropper reading the
   Token can match requests to responses that can be used in traffic
   analysis. In particular, this is true for notifications, where
-  multiple responses are matched with one request. Modifications of
+  multiple responses are matched to one request. Modifications of
   Token and Token Length by an on-path attacker may become a
   denial-of-service attack, since it may prevent the client to
   identify to which request the response belongs or to find the

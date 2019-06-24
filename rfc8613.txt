@@ -4840,11 +4840,11 @@ D.5.1.  CoAP Header Fields
       between hops.  An eavesdropper reading the Token can match
       requests to responses that can be used in traffic analysis.  In
       particular, this is true for notifications, where multiple
-      responses are matched with one request.  Modifications of Token
-      and Token Length by an on-path attacker may become a denial-of-
-      service attack, since it may prevent the client to identify to
-      which request the response belongs or to find the correct
-      information to verify integrity of the response.
+      responses are matched to one request.  Modifications of Token and
+      Token Length by an on-path attacker may become a denial-of-service
+      attack, since it may prevent the client to identify to which
+      request the response belongs or to find the correct information to
+      verify integrity of the response.
 
    o  Code.  The Outer CoAP Code of an OSCORE message is POST or FETCH
       for requests with corresponding response codes.  An endpoint
