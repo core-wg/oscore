@@ -6,9 +6,9 @@ CoRE Working Group                                           G. Selander
 Internet-Draft                                               J. Mattsson
 Updates: 7252 (if approved)                                 F. Palombini
 Intended status: Standards Track                             Ericsson AB
-Expires: December 26, 2019                                      L. Seitz
+Expires: 21 September 2020                                      L. Seitz
                                                                RISE SICS
-                                                           June 24, 2019
+                                                           20 March 2020
 
 
      Object Security for Constrained RESTful Environments (OSCORE)
@@ -44,34 +44,28 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on December 26, 2019.
-
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 1]
-
-Internet-Draft                   OSCORE                        June 2019
-
+   This Internet-Draft will expire on 21 September 2020.
 
 Copyright Notice
 
-   Copyright (c) 2019 IETF Trust and the persons identified as the
+   Copyright (c) 2020 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
+
+
+Selander, et al.        Expires 21 September 2020               [Page 1]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents
-   (https://trustee.ietf.org/license-info) in effect on the date of
-   publication of this document.  Please review these documents
-   carefully, as they describe your rights and restrictions with respect
-   to this document.  Code Components extracted from this document must
-   include Simplified BSD License text as described in Section 4.e of
-   the Trust Legal Provisions and are provided without warranty as
-   described in the Simplified BSD License.
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Simplified BSD License text
+   as described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Simplified BSD License.
 
 Table of Contents
 
@@ -79,12 +73,12 @@ Table of Contents
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
    2.  The OSCORE Option . . . . . . . . . . . . . . . . . . . . . .   7
    3.  The Security Context  . . . . . . . . . . . . . . . . . . . .   7
-     3.1.  Security Context Definition . . . . . . . . . . . . . . .   8
+     3.1.  Security Context Definition . . . . . . . . . . . . . . .   7
      3.2.  Establishment of Security Context Parameters  . . . . . .  10
      3.3.  Requirements on the Security Context Parameters . . . . .  12
    4.  Protected Message Fields  . . . . . . . . . . . . . . . . . .  13
      4.1.  CoAP Options  . . . . . . . . . . . . . . . . . . . . . .  14
-     4.2.  CoAP Header Fields and Payload  . . . . . . . . . . . . .  23
+     4.2.  CoAP Header Fields and Payload  . . . . . . . . . . . . .  22
      4.3.  Signaling Messages  . . . . . . . . . . . . . . . . . . .  23
    5.  The COSE Object . . . . . . . . . . . . . . . . . . . . . . .  24
      5.1.  ID Context and 'kid context'  . . . . . . . . . . . . . .  25
@@ -96,33 +90,33 @@ Table of Contents
      6.2.  Encoding of the OSCORE Payload  . . . . . . . . . . . . .  31
      6.3.  Examples of Compressed COSE Objects . . . . . . . . . . .  31
    7.  Message Binding, Sequence Numbers, Freshness, and Replay
-       Protection  . . . . . . . . . . . . . . . . . . . . . . . . .  34
-     7.1.  Message Binding . . . . . . . . . . . . . . . . . . . . .  34
+           Protection  . . . . . . . . . . . . . . . . . . . . . . .  33
+     7.1.  Message Binding . . . . . . . . . . . . . . . . . . . . .  33
      7.2.  Sequence Numbers  . . . . . . . . . . . . . . . . . . . .  34
      7.3.  Freshness . . . . . . . . . . . . . . . . . . . . . . . .  34
-     7.4.  Replay Protection . . . . . . . . . . . . . . . . . . . .  35
-     7.5.  Losing Part of the Context State  . . . . . . . . . . . .  36
-   8.  Processing  . . . . . . . . . . . . . . . . . . . . . . . . .  37
+     7.4.  Replay Protection . . . . . . . . . . . . . . . . . . . .  34
+     7.5.  Losing Part of the Context State  . . . . . . . . . . . .  35
+   8.  Processing  . . . . . . . . . . . . . . . . . . . . . . . . .  36
      8.1.  Protecting the Request  . . . . . . . . . . . . . . . . .  37
      8.2.  Verifying the Request . . . . . . . . . . . . . . . . . .  37
      8.3.  Protecting the Response . . . . . . . . . . . . . . . . .  39
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 2]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
      8.4.  Verifying the Response  . . . . . . . . . . . . . . . . .  40
-   9.  Web Linking . . . . . . . . . . . . . . . . . . . . . . . . .  42
+   9.  Web Linking . . . . . . . . . . . . . . . . . . . . . . . . .  41
    10. CoAP-to-CoAP Forwarding Proxy . . . . . . . . . . . . . . . .  42
    11. HTTP Operations . . . . . . . . . . . . . . . . . . . . . . .  43
      11.1.  The HTTP OSCORE Header Field . . . . . . . . . . . . . .  43
      11.2.  CoAP-to-HTTP Mapping . . . . . . . . . . . . . . . . . .  44
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 2]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
      11.3.  HTTP-to-CoAP Mapping . . . . . . . . . . . . . . . . . .  45
      11.4.  HTTP Endpoints . . . . . . . . . . . . . . . . . . . . .  45
-     11.5.  Example: HTTP Client and CoAP Server . . . . . . . . . .  46
+     11.5.  Example: HTTP Client and CoAP Server . . . . . . . . . .  45
      11.6.  Example: CoAP Client and HTTP Server . . . . . . . . . .  47
    12. Security Considerations . . . . . . . . . . . . . . . . . . .  48
      12.1.  End-to-end Protection  . . . . . . . . . . . . . . . . .  48
@@ -135,48 +129,48 @@ Internet-Draft                   OSCORE                        June 2019
      12.8.  Privacy Considerations . . . . . . . . . . . . . . . . .  51
    13. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  52
      13.1.  COSE Header Parameters Registry  . . . . . . . . . . . .  52
-     13.2.  CoAP Option Numbers Registry . . . . . . . . . . . . . .  53
-     13.3.  CoAP Signaling Option Numbers Registry . . . . . . . . .  54
+     13.2.  CoAP Option Numbers Registry . . . . . . . . . . . . . .  52
+     13.3.  CoAP Signaling Option Numbers Registry . . . . . . . . .  53
      13.4.  Header Field Registrations . . . . . . . . . . . . . . .  54
      13.5.  Media Type Registrations . . . . . . . . . . . . . . . .  54
      13.6.  CoAP Content-Formats Registry  . . . . . . . . . . . . .  56
      13.7.  OSCORE Flag Bits Registry  . . . . . . . . . . . . . . .  56
      13.8.  Expert Review Instructions . . . . . . . . . . . . . . .  57
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  58
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  58
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  57
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  57
      14.2.  Informative References . . . . . . . . . . . . . . . . .  59
    Appendix A.  Scenario Examples  . . . . . . . . . . . . . . . . .  62
      A.1.  Secure Access to Sensor . . . . . . . . . . . . . . . . .  62
      A.2.  Secure Subscribe to Sensor  . . . . . . . . . . . . . . .  63
-   Appendix B.  Deployment Examples  . . . . . . . . . . . . . . . .  64
-     B.1.  Security Context Derived Once . . . . . . . . . . . . . .  64
-     B.2.  Security Context Derived Multiple Times . . . . . . . . .  66
-   Appendix C.  Test Vectors . . . . . . . . . . . . . . . . . . . .  71
+   Appendix B.  Deployment Examples  . . . . . . . . . . . . . . . .  65
+     B.1.  Security Context Derived Once . . . . . . . . . . . . . .  65
+     B.2.  Security Context Derived Multiple Times . . . . . . . . .  67
+   Appendix C.  Test Vectors . . . . . . . . . . . . . . . . . . . .  72
      C.1.  Test Vector 1: Key Derivation with Master Salt  . . . . .  72
-     C.2.  Test Vector 2: Key Derivation without Master Salt . . . .  73
+     C.2.  Test Vector 2: Key Derivation without Master Salt . . . .  74
      C.3.  Test Vector 3: Key Derivation with ID Context . . . . . .  75
-     C.4.  Test Vector 4: OSCORE Request, Client . . . . . . . . . .  76
-     C.5.  Test Vector 5: OSCORE Request, Client . . . . . . . . . .  77
+     C.4.  Test Vector 4: OSCORE Request, Client . . . . . . . . . .  77
+     C.5.  Test Vector 5: OSCORE Request, Client . . . . . . . . . .  78
      C.6.  Test Vector 6: OSCORE Request, Client . . . . . . . . . .  79
      C.7.  Test Vector 7: OSCORE Response, Server  . . . . . . . . .  80
-     C.8.  Test Vector 8: OSCORE Response with Partial IV, Server  .  81
-   Appendix D.  Overview of Security Properties  . . . . . . . . . .  82
-     D.1.  Threat Model  . . . . . . . . . . . . . . . . . . . . . .  82
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 3]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-     D.2.  Supporting Proxy Operations . . . . . . . . . . . . . . .  83
+     C.8.  Test Vector 8: OSCORE Response with Partial IV, Server  .  82
+   Appendix D.  Overview of Security Properties  . . . . . . . . . .  83
+     D.1.  Threat Model  . . . . . . . . . . . . . . . . . . . . . .  83
+     D.2.  Supporting Proxy Operations . . . . . . . . . . . . . . .  84
      D.3.  Protected Message Fields  . . . . . . . . . . . . . . . .  84
      D.4.  Uniqueness of (key, nonce)  . . . . . . . . . . . . . . .  85
      D.5.  Unprotected Message Fields  . . . . . . . . . . . . . . .  86
-   Appendix E.  CDDL Summary . . . . . . . . . . . . . . . . . . . .  89
+   Appendix E.  CDDL Summary . . . . . . . . . . . . . . . . . . . .  90
    Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  90
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  90
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 3]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  91
 
 1.  Introduction
 
@@ -218,18 +212,19 @@ Internet-Draft                   OSCORE                        June 2019
    addition to what is required by CoAP.  Examples of the use of OSCORE
    are given in Appendix A.  OSCORE may be used over any underlying
    layer, such as e.g.  UDP or TCP, and with non-IP transports (e.g.,
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 4]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    [I-D.bormann-6lo-coap-802-15-ie]).  OSCORE may also be used in
    different ways with HTTP.  OSCORE messages may be transported in
    HTTP, and OSCORE may also be used to protect CoAP-mappable HTTP
    messages, as described below.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 4]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
                +-----------------------------------+
                |            Application            |
@@ -274,18 +269,18 @@ Internet-Draft                   OSCORE                        June 2019
    (if not already in CoAP) and protected in a COSE object.  The
    encrypted message fields of this COSE object are transported in the
    CoAP payload/HTTP body of the OSCORE message, and the OSCORE option/
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 5]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    header field is included in the message.  A sketch of an exchange of
    OSCORE messages, in the case of the original message being CoAP, is
    provided in Figure 2.  The use of OSCORE with HTTP is detailed in
    Section 11.
+
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 5]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
           Client                                          Server
              |      OSCORE request - POST example.com:      |
@@ -301,7 +296,7 @@ Internet-Draft                   OSCORE                        June 2019
              |        Payload: COSE ciphertext              |
              |                                              |
 
-                   Figure 2: Sketch of CoAP with OSCORE
+                    Figure 2: Sketch of CoAP with OSCORE
 
    An implementation supporting this specification MAY implement only
    the client part, MAY implement only the server part, or MAY implement
@@ -330,17 +325,18 @@ Internet-Draft                   OSCORE                        June 2019
    that the message is not passed up to the CoAP Request/Response Layer
    (see Figure 1).
 
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 6]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    The terms Common/Sender/Recipient Context, Master Secret/Salt, Sender
    ID/Key, Recipient ID/Key, ID Context, and Common IV are defined in
    Section 3.1.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 6]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 2.  The OSCORE Option
 
@@ -384,22 +380,19 @@ Internet-Draft                   OSCORE                        June 2019
    in client and server based on a shared secret and a key derivation
    function.
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 7]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 3.1.  Security Context Definition
 
    The security context is the set of information elements necessary to
    carry out the cryptographic operations in OSCORE.  For each endpoint,
    the security context is composed of a "Common Context", a "Sender
    Context", and a "Recipient Context".
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 7]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    The endpoints protect messages to send using the Sender Context and
    verify messages received using the Recipient Context, both contexts
@@ -443,44 +436,46 @@ Internet-Draft                   OSCORE                        June 2019
 
    The Common Context contains the following parameters:
 
+   *  AEAD Algorithm.  The COSE AEAD algorithm to use for encryption.
 
-
-Selander, et al.        Expires December 26, 2019               [Page 8]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  AEAD Algorithm.  The COSE AEAD algorithm to use for encryption.
-
-   o  HKDF Algorithm.  An HMAC-based key derivation function HKDF
+   *  HKDF Algorithm.  An HMAC-based key derivation function HKDF
       [RFC5869] used to derive Sender Key, Recipient Key, and Common IV.
 
-   o  Master Secret.  Variable length, random byte string (see
+
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 8]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Master Secret.  Variable length, random byte string (see
       Section 12.3) used to derive AEAD keys and Common IV.
 
-   o  Master Salt.  Optional variable length byte string containing the
+   *  Master Salt.  Optional variable length byte string containing the
       salt used to derive AEAD keys and Common IV.
 
-   o  ID Context.  Optional variable length byte string providing
+   *  ID Context.  Optional variable length byte string providing
       additional information to identify the Common Context and to
       derive AEAD keys and Common IV.  The use of ID Context is
       described in Section 5.1.
 
-   o  Common IV.  Byte string derived from Master Secret, Master Salt,
+   *  Common IV.  Byte string derived from Master Secret, Master Salt,
       and ID Context.  Used to generate the AEAD Nonce (see
       Section 5.2).  Same length as the nonce of the AEAD Algorithm.
 
    The Sender Context contains the following parameters:
 
-   o  Sender ID.  Byte string used to identify the Sender Context, to
+   *  Sender ID.  Byte string used to identify the Sender Context, to
       derive AEAD keys and Common IV, and to assure unique AEAD nonces.
       Maximum length is determined by the AEAD Algorithm.
 
-   o  Sender Key. Byte string containing the symmetric AEAD key to
+   *  Sender Key. Byte string containing the symmetric AEAD key to
       protect messages to send.  Derived from Common Context and Sender
       ID.  Length is determined by the AEAD Algorithm.
 
-   o  Sender Sequence Number.  Non-negative integer used by the sender
+   *  Sender Sequence Number.  Non-negative integer used by the sender
       to enumerate requests and certain responses, e.g.  Observe
       notifications.  Used as 'Partial IV' [RFC8152] to generate unique
       AEAD nonces.  Maximum value is determined by the AEAD Algorithm.
@@ -488,31 +483,29 @@ Internet-Draft                   OSCORE                        June 2019
 
    The Recipient Context contains the following parameters:
 
-   o  Recipient ID.  Byte string used to identify the Recipient Context,
+   *  Recipient ID.  Byte string used to identify the Recipient Context,
       to derive AEAD keys and Common IV, and to assure unique AEAD
       nonces.  Maximum length is determined by the AEAD Algorithm.
 
-   o  Recipient Key. Byte string containing the symmetric AEAD key to
+   *  Recipient Key. Byte string containing the symmetric AEAD key to
       verify messages received.  Derived from Common Context and
       Recipient ID.  Length is determined by the AEAD Algorithm.
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019               [Page 9]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  Replay Window (Server only).  The replay window to verify requests
+   *  Replay Window (Server only).  The replay window to verify requests
       received.  Replay protection is described in Section 7.4 and
       Section 3.2.2.
 
    All parameters except Sender Sequence Number and Replay Window are
    immutable once the security context is established.  An endpoint may
    free up memory by not storing the Common IV, Sender Key, and
+
+
+
+Selander, et al.        Expires 21 September 2020               [Page 9]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    Recipient Key, deriving them when needed.  Alternatively, an endpoint
    may free up memory by not storing the Master Secret and Master Salt
    after the other parameters have been derived.
@@ -531,43 +524,44 @@ Internet-Draft                   OSCORE                        June 2019
    small set of input parameters.  The following input parameters SHALL
    be pre-established:
 
-   o  Master Secret
+   *  Master Secret
 
-   o  Sender ID
+   *  Sender ID
 
-   o  Recipient ID
+   *  Recipient ID
 
    The following input parameters MAY be pre-established.  In case any
    of these parameters is not pre-established, the default value
    indicated below is used:
 
-   o  AEAD Algorithm
+   *  AEAD Algorithm
 
-      *  Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
+      -  Default is AES-CCM-16-64-128 (COSE algorithm encoding: 10)
 
-   o  Master Salt
+   *  Master Salt
 
-      *  Default is the empty byte string
+      -  Default is the empty byte string
 
-   o  HKDF Algorithm
+   *  HKDF Algorithm
 
-      *  Default is HKDF SHA-256
+      -  Default is HKDF SHA-256
 
-   o  Replay Window
+   *  Replay Window
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 10]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-      *  Default is DTLS-type replay protection with a window size of 32
+      -  Default is DTLS-type replay protection with a window size of 32
          [RFC6347]
 
    All input parameters need to be known to and agreed on by both
    endpoints, but the replay window may be different in the two
    endpoints.  The way the input parameters are pre-established, is
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 10]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    application specific.  Considerations of security context
    establishment are given in Section 12.2 and examples of deploying
    OSCORE in Appendix B.
@@ -585,11 +579,11 @@ Internet-Draft                   OSCORE                        June 2019
 
    where:
 
-   o  salt is the Master Salt as defined above
+   *  salt is the Master Salt as defined above
 
-   o  IKM is the Master Secret as defined above
+   *  IKM is the Master Secret as defined above
 
-   o  info is the serialization of a CBOR array consisting of (the
+   *  info is the serialization of a CBOR array consisting of (the
       notation follows Appendix E):
 
       info = [
@@ -602,27 +596,27 @@ Internet-Draft                   OSCORE                        June 2019
 
    where:
 
-   o  id is the Sender ID or Recipient ID when deriving Sender Key and
+   *  id is the Sender ID or Recipient ID when deriving Sender Key and
       Recipient Key, respectively, and the empty byte string when
       deriving the Common IV.
 
-   o  id_context is the ID Context, or nil if ID Context is not
+   *  id_context is the ID Context, or nil if ID Context is not
       provided.
 
-   o  alg_aead is the AEAD Algorithm, encoded as defined in [RFC8152].
+   *  alg_aead is the AEAD Algorithm, encoded as defined in [RFC8152].
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 11]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  type is "Key" or "IV".  The label is an ASCII string, and does not
+   *  type is "Key" or "IV".  The label is an ASCII string, and does not
       include a trailing NUL byte.
 
-   o  L is the size of the key/nonce for the AEAD algorithm used, in
+   *  L is the size of the key/nonce for the AEAD algorithm used, in
       bytes.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 11]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    For example, if the algorithm AES-CCM-16-64-128 (see Section 10.2 in
    [RFC8152]) is used, the integer value for alg_aead is 10, the value
@@ -665,15 +659,6 @@ Internet-Draft                   OSCORE                        June 2019
    Context, Sender ID) SHALL be unique in the set of all security
    contexts using the same Master Secret and Master Salt.  This means
    that Sender ID SHALL be unique in the set of all security contexts
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 12]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    using the same Master Secret, Master Salt, and ID Context; such a
    requirement guarantees unique (key, nonce) pairs for the AEAD.
 
@@ -681,6 +666,14 @@ Internet-Draft                   OSCORE                        June 2019
    allows the parties to negotiate locally unique identifiers, a trusted
    third party (e.g., [I-D.ietf-ace-oauth-authz]), or the identifiers
    can be assigned out-of-band.  The Sender IDs can be very short (note
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 12]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    that the empty string is a legitimate value).  The maximum length of
    Sender ID in bytes equals the length of AEAD nonce minus 6, see
    Section 5.2.  For AES-CCM-16-64-128 the maximum length of Sender ID
@@ -723,21 +716,21 @@ Internet-Draft                   OSCORE                        June 2019
    specified in Section 4.3.  The other parts of this section target
    Request/Response messages.
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 13]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    Message fields of the CoAP message may be protected end-to-end
    between CoAP client and CoAP server in different ways:
 
-   o  Class E: encrypted and integrity protected,
+   *  Class E: encrypted and integrity protected,
 
-   o  Class I: integrity protected only, or
+   *  Class I: integrity protected only, or
 
-   o  Class U: unprotected.
+
+
+Selander, et al.        Expires 21 September 2020              [Page 13]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Class U: unprotected.
 
    The sending endpoint SHALL transfer Class E message fields in the
    ciphertext of the COSE object in the OSCORE message.  The sending
@@ -774,18 +767,6 @@ Internet-Draft                   OSCORE                        June 2019
    the potential issues with the option being unprotected SHOULD be
    documented (see Appendix D.5).
 
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 14]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 4.1.1.  Inner Options
 
    Inner option message fields (class E) are used to communicate
@@ -795,6 +776,15 @@ Internet-Draft                   OSCORE                        June 2019
    present in the original CoAP message into the plaintext of the COSE
    object (Section 5.3), and then remove the Inner option message fields
    from the OSCORE message.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 14]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    The processing of Inner option message fields by the receiving
    endpoint is specified in Sections 8.2 and 8.4.
@@ -828,19 +818,7 @@ Internet-Draft                   OSCORE                        June 2019
                  E = Encrypt and Integrity Protect (Inner)
                  U = Unprotected (Outer)
 
-                   Figure 5: Protection of CoAP Options
-
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 15]
-
-Internet-Draft                   OSCORE                        June 2019
-
+                    Figure 5: Protection of CoAP Options
 
 4.1.2.  Outer Options
 
@@ -856,6 +834,13 @@ Internet-Draft                   OSCORE                        June 2019
 
    The processing of Outer options by the receiving endpoint is
    specified in Sections 8.2 and 8.4.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 15]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    A procedure for integrity-protection-only of Class I option message
    fields is specified in Section 5.4.  Specifications that introduce
@@ -889,15 +874,6 @@ Internet-Draft                   OSCORE                        June 2019
    responses appear to the OSCORE-unaware intermediary as 2.04 (Changed)
    responses, which are non-cacheable (see Section 4.2).
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 16]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    The Outer Max-Age message field is processed according to
    Section 4.1.2.
 
@@ -914,6 +890,14 @@ Internet-Draft                   OSCORE                        June 2019
 
    Manipulation of unprotected message fields (including Uri-Host, Uri-
    Port, destination IP/port or request scheme) MUST NOT lead to an
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 16]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    OSCORE message becoming verified by an unintended server.  Different
    servers SHALL have different security contexts.
 
@@ -945,39 +929,39 @@ Internet-Draft                   OSCORE                        June 2019
    An example of how Proxy-Uri is processed is given here.  Assume that
    the original CoAP message contains:
 
-   o  Proxy-Uri = "coap://example.com/resource?q=1"
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 17]
-
-Internet-Draft                   OSCORE                        June 2019
-
+   *  Proxy-Uri = "coap://example.com/resource?q=1"
 
    During OSCORE processing, Proxy-Uri is split into:
 
-   o  Proxy-Scheme = "coap"
+   *  Proxy-Scheme = "coap"
 
-   o  Uri-Host = "example.com"
+   *  Uri-Host = "example.com"
 
-   o  Uri-Port = "5683"
+   *  Uri-Port = "5683"
 
-   o  Uri-Path = "resource"
+   *  Uri-Path = "resource"
 
-   o  Uri-Query = "q=1"
+   *  Uri-Query = "q=1"
 
    Uri-Path and Uri-Query follow the processing defined in
    Section 4.1.1, and are thus encrypted and transported in the COSE
    object:
 
-   o  Uri-Path = "resource"
 
-   o  Uri-Query = "q=1"
+
+Selander, et al.        Expires 21 September 2020              [Page 17]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Uri-Path = "resource"
+
+   *  Uri-Query = "q=1"
 
    The remaining options are composed into the Proxy-Uri included in the
    options part of the OSCORE message, which has value:
 
-   o  Proxy-Uri = "coap://example.com"
+   *  Proxy-Uri = "coap://example.com"
 
    See Sections 6.1 and 12.6 of [RFC7252] for more details.
 
@@ -1003,13 +987,6 @@ Internet-Draft                   OSCORE                        June 2019
    the OSCORE message before processing Block-wise as defined in
    [RFC7959].
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 18]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 4.1.3.4.2.  Outer Block Options
 
    Proxies MAY fragment an OSCORE message using [RFC7959], by
@@ -1025,6 +1002,13 @@ Internet-Draft                   OSCORE                        June 2019
    can be handled by the endpoints.  Messages exceeding this size SHOULD
    be fragmented by the sending endpoint using Inner Block options
    (Section 4.1.3.4.1).
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 18]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    An endpoint receiving an OSCORE message with an Outer Block option
    SHALL first process this option according to [RFC7959], until all
@@ -1058,14 +1042,6 @@ Internet-Draft                   OSCORE                        June 2019
 
    The server SHALL include a new Partial IV (see Section 5) in
    responses (with or without the Observe option) to Observe
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 19]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    registrations, except for the first response where Partial IV MAY be
    omitted.
 
@@ -1082,6 +1058,13 @@ Internet-Draft                   OSCORE                        June 2019
    Since POST with Observe is not defined, for messages with Observe,
    the Outer Code MUST be set to 0.05 (FETCH) for requests and to 2.05
    (Content) for responses (see Section 4.2).
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 19]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 4.1.3.5.1.  Registrations and Cancellations
 
@@ -1100,28 +1083,20 @@ Internet-Draft                   OSCORE                        June 2019
    receiving endpoint as coming from the other endpoint.  This has the
    following consequences and limitations for Observe operations.
 
-   o  An intermediary node removing the Outer Observe 0 does not change
+   *  An intermediary node removing the Outer Observe 0 does not change
       the registration request to a request without Observe (see
       Section 2 of [RFC7641]).  Instead other means for cancellation may
       be used as described in Section 3.6 of [RFC7641].
 
-   o  An intermediary node is not able to transform a normal response
+   *  An intermediary node is not able to transform a normal response
       into an OSCORE protected Observe notification (see figure 7 of
       [RFC7641]) which verifies as coming from the server.
 
-   o  An intermediary node is not able to initiate an OSCORE protected
+   *  An intermediary node is not able to initiate an OSCORE protected
       Observe registration (Observe with value 0) which verifies as
       coming from the client.  An OSCORE-aware intermediary SHALL NOT
       initiate registrations of observations (see Section 10).  If an
       OSCORE-unaware proxy re-sends an old registration message from a
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 20]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
       client this will trigger the replay protection mechanism in the
       server.  To prevent this from resulting in the OSCORE-unaware
       proxy to cancel of the registration, a server MAY respond to a
@@ -1129,7 +1104,7 @@ Internet-Draft                   OSCORE                        June 2019
       notification.  Alternatively, the server MAY send a new
       notification.
 
-   o  An intermediary node is not able to initiate an OSCORE protected
+   *  An intermediary node is not able to initiate an OSCORE protected
       Observe cancellation (Observe with value 1) which verifies as
       coming from the client.  An application MAY decide to allow
       intermediaries to cancel Observe registrations, e.g. to send
@@ -1137,6 +1112,15 @@ Internet-Draft                   OSCORE                        June 2019
       also be done with other methods, e.g. reusing the Token in a
       different request or sending a RST message.  This is out of scope
       for this specification.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 20]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 4.1.3.5.2.  Notifications
 
@@ -1169,15 +1153,6 @@ Internet-Draft                   OSCORE                        June 2019
    support existing Observe implementations the OSCORE client
    implementation MAY set the Observe value to the three least
    significant bytes of the Partial IV.  Implementations need to make
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 21]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    sure that the notification without Partial IV is considered the
    oldest.
 
@@ -1194,6 +1169,15 @@ Internet-Draft                   OSCORE                        June 2019
    option.  The client MAY set the Outer No-Response value to 26
    ('suppress all known codes') if the Inner value is set to 26.  The
    client MUST be prepared to receive and discard 5.04 (Gateway Timeout)
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 21]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    error messages from intermediaries potentially resulting from
    destination time out due to no response.
 
@@ -1223,16 +1207,7 @@ Internet-Draft                   OSCORE                        June 2019
                  E = Encrypt and Integrity Protect (Inner)
                  U = Unprotected (Outer)
 
-          Figure 6: Protection of CoAP Header Fields and Payload
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 22]
-
-Internet-Draft                   OSCORE                        June 2019
-
+           Figure 6: Protection of CoAP Header Fields and Payload
 
 4.2.  CoAP Header Fields and Payload
 
@@ -1251,6 +1226,13 @@ Internet-Draft                   OSCORE                        June 2019
    encrypted and integrity protected (Class E) to prevent an
    intermediary from eavesdropping on or manipulating the Code (e.g.,
    changing from GET to DELETE).
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 22]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    The sending endpoint SHALL write the Code of the original CoAP
    message into the plaintext of the COSE object (see Section 5.3).
@@ -1280,35 +1262,33 @@ Internet-Draft                   OSCORE                        June 2019
    information related to an underlying transport connection in the
    specific case of CoAP over reliable transports [RFC8323].
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 23]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    OSCORE MAY be used to protect Signaling if the endpoints for OSCORE
    coincide with the endpoints for the signaling message.  If OSCORE is
    used to protect Signaling then:
 
-   o  To comply with [RFC8323], an initial empty CSM message SHALL be
+   *  To comply with [RFC8323], an initial empty CSM message SHALL be
       sent.  The subsequent signaling message SHALL be protected.
 
-   o  Signaling messages SHALL be protected as CoAP Request messages,
+   *  Signaling messages SHALL be protected as CoAP Request messages,
       except in the case the Signaling message is a response to a
       previous Signaling message, in which case it SHALL be protected as
       a CoAP Response message.  For example, 7.02 (Ping) is protected as
       a CoAP Request and 7.03 (Pong) as a CoAP response.
 
-   o  The Outer Code for Signaling messages SHALL be set to 0.02 (POST),
+   *  The Outer Code for Signaling messages SHALL be set to 0.02 (POST),
       unless it is a response to a previous Signaling message, in which
       case it SHALL be set to 2.04 (Changed).
 
-   o  All Signaling options, except the OSCORE option, SHALL be Inner
+   *  All Signaling options, except the OSCORE option, SHALL be Inner
       (Class E).
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 23]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    NOTE: Option numbers for Signaling messages are specific to the CoAP
    Code (see Section 5.2 of [RFC8323]).
@@ -1337,18 +1317,11 @@ Internet-Draft                   OSCORE                        June 2019
    The COSE Object SHALL be a COSE_Encrypt0 object with fields defined
    as follows
 
-   o  The 'protected' field is empty.
+   *  The 'protected' field is empty.
 
+   *  The 'unprotected' field includes:
 
-
-Selander, et al.        Expires December 26, 2019              [Page 24]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  The 'unprotected' field includes:
-
-      *  The 'Partial IV' parameter.  The value is set to the Sender
+      -  The 'Partial IV' parameter.  The value is set to the Sender
          Sequence Number.  All leading bytes of value zero SHALL be
          removed when encoding the Partial IV, except in the case of
          Partial IV of value 0 which is encoded to the byte string 0x00.
@@ -1358,13 +1331,22 @@ Internet-Draft                   OSCORE                        June 2019
          be present in responses (for one exception, see
          Appendix B.1.2).
 
-      *  The 'kid' parameter.  The value is set to the Sender ID.  This
+      -  The 'kid' parameter.  The value is set to the Sender ID.  This
          parameter SHALL be present in requests and will not typically
          be present in responses.  An example where the Sender ID is
          included in a response is the extension of OSCORE to group
          communication [I-D.ietf-core-oscore-groupcomm].
 
-      *  Optionally, a 'kid context' parameter (see Section 5.1).  This
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 24]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+      -  Optionally, a 'kid context' parameter (see Section 5.1).  This
          parameter MAY be present in requests, and if so, MUST contain
          an ID Context (see Section 3.1).  This parameter SHOULD NOT be
          present in responses: an example of how 'kid context' can be
@@ -1372,7 +1354,7 @@ Internet-Draft                   OSCORE                        June 2019
          is present in the request, then the server SHALL use a security
          context with that ID Context when verifying the request.
 
-   o  The 'ciphertext' field is computed from the secret key (Sender Key
+   *  The 'ciphertext' field is computed from the secret key (Sender Key
       or Recipient Key), AEAD nonce (see Section 5.2), plaintext (see
       Section 5.3), and the Additional Authenticated Data (AAD) (see
       Section 5.4) following Section 5.2 of [RFC8152].
@@ -1386,23 +1368,13 @@ Internet-Draft                   OSCORE                        June 2019
    see Section 3.3) for the client to use an ID Context to distinguish
    the security contexts (see Section 3.1).  For example:
 
-   o  If the client has a unique identifier in some namespace then that
+   *  If the client has a unique identifier in some namespace then that
       identifier can be used as ID Context.
 
-   o  The ID Context may be used to add randomness into new Sender and
+   *  The ID Context may be used to add randomness into new Sender and
       Recipient Contexts, see Appendix B.2.
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 25]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  In case of group communication [I-D.ietf-core-oscore-groupcomm], a
+   *  In case of group communication [I-D.ietf-core-oscore-groupcomm], a
       group identifier is used as ID Context to enable different
       security contexts for a server belonging to multiple groups.
 
@@ -1422,6 +1394,13 @@ Internet-Draft                   OSCORE                        June 2019
    +----------+--------+------------+----------------+-----------------+
 
     Figure 7: Common Header Parameter 'kid context' for the COSE object
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 25]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    If ID Context is non-empty and the client sends a request without
    'kid context' which results in an error indicating that the server
@@ -1449,15 +1428,6 @@ Internet-Draft                   OSCORE                        June 2019
    Note that in this specification only AEAD algorithms that use nonces
    equal or greater than 7 bytes are supported.  The nonce construction
    with S, ID_PIV, and PIV together with endpoint unique IDs and
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 26]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    encryption keys makes it easy to verify that the nonces used with a
    specific key will be unique, see Appendix D.4.
 
@@ -1470,6 +1440,23 @@ Internet-Draft                   OSCORE                        June 2019
    scenario where a Partial IV must be included in a response is when
    the server is unable to perform replay protection, see
    Appendix B.1.2.  For processing instructions see Section 8.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 26]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
               <- nonce length minus 6 B -> <-- 5 bytes -->
          +---+-------------------+--------+---------+-----+
@@ -1486,33 +1473,24 @@ Internet-Draft                   OSCORE                        June 2019
          |                     Nonce                      |<---+
          +------------------------------------------------+
 
-                      Figure 8: AEAD Nonce Formation
+                       Figure 8: AEAD Nonce Formation
 
 5.3.  Plaintext
 
    The plaintext is formatted as a CoAP message without Header (see
    Figure 9) consisting of:
 
-   o  the Code of the original CoAP message as defined in Section 3 of
+   *  the Code of the original CoAP message as defined in Section 3 of
       [RFC7252]; and
 
-   o  all Inner option message fields (see Section 4.1.1) present in the
+   *  all Inner option message fields (see Section 4.1.1) present in the
       original CoAP message (see Section 4.1).  The options are encoded
       as described in Section 3.1 of [RFC7252], where the delta is the
       difference to the previously included instance of Class E option;
       and
 
-   o  the Payload of original CoAP message, if present, and in that case
+   *  the Payload of original CoAP message, if present, and in that case
       prefixed by the one-byte Payload Marker (0xff).
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 27]
-
-Internet-Draft                   OSCORE                        June 2019
-
 
    NOTE: The plaintext contains all CoAP data that needs to be encrypted
    end-to-end between the endpoints.
@@ -1528,6 +1506,13 @@ Internet-Draft                   OSCORE                        June 2019
         is payload)
 
                             Figure 9: Plaintext
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 27]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 5.4.  Additional Authenticated Data
 
@@ -1546,31 +1531,23 @@ Internet-Draft                   OSCORE                        June 2019
 
    where:
 
-   o  oscore_version: contains the OSCORE version number.
+   *  oscore_version: contains the OSCORE version number.
       Implementations of this specification MUST set this field to 1.
       Other values are reserved for future versions.
 
-   o  algorithms: contains (for extensibility) an array of algorithms,
+   *  algorithms: contains (for extensibility) an array of algorithms,
       according to this specification only containing alg_aead.
 
-   o  alg_aead: contains the AEAD Algorithm from the security context
+   *  alg_aead: contains the AEAD Algorithm from the security context
       used for the exchange (see Section 3.1).
 
-   o  request_kid: contains the value of the 'kid' in the COSE object of
+   *  request_kid: contains the value of the 'kid' in the COSE object of
       the request (see Section 5).
 
-   o  request_piv: contains the value of the 'Partial IV' in the COSE
+   *  request_piv: contains the value of the 'Partial IV' in the COSE
       object of the request (see Section 5).
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 28]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  options: contains the Class I options (see Section 4.1.2) present
+   *  options: contains the Class I options (see Section 4.1.2) present
       in the original CoAP message encoded as described in Section 3.1
       of [RFC7252], where the delta is the difference to the previously
       included instance of class I option.
@@ -1586,27 +1563,34 @@ Internet-Draft                   OSCORE                        June 2019
    The Additional Authenticated Data (AAD) is composed from the
    external_aad as described in Section 5.3 of [RFC8152]:
 
+
+
+Selander, et al.        Expires 21 September 2020              [Page 28]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       AAD = Enc_structure = [ "Encrypt0", h'', external_aad ]
 
    The following is an example of AAD constructed using AEAD Algorithm =
    AES-CCM-16-64-128 (10), request_kid = 0x00, request_piv = 0x25 and no
    Class I options:
 
-   o  oscore_version: 0x01 (1 byte)
+   *  oscore_version: 0x01 (1 byte)
 
-   o  algorithms: 0x810a (2 bytes)
+   *  algorithms: 0x810a (2 bytes)
 
-   o  request_kid: 0x00 (1 byte)
+   *  request_kid: 0x00 (1 byte)
 
-   o  request_piv: 0x25 (1 byte)
+   *  request_piv: 0x25 (1 byte)
 
-   o  options: 0x (0 bytes)
+   *  options: 0x (0 bytes)
 
-   o  aad_array: 0x8501810a4100412540 (9 bytes)
+   *  aad_array: 0x8501810a4100412540 (9 bytes)
 
-   o  external_aad: 0x498501810a4100412540 (10 bytes)
+   *  external_aad: 0x498501810a4100412540 (10 bytes)
 
-   o  AAD: 0x8368456e63727970743040498501810a4100412540 (21 bytes)
+   *  AAD: 0x8368456e63727970743040498501810a4100412540 (21 bytes)
 
    Note that the AAD consists of a fixed string of 11 bytes concatenated
    with the external_aad.
@@ -1618,14 +1602,6 @@ Internet-Draft                   OSCORE                        June 2019
    and Encryption (COSE) [RFC8152] uses CBOR to create compact encoding
    of signed and encrypted data.  COSE is however constructed to support
    a large number of different stateless use cases, and is not fully
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 29]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    optimized for use as a stateful security protocol, leading to a
    larger than necessary message expansion.  In this section, we define
    a stateless header compression mechanism, simply removing redundant
@@ -1637,6 +1613,18 @@ Internet-Draft                   OSCORE                        June 2019
    option and in the Payload.  The Payload contains the Ciphertext of
    the COSE object.  The headers of the COSE object are compactly
    encoded as described in the next section.
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 29]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 6.1.  Encoding of the OSCORE Option Value
 
@@ -1654,50 +1642,50 @@ Internet-Draft                   OSCORE                        June 2019
          | s (if any) | kid context (if any) | kid (if any) ... |
          +------------+----------------------+------------------+
 
-                    Figure 10: The OSCORE Option Value
+                     Figure 10: The OSCORE Option Value
 
-   o  The first byte, containing the OSCORE flag bits, encodes the
+   *  The first byte, containing the OSCORE flag bits, encodes the
       following set of bits and the length of the Partial IV parameter:
 
-      *  The three least significant bits encode the Partial IV length
+      -  The three least significant bits encode the Partial IV length
          n.  If n = 0 then the Partial IV is not present in the
          compressed COSE object.  The values n = 6 and n = 7 are
          reserved.
 
-      *  The fourth least significant bit is the 'kid' flag, k: it is
+      -  The fourth least significant bit is the 'kid' flag, k: it is
          set to 1 if the kid is present in the compressed COSE object.
 
-      *  The fifth least significant bit is the 'kid context' flag, h:
+      -  The fifth least significant bit is the 'kid context' flag, h:
          it is set to 1 if the compressed COSE object contains a 'kid
          context (see Section 5.1).
 
-      *  The sixth to eighth least significant bits are reserved for
+      -  The sixth to eighth least significant bits are reserved for
          future use.  These bits SHALL be set to zero when not in use.
          According to this specification, if any of these bits are set
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 30]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
          to 1 the message is considered to be malformed and
          decompression fails as specified in item 2 of Section 8.2.
 
    The flag bits are registered in the OSCORE Flag Bits registry
    specified in Section 13.7.
 
-   o  The following n bytes encode the value of the Partial IV, if the
+   *  The following n bytes encode the value of the Partial IV, if the
       Partial IV is present (n > 0).
 
-   o  The following 1 byte encode the length of the 'kid context'
+   *  The following 1 byte encode the length of the 'kid context'
       (Section 5.1) s, if the 'kid context' flag is set (h = 1).
 
-   o  The following s bytes encode the 'kid context', if the 'kid
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 30]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  The following s bytes encode the 'kid context', if the 'kid
       context' flag is set (h = 1).
 
-   o  The remaining bytes encode the value of the 'kid', if the 'kid' is
+   *  The remaining bytes encode the value of the 'kid', if the 'kid' is
       present (k = 1).
 
    Note that the 'kid' MUST be the last field of the OSCORE option
@@ -1729,15 +1717,6 @@ Internet-Draft                   OSCORE                        June 2019
    1.  Request with ciphertext = 0xaea0155667924dff8a24e4cb35b9, kid =
        0x25, and Partial IV = 0x05
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 31]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
        Before compression (24 bytes):
 
          [
@@ -1745,6 +1724,19 @@ Internet-Draft                   OSCORE                        June 2019
            { 4:h'25', 6:h'05' },
            h'aea0155667924dff8a24e4cb35b9',
          ]
+
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 31]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
        After compression (17 bytes):
 
@@ -1784,16 +1776,6 @@ Internet-Draft                   OSCORE                        June 2019
            h'aea0155667924dff8a24e4cb35b9',
          ]
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 32]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
        After compression (22  bytes):
 
          Flag byte: 0b00011001 = 0x19 (1 byte)
@@ -1804,6 +1786,13 @@ Internet-Draft                   OSCORE                        June 2019
 
    4.  Response with ciphertext = 0xaea0155667924dff8a24e4cb35b9 and no
        Partial IV
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 32]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
        Before compression (18 bytes):
 
@@ -1840,16 +1829,6 @@ Internet-Draft                   OSCORE                        June 2019
 
          Payload: 0xaea0155667924dff8a24e4cb35b9 (14 bytes)
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 33]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 7.  Message Binding, Sequence Numbers, Freshness, and Replay Protection
 
 7.1.  Message Binding
@@ -1860,6 +1839,16 @@ Internet-Draft                   OSCORE                        June 2019
    including the 'kid' and Partial IV of the request in the AAD of the
    response.  The server therefore needs to store the 'kid' and Partial
    IV of the request until all responses have been sent.
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 33]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 7.2.  Sequence Numbers
 
@@ -1897,15 +1886,6 @@ Internet-Draft                   OSCORE                        June 2019
    server created the response before receiving the request, i.e. it
    does not verify server aliveness.
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 34]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    For requests and notifications, OSCORE also provides relative
    freshness in the sense that the received Partial IV allows a
    recipient to determine the relative order of requests or responses.
@@ -1918,6 +1898,14 @@ Internet-Draft                   OSCORE                        June 2019
    not been received before.  If this verification fails, the server
    SHALL stop processing the message, and MAY optionally respond with a
    4.01 (Unauthorized) error message.  Also, the server MAY set an Outer
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 34]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    Max-Age option with value zero, to inform any intermediary that the
    response is not to be cached.  The diagnostic payload MAY contain the
    "Replay detected" string.  The size and type of the Replay Window
@@ -1953,15 +1941,6 @@ Internet-Draft                   OSCORE                        June 2019
    Applications MAY decide that a client only processes notifications
    which have greater Partial IV than the Notification Number.
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 35]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    If the verification of the response succeeds, and the received
    Partial IV was greater than the Notification Number then the client
    SHALL overwrite the corresponding Notification Number with the
@@ -1975,6 +1954,13 @@ Internet-Draft                   OSCORE                        June 2019
    the Sender Sequence Number, and Replay Window.  These are typically
    stored in RAM and therefore lost in the case of e.g. an unplanned
    reboot.  There are different alternatives to recover, for example:
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 35]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    1.  The endpoints can reuse an existing Security Context after
        updating the mutable parts of the security context (Sender
@@ -2011,13 +1997,6 @@ Internet-Draft                   OSCORE                        June 2019
    exchange protocol is necessary for deployments that require forward
    secrecy.
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 36]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 8.  Processing
 
    This section describes the OSCORE message processing.  Additional
@@ -2030,6 +2009,15 @@ Internet-Draft                   OSCORE                        June 2019
    Context and compute the AAD to protect or verify the response.  The
    association MAY be forgotten after it has been used to successfully
    protect or verify the response, with the exception of Observe
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 36]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    processing, where the association MUST be kept as long as the
    Observation is active.
 
@@ -2067,13 +2055,6 @@ Internet-Draft                   OSCORE                        June 2019
        If-Match Outer option is discarded, but an Uri-Host Outer option
        is not discarded.
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 37]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    2.  Decompress the COSE Object (Section 6) and retrieve the Recipient
        Context associated with the Recipient ID in the 'kid' parameter,
        additionally using the 'kid context', if present.  If either the
@@ -2085,6 +2066,14 @@ Internet-Draft                   OSCORE                        June 2019
        *  If either the decompression or the COSE message fails to
           decode, the server MAY respond with a 4.02 (Bad Option) error
           message.  The server MAY set an Outer Max-Age option with
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 37]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
           value zero.  The diagnostic payload MAY contain the string
           "Failed to decode COSE".
 
@@ -2122,14 +2111,6 @@ Internet-Draft                   OSCORE                        June 2019
 
    8.  The decrypted CoAP request is processed according to [RFC7252].
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 38]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 8.2.1.  Supporting Block-wise
 
    If Block-wise is supported, insert the following step before any
@@ -2138,6 +2119,16 @@ Internet-Draft                   OSCORE                        June 2019
    A.  If Block-wise is present in the request, then process the Outer
    Block options according to [RFC7959], until all blocks of the request
    have been received (see Section 4.1.3.4).
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 38]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 8.3.  Protecting the Response
 
@@ -2178,32 +2169,33 @@ Internet-Draft                   OSCORE                        June 2019
    If Observe is supported, insert the following step between step 2 and
    3 of Section 8.3:
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 39]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    A.  If the response is an observe notification:
 
-   o  If the response is the first notification:
+   *  If the response is the first notification:
 
-      *  compute the AEAD nonce as described in Section 5.2:
+      -  compute the AEAD nonce as described in Section 5.2:
 
-         +  Either use the AEAD nonce from the request, or
+         o  Either use the AEAD nonce from the request, or
 
-         +  Encode the Partial IV (Sender Sequence Number in network
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 39]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+         o  Encode the Partial IV (Sender Sequence Number in network
             byte order) and increment the Sender Sequence Number by one.
             Compute the AEAD nonce from the Sender ID, Common IV, and
             Partial IV.
 
          Then go to 4.
 
-   o  If the response is not the first notification:
+   *  If the response is not the first notification:
 
-      *  encode the Partial IV (Sender Sequence Number in network byte
+      -  encode the Partial IV (Sender Sequence Number in network byte
          order) and increment the Sender Sequence Number by one.
          Compute the AEAD nonce from the Sender ID, Common IV, and
          Partial IV, then go to 4.
@@ -2234,14 +2226,6 @@ Internet-Draft                   OSCORE                        June 2019
           nonce from the Recipient ID, Common IV, and the 'Partial IV'
           parameter, received in the COSE Object.
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 40]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    5.  Decrypt the COSE object using the Recipient Key, as per [RFC8152]
        Section 5.3.  (The decrypt operation includes the verification of
        the integrity.)  If decryption fails, then go to 8.
@@ -2250,6 +2234,13 @@ Internet-Draft                   OSCORE                        June 2019
        The OSCORE option is removed.
 
    7.  The decrypted CoAP response is processed according to [RFC7252].
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 40]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    8.  In case any of the previous erroneous conditions apply: the
        client SHALL stop processing the response.
@@ -2271,18 +2262,18 @@ Internet-Draft                   OSCORE                        June 2019
 
    A.  If the request was an Observe registration, then:
 
-   o  If the Partial IV is not present in the response, and Inner
+   *  If the Partial IV is not present in the response, and Inner
       Observe is present, and the AEAD nonce from the request was
       already used once, then go to 8.
 
-   o  If the Partial IV is present in the response and Inner Observe is
+   *  If the Partial IV is present in the response and Inner Observe is
       present, then follow the processing described in Section 4.1.3.5.2
       and Section 7.4.1, then:
 
-      *  initialize the Notification Number (if first successfully
+      -  initialize the Notification Number (if first successfully
          verified notification), or
 
-      *  overwrite the Notification Number (if the received Partial IV
+      -  overwrite the Notification Number (if the received Partial IV
          was greater than the Notification Number).
 
    Replace step 8 of Section 8.4 with:
@@ -2290,14 +2281,6 @@ Internet-Draft                   OSCORE                        June 2019
    B.  In case any of the previous erroneous conditions apply: the
    client SHALL stop processing the response.  An error condition
    occurring while processing a response to an observation request does
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 41]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    not cancel the observation.  A client MUST NOT react to failure by
    re-registering the observation immediately.
 
@@ -2306,6 +2289,14 @@ Internet-Draft                   OSCORE                        June 2019
    The use of OSCORE MAY be indicated by a target attribute "osc" in a
    web link [RFC8288] to a resource, e.g. using a link-format document
    [RFC6690] if the resource is accessible over CoAP.
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 41]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    The "osc" attribute is a hint indicating that the destination of that
    link is only accessible using OSCORE, and unprotected access to it is
@@ -2344,36 +2335,36 @@ Internet-Draft                   OSCORE                        June 2019
 
    However, not all CoAP proxy operations are useful:
 
-   o  Since a CoAP response is only applicable to the original CoAP
+   *  Since a CoAP response is only applicable to the original CoAP
       request, caching is in general not useful.  In support of existing
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 42]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
       proxies, OSCORE uses the outer Max-Age option, see
       Section 4.1.3.1.
 
-   o  Proxy processing of the (Outer) Observe option as defined in
+   *  Proxy processing of the (Outer) Observe option as defined in
       [RFC7641] is specified in Section 4.1.3.5.
 
    Optionally, a CoAP proxy MAY detect OSCORE and act accordingly.  An
    OSCORE-aware CoAP proxy:
 
-   o  SHALL bypass caching for the request if the OSCORE option is
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 42]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  SHALL bypass caching for the request if the OSCORE option is
       present
 
-   o  SHOULD avoid caching responses to requests with an OSCORE option
+   *  SHOULD avoid caching responses to requests with an OSCORE option
 
    In the case of Observe (see Section 4.1.3.5) the OSCORE-aware CoAP
    proxy:
 
-   o  SHALL NOT initiate an Observe registration
+   *  SHALL NOT initiate an Observe registration
 
-   o  MAY verify the order of notifications using Partial IV rather than
+   *  MAY verify the order of notifications using Partial IV rather than
       the Observe option
 
 11.  HTTP Operations
@@ -2403,13 +2394,6 @@ Internet-Draft                   OSCORE                        June 2019
    specification: ALPHA (letters) and DIGIT (decimal digits), the HTTP
    OSCORE header field value is as follows.
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 43]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    base64url-char = ALPHA / DIGIT / "-" / "_"
 
    OSCORE = 2*base64url-char
@@ -2418,6 +2402,14 @@ Internet-Draft                   OSCORE                        June 2019
    Connection header field (see Section 6.1 of [RFC7230]) since it is
    not hop-by-hop.  OSCORE messages are generally not useful when served
    from cache (i.e., they will generally be marked Cache-Control: no-
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 43]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    cache) and so interaction with Vary is not relevant (Section 7.1.4 of
    [RFC7231]).  Since the HTTP OSCORE header field is critical for
    message processing, moving it from headers to trailers renders the
@@ -2435,13 +2427,13 @@ Internet-Draft                   OSCORE                        June 2019
    redirects to work.  For CoAP client to HTTP server, such conditions
    include:
 
-   o  the CoAP-to-HTTP proxy follows the redirect, instead of the CoAP
+   *  the CoAP-to-HTTP proxy follows the redirect, instead of the CoAP
       client as in the HTTP case
 
-   o  the CoAP-to-HTTP proxy copies the HTTP OSCORE header field and
+   *  the CoAP-to-HTTP proxy copies the HTTP OSCORE header field and
       body to the new request
 
-   o  the target of the redirect has the necessary OSCORE security
+   *  the target of the redirect has the necessary OSCORE security
       context required to decrypt and verify the message
 
    Since OSCORE requires HTTP body to be preserved across redirects, the
@@ -2459,23 +2451,25 @@ Internet-Draft                   OSCORE                        June 2019
    HTTP cross-protocol mapping process.  The additional rules for OSCORE
    messages are:
 
+   *  The HTTP OSCORE header field value is set to
 
+      -  AA if the CoAP OSCORE option is empty, otherwise
 
-Selander, et al.        Expires December 26, 2019              [Page 44]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  The HTTP OSCORE header field value is set to
-
-      *  AA if the CoAP OSCORE option is empty, otherwise
-
-      *  the value of the CoAP OSCORE option (Section 6.1) in base64url
+      -  the value of the CoAP OSCORE option (Section 6.1) in base64url
          (Section 5 of [RFC4648]) encoding without padding.
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 44]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
          Implementation notes for this encoding are given in Appendix C
          of [RFC7515].
 
-   o  The HTTP Content-Type is set to 'application/oscore' (see
+   *  The HTTP Content-Type is set to 'application/oscore' (see
       Section 13.5), independent of CoAP Content-Format.
 
 11.3.  HTTP-to-CoAP Mapping
@@ -2484,17 +2478,17 @@ Internet-Draft                   OSCORE                        June 2019
    HTTP-to-CoAP proxy.  The additional rules for HTTP messages with the
    OSCORE header field are:
 
-   o  The CoAP OSCORE option is set as follows:
+   *  The CoAP OSCORE option is set as follows:
 
-      *  empty if the value of the HTTP OSCORE header field is a single
+      -  empty if the value of the HTTP OSCORE header field is a single
          zero byte (0x00) represented by AA, otherwise
 
-      *  the value of the HTTP OSCORE header field decoded from
+      -  the value of the HTTP OSCORE header field decoded from
          base64url (Section 5 of [RFC4648]) without padding.
          Implementation notes for this encoding are given in Appendix C
          of [RFC7515].
 
-   o  The CoAP Content-Format option is omitted, the content format for
+   *  The CoAP Content-Format option is omitted, the content format for
       OSCORE (Section 13.6) MUST NOT be used.
 
 11.4.  HTTP Endpoints
@@ -2514,20 +2508,19 @@ Internet-Draft                   OSCORE                        June 2019
    CoAP message is translated to HTTP for normal processing in the
    endpoint.
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 45]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 11.5.  Example: HTTP Client and CoAP Server
 
    This section is giving an example of how a request and a response
    between an HTTP client and a CoAP server could look like.  The
    example is not a test vector but intended as an illustration of how
    the message fields are translated in the different steps.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 45]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    Mapping and notation here is based on "Simple Form" (Section 5.4.1 of
    [RFC8075]).
@@ -2566,24 +2559,24 @@ Internet-Draft                   OSCORE                        June 2019
      OSCORE: [empty]
      Payload: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
 
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 46]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    [HTTP response -- Proxy to HTTP Client]
 
      HTTP/1.1 200 OK
      Content-Type: application/oscore
      OSCORE: AA
      Body: 00 31 d1 fc f6 70 fb 0c 1d d5 ... [binary]
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 46]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    [HTTP response -- After client object security processing]
 
@@ -2627,18 +2620,19 @@ Internet-Draft                   OSCORE                        June 2019
 
      GET http://server.url/orders HTTP/1.1
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 47]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    [HTTP response -- Before server object security processing]
 
      HTTP/1.1 200 OK
      Content-Type: text/plain
      Body: Exterminate! Exterminate!
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 47]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    [HTTP response -- HTTP Server to Proxy]
 
@@ -2682,20 +2676,20 @@ Internet-Draft                   OSCORE                        June 2019
    intermediary nodes are fully trusted, attacks and data breaches make
    such an architecture brittle.
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 48]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    (D)TLS protects hop-by-hop the entire message.  OSCORE protects end-
    to-end all information that is not required for proxy operations (see
    Section 4).  (D)TLS and OSCORE can be combined, thereby enabling end-
    to-end security of the message payload, in combination with hop-by-
    hop protection of the entire message, during transport between end-
    point and intermediary node.  In particular when OSCORE is used with
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 48]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    HTTP, the additional TLS protection of HTTP hops is RECOMMENDED, e.g.
    between an HTTP endpoint and a proxy translating between HTTP and
    CoAP.
@@ -2737,21 +2731,21 @@ Internet-Draft                   OSCORE                        June 2019
    an attacker has some partial knowledge) and derive from it one or
    more cryptographically strong secret keys [RFC5869].
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 49]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    Therefore, the main requirement for the OSCORE Master Secret, in
    addition to being secret, is that it is has a good amount of
    randomness.  The selected key establishment schemes must ensure that
    the necessary properties for the Master Secret are fulfilled.  For
    pre-shared key deployments and key transport solutions such as
    [I-D.ietf-ace-oscore-profile], the Master Secret can be generated
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 49]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    offline using a good random number generator.  Randomness
    requirements for security are described in [RFC4086].
 
@@ -2793,15 +2787,6 @@ Internet-Draft                   OSCORE                        June 2019
    algorithm AES-CCM-16-64-128 is selected for compatibility with CCM*.
    AEAD algorithms that require unpredictable nonces are not supported.
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 50]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    In order to prevent cryptanalysis when the same plaintext is
    repeatedly encrypted by many different users with distinct AEAD keys,
    the AEAD nonce is formed by mixing the sequence number with a secret
@@ -2809,6 +2794,14 @@ Internet-Draft                   OSCORE                        June 2019
    keys (see Section 3.1 of [RFC8152]), and by using a Master Salt in
    the key derivation (see [MF00] for an overview).  The Master Secret,
    Sender Key, Recipient Key, and Common IV must be secret, the rest of
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 50]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    the parameters may be public.  The Master Secret must have a good
    amount of randomness (see Section 12.3).
 
@@ -2850,14 +2843,6 @@ Internet-Draft                   OSCORE                        June 2019
 
    COSE message fields, i.e. the OSCORE option, may reveal information
    about the communicating endpoints.  E.g. 'kid' and 'kid context',
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 51]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    which are intended to help the server find the right context, may
    reveal information about the client.  Tracking 'kid' and 'kid
    context' to one server may be used for correlating requests from one
@@ -2865,6 +2850,14 @@ Internet-Draft                   OSCORE                        June 2019
 
    Unprotected error messages reveal information about the security
    state in the communication between the endpoints.  Unprotected
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 51]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    signaling messages reveal information about the reliable transport
    used on a leg of the path.  Using the mechanisms described in
    Section 7.5 may reveal when a device goes through a reboot.  This can
@@ -2888,31 +2881,20 @@ Internet-Draft                   OSCORE                        June 2019
    The 'kid context' parameter is added to the "COSE Header Parameters
    Registry":
 
-   o  Name: kid context
+   *  Name: kid context
 
-   o  Label: TBD2
+   *  Label: TBD2
 
-   o  Value Type: bstr
+   *  Value Type: bstr
 
-   o  Value Registry:
+   *  Value Registry:
 
-   o  Description: Identifies the context for 'kid'
+   *  Description: Identifies the context for 'kid'
 
-   o  Reference: Section 5.1 of this document
+   *  Reference: Section 5.1 of this document
 
    Note to IANA: Label assignment in (Integer value between 1 and 255)
    is requested.  (RFC Editor: Delete this note after IANA assignment)
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 52]
-
-Internet-Draft                   OSCORE                        June 2019
-
 
 13.2.  CoAP Option Numbers Registry
 
@@ -2923,6 +2905,14 @@ Internet-Draft                   OSCORE                        June 2019
              +--------+-----------------+-------------------+
              |  TBD1  | OSCORE          | [[this document]] |
              +--------+-----------------+-------------------+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 52]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    Note to IANA: Label assignment in (Integer value between 0 and 12) is
    requested.  We also request Expert review if possible, to make sure a
@@ -2962,14 +2952,6 @@ Internet-Draft                   OSCORE                        June 2019
    a reference to the document where the OSCORE processing of that CoAP
    Option is defined.
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 53]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 13.3.  CoAP Signaling Option Numbers Registry
 
    The OSCORE option is added to the CoAP Signaling Option Numbers
@@ -2980,6 +2962,13 @@ Internet-Draft                   OSCORE                        June 2019
      +------------+--------+---------------------+-------------------+
      | 7.xx (all) |  TBD1  | OSCORE              | [[this document]] |
      +------------+--------+---------------------+-------------------+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 53]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    Note to IANA: The value in the "Number" field is the same value
    that's being assigned to the new Option Number.  Please make sure
@@ -3021,9 +3010,20 @@ Internet-Draft                   OSCORE                        June 2019
 
 
 
-Selander, et al.        Expires December 26, 2019              [Page 54]
+
+
+
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 54]
 
-Internet-Draft                   OSCORE                        June 2019
+Internet-Draft                   OSCORE                       March 2020
 
 
      Type name: application
@@ -3065,7 +3065,7 @@ Internet-Draft                   OSCORE                        June 2019
 
      Restrictions on usage: N/A
 
-     Author: Goeran Selander, goran.selander@ericsson.com
+     Author: Göran Selander, goran.selander@ericsson.com
 
      Change Controller: IESG
 
@@ -3077,9 +3077,9 @@ Internet-Draft                   OSCORE                        June 2019
 
 
 
-Selander, et al.        Expires December 26, 2019              [Page 55]
+Selander, et al.        Expires 21 September 2020              [Page 55]
 
-Internet-Draft                   OSCORE                        June 2019
+Internet-Draft                   OSCORE                       March 2020
 
 
 13.6.  CoAP Content-Formats Registry
@@ -3109,19 +3109,19 @@ Internet-Draft                   OSCORE                        June 2019
 
    The columns of the registry are:
 
-   o  bit position: This indicates the position of the bit in the set of
+   *  bit position: This indicates the position of the bit in the set of
       OSCORE flag bits, starting at 0 for the most significant bit.  The
       bit position must be an integer or a range of integers, in the
       range 0 to 63.
 
-   o  name: The name is present to make it easier to refer to and
+   *  name: The name is present to make it easier to refer to and
       discuss the registration entry.  The value is not used in the
       protocol.  Names are to be unique in the table.
 
-   o  description: This contains a brief description of the use of the
+   *  description: This contains a brief description of the use of the
       bit.
 
-   o  specification: This contains a pointer to the specification
+   *  specification: This contains a pointer to the specification
       defining the entry.
 
    The initial contents of the registry can be found in the table below.
@@ -3133,38 +3133,38 @@ Internet-Draft                   OSCORE                        June 2019
 
 
 
-Selander, et al.        Expires December 26, 2019              [Page 56]
+Selander, et al.        Expires 21 September 2020              [Page 56]
 
-Internet-Draft                   OSCORE                        June 2019
+Internet-Draft                   OSCORE                       March 2020
 
 
    for the OSCORE flag bits in Section 6.1, so that entries 8-63 of the
    registry are defined.
 
-+--------------+-------------+---------------------+-------------------+
-| Bit Position |     Name    |     Description     |   Specification   |
-+--------------+-------------+---------------------+-------------------+
-|       0      | Reserved    |                     |                   |
-+--------------+-------------+---------------------+-------------------+
-|       1      | Reserved    |                     |                   |
-+--------------+-------------+---------------------+-------------------+
-|       2      | Unassigned  |                     |                   |
-+--------------+-------------+---------------------+-------------------+
-|       3      | Kid Context | Set to 1 if 'kid    | [[this document]] |
-|              | Flag        | context' is present |                   |
-|              |             | in the compressed   |                   |
-|              |             | COSE object         |                   |
-+--------------+-------------+---------------------+-------------------+
-|       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
-|              |             | present in the com- |                   |
-|              |             | pressed COSE object |                   |
-+--------------+-------------+---------------------+-------------------+
-|     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
-|              | Length      | IV length; can have |                   |
-|              |             | value 0 to 5        |                   |
-+--------------+-------------+---------------------+-------------------+
-|    8-63      | Unassigned  |                     |                   |
-+--------------+-------------+---------------------+-------------------+
+   +--------------+-------------+---------------------+-------------------+
+   | Bit Position |     Name    |     Description     |   Specification   |
+   +--------------+-------------+---------------------+-------------------+
+   |       0      | Reserved    |                     |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |       1      | Reserved    |                     |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |       2      | Unassigned  |                     |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |       3      | Kid Context | Set to 1 if 'kid    | [[this document]] |
+   |              | Flag        | context' is present |                   |
+   |              |             | in the compressed   |                   |
+   |              |             | COSE object         |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |       4      | Kid Flag    | Set to 1 if kid is  | [[this document]] |
+   |              |             | present in the com- |                   |
+   |              |             | pressed COSE object |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |     5-7      | Partial IV  | Encodes the Partial | [[this document]] |
+   |              | Length      | IV length; can have |                   |
+   |              |             | value 0 to 5        |                   |
+   +--------------+-------------+---------------------+-------------------+
+   |    8-63      | Unassigned  |                     |                   |
+   +--------------+-------------+---------------------+-------------------+
 
 13.8.  Expert Review Instructions
 
@@ -3182,21 +3182,17 @@ Internet-Draft                   OSCORE                        June 2019
    points are defined (i.e. until the mechanism for the OSCORE flag bits
    expansion via bit 1 is specified).
 
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 57]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 14.  References
 
 14.1.  Normative References
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 57]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -3240,20 +3236,19 @@ Internet-Draft                   OSCORE                        June 2019
               DOI 10.17487/RFC7252, June 2014,
               <https://www.rfc-editor.org/info/rfc7252>.
 
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 58]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    [RFC7641]  Hartke, K., "Observing Resources in the Constrained
               Application Protocol (CoAP)", RFC 7641,
               DOI 10.17487/RFC7641, September 2015,
               <https://www.rfc-editor.org/info/rfc7641>.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 58]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    [RFC7959]  Bormann, C. and Z. Shelby, Ed., "Block-Wise Transfers in
               the Constrained Application Protocol (CoAP)", RFC 7959,
@@ -3295,77 +3290,90 @@ Internet-Draft                   OSCORE                        June 2019
 
 14.2.  Informative References
 
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 59]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    [I-D.bormann-6lo-coap-802-15-ie]
               Bormann, C., "Constrained Application Protocol (CoAP) over
-              IEEE 802.15.4 Information Element for IETF", draft-
-              bormann-6lo-coap-802-15-ie-00 (work in progress), April
-              2016.
+              IEEE 802.15.4 Information Element for IETF", Work in
+              Progress, Internet-Draft, draft-bormann-6lo-coap-802-15-
+              ie-00, 4 April 2016, <http://www.ietf.org/internet-drafts/
+              draft-bormann-6lo-coap-802-15-ie-00.txt>.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 59]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    [I-D.hartke-core-e2e-security-reqs]
               Selander, G., Palombini, F., and K. Hartke, "Requirements
-              for CoAP End-To-End Security", draft-hartke-core-e2e-
-              security-reqs-03 (work in progress), July 2017.
+              for CoAP End-To-End Security", Work in Progress, Internet-
+              Draft, draft-hartke-core-e2e-security-reqs-03, 29 July
+              2017, <http://www.ietf.org/internet-drafts/draft-hartke-
+              core-e2e-security-reqs-03.txt>.
 
    [I-D.ietf-ace-oauth-authz]
               Seitz, L., Selander, G., Wahlstroem, E., Erdtman, S., and
               H. Tschofenig, "Authentication and Authorization for
               Constrained Environments (ACE) using the OAuth 2.0
-              Framework (ACE-OAuth)", draft-ietf-ace-oauth-authz-24
-              (work in progress), March 2019.
+              Framework (ACE-OAuth)", Work in Progress, Internet-Draft,
+              draft-ietf-ace-oauth-authz-33, 6 February 2020,
+              <http://www.ietf.org/internet-drafts/draft-ietf-ace-oauth-
+              authz-33.txt>.
 
    [I-D.ietf-ace-oscore-profile]
               Palombini, F., Seitz, L., Selander, G., and M. Gunnarsson,
               "OSCORE profile of the Authentication and Authorization
-              for Constrained Environments Framework", draft-ietf-ace-
-              oscore-profile-07 (work in progress), February 2019.
+              for Constrained Environments Framework", Work in Progress,
+              Internet-Draft, draft-ietf-ace-oscore-profile-10, 9 March
+              2020, <http://www.ietf.org/internet-drafts/draft-ietf-ace-
+              oscore-profile-10.txt>.
 
    [I-D.ietf-cbor-cddl]
               Birkholz, H., Vigano, C., and C. Bormann, "Concise data
               definition language (CDDL): a notational convention to
-              express CBOR and JSON data structures", draft-ietf-cbor-
-              cddl-08 (work in progress), March 2019.
+              express CBOR and JSON data structures", Work in Progress,
+              Internet-Draft, draft-ietf-cbor-cddl-08, 24 March 2019,
+              <http://www.ietf.org/internet-drafts/draft-ietf-cbor-cddl-
+              08.txt>.
 
    [I-D.ietf-core-echo-request-tag]
               Amsuess, C., Mattsson, J., and G. Selander, "CoAP: Echo,
-              Request-Tag, and Token Processing", draft-ietf-core-echo-
-              request-tag-05 (work in progress), May 2019.
+              Request-Tag, and Token Processing", Work in Progress,
+              Internet-Draft, draft-ietf-core-echo-request-tag-09, 9
+              March 2020, <http://www.ietf.org/internet-drafts/draft-
+              ietf-core-echo-request-tag-09.txt>.
 
    [I-D.ietf-core-oscore-groupcomm]
               Tiloca, M., Selander, G., Palombini, F., and J. Park,
-              "Group OSCORE - Secure Group Communication for CoAP",
-              draft-ietf-core-oscore-groupcomm-04 (work in progress),
-              March 2019.
+              "Group OSCORE - Secure Group Communication for CoAP", Work
+              in Progress, Internet-Draft, draft-ietf-core-oscore-
+              groupcomm-07, 9 March 2020, <http://www.ietf.org/internet-
+              drafts/draft-ietf-core-oscore-groupcomm-07.txt>.
 
    [I-D.mattsson-core-coap-actuators]
               Mattsson, J., Fornehed, J., Selander, G., Palombini, F.,
-              and C. Amsuess, "Controlling Actuators with CoAP", draft-
-              mattsson-core-coap-actuators-06 (work in progress),
-              September 2018.
 
 
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 60]
+Selander, et al.        Expires 21 September 2020              [Page 60]
 
-Internet-Draft                   OSCORE                        June 2019
+Internet-Draft                   OSCORE                       March 2020
 
+
+              and C. Amsuess, "Controlling Actuators with CoAP", Work in
+              Progress, Internet-Draft, draft-mattsson-core-coap-
+              actuators-06, 17 September 2018, <http://www.ietf.org/
+              internet-drafts/draft-mattsson-core-coap-actuators-
+              06.txt>.
 
    [I-D.mcgrew-iv-gen]
               McGrew, D., "Generation of Deterministic Initialization
-              Vectors (IVs) and Nonces", draft-mcgrew-iv-gen-03 (work in
-              progress), October 2013.
+              Vectors (IVs) and Nonces", Work in Progress, Internet-
+              Draft, draft-mcgrew-iv-gen-03, 15 October 2013,
+              <http://www.ietf.org/internet-drafts/draft-mcgrew-iv-gen-
+              03.txt>.
 
    [MF00]     McGrew, D. and S. Fluhrer, "Attacks on Encryption of
               Redundant Plaintext and Implications on Internet
@@ -3401,6 +3409,15 @@ Internet-Draft                   OSCORE                        June 2019
               DOI 10.17487/RFC7228, May 2014,
               <https://www.rfc-editor.org/info/rfc7228>.
 
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 61]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
               Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
               2015, <https://www.rfc-editor.org/info/rfc7515>.
@@ -3409,14 +3426,6 @@ Internet-Draft                   OSCORE                        June 2019
               Bose, "Constrained Application Protocol (CoAP) Option for
               No Server Response", RFC 7967, DOI 10.17487/RFC7967,
               August 2016, <https://www.rfc-editor.org/info/rfc7967>.
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 61]
-
-Internet-Draft                   OSCORE                        June 2019
-
 
 Appendix A.  Scenario Examples
 
@@ -3432,47 +3441,46 @@ A.1.  Secure Access to Sensor
    This example illustrates a client requesting the alarm status from a
    server.
 
-      Client  Proxy  Server
-        |       |       |
-        +------>|       |            Code: 0.02 (POST)
-        | POST  |       |           Token: 0x8c
-        |       |       |          OSCORE: [kid:5f, Partial IV:42]
-        |       |       |         Payload: {Code:0.01,
-        |       |       |                   Uri-Path:"alarm_status"}
-        |       |       |
-        |       +------>|            Code: 0.02 (POST)
-        |       | POST  |           Token: 0x7b
-        |       |       |          OSCORE: [kid:5f, Partial IV:42]
-        |       |       |         Payload: {Code:0.01,
-        |       |       |                   Uri-Path:"alarm_status"}
-        |       |       |
-        |       |<------+            Code: 2.04 (Changed)
-        |       |  2.04 |           Token: 0x7b
-        |       |       |          OSCORE: -
-        |       |       |         Payload: {Code:2.05, "0"}
-        |       |       |
-        |<------+       |            Code: 2.04 (Changed)
-        |  2.04 |       |           Token: 0x8c
-        |       |       |          OSCORE: -
-        |       |       |         Payload: {Code:2.05, "0"}
-        |       |       |
+   Client  Proxy  Server
+     |       |       |
+     +------>|       |            Code: 0.02 (POST)
+     | POST  |       |           Token: 0x8c
+     | &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; |          OSCORE: [kid:5f, Partial IV:42]
+    &nbsp;| &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;   Payload: {Code:0.01,
+     |       |       |                   Uri-Path:"alarm_status"}
+     |       |       |
+     |       +------>|            Code: 0.02 (POST)
+     |       | POST  |           Token: 0x7b
+     |       |       |          OSCORE: [kid:5f, Partial IV:42]
+     |       |       |         Payload: {Code:0.01,
+     |       |       |                   Uri-Path:"alarm_status"}
+     |       |       |
+     |       |<------+            Code: 2.04 (Changed)
+     |       |  2.04 |           Token: 0x7b
+     |       |       |          OSCORE: -
+     |       |       |         Payload: {Code:2.05, "0"}
+     |       |       |
+     |<------+       |            Code: 2.04 (Changed)
+     |  2.04 |       |           Token: 0x8c
+     |       |       |          OSCORE: -
+     |       |       |         Payload: {Code:2.05, "0"}
+     |       |       |
 
-   Figure 12: Secure Access to Sensor.  Square brackets [ ... ] indicate
-    content of compressed COSE object.  Curly brackets { ... } indicate
-                              encrypted data.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 62]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+        Figure 12: Secure Access to Sensor.  Square brackets [ ... ]
+     indicate content of compressed COSE object.  Curly brackets { ...
+                         } indicate encrypted data.
 
    The request/response Codes are encrypted by OSCORE and only dummy
    Codes (POST/Changed) are visible in the header of the OSCORE message.
    The option Uri-Path ("alarm_status") and payload ("0") are encrypted.
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 62]
-
-Internet-Draft                   OSCORE                        June 2019
-
 
    The COSE header of the request contains an identifier (5f),
    indicating which security context was used to protect the message and
@@ -3486,6 +3494,41 @@ A.2.  Secure Subscribe to Sensor
    This example illustrates a client requesting subscription to a blood
    sugar measurement resource (GET /glucose), first receiving the value
    220 mg/dl and then a second value 180 mg/dl.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 63]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
       Client  Proxy  Server
         |       |       |
@@ -3522,14 +3565,6 @@ A.2.  Secure Subscribe to Sensor
         |       |  2.05 |           Token: 0xbe
         |       |       |         Observe: 8
         |       |       |          OSCORE: [Partial IV:36]
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 63]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
         |       |       |         Payload: {Code:2.05,
         |       |       |                   Content-Format:0, "180"}
         |       |       |
@@ -3541,9 +3576,19 @@ Internet-Draft                   OSCORE                        June 2019
         |       |       |                   Content-Format:0, "180"}
         |       |       |
 
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 64]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       Figure 13: Secure Subscribe to Sensor.  Square brackets [ ... ]
-   indicate content of compressed COSE object header.  Curly brackets {
-                      ... } indicate encrypted data.
+         indicate content of compressed COSE object header.  Curly
+                 brackets { ... } indicate encrypted data.
 
    The dummy Codes (FETCH/Content) are used to allow forwarding of
    Observe messages.  The options Content-Format (0) and the payload
@@ -3574,18 +3619,6 @@ B.1.  Security Context Derived Once
    handle the loss of mutable security context parameters, e.g. due to
    reboot.
 
-
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 64]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 B.1.1.  Sender Sequence Number
 
    In order to handle loss of Sender Sequence Numbers, the device may
@@ -3600,6 +3633,15 @@ B.1.1.  Sender Sequence Number
    operations during its life time.  Also, the time for a write
    operation to non-volatile memory to be completed may be
    unpredictable, e.g. due to caching, which could result in important
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 65]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    security context data not being stored at the time when the device
    reboots.
 
@@ -3610,18 +3652,18 @@ B.1.1.  Sender Sequence Number
    To prevent reuse of Sender Sequence Numbers (SSN), an endpoint may
    perform the following procedure during normal operations:
 
-   o  Before using a Sender Sequence Number that is evenly divisible by
+   *  Before using a Sender Sequence Number that is evenly divisible by
       K, where K is a positive integer, store the Sender Sequence Number
       (SSN1) in non-volatile memory.  After boot, the endpoint initiates
       the new Sender Sequence Number (SSN2) to the value stored in
       persistent memory plus K plus F: SSN2 = SSN1 + K + F, where F is a
       positive integer.
 
-      *  Writing to non-volatile memory can be costly; the value K gives
+      -  Writing to non-volatile memory can be costly; the value K gives
          a trade-off between frequency of storage operations and
          efficient use of Sender Sequence Numbers.
 
-      *  Writing to non-volatile memory may be subject to delays, or
+      -  Writing to non-volatile memory may be subject to delays, or
          failure; F MUST be set so that the last Sender Sequence Number
          used before reboot is never larger than SSN2.
 
@@ -3635,18 +3677,11 @@ B.1.2.  Replay Window
    accepting replay of previously received requests, the server may
    perform the following procedure after boot:
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 65]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  The server updates its Sender Sequence Number as specified in
+   *  The server updates its Sender Sequence Number as specified in
       Appendix B.1.1, to be used as Partial IV in the response
       containing the Echo option (next bullet).
 
-   o  For each stored security context, the first time after boot the
+   *  For each stored security context, the first time after boot the
       server receives an OSCORE request, the server responds with an
       OSCORE protected 4.01 (Unauthorized), containing only the Echo
       option [I-D.ietf-core-echo-request-tag] and no diagnostic payload.
@@ -3654,6 +3689,15 @@ Internet-Draft                   OSCORE                        June 2019
       and MUST include the Partial IV in the response (see Section 5).
       If the server with use of the Echo option can verify a second
       OSCORE request as fresh, then the Partial IV of the second request
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 66]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       is set as the lower limit of the replay window of that security
       context.
 
@@ -3662,7 +3706,7 @@ B.1.3.  Notifications
    To prevent accepting replay of previously received notifications, the
    client may perform the following procedure after boot:
 
-   o  The client forgets about earlier registrations, removes all
+   *  The client forgets about earlier registrations, removes all
       Notification Numbers and registers using Observe.
 
 B.2.  Security Context Derived Multiple Times
@@ -3690,14 +3734,6 @@ B.2.  Security Context Derived Multiple Times
 
    The protocol described in this section may only be needed when the
    mutable part of security context is lost in the client or server,
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 66]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    e.g. when the endpoint has rebooted.  The protocol may additionally
    be used whenever the client and server need to derive a new security
    context.  For example, if a device is provisioned with one fixed set
@@ -3709,25 +3745,34 @@ Internet-Draft                   OSCORE                        June 2019
    client or the server may initiate the protocol, in the latter case
    step 1 is omitted.
 
-                      Client                Server
-                        |                      |
-1. Protect with         |      request #1      |
-   ID Context = ID1     |--------------------->| 2. Verify with
-                        |  kid_context = ID1   |    ID Context = ID1
-                        |                      |
-                        |      response #1     |    Protect with
-3. Verify with          |<---------------------|    ID Context = R2||ID1
-   ID Context = R2||ID1 |   kid_context = R2   |
-                        |                      |
-   Protect with         |      request #2      |
-   ID Context = R2||R3  |--------------------->| 4. Verify with
-                        | kid_context = R2||R3 |    ID Context = R2||R3
-                        |                      |
-                        |      response #2     |    Protect with
-5. Verify with          |<---------------------|    ID Context = R2||R3
-   ID Context = R2||R3  |                      |
 
-       Figure 14: Protocol for establishing a new security context.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 67]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+                         Client                Server
+                           |                      |
+   1. Protect with         |      request #1      |
+      ID Context = ID1     |--------------------->| 2. Verify with
+                           |  kid_context = ID1   |    ID Context = ID1
+                           |                      |
+                           |      response #1     |    Protect with
+   3. Verify with          |<---------------------|    ID Context = R2||ID1
+      ID Context = R2||ID1 |   kid_context = R2   |
+                           |                      |
+      Protect with         |      request #2      |
+      ID Context = R2||R3  |--------------------->| 4. Verify with
+                           | kid_context = R2||R3 |    ID Context = R2||R3
+                           |                      |
+                           |      response #2     |    Protect with
+   5. Verify with          |<---------------------|    ID Context = R2||R3
+      ID Context = R2||R3  |                      |
+
+        Figure 14: Protocol for establishing a new security context.
 
    1.  (Optional) If the client does not have a valid security context
        with the server, e.g. because of reboot or because this is the
@@ -3746,14 +3791,6 @@ Internet-Draft                   OSCORE                        June 2019
        Number or replay window.  If the server is able to verify the
        request (see Section 8.2) with the new derived first security
        context using the received ID1 (transported in 'kid context') as
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 67]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
        ID Context and the input parameters associated to the received
        'kid', then the server generates a random string R2, and derives
        a second security context with ID Context = ID2 = R2 || ID1.  The
@@ -3765,6 +3802,13 @@ Internet-Draft                   OSCORE                        June 2019
        security context, leading to multiple parallel protocol runs.
        Multiple instances of R2 may need to be cached until one of the
        protocol runs is completed, see Appendix B.2.1.
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 68]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    3.  The client receives a response with 'kid context' containing a
        CBOR bstr wrapping R2 to an OSCORE request it made with ID
@@ -3802,14 +3846,6 @@ Internet-Draft                   OSCORE                        June 2019
 
    The length of the nonces R1, R2, and R3 is application specific.  The
    application needs to set the length of each nonce such the
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 68]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    probability of its value being repeated is negligible; typically, at
    least 8 bytes long.  Since R2 may be generated as the result of a
    replayed request #1, the probability for collision of R2s is impacted
@@ -3821,6 +3857,15 @@ Internet-Draft                   OSCORE                        June 2019
    Request #2 can be an ordinary request.  The server performs the
    action of the request and sends response #2 after having successfully
    completed the security context related operations in step 4.  The
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 69]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    client acts on response #2 after having successfully completed step
    5.
 
@@ -3858,14 +3903,6 @@ B.2.1.  Implementation Considerations
    from the cache at timeout.  Additionally, state information can be
    flushed at reboot.
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 69]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    As an alternative to caching R2, the server could generate R2 in such
    a way that it can be sent (in response #1) and verified (at reception
    of request #2) as the value of R2 it had generated.  Such a procedure
@@ -3877,7 +3914,15 @@ Internet-Draft                   OSCORE                        June 2019
    storing the K_HMAC keys and a slightly larger message overhead in
    response #1.  Steps below refer to modifications to Appendix B.2:
 
-   o  In step 2, R2 is generated in the following way.  First, the
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 70]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  In step 2, R2 is generated in the following way.  First, the
       server generates a random K_HMAC (unless it already has one
       associated with the security context), then it sets R2 = S2 ||
       HMAC(K_HMAC, S2) where S2 is a random byte string, and the HMAC is
@@ -3885,7 +3930,7 @@ Internet-Draft                   OSCORE                        June 2019
       which it is erased.  Note that neither R2, S2 nor the derived
       first and second security contexts need to be cached.
 
-   o  In step 4, instead of verifying that R2 coincides with a cached
+   *  In step 4, instead of verifying that R2 coincides with a cached
       value, the server looks up the associated K_HMAC and verifies the
       truncated HMAC, and the processing continues accordingly depending
       on verification success or failure.  K_HMAC is used until a run of
@@ -3913,15 +3958,6 @@ Internet-Draft                   OSCORE                        June 2019
    random delay before requests immediately after reboot or if such
    parallel protocol runs are detected.
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 70]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 B.2.2.  Attack Considerations
 
    An on-path attacker may inject a message causing the endpoint to
@@ -3934,6 +3970,14 @@ B.2.2.  Attack Considerations
    a response.  But if the client did not expect a response it will be
    discarded.  This may still result in a denial-of-service attack
    against the server e.g. because of not being able to manage the state
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 71]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    associated with many parallel protocol runs, and it may prevent
    legitimate client requests.  Implementation alternatives with less
    data caching per request #1 message are favorable in this respect,
@@ -3967,17 +4011,6 @@ Appendix C.  Test Vectors
    vectors with data provided by the authors.  Please remove this
    paragraph before publication.]
 
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 71]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 C.1.  Test Vector 1: Key Derivation with Master Salt
 
    In this test vector, a Master Salt of 8 bytes is used.  The default
@@ -3987,79 +4020,86 @@ C.1.1.  Client
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Master Salt: 0x9e7ca92223786340 (8 bytes)
+   *  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
-   o  Sender ID: 0x (0 byte)
+   *  Sender ID: 0x (0 byte)
 
-   o  Recipient ID: 0x01 (1 byte)
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 72]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Recipient ID: 0x01 (1 byte)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x8540f60a634b657910 (9 bytes)
+   *  info (for Sender Key): 0x8540f60a634b657910 (9 bytes)
 
-   o  info (for Recipient Key): 0x854101f60a634b657910 (10 bytes)
+   *  info (for Recipient Key): 0x854101f60a634b657910 (10 bytes)
 
-   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
+   *  info (for Common IV): 0x8540f60a6249560d (8 bytes)
 
    Outputs:
 
-   o  Sender Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
+   *  Sender Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
 
-   o  Recipient Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
+   *  Recipient Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-   o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  sender nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
-   o  recipient nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
+   *  recipient nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
 
 C.1.2.  Server
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Master Salt: 0x9e7ca92223786340 (8 bytes)
+   *  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
+   *  Sender ID: 0x01 (1 byte)
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 72]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  Sender ID: 0x01 (1 byte)
-
-   o  Recipient ID: 0x (0 byte)
+   *  Recipient ID: 0x (0 byte)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
+   *  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
 
-   o  info (for Recipient Key): 0x8540f60a634b657910 (9 bytes)
+   *  info (for Recipient Key): 0x8540f60a634b657910 (9 bytes)
 
-   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
+   *  info (for Common IV): 0x8540f60a6249560d (8 bytes)
 
    Outputs:
 
-   o  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
+   *  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-   o  Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
 
-   o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+
+Selander, et al.        Expires 21 September 2020              [Page 73]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
+
+   *  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
+   *  sender nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
 
-   o  recipient nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  recipient nonce: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
 C.2.  Test Vector 2: Key Derivation without Master Salt
 
@@ -4070,83 +4110,74 @@ C.2.1.  Client
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Sender ID: 0x00 (1 byte)
+   *  Sender ID: 0x00 (1 byte)
 
-   o  Recipient ID: 0x01 (1 byte)
+   *  Recipient ID: 0x01 (1 byte)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x854100f60a634b657910 (10 bytes)
+   *  info (for Sender Key): 0x854100f60a634b657910 (10 bytes)
 
-   o  info (for Recipient Key): 0x854101f60a634b657910 (10 bytes)
+   *  info (for Recipient Key): 0x854101f60a634b657910 (10 bytes)
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 73]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
+   *  info (for Common IV): 0x8540f60a6249560d (8 bytes)
 
    Outputs:
 
-   o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
+   *  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
-   o  Recipient Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
+   *  Recipient Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 
-   o  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
+   *  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
+   *  sender nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
-   o  recipient nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
+   *  recipient nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 74]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 C.2.2.  Server
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Sender ID: 0x01 (1 byte)
+   *  Sender ID: 0x01 (1 byte)
 
-   o  Recipient ID: 0x00 (1 byte)
+   *  Recipient ID: 0x00 (1 byte)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
+   *  info (for Sender Key): 0x854101f60a634b657910 (10 bytes)
 
-   o  info (for Recipient Key): 0x854100f60a634b657910 (10 bytes)
+   *  info (for Recipient Key): 0x854100f60a634b657910 (10 bytes)
 
-   o  info (for Common IV): 0x8540f60a6249560d (8 bytes)
+   *  info (for Common IV): 0x8540f60a6249560d (8 bytes)
 
    Outputs:
 
-   o  Sender Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
+   *  Sender Key: 0xe57b5635815177cd679ab4bcec9d7dda (16 bytes)
 
-   o  Recipient Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
+   *  Recipient Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
-   o  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
+   *  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
+   *  sender nonce: 0xbf35ae297d2dace810c52e99f9 (13 bytes)
 
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 74]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
+   *  recipient nonce: 0xbf35ae297d2dace910c52e99f9 (13 bytes)
 
 C.3.  Test Vector 3: Key Derivation with ID Context
 
@@ -4158,89 +4189,95 @@ C.3.1.  Client
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Master Salt: 0x9e7ca92223786340 (8 bytes)
+   *  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
-   o  Sender ID: 0x (0 byte)
+   *  Sender ID: 0x (0 byte)
 
-   o  Recipient ID: 0x01 (1 byte)
 
-   o  ID Context: 0x37cbf3210017a2d3 (8 bytes)
+
+Selander, et al.        Expires 21 September 2020              [Page 75]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Recipient ID: 0x01 (1 byte)
+
+   *  ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x85404837cbf3210017a2d30a634b657910 (17
+   *  info (for Sender Key): 0x85404837cbf3210017a2d30a634b657910 (17
       bytes)
 
-   o  info (for Recipient Key): 0x8541014837cbf3210017a2d30a634b657910
+   *  info (for Recipient Key): 0x8541014837cbf3210017a2d30a634b657910
       (18 bytes)
 
-   o  info (for Common IV): 0x85404837cbf3210017a2d30a6249560d (16
+   *  info (for Common IV): 0x85404837cbf3210017a2d30a6249560d (16
       bytes)
 
    Outputs:
 
-   o  Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+   *  Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 
-   o  Recipient Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
+   *  Recipient Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 
-   o  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+   *  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+   *  sender nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
-   o  recipient nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 75]
-
-Internet-Draft                   OSCORE                        June 2019
-
+   *  recipient nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
 
 C.3.2.  Server
 
    Inputs:
 
-   o  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
+   *  Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)
 
-   o  Master Salt: 0x9e7ca92223786340 (8 bytes)
+   *  Master Salt: 0x9e7ca92223786340 (8 bytes)
 
-   o  Sender ID: 0x01 (1 byte)
+   *  Sender ID: 0x01 (1 byte)
 
-   o  Recipient ID: 0x (0 byte)
+   *  Recipient ID: 0x (0 byte)
 
-   o  ID Context: 0x37cbf3210017a2d3 (8 bytes)
+   *  ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
    From the previous parameters,
 
-   o  info (for Sender Key): 0x8541014837cbf3210017a2d30a634b657910 (18
+   *  info (for Sender Key): 0x8541014837cbf3210017a2d30a634b657910 (18
       bytes)
 
-   o  info (for Recipient Key): 0x85404837cbf3210017a2d30a634b657910 (17
+
+
+Selander, et al.        Expires 21 September 2020              [Page 76]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  info (for Recipient Key): 0x85404837cbf3210017a2d30a634b657910 (17
       bytes)
 
-   o  info (for Common IV): 0x85404837cbf3210017a2d30a6249560d (16
+   *  info (for Common IV): 0x85404837cbf3210017a2d30a6249560d (16
       bytes)
 
    Outputs:
 
-   o  Sender Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
+   *  Sender Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)
 
-   o  Recipient Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+   *  Recipient Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 
-   o  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+   *  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
    From the previous parameters and a Partial IV equal to 0 (both for
    sender and recipient):
 
-   o  sender nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
+   *  sender nonce: 0x2da58fb85ff1b81d0b7181b85e (13 bytes)
 
-   o  recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+   *  recipient nonce: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
 C.4.  Test Vector 4: OSCORE Request, Client
 
@@ -4251,54 +4288,55 @@ C.4.  Test Vector 4: OSCORE Request, Client
    Unprotected CoAP request:
    0x44015d1f00003974396c6f63616c686f737483747631 (22 bytes)
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 76]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    Common Context:
 
-   o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
+   *  AEAD Algorithm: 10 (AES-CCM-16-64-128)
 
-   o  Key Derivation Function: HKDF SHA-256
+   *  Key Derivation Function: HKDF SHA-256
 
-   o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
    Sender Context:
 
-   o  Sender ID: 0x (0 byte)
+   *  Sender ID: 0x (0 byte)
 
-   o  Sender Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
+   *  Sender Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
 
-   o  Sender Sequence Number: 20
+   *  Sender Sequence Number: 20
 
    The following COSE and cryptographic parameters are derived:
 
-   o  Partial IV: 0x14 (1 byte)
 
-   o  kid: 0x (0 byte)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
 
-   o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+Selander, et al.        Expires 21 September 2020              [Page 77]
+
+Internet-Draft                   OSCORE                       March 2020
 
-   o  plaintext: 0x01b3747631 (5 bytes)
 
-   o  encryption key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
+   *  Partial IV: 0x14 (1 byte)
 
-   o  nonce: 0x4622d4dd6d944168eefb549868 (13 bytes)
+   *  kid: 0x (0 byte)
+
+   *  external_aad: 0x8501810a40411440 (8 bytes)
+
+   *  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+
+   *  plaintext: 0x01b3747631 (5 bytes)
+
+   *  encryption key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)
+
+   *  nonce: 0x4622d4dd6d944168eefb549868 (13 bytes)
 
    From the previous parameter, the following is derived:
 
-   o  OSCORE option value: 0x0914 (2 bytes)
+   *  OSCORE option value: 0x0914 (2 bytes)
 
-   o  ciphertext: 0x612f1092f1776f1c1668b3825e (13 bytes)
+   *  ciphertext: 0x612f1092f1776f1c1668b3825e (13 bytes)
 
    From there:
 
-   o  Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f6
+   *  Protected CoAP request (OSCORE message): 0x44025d1f00003974396c6f6
       3616c686f7374620914ff612f1092f1776f1c1668b3825e (35 bytes)
 
 C.5.  Test Vector 5: OSCORE Request, Client
@@ -4307,68 +4345,59 @@ C.5.  Test Vector 5: OSCORE Request, Client
    request using the security context derived in Appendix C.2.  The
    unprotected request only contains the Uri-Path and Uri-Host options.
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 77]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    Unprotected CoAP request:
    0x440171c30000b932396c6f63616c686f737483747631 (22 bytes)
 
    Common Context:
 
-   o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
+   *  AEAD Algorithm: 10 (AES-CCM-16-64-128)
 
-   o  Key Derivation Function: HKDF SHA-256
+   *  Key Derivation Function: HKDF SHA-256
 
-   o  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
+   *  Common IV: 0xbe35ae297d2dace910c52e99f9 (13 bytes)
 
    Sender Context:
 
-   o  Sender ID: 0x00 (1 bytes)
+   *  Sender ID: 0x00 (1 bytes)
 
-   o  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
+   *  Sender Key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
-   o  Sender Sequence Number: 20
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 78]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Sender Sequence Number: 20
 
    The following COSE and cryptographic parameters are derived:
 
-   o  Partial IV: 0x14 (1 byte)
+   *  Partial IV: 0x14 (1 byte)
 
-   o  kid: 0x00 (1 byte)
+   *  kid: 0x00 (1 byte)
 
-   o  external_aad: 0x8501810a4100411440 (9 bytes)
+   *  external_aad: 0x8501810a4100411440 (9 bytes)
 
-   o  AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
+   *  AAD: 0x8368456e63727970743040498501810a4100411440 (21 bytes)
 
-   o  plaintext: 0x01b3747631 (5 bytes)
+   *  plaintext: 0x01b3747631 (5 bytes)
 
-   o  encryption key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
+   *  encryption key: 0x321b26943253c7ffb6003b0b64d74041 (16 bytes)
 
-   o  nonce: 0xbf35ae297d2dace910c52e99ed (13 bytes)
+   *  nonce: 0xbf35ae297d2dace910c52e99ed (13 bytes)
 
    From the previous parameter, the following is derived:
 
-   o  OSCORE option value: 0x091400 (3 bytes)
+   *  OSCORE option value: 0x091400 (3 bytes)
 
-   o  ciphertext: 0x4ed339a5a379b0b8bc731fffb0 (13 bytes)
+   *  ciphertext: 0x4ed339a5a379b0b8bc731fffb0 (13 bytes)
 
    From there:
 
-   o  Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f6
+   *  Protected CoAP request (OSCORE message): 0x440271c30000b932396c6f6
       3616c686f737463091400ff4ed339a5a379b0b8bc731fffb0 (36 bytes)
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 78]
-
-Internet-Draft                   OSCORE                        June 2019
-
 
 C.6.  Test Vector 6: OSCORE Request, Client
 
@@ -4384,57 +4413,56 @@ C.6.  Test Vector 6: OSCORE Request, Client
 
    Common Context:
 
-   o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
+   *  AEAD Algorithm: 10 (AES-CCM-16-64-128)
 
-   o  Key Derivation Function: HKDF SHA-256
+   *  Key Derivation Function: HKDF SHA-256
 
-   o  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
+   *  Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)
 
-   o  ID Context: 0x37cbf3210017a2d3 (8 bytes)
+
+
+Selander, et al.        Expires 21 September 2020              [Page 79]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  ID Context: 0x37cbf3210017a2d3 (8 bytes)
 
    Sender Context:
 
-   o  Sender ID: 0x (0 bytes)
+   *  Sender ID: 0x (0 bytes)
 
-   o  Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+   *  Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 
-   o  Sender Sequence Number: 20
+   *  Sender Sequence Number: 20
 
    The following COSE and cryptographic parameters are derived:
 
-   o  Partial IV: 0x14 (1 byte)
+   *  Partial IV: 0x14 (1 byte)
 
-   o  kid: 0x (0 byte)
+   *  kid: 0x (0 byte)
 
-   o  kid context: 0x37cbf3210017a2d3 (8 bytes)
+   *  kid context: 0x37cbf3210017a2d3 (8 bytes)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   *  external_aad: 0x8501810a40411440 (8 bytes)
 
-   o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+   *  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
-   o  plaintext: 0x01b3747631 (5 bytes)
+   *  plaintext: 0x01b3747631 (5 bytes)
 
-   o  encryption key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
+   *  encryption key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)
 
-   o  nonce: 0x2ca58fb85ff1b81c0b7181b84a (13 bytes)
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 79]
-
-Internet-Draft                   OSCORE                        June 2019
-
+   *  nonce: 0x2ca58fb85ff1b81c0b7181b84a (13 bytes)
 
    From the previous parameter, the following is derived:
 
-   o  OSCORE option value: 0x19140837cbf3210017a2d3 (11 bytes)
+   *  OSCORE option value: 0x19140837cbf3210017a2d3 (11 bytes)
 
-   o  ciphertext: 0x72cd7273fd331ac45cffbe55c3 (13 bytes)
+   *  ciphertext: 0x72cd7273fd331ac45cffbe55c3 (13 bytes)
 
    From there:
 
-   o  Protected CoAP request (OSCORE message):
+   *  Protected CoAP request (OSCORE message):
       0x44022f8eef9bbf7a396c6f63616c686f73746b19140837cbf3210017a2d3ff
       72cd7273fd331ac45cffbe55c3 (44 bytes)
 
@@ -4446,56 +4474,69 @@ C.7.  Test Vector 7: OSCORE Response, Server
    response does not contain a 'kid' nor a Partial IV.  Note that some
    parameters are derived from the request.
 
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 80]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    Unprotected CoAP response:
    0x64455d1f00003974ff48656c6c6f20576f726c6421 (21 bytes)
 
    Common Context:
 
-   o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
+   *  AEAD Algorithm: 10 (AES-CCM-16-64-128)
 
-   o  Key Derivation Function: HKDF SHA-256
+   *  Key Derivation Function: HKDF SHA-256
 
-   o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
    Sender Context:
 
-   o  Sender ID: 0x01 (1 byte)
+   *  Sender ID: 0x01 (1 byte)
 
-   o  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
+   *  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-   o  Sender Sequence Number: 0
+   *  Sender Sequence Number: 0
 
    The following COSE and cryptographic parameters are derived:
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   *  external_aad: 0x8501810a40411440 (8 bytes)
 
-   o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
+   *  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
-   o  plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
+   *  plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
 
-   o  encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
+   *  encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-
-
-Selander, et al.        Expires December 26, 2019              [Page 80]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  nonce: 0x4622d4dd6d944168eefb549868 (13 bytes)
+   *  nonce: 0x4622d4dd6d944168eefb549868 (13 bytes)
 
    From the previous parameter, the following is derived:
 
-   o  OSCORE option value: 0x (0 bytes)
+   *  OSCORE option value: 0x (0 bytes)
 
-   o  ciphertext: 0xdbaad1e9a7e7b2a813d3c31524378303cdafae119106 (22
+   *  ciphertext: 0xdbaad1e9a7e7b2a813d3c31524378303cdafae119106 (22
       bytes)
 
    From there:
 
-   o  Protected CoAP response (OSCORE message):
+   *  Protected CoAP response (OSCORE message):
       0x64445d1f0000397490ffdbaad1e9a7e7b2a813d3c31524378303cdafae119106
       (32 bytes)
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 81]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
 C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
@@ -4510,52 +4551,52 @@ C.8.  Test Vector 8: OSCORE Response with Partial IV, Server
 
    Common Context:
 
-   o  AEAD Algorithm: 10 (AES-CCM-16-64-128)
+   *  AEAD Algorithm: 10 (AES-CCM-16-64-128)
 
-   o  Key Derivation Function: HKDF SHA-256
+   *  Key Derivation Function: HKDF SHA-256
 
-   o  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
+   *  Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)
 
    Sender Context:
 
-   o  Sender ID: 0x01 (1 byte)
+   *  Sender ID: 0x01 (1 byte)
 
-   o  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
+   *  Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-   o  Sender Sequence Number: 0
+   *  Sender Sequence Number: 0
 
    The following COSE and cryptographic parameters are derived:
 
-   o  Partial IV: 0x00 (1 byte)
+   *  Partial IV: 0x00 (1 byte)
 
-   o  external_aad: 0x8501810a40411440 (8 bytes)
+   *  external_aad: 0x8501810a40411440 (8 bytes)
 
+   *  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
 
+   *  plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
 
+   *  encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
 
-Selander, et al.        Expires December 26, 2019              [Page 81]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
-   o  AAD: 0x8368456e63727970743040488501810a40411440 (20 bytes)
-
-   o  plaintext: 0x45ff48656c6c6f20576f726c6421 (14 bytes)
-
-   o  encryption key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)
-
-   o  nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
+   *  nonce: 0x4722d4dd6d944169eefb54987c (13 bytes)
 
    From the previous parameter, the following is derived:
 
-   o  OSCORE option value: 0x0100 (2 bytes)
+   *  OSCORE option value: 0x0100 (2 bytes)
 
-   o  ciphertext: 0x4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (22
+   *  ciphertext: 0x4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (22
       bytes)
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 82]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    From there:
 
-   o  Protected CoAP response (OSCORE message): 0x64445d1f00003974920100
+   *  Protected CoAP response (OSCORE message): 0x64445d1f00003974920100
       ff4d4c13669384b67354b2b6175ff4b8658c666a6cf88e (34 bytes)
 
 Appendix D.  Overview of Security Properties
@@ -4586,14 +4627,6 @@ D.1.  Threat Model
    Additionally, OSCORE does not protect Class U option instances
    (Section 4.1), as these are used to support CoAP forward proxy
    operations (see Section 5.7.2 of [RFC7252]).  The supported proxies
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 82]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    (forwarding, cross-protocol e.g.  CoAP to CoAP-mappable protocols
    such as HTTP) must be able to change certain Class U options (by
    instruction from the Client), resulting in the CoAP request being
@@ -4607,6 +4640,15 @@ Internet-Draft                   OSCORE                        June 2019
    Attacks on unprotected CoAP message fields generally causes denial-
    of-service attacks which are out of scope of this document, more
    details are given in Appendix D.5.
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 83]
+
+Internet-Draft                   OSCORE                       March 2020
+
 
    Attacks against the CoAP request-response layer are in scope.  OSCORE
    is intended to protect against eavesdropping, spoofing, insertion,
@@ -4641,15 +4683,6 @@ D.2.  Supporting Proxy Operations
    protected message fields and the consequences of message fields
    intended for proxy operation being unprotected.
 
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 83]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 D.3.  Protected Message Fields
 
    Protected message fields are included in the Plaintext (Section 5.3)
@@ -4662,18 +4695,25 @@ D.3.  Protected Message Fields
    true, and the keys are used for no more data than indicated in
    Section 7.2.1, OSCORE should provide the following guarantees:
 
-   o  Confidentiality: An attacker should not be able to determine the
+   *  Confidentiality: An attacker should not be able to determine the
       plaintext contents of a given OSCORE message or determine that
       different plaintexts are related (Section 5.3).
 
-   o  Integrity: An attacker should not be able to craft a new OSCORE
+
+
+Selander, et al.        Expires 21 September 2020              [Page 84]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
+   *  Integrity: An attacker should not be able to craft a new OSCORE
       message with protected message fields different from an existing
       OSCORE message which will be accepted by the receiver.
 
-   o  Request-response binding: An attacker should not be able to make a
+   *  Request-response binding: An attacker should not be able to make a
       client match a response to the wrong request.
 
-   o  Non-replayability: An attacker should not be able to cause the
+   *  Non-replayability: An attacker should not be able to cause the
       receiver to accept a message which it has previously received and
       accepted.
 
@@ -4695,17 +4735,6 @@ D.3.  Protected Message Fields
    about padding may still be revealed by side-channel attacks observing
    differences in timing.
 
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 84]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 D.4.  Uniqueness of (key, nonce)
 
    In this section we show that (key, nonce) pairs are unique as long as
@@ -4725,12 +4754,20 @@ D.4.  Uniqueness of (key, nonce)
    ID_PIV (S) creates unique nonces for different (ID_PIV, PIV) pairs.
    There are two cases:
 
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 85]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
    A.  For requests, and responses with Partial IV (e.g.  Observe
    notifications):
 
-   o  ID_PIV = Sender ID of the encrypting endpoint
+   *  ID_PIV = Sender ID of the encrypting endpoint
 
-   o  PIV = current Partial IV of the encrypting endpoint
+   *  PIV = current Partial IV of the encrypting endpoint
 
    Since the encrypting endpoint steps the Partial IV for each use, the
    nonces used in case A are all unique as long as the number of
@@ -4739,9 +4776,9 @@ D.4.  Uniqueness of (key, nonce)
    B.  For responses without Partial IV (e.g. single response to a
    request):
 
-   o  ID_PIV = Sender ID of the endpoint generating the request
+   *  ID_PIV = Sender ID of the endpoint generating the request
 
-   o  PIV = Partial IV of the request
+   *  PIV = Partial IV of the request
 
    Since the Sender IDs are unique, ID_PIV is different from the Sender
    ID of the encrypting endpoint.  Therefore, the nonces in case B are
@@ -4751,17 +4788,6 @@ D.4.  Uniqueness of (key, nonce)
    Context, PIV is unique for this ID_PIV, which makes all nonces in
    case B distinct.
 
-
-
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 85]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
 D.5.  Unprotected Message Fields
 
    This sections analyses attacks on message fields which are not
@@ -4769,14 +4795,14 @@ D.5.  Unprotected Message Fields
 
 D.5.1.  CoAP Header Fields
 
-   o  Version.  The CoAP version [RFC7252] is not expected to be
+   *  Version.  The CoAP version [RFC7252] is not expected to be
       sensitive to disclose.  Currently there is only one CoAP version
       defined.  A change of this parameter is potentially a denial-of-
       service attack.  Future versions of CoAP need to analyze attacks
       to OSCORE protected messages due to an adversary changing the CoAP
       version.
 
-   o  Token/Token Length.  The Token field is a client-local identifier
+   *  Token/Token Length.  The Token field is a client-local identifier
       for differentiating between concurrent requests [RFC7252].  CoAP
       proxies are allowed to read and change Token and Token Length
       between hops.  An eavesdropper reading the Token can match
@@ -4784,11 +4810,19 @@ D.5.1.  CoAP Header Fields
       particular this is true for notifications, where multiple
       responses are matched with one request.  Modifications of Token
       and Token Length by an on-path attacker may become a denial-of-
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 86]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       service attack, since it may prevent the client to identify to
       which request the response belongs or to find the correct
       information to verify integrity of the response.
 
-   o  Code.  The Outer CoAP Code of an OSCORE message is POST or FETCH
+   *  Code.  The Outer CoAP Code of an OSCORE message is POST or FETCH
       for requests with corresponding response codes.  An endpoint
       receiving the message discards the Outer CoAP Code and uses the
       Inner CoAP Code instead (see Section 4.2).  Hence, modifications
@@ -4801,7 +4835,7 @@ D.5.1.  CoAP Header Fields
       POST reveals no more than what is revealed by the presence of the
       Outer Observe option.
 
-   o  Type/Message ID.  The Type/Message ID fields [RFC7252] reveal
+   *  Type/Message ID.  The Type/Message ID fields [RFC7252] reveal
       information about the UDP transport binding, e.g. an eavesdropper
       reading the Type or Message ID gain information about how UDP
       messages are related to each other.  CoAP proxies are allowed to
@@ -4810,20 +4844,12 @@ D.5.1.  CoAP Header Fields
       response message.  A change of these fields in a UDP hop is a
       denial-of-service attack.  By sending an ACK, an attacker can make
       the endpoint believe that it does not need to retransmit the
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 86]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
       previous message.  By sending a RST, an attacker may be able to
       cancel an observation.  By changing a NON to a CON, the attacker
       can cause the receiving endpoint to ACK messages for which no ACK
       was requested.
 
-   o  Length.  This field contain the length of the message [RFC8323]
+   *  Length.  This field contain the length of the message [RFC8323]
       which may be used for traffic analysis.  These message fields are
       not present in CoAP over UDP, and does not impact the request/
       response message.  A change of Length is a denial-of-service
@@ -4831,27 +4857,35 @@ Internet-Draft                   OSCORE                        June 2019
 
 D.5.2.  CoAP Options
 
-   o  Max-Age. The Outer Max-Age is set to zero to avoid unnecessary
+   *  Max-Age. The Outer Max-Age is set to zero to avoid unnecessary
       caching of OSCORE error responses.  Changing this value thus may
       cause unnecessary caching.  No additional information is carried
       with this option.
 
-   o  Proxy-Uri/Proxy-Scheme.  These options are used in CoAP forward
+   *  Proxy-Uri/Proxy-Scheme.  These options are used in CoAP forward
       proxy deployments.  With OSCORE, the Proxy-Uri option does not
       contain the Uri-Path/Uri-Query parts of the URI.  The other parts
       of Proxy-Uri cannot be protected because forward proxies need to
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 87]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       change them in order to perform their functions.  The server can
       verify what scheme is used in the last hop, but not what was
       requested by the client or what was used in previous hops.
 
-   o  Uri-Host/Uri-Port.  In forward proxy deployments, the Uri-Host/
+   *  Uri-Host/Uri-Port.  In forward proxy deployments, the Uri-Host/
       Uri-Port may be changed by an adversary, and the application needs
       to handle the consequences of that (see Section 4.1.3.2).  The
       Uri-Host may either be omitted, reveal information equivalent to
       that of the IP address or more privacy-sensitive information,
       which is discouraged.
 
-   o  Observe.  The Outer Observe option is intended for a proxy to
+   *  Observe.  The Outer Observe option is intended for a proxy to
       support forwarding of Observe messages, but is ignored by the
       endpoints since the Inner Observe determines the processing in the
       endpoints.  Since the Partial IV provides absolute ordering of
@@ -4865,19 +4899,10 @@ D.5.2.  CoAP Options
       responses are bound to requests in OSCORE (see Appendix D.3), but
       that does not open up for attacks based on mismatched
       cancellations, since for cancellations to be accepted, all options
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 87]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
       in the decrypted message except for ETag Options MUST be the same
       (see Section 4.1.3.5).
 
-   o  Block1/Block2/Size1/Size2.  The Outer Block options enables
+   *  Block1/Block2/Size1/Size2.  The Outer Block options enables
       fragmentation of OSCORE messages in addition to segmentation
       performed by the Inner Block options.  The presence of these
       options indicates a large message being sent and the message size
@@ -4888,7 +4913,7 @@ Internet-Draft                   OSCORE                        June 2019
       (Section 4.1.3.4.2), above which messages will be dropped, is
       intended as one measure to mitigate this kind of attack.
 
-   o  No-Response.  The Outer No-Response option is used to support
+   *  No-Response.  The Outer No-Response option is used to support
       proxy functionality, specifically to avoid error transmissions
       from proxies to clients, and to avoid bandwidth reduction to
       servers by proxies applying congestion control when not receiving
@@ -4896,10 +4921,19 @@ Internet-Draft                   OSCORE                        June 2019
       denial-of-service attack against the proxy operations, but since
       the option has an Inner value its use can be securely agreed
       between the endpoints.  The presence of this option is not
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 88]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
       expected to reveal any sensitive information about the message
       exchange.
 
-   o  OSCORE.  The OSCORE option contains information about the
+   *  OSCORE.  The OSCORE option contains information about the
       compressed COSE header.  Changing this field may cause OSCORE
       verification to fail.
 
@@ -4921,15 +4955,6 @@ D.5.3.  Error and Signaling Messages
    responding altogether in case of OSCORE processing errors, if that is
    a security concern for the application.  Moreover, clients MUST NOT
    rely on the error code or the diagnostic payload to trigger specific
-
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 88]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
    actions, as these errors are unprotected and can be spoofed or
    manipulated.
 
@@ -4948,6 +4973,19 @@ D.5.4.  HTTP Message Fields
    HTTP hops, which enables encryption and integrity protection of
    headers, but still leaves some information for traffic analysis.
 
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 89]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
 Appendix E.  CDDL Summary
 
    Data structure definitions in the present specification employ the
@@ -4961,7 +4999,7 @@ Appendix E.  CDDL Summary
    type", where "name" is the name given to the "type".  A "type" can be
    one of:
 
-   o  a reference to another named type, by giving its name.  The
+   *  a reference to another named type, by giving its name.  The
       predefined named types used in the present specification are:
       "uint", an unsigned integer (as represented in CBOR by major type
       0); "int", an unsigned or negative integer (as represented in CBOR
@@ -4969,23 +5007,15 @@ Appendix E.  CDDL Summary
       CBOR by major type 2); "tstr", a text string (as represented in
       CBOR by major type 3);
 
-   o  a choice between two types, by giving both types separated by a
+   *  a choice between two types, by giving both types separated by a
       "/";
 
-   o  an array type (as represented in CBOR by major type 4), where the
+   *  an array type (as represented in CBOR by major type 4), where the
       sequence of elements of the array is described by giving a
       sequence of entries separated by commas ",", and this sequence is
       enclosed by square brackets "[" and "]".  Arrays described by an
       array description contain elements that correspond one-to-one to
       the sequence of entries given.  Each entry of an array description
-
-
-
-Selander, et al.        Expires December 26, 2019              [Page 89]
-
-Internet-Draft                   OSCORE                        June 2019
-
-
       is of the form "name : type", where "name" is the name given to
       the entry and "type" is the type of the array element
       corresponding to this entry.
@@ -5003,9 +5033,18 @@ Acknowledgments
    Ludwig Seitz and Goeran Selander worked on this document as part of
    the CelticPlus project CyberWI, with funding from Vinnova.
 
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 90]
+
+Internet-Draft                   OSCORE                       March 2020
+
+
 Authors' Addresses
 
-   Goeran Selander
+   Göran Selander
    Ericsson AB
 
    Email: goran.selander@ericsson.com
@@ -5037,4 +5076,21 @@ Authors' Addresses
 
 
 
-Selander, et al.        Expires December 26, 2019              [Page 90]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Selander, et al.        Expires 21 September 2020              [Page 91]
