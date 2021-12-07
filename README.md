@@ -2,10 +2,8 @@
 
 This is the working area for the Working Group internet-draft, "Object Security for Constrained RESTful Environments (OSCORE)".
 
-* [Editor's copy](https://core-wg.github.io/oscore/) [![Build Status](https://travis-ci.org/core-wg/oscore.svg?branch=master)](https://travis-ci.org/core-wg/oscore)
-* [Working Group Draft](https://tools.ietf.org/html/draft-ietf-core-object-security)
-* [Compare Working Group Draft and Editor's copy](https://tools.ietf.org/rfcdiff?url1=draft-ietf-core-object-security.txt&url2=https://raw.githubusercontent.com/core-wg/oscoap/gh-pages/draft-ietf-core-object-security.txt)
-
+* [Interoperability testing](https://core-wg.github.io/oscore/) 
+* [Published RFC](https://www.rfc-editor.org/rfc/rfc8613.html)
 
 ## Building the Draft
 
