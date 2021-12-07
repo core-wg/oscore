@@ -1,0 +1,3396 @@
+<h1 id="tests-specification-for-oscore">Tests Specification for OSCORE</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol style="list-style-type: decimal">
+<li><a href="#notes">Notes</a></li>
+<li><a href="#security-contexts-and-resources">Security Contexts and Resources</a>
+<ol style="list-style-type: decimal">
+<li><a href="#client-sec">Security Context A: Client</a></li>
+<li><a href="#server-sec">Security Context B: Server</a></li>
+<li><a href="#client-secC">Security Context C: Client</a></li>
+<li><a href="#server-secD">Security Context D: Server</a></li>
+<li><a href="#resources">Resources</a></li>
+</ol></li>
+<li><a href="#env-setup">Set up the environment</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-0a">Test 0a</a></li>
+<li><a href="#test-0b">Test 0b</a></li>
+</ol></li>
+<li><a href="#correct-oscore-use">Correct OSCORE use</a>
+<ol style="list-style-type: decimal">
+<li><a href="#get">GET test</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-1a">Test 1a</a></li>
+<li><a href="#test-1b">Test 1b</a></li>
+<li><a href="#test-2a">Test 2a</a></li>
+<li><a href="#test-2b">Test 2b</a></li>
+<li><a href="#test-3a">Test 3a</a></li>
+<li><a href="#test-3b">Test 3b</a></li>
+<li><a href="#test-4a">Test 4a</a></li>
+<li><a href="#test-4b">Test 4b</a></li>
+<li><a href="#test-5a">Test 5a</a></li>
+<li><a href="#test-5b">Test 5b</a></li>
+<li><a href="#test-6a">Test 6a</a></li>
+<li><a href="#test-6b">Test 6b</a></li>
+<li><a href="#test-7a">Test 7a</a></li>
+<li><a href="#test-7b">Test 7b</a></li>
+</ol></li>
+<li><a href="#post">POST test</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-8a">Test 8a</a></li>
+<li><a href="#test-8b">Test 8b</a></li>
+</ol></li>
+<li><a href="#put">PUT test</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-9a">Test 9a</a></li>
+<li><a href="#test-9b">Test 9b</a></li>
+<li><a href="#test-10a">Test 10a</a></li>
+<li><a href="#test-10b">Test 10b</a></li>
+</ol></li>
+<li><a href="#del">DELETE test</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-11a">Test 11a</a></li>
+<li><a href="#test-11b">Test 11b</a></li>
+</ol></li>
+</ol></li>
+<li><a href="#incorrect-oscore">Incorrect OSCORE use</a>
+<ol style="list-style-type: decimal">
+<li><a href="#sec-context">Security Context not matching</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-12a">Test 12a</a></li>
+<li><a href="#test-12b">Test 12b</a></li>
+<li><a href="#test-13a">Test 13a</a></li>
+<li><a href="#test-13b">Test 13b</a></li>
+<li><a href="#test-14a">Test 14a</a></li>
+<li><a href="#test-14b">Test 14b</a></li>
+</ol></li>
+<li><a href="#replay">Replay of a previously sent message</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-15a">Test 15a</a></li>
+<li><a href="#test-15b">Test 15b</a></li>
+</ol></li>
+<li><a href="#auth">Accessing a non-OSCORE-protected resource with OSCORE</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-16a">Test 16a</a></li>
+<li><a href="#test-16b">Test 16b</a></li>
+</ol></li>
+<li><a href="#unauth">Accessing an OSCORE-protected resource without OSCORE</a>
+<ol style="list-style-type: decimal">
+<li><a href="#test-17a">Test 17a</a></li>
+<li><a href="#test-17b">Test 17b</a></li>
+</ol></li>
+</ol></li>
+</ol>
+<h2 id="notes">1. Notes</h2>
+<p>CoAP Version is 1 in all the tests.</p>
+<p>The client and server may optionally display external_aad and COSE object (before and after compression) to simplify debugging.</p>
+<p>When non-indicated, CoAP messages can be NON or CON (implementer's choice).</p>
+<p>To be able to run Test 16, the implementer must run an OSCORE-unaware server.</p>
+<p>The number used as Object-Security option number is set to 9 in this document.</p>
+<h2 id="security-contexts-and-resources">2. Security Contexts and Resources</h2>
+<h3 id="client-sec">Security Context A: Client</h3>
+<ul>
+<li>Common Context:
+<ul>
+<li>Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)</li>
+<li>Master Salt: 0x9e7ca92223786340 (8 bytes)</li>
+<li>Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)</li>
+</ul></li>
+<li>Sender Context:
+<ul>
+<li>Sender ID: 0x (0 byte)</li>
+<li>Sender Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)</li>
+<li>Sender Seq Number: 00</li>
+<li>Sender IV: 0x4622d4dd6d944168eefb54987c (using Partial IV: 00)</li>
+</ul></li>
+<li>Recipient Context:
+<ul>
+<li>Recipient ID: 0x01 (1 byte)</li>
+<li>Recipient Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)</li>
+<li>Recipient IV: 0x4722d4dd6d944169eefb54987c (using Partial IV: 00)</li>
+</ul></li>
+</ul>
+<h3 id="server-sec">Security Context B: Server</h3>
+<ul>
+<li>Common Context:
+<ul>
+<li>Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)</li>
+<li>Master Salt: 0x9e7ca92223786340 (8 bytes)</li>
+<li>Common IV: 0x4622d4dd6d944168eefb54987c (13 bytes)</li>
+</ul></li>
+<li>Sender Context:
+<ul>
+<li>Sender Id: 0x01 (1 byte)</li>
+<li>Sender Key: 0xffb14e093c94c9cac9471648b4f98710 (16 bytes)</li>
+<li>Sender Seq Number: 00</li>
+<li>Sender IV: 0x4722d4dd6d944169eefb54987c (using Partial IV: 00)</li>
+</ul></li>
+<li>Recipient Context:
+<ul>
+<li>Recipient Id: 0x (0 byte)</li>
+<li>Recipient Key: 0xf0910ed7295e6ad4b54fc793154302ff (16 bytes)</li>
+<li>Recipient IV: 0x4622d4dd6d944168eefb54987c (using Partial IV: 00)</li>
+</ul></li>
+</ul>
+<h3 id="client-secC">Security Context C: Client</h3>
+<ul>
+<li>Common Context:
+<ul>
+<li>Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)</li>
+<li>Master Salt: 0x9e7ca92223786340 (8 bytes)</li>
+<li>Common IV: 0x0x2ca58fb85ff1b81c0b7181b85e (13 bytes)</li>
+<li>ID Context: 0x37cbf3210017a2d3 (8 bytes)</li>
+</ul></li>
+<li>Sender Context:
+<ul>
+<li>Sender ID: 0x (0 byte)</li>
+<li>Sender Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)</li>
+<li>Sender Seq Number: 00</li>
+<li>Sender IV: 0x2ca58fb85ff1b81c0b7181b85e (using Partial IV: 00)</li>
+</ul></li>
+<li>Recipient Context:
+<ul>
+<li>Recipient ID: 0x01 (1 byte)</li>
+<li>Recipient Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)</li>
+<li>Recipient IV: 0x2da58fb85ff1b81d0b7181b85e (using Partial IV: 00)</li>
+</ul></li>
+</ul>
+<h3 id="server-secD">Security Context D: Server</h3>
+<ul>
+<li>Common Context:
+<ul>
+<li>Master Secret: 0x0102030405060708090a0b0c0d0e0f10 (16 bytes)</li>
+<li>Master Salt: 0x9e7ca92223786340 (8 bytes)</li>
+<li>Common IV: 0x2ca58fb85ff1b81c0b7181b85e (13 bytes)</li>
+<li>ID Context: 0x37cbf3210017a2d3 (8 bytes)</li>
+</ul></li>
+<li>Sender Context:
+<ul>
+<li>Sender Id: 0x01 (1 byte)</li>
+<li>Sender Key: 0xe39a0c7c77b43f03b4b39ab9a268699f (16 bytes)</li>
+<li>Sender Seq Number: 00</li>
+<li>Sender IV: 0x2da58fb85ff1b81d0b7181b85e (using Partial IV: 00)</li>
+</ul></li>
+<li>Recipient Context:
+<ul>
+<li>Recipient Id: 0x (0 byte)</li>
+<li>Recipient Key: 0xaf2a1300a5e95788b356336eeecd2b92 (16 bytes)</li>
+<li>Recipient IV: 0x2ca58fb85ff1b81c0b7181b85e (using Partial IV: 00)</li>
+</ul></li>
+</ul>
+<h3 id="resources">Resources</h3>
+<p>The list of resources the OSCORE-aware server must implement is the following:</p>
+<ul>
+<li>/oscore/hello/coap : authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+<li>/oscore/hello/2 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain), and with ETag 0x2b</li>
+<li>/oscore/hello/3 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain), and Max-Age 5</li>
+<li>/oscore/hello/6 : protected resource, authorized method: POST, returns the value of the resource with content-format 0 (text/plain)</li>
+<li>/oscore/hello/7 : protected resource, authorized method: PUT, returns the value of the resource with content-format 0 (text/plain), has ETag 0x7b</li>
+<li>/oscore/observe1 : protected resource, authorized method: GET, supports observe, returns &quot;one&quot; for the first notification, &quot;two&quot; for the second notification. The server is configured to return 5.00 after the 2 notifications are sent.</li>
+<li>/oscore/observe2 : protected resource, authorized method: GET, supports observe, returns &quot;one&quot; for the first notification, &quot;two&quot; for the second notification.</li>
+<li>/oscore/test: protected resource, authorized method: DEL.</li>
+</ul>
+<p>The list of resource the OSCORE-unaware server must implement is the following:</p>
+<ul>
+<li>/oscore/hello/coap : authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<hr />
+<h2 id="env-setup">3. Set up the environment</h2>
+<h3 id="test-0a">3.1. Identifier: TEST_0a</h3>
+<p><strong>Objective</strong> : Verify that CoAP exchange works. Perform a simple GET transaction using COAP, Content-Format and Uri-Path option (Client side)</p>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/coap</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response and continues the CoAP processing expected; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-0b">3.2. Identifier: TEST_0b</h4>
+<p><strong>Objective</strong> : Verify that CoAP exchange works. Perform a simple GET transaction using COAP, Content-Format and Uri-Path option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/coap : authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request including:</p>
+<ul>
+<li>Uri-Path = /oscore/hello/coap</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h2 id="correct-oscore-use">4. Correct OSCORE use</h2>
+<h3 id="get">4.1 GET Tests</h3>
+<h4 id="test-1a">4.1.1. Identifier: TEST_1a</h4>
+<p><strong>Objective</strong> : Perform a simple GET transaction using OSCORE, Content-Format and Uri-Path option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number received not in client's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-1b">4.1.2. Identifier: TEST_1b</h4>
+<p><strong>Objective</strong> : Perform a simple GET transaction using OSCORE, Content-Format and Uri-Path option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-2a">4.1.3. Identifier: TEST_2a</h4>
+<p><strong>Objective</strong> : Perform a simple GET transaction using OSCORE, Content-Format and Uri-Path option (Client side), sending an ID Context in the Object Security option</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-secC">Security Context C</a>, with:</p>
+<ul>
+<li>Sequence number received not in client's replay window</li>
+<li>ID Context sent in the request</li>
+<li>Sender ID sent in the request</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option (with ID Context)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-2b">4.1.4. Identifier: TEST_2b</h4>
+<p><strong>Objective</strong> : Perform a simple GET transaction using OSCORE, Content-Format and Uri-Path option (Server side), receiving an ID Context in the Object Security option</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-secD">Security Context D</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+<li>ID Context not sent in the response</li>
+<li>Sender ID not sent in the response</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option (Containing ID Context)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-3a">4.1.5. Identifier: TEST_3a</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, Uri-Query and ETag option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/2</li>
+<li>Uri-Query : first=1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path : /oscore/hello/2</li>
+<li>Uri-Query : first=1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>ETag with value 0x2b</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-3b">4.1.6. Identifier: TEST_3b</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, Uri-Query and ETag option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/2 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain), and with ETag 0x2b</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/hello/2</li>
+<li>Uri-Query : first=1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/hello/2</li>
+<li>Uri-Query : first=1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>ETag with value 0x2b</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-4a">4.1.7. Identifier: TEST_4a</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, Accept and Max-Age option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/hello/3</li>
+<li>Accept = 0 (text/plain;charset=utf-8)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/3</li>
+<li>Accept = 0 (text/plain;charset=utf-8)</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Max-Age with value 0x00 (optional)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Max-Age with value 0x05</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-4b">4.1.8. Identifier: TEST_4b</h4>
+<p><strong>Objective</strong> :Perform a GET transaction using OSCORE, Content-Format, Uri-Path, Accept and Max-Age option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/3 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain), and Max-Age 5</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/hello/3</li>
+<li>Accept = 0 (text/plain;charset=utf-8)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Max-Age with value 0x00</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/hello/3</li>
+<li>Accept = 0 (text/plain;charset=utf-8)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Max-Age with value 05</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-5a">4.1.9. Identifier: TEST_5a</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, and Observe. Response without observe. (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/hello/1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a FETCH request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-5b">4.1.10. Identifier: TEST_5b</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, and Observe. Response without observe. (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/hello/1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.05 FETCH with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/hello/1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-6a">4.1.11. Identifier: TEST_6a</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, and Observe (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+<li>Sequence number received not in client's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a FETCH request, with:</p>
+<ul>
+<li>Observe = 0 (Registration)</li>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/observe1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Object-Security option (with or without Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;one&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>9</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>10</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>11</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>12</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>13</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>14</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 5.00 Internal Server Error:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Terminate Observe&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>15</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-6b">4.1.12. Identifier: TEST_6b</h4>
+<p><strong>Objective</strong> : Perform a GET transaction using OSCORE, Content-Format, Uri-Path, and Observe (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+<li>Sequence sent received not in client's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/observe1 : protected resource, authorized method: GET, supports observe, returns &quot;one&quot; for the first notification, &quot;two&quot; for the second notification. The server is configured to return 5.00 after the 2 notifications are sent.</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.05 FETCH with:</p>
+<ul>
+<li>Observe = 0 (Registration)</li>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/observe1</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with or without Partial IV)</li>
+<li>Observe (Notification)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;one&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>9</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Observe (Notification)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>10</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>11</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 5.00 Internal Server Error</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Terminate Observe&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>12</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-7a">4.1.13. Identifier: TEST_7a</h4>
+<p><strong>Objective</strong> : Perform 2 GET (Registration and Cancellation) transactions using OSCORE, Content-Format, Uri-Path, and Observe (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+<li>Sequence number received not in client's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a FETCH request, with:</p>
+<ul>
+<li>Observe = 0 (Registration)</li>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/observe2</li>
+<li>Observe = 0 (Registration)</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Object-Security option (with or without Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;one&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>9</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>10</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Observe (Notification)</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>11</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>12</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 1 (Cancellation)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>13</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a FETCH request, with:</p>
+<ul>
+<li>Observe = 1 (Cancellation)</li>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/observe2</li>
+<li>Observe = 1 (Cancellation)</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>14</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>15</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>16</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>17</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>18</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-7b">4.1.14. Identifier: TEST_7b</h4>
+<p><strong>Objective</strong> : Perform 2 GET (Registration and Cancellation) transactions using OSCORE, Content-Format, Uri-Path, and Observe (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+<li>Sequence sent received not in client's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/observe2 : protected resource, authorized method: GET, supports observe, returns &quot;one&quot; for the first notification, &quot;two&quot; for the second notification.</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.05 FETCH with:</p>
+<ul>
+<li>Observe = 0 (Registration)</li>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 0 (Registration)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with or without Partial IV)</li>
+<li>Observe (Notification)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;one&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>9</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Observe (Notification)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>10</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>11</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 1 (Cancellation)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>12</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>13</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.05 FETCH with:</p>
+<ul>
+<li>Observe = 1 (Cancellation)</li>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>14</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>15</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-path = /oscore/observe2</li>
+<li>Observe = 0 (Cancellation)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>16</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>17</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.05 Content Response with:</p>
+<ul>
+<li>Object-Security option (with Partial IV)</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;two&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>18</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="post">4.2. POST Tests</h3>
+<h4 id="test-8a">4.2.1. Identifier: TEST_8a</h4>
+<p><strong>Objective</strong> : Perform a POST transaction using OSCORE, Content-Format, and Uri-Path option, changing a resource (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP POST request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/6</li>
+<li>Content-Format = 0</li>
+<li>payload = 0x4a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: POST</li>
+<li>Uri-Path = /oscore/hello/6</li>
+<li>Content-Format = 0</li>
+<li>payload = 0x4a</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.04 Changed Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = 0x4a</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-8b">4.2.2. Identifier: TEST_8b</h4>
+<p><strong>Objective</strong> : Perform a POST transaction using OSCORE, Content-Format, and Uri-Path option, updating a resource (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/hello/6 : protected resource, authorized method: POST, returns the value of the resource with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP POST request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/6</li>
+<li>Content-Format = 0</li>
+<li>payload = 0x4a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP POST request, including:</p>
+<ul>
+<li>Uri-Path = /oscore/hello/6</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = 0x4a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.04 Changed Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = 0x4a</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="PUT">4.3 PUT Tests</h3>
+<h4 id="test-9a">4.3.1. Identifier: TEST_9a</h4>
+<p><strong>Objective</strong> : Perform a PUT transaction using OSCORE, Uri-Path, Content-Format and If-Match option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP PUT request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-Match with value 0x7b</li>
+<li>payload = 0x7a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: PUT</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-Match with value 0x7b</li>
+<li>payload = 0x7a</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.04 Changed Response</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-9b">4.3.2. Identifier: TEST_9b</h4>
+<p><strong>Objective</strong> : Perform a PUT transaction using OSCORE, Uri-Path, Content-Format and If-Match option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/hello/7 : protected resource, authorized method: PUT, returns the value of the resource with content-format 0 (text/plain), has ETag 0x7b</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP PUT request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-Match with value 0x7b</li>
+<li>payload = 0x7a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP PUT request, including:</p>
+<ul>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-Match with value 0x7b</li>
+<li>payload = 0x7a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.04 Changed Response</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-10a">4.3.3. Identifier: TEST_10a</h4>
+<p><strong>Objective</strong> : Perform a PUT transaction using OSCORE, Uri-Path, Content-Format and If-None-Match option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP PUT request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-None-Match</li>
+<li>payload = 0x8a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: PUT</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-None-Match</li>
+<li>payload = 0x8a</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 4.12 Precondition Failed</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-10b">4.3.4. Identifier: TEST_10b</h4>
+<p><strong>Objective</strong> : Perform a PUT transaction using OSCORE, Uri-Path, Content-Format and If-None-Match option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/7 : protected resource, authorized method: PUT, returns the value of the resource with content-format 0 (text/plain), has ETag 0x7b</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP PUT request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-None-Match</li>
+<li>payload = 0x8a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP PUT request, including:</p>
+<ul>
+<li>Uri-Path = /oscore/hello/7</li>
+<li>Content-Format = 0</li>
+<li>If-None-Match</li>
+<li>payload = 0x8a</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 4.12 Precondition Failed</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="DEL">4.4. DELETE Tests</h3>
+<h4 id="test-11a">4.4.1. Identifier: TEST_11a</h4>
+<p><strong>Objective</strong> : Perform a DELETE transaction using OSCORE and Uri-Path option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sequence number sent not in server's replay window</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP DEL request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/test</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: DEL</li>
+<li>Uri-Path = /oscore/test</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.02 Deleted</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-11b">4.4.2. Identifier: TEST_11b</h4>
+<p><strong>Objective</strong> : Perform a DELETE transaction using OSCORE and Uri-Path option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a>, with:</p>
+<ul>
+<li>Sequence number received not in server's replay window</li>
+</ul>
+<p><em>server resources</em>:</p>
+<ul>
+<li>oscore/test: protected resource, authorized method: DEL.</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP DEL request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/test</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP DEL request, including:</p>
+<ul>
+<li>Uri-Path = /oscore/test</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.02 Deleted</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h2 id="incorrect-oscore">5. Incorrect OSCORE use</h2>
+<h3 id="sec-context">5.1. Security Context not matching</h3>
+<h4 id="test-12a">5.1.1. Identifier: TEST_12a</h4>
+<p><strong>Objective</strong> : Perform an unauthorized CON GET transaction: non matching Client Sender Id - Server Recipient Id (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sender Context:
+<ul>
+<li>Sender ID: modified sender ID (arbitrarily set by the Client)</li>
+</ul></li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option (modified Sender ID)</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 4.01 Unauthorized, with:</p>
+<ul>
+<li>Payload: Security context not found (optional)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-12b">5.1.2. Identifier: TEST_12b</h4>
+<p><strong>Objective</strong> :Perform an unauthorized GET transaction: non matching Client Sender Id - Server Recipient Id (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a></p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option (modified Sender ID)</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server: OSCORE verification fails (Context not found)</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is 4.01 Unauthorized, with:</p>
+<ul>
+<li>Payload: Security context not found (optional)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-13a">5.1.3. Identifier: TEST_13a</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction with non matching Client Sender - Server Recipient Keys (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Sender Context:
+<ul>
+<li>Sender Key: modified key (arbitrarily set by the Client)</li>
+</ul></li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 4.00 Bad Request error message:</p>
+<ul>
+<li>Payload: Decryption failed (optional)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-13b">5.1.4. Identifier: TEST_13b</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction with non matching Client Sender - Server Recipient Keys (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a></p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server: OSCORE verification fails (Decryption failed)</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is 4.00 Bad Request, with:</p>
+<ul>
+<li>Payload: Decryption failed (optional)</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-14a">5.1.5. Identifier: TEST_14a</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction with non matching Client Recipient - Server Sender Keys (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a>, with:</p>
+<ul>
+<li>Recipient Context:
+<ul>
+<li>Recipient Key: modified key (arbitrarily set by the Client)</li>
+</ul></li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client: OSCORE verification fails (Decryption failed) response dropped, empty ACK sent back to the Server</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-14b">5.1.6. Identifier: TEST_14b</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction with non matching Client Recipient - Server Sender Keys (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a></p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="replay">5.2. Replay of a previously sent message</h3>
+<h4 id="test-15a">5.2.1. Identifier: TEST_15a</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction using OSCORE, Content-Format and Uri-Path option, request replayed by the Client (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a></p>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the decrypted response and continues the CoAP processing; expected 2.05 Content Response with:</p>
+<ul>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to reset its own sequence number to the value before executing step 1</p></td>
+</tr>
+<tr class="odd">
+<td><p>9</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>10</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>11</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>12</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 4.01 Unauthorized, with:</p>
+<ul>
+<li>Payload: Replay detected</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>15</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-15b">5.2.2. Identifier: TEST_15b</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction using OSCORE, Content-Format and Uri-Path option, request replayed by the Client (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a></p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path = /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server decrypts the message: OSCORE verification succeeds</p></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request and continues the CoAP processing; expected: CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>7</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 2.04 Changed Response with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: 2.05 Content Response</li>
+<li>Content-Format = 0 (text/plain)</li>
+<li>Payload = &quot;Hello World!&quot;</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>8</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to reset its own sequence number to the value before executing step 1</p></td>
+</tr>
+<tr class="even">
+<td><p>9</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>4</p></td>
+<td><p>Verify</p></td>
+<td><p>Server: OSCORE verification fails (Replay protection failed)</p></td>
+</tr>
+<tr class="even">
+<td><p>5</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is 4.01 Unauthorized, with:</p>
+<ul>
+<li>Payload: Replay protection failed (optional)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>8</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="auth">5.3. Accessing a non-OSCORE-protected resource with OSCORE</h3>
+<h4 id="test-16a">5.3.1. Identifier: TEST_16a</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction using OSCORE to an OSCORE-unaware resource server, Content-Format and Uri-Path option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>client security context</em>: <a href="#client-sec">Security Context A</a></p>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request protected with OSCORE, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/coap</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a POST request, with:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Payload: ciphertext including:
+<ul>
+<li>Code: GET</li>
+<li>Uri-Path = /oscore/hello/coap</li>
+</ul></li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response; expected: 4.02 Bad Option with:</p>
+<ul>
+<li>(Optional) Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client: OSCORE verification fails (expected OSCORE) response dropped, empty ACK sent back to the Server</p></td>
+</tr>
+<tr class="even">
+<td><p>6</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-16b">5.3.2. Identifier: TEST_16b</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction using OSCORE to a non protected resource, Content-Format and Uri-Path option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p>The server does not implement OSCORE.</p>
+<p><em>server security context</em>: None</p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/coap : authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p>Note: a 4.05 Method Not Allowed error response is also an acceptable outcome of this test. To avoid entering this case, it is recommended that the /oscore/hello/coap resource also supports the method PUT.</p>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request, including:</p>
+<ul>
+<li>Object-Security option</li>
+<li>Uri-Path : /oscore/hello/coap</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.02 POST with:</p>
+<ul>
+<li>Object-Security option (unrecognized &quot;critical&quot; option)</li>
+<li>Payload</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 4.02 Bad Option with:</p>
+<ul>
+<li>(Optional) Payload</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="unauth">5.4. Accessing an OSCORE-protected resource without OSCORE</h3>
+<h4 id="test-17a">5.4.1. Identifier: TEST_17a</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction to a protected resource, Content-Format and Uri-Path option (Client side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Client serializes the request, which is a GET request, with:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the sent packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Client parses the response and continues the CoAP processing; expected: 4.01 Unauthorized error response, with:</p>
+<ul>
+<li>Payload = diagnostic payload (optional)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Client displays the received packet</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="test-17b">5.3.2. Identifier: TEST_17b</h4>
+<p><strong>Objective</strong> : Perform a CON GET transaction to a protected resource, Content-Format and Uri-Path option (Server side)</p>
+<p><strong>Configuration</strong> :</p>
+<p><em>server security context</em>: <a href="#server-sec">Security Context B</a></p>
+<p><em>server resources</em>:</p>
+<ul>
+<li>/oscore/hello/1 : protected resource, authorized method: GET, returns the string &quot;Hello World!&quot; with content-format 0 (text/plain)</li>
+</ul>
+<p><strong>Test Sequence</strong></p>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>1</p></td>
+<td><p>Stimulus</p></td>
+<td><p>The client is requested to send a CoAP GET request, including:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="even">
+<td><p>2</p></td>
+<td><p>Check</p></td>
+<td><p>Server parses the request; expected: 0.01 GET with:</p>
+<ul>
+<li>Uri-Path : /oscore/hello/1</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>3</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the received packet</p></td>
+</tr>
+<tr class="even">
+<td><p>4</p></td>
+<td><p>Check</p></td>
+<td><p>Server serialize the response correctly, which is: 4.01 Unauthorized error response, with:</p>
+<ul>
+<li>Payload = diagnostic payload (optional)</li>
+</ul></td>
+</tr>
+<tr class="odd">
+<td><p>5</p></td>
+<td><p>Verify</p></td>
+<td><p>Server displays the sent packet</p></td>
+</tr>
+</tbody>
+</table>

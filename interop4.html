@@ -1,0 +1,158 @@
+<h1 id="oscoap-interop-4-recap">OSCOAP Interop 4 Recap</h1>
+<p>14-15th of July 2017, all day</p>
+<h2 id="participants">Participants</h2>
+<ul>
+<li>Christian Amsüss</li>
+<li>Jim Schaad</li>
+<li>Martin Gunnarsson</li>
+<li>Malisa Vucinic</li>
+<li>Francesca Palombini</li>
+</ul>
+<h2 id="note-takers">Note takers</h2>
+<p>Francesca, Christian</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="test-specification-provided">[1]: <a href="test-spec3.html">Test specification provided</a></h3>
+<h3 id="oscoap-version-implemented">[2]: <a href="https://github.com/core-wg/oscoap/releases/tag/interop-14-07-2017">OSCOAP version implemented</a></h3>
+<h2 id="summary">Summary</h2>
+<p>This 4th interop was carried on before the IETF99. Four implementors participated: Christian, Jim, Martin and Malisa, with implementations based on OSCOAP v-04 (see [2]).</p>
+<p>The result is summarized in the table below:</p>
+<table style="width:76%;">
+<colgroup>
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">round</th>
+<th align="center">Client</th>
+<th align="center">Server</th>
+<th align="center">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><p><a href="#CMr">1</a></p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><p>Martin</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="even">
+<td align="center"><p><a href="#MlC">2</a></p></td>
+<td align="center"><p>Malisa</p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="odd">
+<td align="center"><p><a href="#MrC">3</a></p></td>
+<td align="center"><p>Martin</p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="even">
+<td align="center"><p><a href="#CMl">4</a></p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><p>Malisa</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="odd">
+<td align="center"><p><a href="#CJ">5</a></p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><p>Jim</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>The set of tests was run in parallel between most implementations. The outcome of each test during the run was marked as successful (passed) or not (failed) if the outcome was the one expected according to the test specification [1]. Christian has also captured the traffic and shared it with us, to allow for a more extensive analysis of the results.</p>
+<p>Test set 5 tests OSCOAP with Blockwise. Jim and Christian did not run Tests 1-15 since they were tested and passed during Interop 3. Also, it is worth noting that all tests marked as * in Interop 3 were run remotely between Interop 3 and Interop 4 and passed (3, 4, 5).</p>
+<p>For test set 2 and 4, many tests were skipped because of features non implemented in the CoAP implementation used, but the OSCOAP processing passed, so the test is considered successful.</p>
+<p>In short, this interop for OSCOAP was successful, with some implementations disagreements that provided good feedback and new input for the draft specification.</p>
+<h2 id="details">Details</h2>
+<h2 id="notes">notes:</h2>
+<p>Added one test: 15: ordinary CoAP request (without OSCOAP) to a resource that requires OSCOAP. Expects 4.01 Unauthorized response.</p>
+<h3 id="CMr">1. Client: Christian, Server: Martin</h3>
+<ul>
+<li>0. Passed after fixing the server's content format on the response that was not set correctly</li>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. Passed</li>
+<li>5. Invalid AEAD in the response, request sequence number (4.3.2.1. not well iplemented on Christian's side: observe takes the value of the seq)</li>
+<li>6. Failed, not enough space to create a resource. When flashed, passed.</li>
+<li>7. Passed*</li>
+<li>8. Passed*</li>
+<li>9. Skipped (Delete not supported)</li>
+<li>10. Failed (Token did not match, and error on server's side: finds the context when it should not)</li>
+<li>11. Passed*</li>
+<li>12. Passed</li>
+<li>13. Passed*</li>
+<li>14. Skipped</li>
+<li>15. Failed (not implemented on Server)</li>
+</ul>
+<p>Note: Martin's server sometimes did not send the response back (on Martin's side it looked like it was sent but Christian Client did not receive it) * CoAP issues in the response.</p>
+<h3 id="MlC">2. Client: Malisa, Server: Christian</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Skipped (CoAP features not implemented on client)</li>
+<li>3. Skipped (CoAP features not implemented on client)</li>
+<li>4. Skipped (CoAP features not implemented on client)</li>
+<li>5. Skipped (CoAP features not implemented on client)</li>
+<li>6. Passed</li>
+<li>7. Skipped (CoAP features not implemented on client)</li>
+<li>8. Skipped (CoAP features not implemented on client)</li>
+<li>9. Skipped (CoAP features not implemented on client)</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Skipped (CoAP features not implemented on server)</li>
+<li>15. Skipped (CoAP features not implemented on client)</li>
+</ul>
+<p>Test12: About the &quot;empty ack&quot;: the server is sending the response piggy-backed, so the client has no reason to send an empty ack back.</p>
+<h3 id="MrC">3. Client: Martin, Server: Christian</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. Skipped</li>
+<li>5. Skipped</li>
+<li>6. Passed</li>
+<li>7. Passed</li>
+<li>8. Passed</li>
+<li>9. Passed</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Passed</li>
+<li>15. Passed</li>
+</ul>
+<h3 id="CMl">4. Client: Christian, Server: Malisa</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Skipped (CoAP features not implemented on client)</li>
+<li>3. Skipped (CoAP features not implemented on client)</li>
+<li>4. Skipped (CoAP features not implemented on client)</li>
+<li>5. Skipped (CoAP features not implemented on client)</li>
+<li>6. Passed</li>
+<li>7. Skipped (CoAP features not implemented on client)</li>
+<li>8. Skipped (CoAP features not implemented on client)</li>
+<li>9. Skipped (CoAP features not implemented on client)</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Skipped (CoAP features not implemented on server)</li>
+<li>15. Skipped (CoAP features not implemented on client)</li>
+</ul>
+<p>What we found that's not tested: CoAP implementations that do not store seen message IDs and the responses (but rather trust that every request is idempotent), like the one under Malisa's OSCOAP implementation, create replay protection errors when a regular CoAP retransmission (eg. due to a lost response) happens.</p>
+<p>Another issue for the &quot;basic CoAP plug tests&quot; list is that tokens are not to be treated like integers, so leading zeros must not be stripped.</p>
+<h3 id="CJ">5. Client: Christian, Server: Jim</h3>
+<ul>
+<li>Inner Blockwise tested and passed: client GET to /LargeResource and is served back 5 blocks of size 512 Bytes (tot 2080 Bytes)</li>
+</ul>
+<h2 id="feedback-on-test-specifications-and-issues">Feedback on Test Specifications and Issues</h2>

@@ -1,0 +1,101 @@
+<h1 id="oscore-interop-7-report">OSCORE Interop 7 Report</h1>
+<p>Starting on 7th of Dec 2018, 09:00 CET (several days)</p>
+<h2 id="participants">Participants</h2>
+<ul>
+<li>Martin Gunnarsson</li>
+<li>Rikard Höglund</li>
+<li>Francesca Palombini</li>
+</ul>
+<h2 id="note-takers">Note takers</h2>
+<p>Francesca</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="test-specification-provided">[1]: <a href="test-spec5.html">Test specification provided</a></h3>
+<h3 id="oscore-version-implemented">[2]: <a href="https://tools.ietf.org/html/draft-ietf-core-object-security-15">OSCORE version implemented</a></h3>
+<h2 id="summary">Summary</h2>
+<p>This 7th interop was carried on after IETF103. Two implementers participated: Martin and Rikard, with implementations based on OSCORE v-15 (see [2]). Rikard participated with a Java implementation based on Californium CoAP, Martin with a C implementation based on Contiki.</p>
+<p>The result is summarized in the table below:</p>
+<table style="width:76%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">round</th>
+<th style="text-align: center;">Client</th>
+<th style="text-align: center;">Server</th>
+<th style="text-align: center;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><a href="#RM">1</a></td>
+<td style="text-align: center;">Rikard</td>
+<td style="text-align: center;">Martin</td>
+<td style="text-align: center;"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><a href="#MR">2</a></td>
+<td style="text-align: center;">Martin</td>
+<td style="text-align: center;">Rikard</td>
+<td style="text-align: center;"><pre><code> Passed</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>The outcome of each test during the run was marked as successful (passed), if the outcome was the one expected according to the test specification [1], not implemented, if either of the implementations did not implement or could not run the test, or failed, if the two implementations did not agree on the output of each test.</p>
+<!--
+The traffic was also captured and shared it with us, to allow for a more extensive analysis of the results.
+-->
+<p>Tests with Observe (5 to 7) were not completed, since the implementations do not have Observe implementations. Some tests did pass with some inconsistencies with the test specification, but the OSCORE outcome was the expected, so they are considered passed. In short, this interop for OSCORE was successful, and we will run a follow up interop to test the rest of the Observe code when that is added to the implementation. –&gt;</p>
+<h2 id="details">Details</h2>
+<h3 id="notes">notes:</h3>
+<p>Some time was taken initially to make the Java code run on Martin’s machine. Then some more time was taken to set up the environment (so that the compiler did not take all the warnings as errors). Then some time to make the border router work.</p>
+<h3 id="RM">1. Client: Rikard, Server: Martin</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Problem on the client to use the IPv6 string as URI to set up the context. Set up a local uri. Now the client works, the server fails in the option number. Then when that was fixed, decryption of request failed on the server, both client and server had wrong aad. After fixing that, and fixing the length on encrypt. After fixing a nonce problem in the response on the server side, Passed.</li>
+<li>2. Passed after implementing the different sec ctx on Server</li>
+<li>3. Passed</li>
+<li>4. Passed after fixing OSCORE option order on server</li>
+<li>5. Not implemented on client and server</li>
+<li>6. Not implemented on client and server</li>
+<li>7. Not implemented on client and server</li>
+<li>8. Passed</li>
+<li>9. Passed</li>
+<li>10. Paseed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Passed</li>
+<li>15. Passed</li>
+<li>16. Not implemented</li>
+<li>17. Passed</li>
+</ul>
+<h3 id="MR">2. Client: Martin, Server: Rikard</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. Passed</li>
+<li>5. Not implemented on client and server</li>
+<li>6. Not implemented on client and server</li>
+<li>7. Not implemented on client and server</li>
+<li>8. Passed</li>
+<li>9. Passed</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Passed</li>
+<li>15. Passed</li>
+<li>16. Passed</li>
+<li>17.Passed</li>
+</ul>
+<h2 id="feedback-on-test-specifications-and-issues">Feedback on Test Specifications and Issues</h2>
+<p>A point was reised on the test specifications:</p>
+<ul>
+<li>Test 14 specifies that an ACK should be sent. That is CoAP behavior independent from OSCORE, and it is not always the case that the ACK will be sent (see piggibacked response). An issue was created on OSCORE to fix the ambiguity between an error that comes from not recognizing OSCORE and an error that comes from OSCORE processing (same code 4.02): https://github.com/core-wg/oscoap/issues/254</li>
+</ul>

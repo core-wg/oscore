@@ -1,0 +1,75 @@
+<h1 id="oscoap-interop-recap">OSCOAP Interop Recap</h1>
+<p>27th of February 2017, 8:00-10:30 CET</p>
+<h2 id="participants">Participants</h2>
+<ul>
+<li>Christian Amsüss</li>
+<li>Jim Schaad</li>
+<li>Ludwig Seitz</li>
+<li>Mališa Vučinić</li>
+<li>Martin Gunnarsson</li>
+<li>Göran Selander</li>
+<li>Francesca Palombini</li>
+</ul>
+<h2 id="note-takers">Note takers</h2>
+<p>Francesca, Christian</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="test-specification-provided">[1]: <a href="https://github.com/EricssonResearch/OSCOAP/releases/tag/interop-27-02-2017">Test specification provided</a></h3>
+<h3 id="oscoap-version-implemented">[2]: <a href="https://github.com/core-wg/oscoap/releases/tag/interop-27-02-2017">OSCOAP version implemented</a></h3>
+<h2 id="summary">Summary</h2>
+<p>Because of the short timeslot and connectivity issues, only two implementations were tested: Christian's and Jim's. The set of tests was run on a first round with Jim's client and Christian's server, and on a second round with Jim's server and Christian's client. Jim and Christian have described the outcome of each test during the run as successful (passed) or not (failed) if the outcome was the one expected according to the test specification [1]. They have also captured the traffic and shared it with us, to allow for a more extensive analysis of the results.</p>
+<p>In short, the interop was successful, and the implementation could interact as expected, for the set of tests provided.</p>
+<h2 id="details">Details</h2>
+<h3 id="client-jims-server-christians">Client: Jim's, Server: Christian's</h3>
+<ul>
+<li>1. Initially failed because of difference sequence number type (byte vs int) in external_aad structure. After correction, passed</li>
+<li>2. A strange content-format was sent from server's side (0x46) for this and some of the following tests. OSCOAP behavior was as expected, though, so passed</li>
+<li>3. The client expected a different option than the one specified in <a href="#ref-1">[1]</a>. Considering that, OSCOAP behaved as expected, so passed</li>
+<li>4. Passed</li>
+<li>5. Passed</li>
+<li>6. Passed</li>
+<li>7. Passed</li>
+<li>8. and 9. were not exactly run as specified because too complicated to implement, but an equivalent of the tests was run (Client's context derivation was given a different master secret, creating a different sender key with same context identifier), so passed</li>
+<li>10. The test was unclear in the test specification, so it was skipped</li>
+<li>11. to 13. were skipped because it was not possible in the client implementation to modify the security context.</li>
+<li>14. Passed</li>
+<li>15. Passed (the behavior was recreated by restarting the server between 2 consequent requests)</li>
+<li>16. Passed</li>
+<li>17. Passed</li>
+</ul>
+<p>Additional tests:</p>
+<ul>
+<li>Deliberate modification to CoAP version number on client side: failed verification on server side, so passed.</li>
+<li>Client sends 2B sequence numbers: passed</li>
+<li>Client sends Uri_Query unprotected: server discards it, so passed.</li>
+<li>Client sends unknown Cid: passed</li>
+</ul>
+<h3 id="client-christians-server-jims">Client: Christian's, Server: Jim's</h3>
+<ul>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. (Strange content-format re-appeared) Passed</li>
+<li>5. Initial problem due to their dependence on test 4, but OSCOAP behavior as expected passed</li>
+<li>6. Passed</li>
+<li>7. Passed</li>
+<li>8. Passed, even though the behavior was slightly different from specified in <a href="#ref-1">[1]</a> the server sent volontarily an error response back to avoid CoAP retransmission.</li>
+<li>9. Passed, same as 8.</li>
+<li>10. Passed, same as 8.</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Passed</li>
+<li>15. Passed</li>
+<li>16. Was skipped, as it was not implemented on the server, since it was difficult to implement</li>
+<li>17. Passed with a minor modification on Uri-Path option</li>
+</ul>
+<h2 id="feedback-on-test-specification">Feedback on Test specification</h2>
+<ul>
+<li>Any of 8-9-10 and 11-12-13 is enough. For example instead of 8-9-10-11-12-13, only run 8 and 11, or 10 and 13. This would test the case where the contexts are incorrectly derived.</li>
+<li>Extra tests are needed if the sender ID is sent in the request</li>
+<li>There was discussion about the necessity of test 16, we should re-evaluate if this is not tested by the set of all the other tests</li>
+<li>Would be good to have one &quot;Test 0&quot; as an non-protected CoAP request, to test connectivity</li>
+<li>More guidance on behavior on CoAP level would have been appreciated (for example CoAP return codes) in the test specifications</li>
+<li>Some tests seemed dependent on the one before (for example, POST was supposed to create a resource that was used afterward), it would have been better to have independent tests, that would only depend on the request URI and method. Specify that the server must allow execution of the tests in any sequence.</li>
+<li>Consider specifying a resource on server side to reset the security context to run a specific test</li>
+</ul>

@@ -1,0 +1,50 @@
+<h1 id="oscoap-interop-recap">OSCOAP Interop Recap</h1>
+<p>26th of March 2017, 17:00-18:00 CET</p>
+<h2 id="participants">Participants</h2>
+<ul>
+<li>Christian Amsüss</li>
+<li>Jim Schaad</li>
+<li>Francesca Palombini</li>
+</ul>
+<h2 id="note-takers">Note takers</h2>
+<p>Francesca</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="test-specification-provided">[1]: <a href="https://github.com/EricssonResearch/OSCOAP/releases/tag/interop-27-02-2017">Test specification provided</a></h3>
+<h3 id="oscoap-version-implemented">[2]: <a href="https://github.com/core-wg/oscoap/releases/tag/interop-26-03-2017">OSCOAP version implemented</a></h3>
+<h2 id="summary">Summary</h2>
+<p>This second interop was carried on during the Hackathon for IETF98. Two implementations were tested: Christian's and Jim's on OSCOAP v-02 (see [2]). The set of tests was run on a first round with Jim's server and Christian's client, and on a second round with Jim's client and Christian's server. Jim and Christian have described the outcome of each test during the run as successful (passed) or not (failed) if the outcome was the one expected according to the test specification [1]. They have also captured the traffic and shared it with us, to allow for a more extensive analysis of the results.</p>
+<p>In short, the interop for OSCOAP was successful, and the implementation could interact as expected, for the set of tests provided.</p>
+<h2 id="details">Details</h2>
+<h2 id="notes">notes:</h2>
+<p>Compared to the verision in [2], the implementors proposed and implemented one more detail that was as a consequence added in later revisions in the draft: they moved the parameters in the protected COSE header to the unprotected COSE header. (See <a href="https://github.com/core-wg/oscoap/issues/107">issue #107</a>)</p>
+<h3 id="client-christians-server-jims">Client: Christian's, Server: Jim's</h3>
+<ul>
+<li>1. aad failure because no response back, with ipv6, with ipv4 there is a response, but aad doesnt decrypt properly. After comparing the external aad (Jim: 86-01-18-45-40-0C-46-63-6C-69-65-6E-74-41-01), Christian was using Sid of the server instead of client in the response aad. When that was fixed, the test passed.</li>
+<li>2. pass *</li>
+<li>3. pass *</li>
+<li>4. failed: weird debugging step was failing on jim's side. After commenting it, pass</li>
+<li>5. pass</li>
+<li>6. pass</li>
+<li>7. pass</li>
+<li>8. pass (invalid ciphertext)</li>
+<li>9. Christian's issue from implementation error. sender id and recipient id inversion</li>
+<li>10. pass</li>
+<li>14. pass on Chris, Jim sent an error while spec says no error back</li>
+</ul>
+<h3 id="client-jims-server-christians">Client: Jim's, Server: Christian's</h3>
+<ul>
+<li>1. pass</li>
+<li>2. pass</li>
+<li>3. pass (After correction of test implem (second=2) on Jim's side)</li>
+<li>4. pass</li>
+<li>5. pass</li>
+<li>6. pass</li>
+<li>7. pass</li>
+<li>8. pass (Error1 on Jim's side)</li>
+<li>9. pass</li>
+<li>10. pass</li>
+<li><p>14. pass</p></li>
+<li><p>disagree on what CoAP options to send back but oscoap passed</p></li>
+</ul>
+<h2 id="feedback-on-test-specifications">Feedback on Test Specifications</h2>
+<p>From Christian: we should add a case where role reversal actually happens, eg. &quot;Client POSTs to /reflect-my-color/, server responds with 2.01 and Location: /reflect-my-color/1, server GETs the client's /color and makes it available at /reflect-my-color/1, client GETs /reflect-my-color/1&quot;.</p>

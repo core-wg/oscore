@@ -1,0 +1,173 @@
+<h1 id="oscoap-interop-3-recap">OSCOAP Interop 3 Recap</h1>
+<p>8th of March 2017, 13:30-17:00 CET</p>
+<h2 id="participants">Participants</h2>
+<ul>
+<li>Christian Amsüss</li>
+<li>Jim Schaad</li>
+<li>Martin Gunnarsson</li>
+<li>Tobias Andersson</li>
+<li>Göran Selander</li>
+<li>Francesca Palombini</li>
+</ul>
+<h2 id="note-takers">Note takers</h2>
+<p>Francesca, Christian</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="test-specification-provided">[1]: <a href="test-spec2.html">Test specification provided</a></h3>
+<h3 id="oscoap-version-implemented">[2]: <a href="https://github.com/core-wg/oscoap/releases/tag/interop-08-05-2017">OSCOAP version implemented</a></h3>
+<h2 id="summary">Summary</h2>
+<p>This 3rd interop was carried on after the IETF98. Four implementors participated: Christian, Jim, Martin and Tobias, with implementations based on OSCOAP v-03 (see [2]).</p>
+<p>Jim and Christian implemented both server and client, while Martin only implemented a server and Tobias only a client.</p>
+<p>The result is summarized in the table below:</p>
+<table style="width:76%;">
+<colgroup>
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">round</th>
+<th align="center">Client</th>
+<th align="center">Server</th>
+<th align="center">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><p><a href="#TJ">1</a></p></td>
+<td align="center"><p>Tobias</p></td>
+<td align="center"><p>Jim</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="even">
+<td align="center"><p><a href="#CJ">2</a></p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><p>Jim</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+<tr class="odd">
+<td align="center"><p><a href="#CM">3*</a></p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><p>Martin</p></td>
+<td align="center"><p>Connection error</p></td>
+</tr>
+<tr class="even">
+<td align="center"><p><a href="#JM">4*</a></p></td>
+<td align="center"><p>Jim</p></td>
+<td align="center"><p>Martin</p></td>
+<td align="center"><p>Connection error</p></td>
+</tr>
+<tr class="odd">
+<td align="center"><p><a href="#TC">5*</a></p></td>
+<td align="center"><p>Tobias</p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><pre><code> Failed</code></pre></td>
+</tr>
+<tr class="even">
+<td align="center"><p><a href="#JC">6</a></p></td>
+<td align="center"><p>Jim</p></td>
+<td align="center"><p>Christian</p></td>
+<td align="center"><pre><code> Passed</code></pre></td>
+</tr>
+</tbody>
+</table>
+<p>* To be continued</p>
+<p>Martin's implementation had network issues. Test 5 could not be fixed by lack of time, so it stopped at the detection of the error.</p>
+<p>The set of tests was run in parallel between most implementations. The outcome of each test during the run was marked as successful (passed) or not (failed) if the outcome was the one expected according to the test specification [1]. Christian and Jim have also captured the traffic and shared it with us, to allow for a more extensive analysis of the results.</p>
+<p>In short, the interop for OSCOAP was mostly successful, with some implementations disagreements that provided good feedback and new input for the draft specification.</p>
+<h2 id="details">Details</h2>
+<h2 id="notes">notes:</h2>
+<p>(**) Test 12 is only correctly described for scenarios where the response is not piggibacked on the ACK. If that's the case, the client is not requested to send an ACK back in case of error.</p>
+<p>Added one test: 15: ordinary CoAP request (without OSCOAP) to a resource that requires OSCOAP. Expects 4.01 Unauthorized response.</p>
+<h3 id="TJ">1. Client: Tobias', Server: Jim's</h3>
+<ul>
+<li>0. Initially didn't pass for an error on the request URI used by the client (client did not receive any response), then created an error &quot;Bad request&quot; on the server side because of implementation error on server's side. After correction on client and server, passed</li>
+<li>1. Initially failed with &quot;decryption failed&quot; error for the response on the client side. The problem was an implementation mistake from the server, which did not send the first byte in the response (since it has value 0x0 for response without observe). After correction, passed.</li>
+<li>2. Passed</li>
+<li>3. Initially failed because of wrong request URI used by the client (client did not receive any response), after correction passed</li>
+<li>4. Passed</li>
+<li>5. Initially failed because of wrong request URI used by the client (client did not receive any response); after correction the client only got 1 response from the server with an observe option empty.</li>
+<li>6. Passed</li>
+<li>7. Initially failed (client received the wrong CoAP response) because of implementation error on server's etag value. After correction passed</li>
+<li>8. Passed</li>
+<li>9. Failed since the client did not implement the test correctly</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed (**)</li>
+<li>13. Passed (after server turned on replay protection)</li>
+<li>14. Not tested (not possible to implement on server's side)</li>
+<li>15. Passed</li>
+</ul>
+<h3 id="CJ">2. Client: Christian's, Server: Jim's</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. Initially failed: the request decryption failed on server's side. The error was an implementation error in the aad: empty observe option. After correction, passed</li>
+<li>5. Initially failed not sending observe, server is looking for inside observe. Fixed on Christian's side according to -03 4.3.2.1. Then failed because of the disagreement about flipped request-sequno used for the first response with observe (Christian understanding) vs uses its own sequence number even for the first response with observe (Jim's understanding)</li>
+<li>6. Passed with Location-Path is /hello/ instead of /hello/6 (test spec error)</li>
+<li>7. Passed</li>
+<li>8. Passed</li>
+<li>9. Passed</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed (after server turned on replay protection)</li>
+<li>14. Not tested (not possible to implement on server's side)</li>
+<li>15. Passed</li>
+</ul>
+<h3 id="CM">3. Client: Christian's, Server: Martin's</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. and following failed: initially failed for decryption error on server's side (server's implementation error: sender id used was wrong). After correction, responses do not get through but errors from retransmissions do.</li>
+</ul>
+<h3 id="JM">4. Client: Jim's, Server: Martin's</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. and following failed: responses do not get through but errors from retransmissions do.</li>
+</ul>
+<h3 id="TC">5. Client: Tobias', Server: Christian's</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed on client side, fails on server's side: the server detects an inner object-security option in the request that should not be there (implementation error on client's side)</li>
+<li>2-4. Same as above</li>
+<li>5. Passed for first response, but the second response triggered a client error in unpacking the compressed data; later failed due to disagreement whether the initial response can be a first-bit-flipped response to the original request or not (same problem as client:Christian-server:Jim for test 5)</li>
+</ul>
+<h3 id="JC">6. Client: Jim's, Server: Christian's</h3>
+<ul>
+<li>0. Passed</li>
+<li>1. Passed</li>
+<li>2. Passed</li>
+<li>3. Passed</li>
+<li>4. Initially failed because client used the wrong URI. After correction, passed</li>
+<li>5. Skipped because of the disagreement about flipped request-sequno used for the first response with observe (Christian understanding) vs uses its own sequence number even for the first response with observe (Jim's understanding)</li>
+<li>6. Passed</li>
+<li>7. Passed (Content-Format:0 option missing)</li>
+<li>8. Passed</li>
+<li>9. Passed</li>
+<li>10. Passed</li>
+<li>11. Passed</li>
+<li>12. Passed</li>
+<li>13. Passed</li>
+<li>14. Not tested (not possible to implement on server's side)</li>
+<li>15. Passed</li>
+</ul>
+<h2 id="feedback-on-test-specifications-and-issues">Feedback on Test Specifications and Issues</h2>
+<ul>
+<li>Test 8: error on test specifications, the request payload is different 8a-8b</li>
+<li>Test 14 is not possible to test on most servers.</li>
+<li>Test 12 is only correctly described for scenarios where the response is not piggibacked on the ACK. If that's the case, the client is not requested to send an ACK back in case of error.</li>
+<li>New <a href="https://github.com/core-wg/oscoap/issues/107">issue #127</a>: What should the responses to GET seqno=::07 observe be?
+<ul>
+<li>2.05 seqno=implied 80::07 &quot;1&quot;, 2.05 seqno=::01 &quot;2&quot;, ...</li>
+<li>2.05 seqno=::01 &quot;1&quot;, 2.05 seqno=::02 &quot;2&quot;, ...</li>
+<li>Christian, Jim: &quot;Accepting both would make sense&quot;
+<ul>
+<li>Christian: esp. w/rt to upcoming multicast applications</li>
+<li>Christian (later note): Might also be useful for clients that can't afford message deduplication. If my constrained server receives a CON again after having sent the payload in an ACK, the response might have gotten lost. Instead of memorizing the response in full or making very sure I produce the very same bytes again, I could just send a (now current) response again, but as I've already used the flipped-space partial IV, I have to use one of my own seqnos.</li>
+</ul></li>
+</ul></li>
+<li>A number of other issues were created following this interop: <a href="https://github.com/core-wg/oscoap/issues/107">issue #131</a> <a href="https://github.com/core-wg/oscoap/issues/107">issue #132</a> <a href="https://github.com/core-wg/oscoap/issues/107">issue #133</a></li>
+</ul>
